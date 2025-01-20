@@ -5,8 +5,6 @@ import styled from 'styled-components';
 import Btn from '../../util/Btn';
 import Pagination from '../../util/Pagination';
 
-const ContentDiv = styled.div``;
-
 const BottomDiv = styled.div`
   display: flex;
   margin: 30px 50px 50px 50px;
@@ -15,19 +13,17 @@ const BottomDiv = styled.div`
 `;
 
 const Board = () => {
-  const dummyData = [
-    { id: 12, category: '병원', title: '제목11111111111111111', votes: 15, author: '홍길동', date: '2025-01-18' },
-    { id: 11, category: '보험', title: '제목222222222222222222', votes: 25, author: '홍길동', date: '2025-01-18' },
-    { id: 10, category: '생활', title: '제목333333333333333333', votes: 36, author: '홍길동', date: '2025-01-18' },
-    { id: 9, category: '생활', title: '제목333333333333333333', votes: 36, author: '홍길동', date: '2025-01-18' },
-    { id: 8, category: '병원', title: '제목11111111111111111', votes: 15, author: '홍길동', date: '2025-01-18' },
-    { id: 7, category: '보험', title: '제목222222222222222222', votes: 25, author: '홍길동', date: '2025-01-18' },
-    { id: 6, category: '생활', title: '제목333333333333333333', votes: 36, author: '홍길동', date: '2025-01-18' },
-    { id: 5, category: '생활', title: '제목333333333333333333', votes: 36, author: '홍길동', date: '2025-01-18' },
-    { id: 4, category: '생활', title: '제목333333333333333333', votes: 36, author: '홍길동', date: '2025-01-18' },
-    { id: 3, category: '생활', title: '제목333333333333333333', votes: 36, author: '홍길동', date: '2025-01-18' },
-    { id: 2, category: '생활', title: '제목333333333333333333', votes: 36, author: '홍길동', date: '2025-01-18' },
-    { id: 1, category: '생활', title: '제목333333333333333333', votes: 36, author: '홍길동', date: '2025-01-18' },
+  const dummyDataVo = [
+    { no: 10, category: '생활', title: '제목333333333333333333', votes: 36, writer: '홍길동', date: '2025-01-18' },
+    { no: 9, category: '생활', title: '제목333333333333333333', votes: 36, writer: '홍길동', date: '2025-01-18' },
+    { no: 8, category: '병원', title: '제목11111111111111111', votes: 15, writer: '홍길동', date: '2025-01-18' },
+    { no: 7, category: '보험', title: '제목222222222222222222', votes: 25, writer: '홍길동', date: '2025-01-18' },
+    { no: 6, category: '생활', title: '제목333333333333333333', votes: 36, writer: '홍길동', date: '2025-01-18' },
+    { no: 5, category: '생활', title: '제목333333333333333333', votes: 36, writer: '홍길동', date: '2025-01-18' },
+    { no: 4, category: '생활', title: '제목333333333333333333', votes: 36, writer: '홍길동', date: '2025-01-18' },
+    { no: 3, category: '생활', title: '제목333333333333333333', votes: 36, writer: '홍길동', date: '2025-01-18' },
+    { no: 2, category: '생활', title: '제목333333333333333333', votes: 36, writer: '홍길동', date: '2025-01-18' },
+    { no: 1, category: '생활', title: '제목333333333333333333', votes: 36, writer: '홍길동', date: '2025-01-18' },
   ];
 
   return (
@@ -45,14 +41,18 @@ const Board = () => {
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>3</td>
-            <td>병원</td>
-            <td>제목11111111111111111</td>
-            <td>15</td>
-            <td>홍길동</td>
-            <td>2025-01-18</td>
-          </tr>
+          {dummyDataVo.map((vo) => {
+            return (
+              <tr key={vo.no}>
+                <td>{vo.no}</td>
+                <td>{vo.category}</td>
+                <td>{vo.title}</td>
+                <td>{vo.votes}</td>
+                <td>{vo.writer}</td>
+                <td>{vo.date}</td>
+              </tr>
+            );
+          })}
         </tbody>
       </BoardList>
       <BottomDiv>
