@@ -29,14 +29,16 @@ const ClearIcon = styled.span`
 `;
 
 const SearchInput = styled.input`
-  padding: 10px 10px 10px 40px; /* 왼쪽 여백을 이모지 크기만큼 추가 */
+  padding: 10px 10px 10px 40px;
   font-size: 16px;
   border: 1px solid #ccc;
   border-radius: 20px;
-  width: 300px;
+  width: ${(props) => {
+    return props.w;
+  }};
 `;
 
-const SearchBar = ({ onSearch }) => {
+const SearchBar = ({ onSearch, w }) => {
   const [query, setQuery] = useState('');
 
   const handleInputChange = (event) => {
@@ -64,7 +66,7 @@ const SearchBar = ({ onSearch }) => {
             />
           </svg>
         </SearchIcon>
-        <SearchInput type="text" placeholder="검색어를 입력하세요" value={query} onChange={handleInputChange} />
+        <SearchInput w={w} type="text" placeholder="검색어를 입력하세요" value={query} onChange={handleInputChange} />
         <ClearIcon onClick={handleClearClick}>
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path
