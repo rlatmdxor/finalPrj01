@@ -1,6 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
 
+const LayoutDiv = styled.div`
+  display: flex;
+  margin: 20px 50px;
+`;
+
 const StyledTable = styled.table`
   width: ${(props) => props.width || '100%'};
   border-collapse: separate;
@@ -44,7 +49,7 @@ const StyledTable = styled.table`
 
 const BoardList = ({ children, width, thbgcolor, thtextcolor, thtextsize, tdbgcolor, tdtextcolor, tdtextsize }) => {
   return (
-    <>
+    <LayoutDiv>
       <StyledTable
         width={width}
         thbgcolor={thbgcolor}
@@ -56,7 +61,7 @@ const BoardList = ({ children, width, thbgcolor, thtextcolor, thtextsize, tdbgco
       >
         {children}
       </StyledTable>
-    </>
+    </LayoutDiv>
   );
 };
 
