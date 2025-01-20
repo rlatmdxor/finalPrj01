@@ -6,6 +6,10 @@ const SearchWrapper = styled.div`
   align-items: center;
   justify-content: center;
   padding: 10px;
+  margin-bottom: ${({ mb }) => (mb ? `${mb}px` : '0')};
+  margin-top: ${({ mt }) => (mt ? `${mt}px` : '0')};
+  margin-left: ${({ ml }) => (ml ? `${ml}px` : '0')};
+  margin-right: ${({ mr }) => (mr ? `${mr}px` : '0')};
 `;
 
 const SearchInputWrapper = styled.div`
@@ -17,7 +21,6 @@ const SearchInputWrapper = styled.div`
 const SearchIcon = styled.span`
   position: absolute;
   left: 15px;
-  top: 8px;
   cursor: pointer;
 `;
 
@@ -29,16 +32,16 @@ const ClearIcon = styled.span`
 `;
 
 const SearchInput = styled.input`
+  box-sizing: border-box;
   padding: 10px 10px 10px 40px;
   font-size: 16px;
   border: 1px solid #ccc;
   border-radius: 20px;
-  width: ${(props) => {
-    return props.w;
-  }};
+  width: ${({ w }) => (w ? `${w}px` : '300px')};
+  height: ${({ h }) => (h ? `${h}px` : '40px')};
 `;
 
-const SearchBar = ({ onSearch, w }) => {
+const SearchBar = ({ onSearch, w, h, mb, mt, ml, mr }) => {
   const [query, setQuery] = useState('');
 
   const handleInputChange = (event) => {
@@ -54,7 +57,7 @@ const SearchBar = ({ onSearch, w }) => {
   };
 
   return (
-    <SearchWrapper>
+    <SearchWrapper mt={mt} mb={mb} ml={ml} mr={mr}>
       <SearchInputWrapper>
         <SearchIcon onClick={handleSearchClick}>
           <svg width="12" height="12" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -66,7 +69,14 @@ const SearchBar = ({ onSearch, w }) => {
             />
           </svg>
         </SearchIcon>
-        <SearchInput w={w} type="text" placeholder="검색어를 입력하세요" value={query} onChange={handleInputChange} />
+        <SearchInput
+          w={w}
+          h={h}
+          type="text"
+          placeholder="검색어를 입력하세요"
+          value={query}
+          onChange={handleInputChange}
+        />
         <ClearIcon onClick={handleClearClick}>
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path
