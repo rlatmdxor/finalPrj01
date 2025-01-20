@@ -1,7 +1,14 @@
-import "./App.css";
+import { Provider } from 'react-redux';
+import './App.css';
+import HomePage from './components/home/HomePage';
+import store from './redux/store';
 
 function App() {
-  return <>1</>;
+  return (
+    <Provider store={store}>
+      <HomePage></HomePage>
+    </Provider>
+  );
 }
 
 export default App;

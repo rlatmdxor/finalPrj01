@@ -1,7 +1,10 @@
-import React from 'react';
+import { configureStore } from '@reduxjs/toolkit';
+import menuReducer from './menuSlice';
 
-const store = () => {
-  return <div></div>;
-};
+const store = configureStore({
+  reducer: {
+    menu: menuReducer,
+  },
+});
 
 export default store;
