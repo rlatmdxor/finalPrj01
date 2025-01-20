@@ -13,19 +13,19 @@ const StyledTable = styled.table`
   overflow: hidden;
 
   & th {
-    background-color: ${(props) => props.thBgColor || '#BAD8B6'};
-    color: ${(props) => props.thTextColor || '#24292f'};
+    background-color: ${(props) => props.thbgcolor || '#BAD8B6'};
+    color: ${(props) => props.thtextcolor || '#24292f'};
     font-weight: 600;
     padding: 12px 15px;
-    font-size: ${(props) => props.thTextSize || '14px'};
+    font-size: ${(props) => props.thtextsize || '14px'};
     border: 1px solid #fafafa;
   }
 
   & td {
-    background-color: ${(props) => props.tdBgColor || '#ffffff'};
-    color: ${(props) => props.tdTextColor || '#393e44'};
+    background-color: ${(props) => props.tdbgcolor || '#ffffff'};
+    color: ${(props) => props.tdtextcolor || '#393e44'};
     padding: 12px 15px;
-    font-size: ${(props) => props.tdTextSize || '14px'};
+    font-size: ${(props) => props.tdtextsize || '14px'};
     border: 1px solid #d0d7de;
   }
 
@@ -34,17 +34,17 @@ const StyledTable = styled.table`
   }
 `;
 
-const Table = ({ children, width, thBgColor, thTextColor, thTextSize, tdBgColor, tdTextColor, tdTextSize }) => {
+const Table = ({ children, width, thbgcolor, thtextcolor, thtextsize, tdbgcolor, tdtextcolor, tdtextsize }) => {
   return (
     <>
       <StyledTable
         width={width}
-        thBgColor={thBgColor}
-        thTextColor={thTextColor}
-        thTextSize={thTextSize}
-        tdBgColor={tdBgColor}
-        tdTextColor={tdTextColor}
-        tdTextSize={tdTextSize}
+        thbgcolor={thbgcolor}
+        thtextcolor={thtextcolor}
+        thtextsize={thtextsize}
+        tdbgcolor={tdbgcolor}
+        tdtextcolor={tdtextcolor}
+        tdtextsize={tdtextsize}
       >
         {children}
       </StyledTable>
