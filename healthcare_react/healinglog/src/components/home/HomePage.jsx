@@ -11,10 +11,10 @@ import { routes } from '../../routes';
 
 const Layout = styled.div`
   display: grid;
-  width: 1920px;
+  width: 100%;
 
   grid-template-columns: 1fr 5fr 1fr;
-  grid-template-rows: 110px fr;
+  grid-template-rows: 110px 1fr;
 `;
 
 const MainContainer = styled.div`

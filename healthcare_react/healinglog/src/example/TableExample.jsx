@@ -12,7 +12,7 @@ const TableExample = () => {
   return (
     <Layout>
       <h1>게시글 리스트</h1>
-      <BoardList>
+      <BoardList width="" thBgColor="" thTextColor="" thTextSize="" tdBgColor="" tdTextColor="" tdTextSize="">
         <thead>
           <tr>
             <th>번호</th>
@@ -53,7 +53,7 @@ const TableExample = () => {
 
       <h1>표</h1>
 
-      <Table width="" thBgColor="">
+      <Table width="" thBgColor="" thTextColor="" thTextSize="" tdBgColor="" tdTextColor="" tdTextSize="">
         <thead>
           <tr>
             <th>일자</th>
@@ -92,7 +92,7 @@ const TableExample = () => {
         </tbody>
       </Table>
 
-      <Table width="" thBgColor="">
+      <Table>
         <thead>
           <tr>
             <th colSpan="2">측정일</th>
@@ -141,7 +141,7 @@ const TableExample = () => {
         </tbody>
       </Table>
 
-      <Table width="" thBgColor="">
+      <Table>
         <thead>
           <tr>
             <th colSpan="4">닉네임 님의 현재 복용약</th>
