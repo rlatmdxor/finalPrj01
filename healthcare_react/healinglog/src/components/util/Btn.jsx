@@ -15,15 +15,11 @@ const CommonBtn = styled.button`
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  margin-bottom: ${({ mb }) => (mb ? `${mb}px` : '0')};
-  margin-top: ${({ mt }) => (mt ? `${mt}px` : '0')};
-  margin-left: ${({ ml }) => (ml ? `${ml}px` : '0')};
-  margin-right: ${({ mr }) => (mr ? `${mr}px` : '0')};
 `;
 
-const Btn = ({ str, f, c, fc, w, h, mb, mt, ml, mr, fs }) => {
+const Btn = ({ str, f, c, fc, w, h, fs }) => {
   return (
-    <CommonBtn onClick={f} c={c} fc={fc} fs={fs} w={w} h={h} mb={mb} mt={mt} ml={ml} mr={mr}>
+    <CommonBtn onClick={f} c={c} fc={fc} fs={fs} w={w} h={h}>
       {str}
     </CommonBtn>
   );
