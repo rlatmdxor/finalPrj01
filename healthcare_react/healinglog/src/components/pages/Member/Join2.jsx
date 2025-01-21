@@ -1,16 +1,22 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Title from '../../util/Title';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import Btn from '../../util/Btn';
 
 const Join2 = () => {
+  const [inputValue, setInputValue] = useState('');
+  const handleInputChange = (event) => {
+    setInputValue(event.target.value);
+  };
+  const theme = useTheme();
+  const isSubmitEnabled = 1;
   return (
     <>
       <Container>
         <Title>회원가입</Title>
         <InputContainer>
           <InputTitle>아이디</InputTitle>
-          <JoinInput placeholder="value" value={''}></JoinInput>
+          <JoinInput placeholder="value" className="id" value={inputValue} onChange={handleInputChange}></JoinInput>
           <InputTitle>비밀번호</InputTitle>
           <JoinInput placeholder="value" value={''}></JoinInput>
           <InputTitle>닉네임</InputTitle>
@@ -36,9 +42,29 @@ const Join2 = () => {
           <InputTitle>프로필 (선택)</InputTitle>
           <ProfileContainer>
             <ProfileImg src="/img/profile.jpg"></ProfileImg>
-            <Btn></Btn>
-            <Btn></Btn>
+            <BtnContainer>
+              <Btn w={'100'} h={'50'} c={theme.orange} str="등록" fc={'white'} />
+            </BtnContainer>
+            <BtnContainer>
+              <Btn w={'100'} h={'50'} c={theme.gray} str="삭제" />
+            </BtnContainer>
           </ProfileContainer>
+          <BlankSpace />
+          <Btn
+            type="submit"
+            w={'450'}
+            h={'60'}
+            fs={'20'}
+            str="회원가입"
+            fc={'white'}
+            c={() => {
+              if (isSubmitEnabled) {
+                return theme.green;
+              } else {
+                return theme.gray;
+              }
+            }}
+          />
         </InputContainer>
       </Container>
     </>
@@ -56,6 +82,7 @@ const InputContainer = styled.form`
   justify-content: center;
   align-items: center;
   margin-top: 100px;
+  margin-bottom: 100px;
 `;
 
 const InputTitle = styled.div`
@@ -83,10 +110,19 @@ const JoinInput = styled.input`
 
 const ProfileContainer = styled.div`
   display: grid;
-  grid-template-columns: 250px 1fr 1fr;
+  grid-template-columns: 200px 1fr 1fr;
+  margin-top: 10px;
 `;
 
 const ProfileImg = styled.img`
-  width: 125px;
-  height: 125px;
+  width: 150px;
+  height: 150px;
 `;
+
+const BtnContainer = styled.div`
+  display: grid;
+  justify-content: end;
+  align-content: end;
+`;
+
+const SubmitBtn = styled.input``;
