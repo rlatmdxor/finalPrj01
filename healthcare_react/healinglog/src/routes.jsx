@@ -1,3 +1,4 @@
+import AdminLogin from './components/admin/AdminLogin';
 import Main from './components/home/Main';
 import Board from './components/pages/Board/Board';
 import DashBoard from './components/pages/Board/DashBoard';
@@ -44,4 +45,5 @@ export const routes = [
   { path: '/findpwd', component: <FindPwdPage /> },
   { path: '/join', component: <Join /> },
   { path: '/join2', component: <Join2 /> },
+  { path: '/admin/login', component: <AdminLogin /> },
 ];

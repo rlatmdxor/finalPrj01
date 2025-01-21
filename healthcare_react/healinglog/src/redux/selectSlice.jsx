@@ -1,19 +1,21 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-const initialState = {
-  order: '최신순', // 기본 정렬 기준
-  options: ['최신순', '오래된순', '추천순', '별점순', '조회순'], // 정렬 옵션 리스트
-};
-
 const selectSlice = createSlice({
   name: 'select',
-  initialState,
+  initialState: {
+    alcohol: '', // 음주
+    smoking: '', // 흡연 << 아래에 추가해서 가져다 쓰기
+  },
   reducers: {
-    setOrder(state, action) {
-      state.order = action.payload; // 선택된 정렬 기준 업데이트
+    setSelection: (state, action) => {
+      const { category, index, value } = action.payload;
+      if (!state[category]) {
+        state[category] = []; // 상태가 없으면 배열 초기화
+      }
+      state[category][index] = value;
     },
   },
 });
 
-export const { setOrder } = selectSlice.actions;
+export const { setSelection } = selectSlice.actions;
 export default selectSlice.reducer;
