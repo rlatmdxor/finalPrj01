@@ -11,6 +11,7 @@ const CommonBtn = styled.button`
   border-radius: 15px;
   border: none;
   font-size: ${({ fs }) => (fs ? `${fs}px` : '17px')};
+  font-weight: bold;
   color: ${({ fc }) => (fc ? `${fc}` : 'black')};
   align-items: center;
   justify-content: center;
