@@ -9,7 +9,8 @@ const Wrapper = styled.div`
 `;
 
 const Select = styled.select`
-  width: 200px;
+  width: 160px;
+  height: 40px;
   padding: 8px;
   margin-right: 10px;
   border: 1px solid #ccc;
@@ -26,9 +27,12 @@ const Label = styled.label`
   margin-right: 10px;
 `;
 
-const SelectBar = ({ label, options, reduxAction, index }) => {
+const SelectedBar = ({ label, options, reduxAction, index }) => {
   const dispatch = useDispatch();
-  const selectedValue = useSelector((state) => (state.selection[label] ? state.selection[label][index] : options[0]));
+  // const selectedValue = useSelector((state) => (state.selection[label] ? state.selection[label][index] : options[0]));
+  const selectedValue = useSelector((state) =>
+    state.selection[label] && state.selection[label][index] !== undefined ? state.selection[label][index] : ''
+  );
 
   const handleChange = (e) => {
     dispatch(reduxAction({ category: label, index, value: e.target.value }));
@@ -36,7 +40,10 @@ const SelectBar = ({ label, options, reduxAction, index }) => {
 
   return (
     <Wrapper>
-      <Label>{/* {label} {index + 1} */}</Label>
+      {/* <Label>
+        {label} {index + 1}
+      </Label> */}
+
       <Select value={selectedValue} onChange={handleChange}>
         {options.map((option, idx) => (
           <option key={idx} value={option}>
@@ -48,4 +55,4 @@ const SelectBar = ({ label, options, reduxAction, index }) => {
   );
 };
 
-export default SelectBar;
+export default SelectedBar;
