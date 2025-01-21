@@ -16,6 +16,7 @@ import Sleep from './components/pages/LivingHealth/Sleep/Sleep';
 import FindIdPage from './components/pages/Member/FindIdPage';
 import FindPwdPage from './components/pages/Member/FindPwdPage';
 import Join from './components/pages/Member/Join';
+import Join2 from './components/pages/Member/Join2';
 import LoginPage from './components/pages/Member/LoginPage';
 import Mypage from './components/pages/Member/Mypage';
 import Notice from './components/pages/Notice/Notice';
@@ -42,4 +43,5 @@ export const routes = [
   { path: '/findid', component: <FindIdPage /> },
   { path: '/findpwd', component: <FindPwdPage /> },
   { path: '/join', component: <Join /> },
+  { path: '/join2', component: <Join2 /> },
 ];
