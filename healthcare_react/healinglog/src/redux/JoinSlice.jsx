@@ -1,4 +1,3 @@
-// features/JoinSlice.js
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
@@ -11,7 +10,7 @@ const initialState = {
   residentNum: '',
   height: '',
   weight: '',
-  profile: '',
+  profile: '/img/profile.jpg',
 };
 
 const JoinSlice = createSlice({
