@@ -1,17 +1,15 @@
 import React from 'react';
 import styled from 'styled-components';
 
-const LayoutDiv = styled.div`
-  display: flex;
-  margin: 20px 50px;
-`;
-
 const StyledTable = styled.table`
   width: ${(props) => props.width || '100%'};
-  border-collapse: separate;
+  border-collapse: collapse;
   border-spacing: 0;
   text-align: center;
   border: 1px solid #d0d7de;
+  outline: 1px solid #d0d7de;
+  outline-offset: -2px;
+  border-radius: ${(props) => props.radius || '6px'};
   overflow: hidden;
 
   & th {
@@ -20,8 +18,7 @@ const StyledTable = styled.table`
     font-weight: 600;
     padding: 12px 15px;
     font-size: ${(props) => props.thtextsize || '14px'};
-    border-right: 1px solid #fafafa;
-    border-bottom: 1px solid #fafafa;
+    border: 1px solid #fafafa;
   }
 
   & td {
@@ -29,17 +26,7 @@ const StyledTable = styled.table`
     color: ${(props) => props.tdtextcolor || '#393e44'};
     padding: 12px 15px;
     font-size: ${(props) => props.tdtextsize || '14px'};
-    border-bottom: 1px solid #d0d7de;
-    border-right: 1px solid #d0d7de;
-  }
-
-  & tr:last-child td {
-    border-bottom: none;
-  }
-
-  & th:last-child,
-  & td:last-child {
-    border-right: none;
+    border: 1px solid #d0d7de;
   }
 
   & tr:hover td {
@@ -47,11 +34,22 @@ const StyledTable = styled.table`
   }
 `;
 
-const BoardList = ({ children, width, thbgcolor, thtextcolor, thtextsize, tdbgcolor, tdtextcolor, tdtextsize }) => {
+const RadiusTable = ({
+  children,
+  width,
+  radius,
+  thbgcolor,
+  thtextcolor,
+  thtextsize,
+  tdbgcolor,
+  tdtextcolor,
+  tdtextsize,
+}) => {
   return (
-    <LayoutDiv>
+    <>
       <StyledTable
         width={width}
+        radius={radius}
         thbgcolor={thbgcolor}
         thtextcolor={thtextcolor}
         thtextsize={thtextsize}
@@ -61,8 +59,8 @@ const BoardList = ({ children, width, thbgcolor, thtextcolor, thtextsize, tdbgco
       >
         {children}
       </StyledTable>
-    </LayoutDiv>
+    </>
   );
 };
 
-export default BoardList;
+export default RadiusTable;
