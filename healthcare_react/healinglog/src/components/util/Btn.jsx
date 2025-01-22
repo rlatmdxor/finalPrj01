@@ -11,19 +11,16 @@ const CommonBtn = styled.button`
   border-radius: 15px;
   border: none;
   font-size: ${({ fs }) => (fs ? `${fs}px` : '17px')};
+  font-weight: bold;
   color: ${({ fc }) => (fc ? `${fc}` : 'black')};
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  margin-bottom: ${({ mb }) => (mb ? `${mb}px` : '0')};
-  margin-top: ${({ mt }) => (mt ? `${mt}px` : '0')};
-  margin-left: ${({ ml }) => (ml ? `${ml}px` : '0')};
-  margin-right: ${({ mr }) => (mr ? `${mr}px` : '0')};
 `;
 
-const Btn = ({ str, f, c, fc, w, h, mb, mt, ml, mr, fs }) => {
+const Btn = ({ type, str, f, c, fc, w, h, fs }) => {
   return (
-    <CommonBtn onClick={f} c={c} fc={fc} fs={fs} w={w} h={h} mb={mb} mt={mt} ml={ml} mr={mr}>
+    <CommonBtn type={type || 'button'} onClick={f} c={c} fc={fc} fs={fs} w={w} h={h}>
       {str}
     </CommonBtn>
   );
