@@ -1,18 +1,20 @@
 import React, { useEffect } from 'react';
 import Title from '../../util/Title';
-import BoardList from '../../common/BoardList';
 import styled from 'styled-components';
 import Btn from '../../util/Btn';
 import Pagination from '../../util/Pagination';
 import { useSelector, useDispatch } from 'react-redux';
 import { setTotalCount, resetPaging } from '../../../redux/pagingSlice';
+import SearchBar from '../../util/SearchBar';
+import SelectedBar from '../../util/SelectedBar';
+import Table from '../../util/Table';
 
 const SearchDiv = styled.div`
   display: flex;
   gap: 10px;
   justify-content: end;
   align-items: center;
-  margin: 20px 50px;
+  margin: 5px 50px;
 `;
 
 const BottomDiv = styled.div`
@@ -109,14 +111,19 @@ const Board = () => {
   const offset = (currentPage - 1) * boardLimit;
   const data = dataVoList.slice(offset, offset + boardLimit);
 
+  const order = {
+    label: '정렬',
+    options: ['최신순', '추천수많은순'],
+  };
+
   return (
     <div>
       <Title>꿀팁게시판</Title>
       <SearchDiv>
-        <div>zzz</div>
-        <div>zzz</div>
+        <SelectedBar label={order.label} options={order.options} />
+        <SearchBar />
       </SearchDiv>
-      <BoardList>
+      <Table>
         <thead>
           <tr>
             <th>번호</th>
@@ -146,7 +153,7 @@ const Board = () => {
             );
           })}
         </tbody>
-      </BoardList>
+      </Table>
       <BottomDiv>
         <div></div>
         <div>

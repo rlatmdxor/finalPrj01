@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
 import Title from '../../util/Title';
-import BoardList from '../../common/BoardList';
 import styled from 'styled-components';
 import Btn from '../../util/Btn';
 import Pagination from '../../util/Pagination';
 import { useSelector, useDispatch } from 'react-redux';
 import { setTotalCount, resetPaging } from '../../../redux/pagingSlice';
+import Table from '../../util/Table';
 
 const SearchDiv = styled.div`
   display: flex;
@@ -62,7 +62,7 @@ const HospitalReview = () => {
         <div>zzz</div>
         <div>zzz</div>
       </SearchDiv>
-      <BoardList>
+      <Table>
         <thead>
           <tr>
             <th>번호</th>
@@ -92,7 +92,7 @@ const HospitalReview = () => {
             );
           })}
         </tbody>
-      </BoardList>
+      </Table>
       <BottomDiv>
         <div></div>
         <div>
