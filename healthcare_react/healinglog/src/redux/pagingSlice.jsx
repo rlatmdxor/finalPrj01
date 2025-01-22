@@ -9,6 +9,7 @@ const pagingSlice = createSlice({
     currentPage: 1,
     startPage: 1,
     endPage: 5,
+    maxPage: 1,
   },
   reducers: {
     setTotalCount: (state, action) => {
@@ -21,14 +22,13 @@ const pagingSlice = createSlice({
           currentPage: 1,
           startPage: 1,
           endPage: 5,
+          maxPage: 1,
         };
       }
       const boardState = state[boardType];
       boardState.totalCount = totalCount;
-      boardState.endPage = Math.min(
-        boardState.startPage + boardState.pageLimit - 1,
-        Math.ceil(state.totalCount / state.boardLimit)
-      );
+      boardState.maxPage = Math.ceil(boardState.totalCount / boardState.boardLimit);
+      boardState.endPage = Math.min(boardState.startPage + boardState.pageLimit - 1, boardState.maxPage);
     },
 
     pageChange: (state, action) => {
@@ -97,6 +97,7 @@ const pagingSlice = createSlice({
           currentPage: 1,
           startPage: 1,
           endPage: 5,
+          maxPage: 1,
         };
       }
       const boardState = state[boardType];
