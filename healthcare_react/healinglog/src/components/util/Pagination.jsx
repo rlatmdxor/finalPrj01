@@ -55,8 +55,9 @@ const Pagination = ({ boardType }) => {
 
   const pageNumber = [];
   const maxpage = Math.ceil(totalCount / boardLimit);
+  const adjustedEndPage = Math.min(endPage, maxpage);
 
-  for (let i = startPage; i <= maxpage; i++) {
+  for (let i = startPage; i <= adjustedEndPage; i++) {
     pageNumber.push(i);
   }
 
