@@ -33,7 +33,13 @@ const Alc = () => {
       <Box>
         <Calendar></Calendar>
       </Box>
-      <SelectedBar label="alcohol" options={['소주', '맥주', '막걸리', '와인']} reduxAction={setSelection} index={0} />
+      <SelectedBar
+        label="alcohol"
+        options={['소주', '맥주', '막걸리', '와인']}
+        reduxAction={setSelection}
+        index={0}
+        margin="500px 10px"
+      />
       <SelectedBar label="alcohol" options={['주 1회', '주 2~3회', '매일']} reduxAction={setSelection} index={1} />
 
       <Modal></Modal>
