@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import Title from '../../util/Title';
-import LoginInput from '../../util/Input';
+import LoginInput from '../../util/LoginInput';
 
 const Layout = styled.div`
   margin-top: 100px;
