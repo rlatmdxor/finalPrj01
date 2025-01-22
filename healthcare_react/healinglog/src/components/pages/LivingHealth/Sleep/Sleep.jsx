@@ -4,7 +4,7 @@ import Chart from '../../../util/Chart';
 import styled from 'styled-components';
 import Btn from '../../../util/Btn';
 import Modal from '../../../util/Modal';
-import ModalInput from '../../../util/ModalInput';
+import InputTag from '../../../util/Input';
 import { useDispatch } from 'react-redux';
 import { open } from '../../../../redux/modalSlice';
 
@@ -51,10 +51,10 @@ const Sleep = () => {
   return (
     <div>
       <Modal title="수면">
-        <ModalInput type="date" plcaeholder="날짜" title="날짜"></ModalInput>
-        <ModalInput type="time" plcaeholder="시작 시간" title="수면 시작 시간"></ModalInput>
-        <ModalInput type="time" plcaeholder="시작 시간" title="수면 시작 시간"></ModalInput>
-        <ModalInput type="time" plcaeholder="시작 시간" title="수면 시작 시간"></ModalInput>
+        <InputTag type="date" plcaeholder="날짜" title="날짜"></InputTag>
+        <InputTag type="time" plcaeholder="시작 시간" title="수면 시작 시간"></InputTag>
+        <InputTag type="time" plcaeholder="시작 시간" title="수면 시작 시간"></InputTag>
+        <InputTag type="time" plcaeholder="시작 시간" title="수면 시작 시간"></InputTag>
       </Modal>
       <Title>수면</Title>
       <CharDiv>
