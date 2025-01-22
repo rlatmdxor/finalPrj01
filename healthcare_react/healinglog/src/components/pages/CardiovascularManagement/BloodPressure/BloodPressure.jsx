@@ -1,8 +1,8 @@
 import React from 'react';
 import Title from '../../../util/Title';
 import Calendar from '../../../util/Calendar';
-import Modal from '../../../util/Modal';
-import ModalInput from '../../../util/ModalInput';
+
+import InputTag from '../../../util/Input';
 
 const BloodPressure = () => {
   return (
@@ -10,7 +10,7 @@ const BloodPressure = () => {
       <Title>혈압</Title>
       <Calendar />
 
-      <ModalInput title="안녕ㅋㅋ"></ModalInput>
+      <InputTag title="안녕ㅋㅋ"></InputTag>
     </div>
   );
 };
