@@ -35,7 +35,7 @@ const AdminLogin = () => {
           </div>
           <div>
             <StyledDiv>관리자</StyledDiv>
-            <Input type="text" size="size1" mt="50" placeholder="아이디"></Input>
+            <Input type="text" size="size1" mt="50" placeholder="아이디" title="관리자 ㅋㅋㅋ"></Input>
             <Input type="password" size="size1" mt="25" placeholder="비밀번호"></Input>
             <Btn></Btn>
           </div>
