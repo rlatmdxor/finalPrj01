@@ -1,9 +1,19 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Title from '../../util/Title';
 import BoardList from '../../common/BoardList';
 import styled from 'styled-components';
 import Btn from '../../util/Btn';
 import Pagination from '../../util/Pagination';
+import { useSelector, useDispatch } from 'react-redux';
+import { setTotalCount, resetPaging } from '../../../redux/pagingSlice';
+
+const SearchDiv = styled.div`
+  display: flex;
+  gap: 10px;
+  justify-content: end;
+  align-items: center;
+  margin: 20px 50px;
+`;
 
 const BottomDiv = styled.div`
   display: flex;
@@ -13,7 +23,14 @@ const BottomDiv = styled.div`
 `;
 
 const Board = () => {
-  const dummyDataVo = [
+  const boardType = 'honeyTip';
+
+  const dataVoList = [
+    { no: 15, category: '생활', title: '제목333333333333333333', votes: 36, writer: '홍길동', date: '2025-01-18' },
+    { no: 14, category: '생활', title: '제목333333333333333333', votes: 36, writer: '홍길동', date: '2025-01-18' },
+    { no: 13, category: '생활', title: '제목333333333333333333', votes: 36, writer: '홍길동', date: '2025-01-18' },
+    { no: 12, category: '생활', title: '제목333333333333333333', votes: 36, writer: '홍길동', date: '2025-01-18' },
+    { no: 11, category: '생활', title: '제목333333333333333333', votes: 36, writer: '홍길동', date: '2025-01-18' },
     { no: 10, category: '생활', title: '제목333333333333333333', votes: 36, writer: '홍길동', date: '2025-01-18' },
     { no: 9, category: '생활', title: '제목333333333333333333', votes: 36, writer: '홍길동', date: '2025-01-18' },
     { no: 8, category: '병원', title: '제목11111111111111111', votes: 15, writer: '홍길동', date: '2025-01-18' },
@@ -26,9 +43,25 @@ const Board = () => {
     { no: 1, category: '생활', title: '제목333333333333333333', votes: 36, writer: '홍길동', date: '2025-01-18' },
   ];
 
+  const dispatch = useDispatch();
+
+  const { currentPage, boardLimit } = useSelector((state) => state.paging[boardType] || {});
+
+  useEffect(() => {
+    dispatch(setTotalCount({ boardType, totalCount: dataVoList.length }));
+    dispatch(resetPaging({ boardType }));
+  }, [dataVoList.length, dispatch]);
+
+  const offset = (currentPage - 1) * boardLimit;
+  const data = dataVoList.slice(offset, offset + boardLimit);
+
   return (
     <div>
       <Title>꿀팁게시판</Title>
+      <SearchDiv>
+        <div>zzz</div>
+        <div>zzz</div>
+      </SearchDiv>
       <BoardList>
         <thead>
           <tr>
@@ -41,9 +74,14 @@ const Board = () => {
           </tr>
         </thead>
         <tbody>
-          {dummyDataVo.map((vo) => {
+          {data.map((vo) => {
             return (
-              <tr key={vo.no}>
+              <tr
+                key={vo.no}
+                onClick={() => {
+                  window.location.href = `/board?bno=${vo.no}`;
+                }}
+              >
                 <td>{vo.no}</td>
                 <td>{vo.category}</td>
                 <td>{vo.title}</td>
@@ -58,7 +96,7 @@ const Board = () => {
       <BottomDiv>
         <div></div>
         <div>
-          <Pagination />
+          <Pagination boardType={boardType} />
         </div>
         <div>
           <Btn str={'등록'} c={'#FF7F50'} fc={'#ffffff'} h={'40'} />

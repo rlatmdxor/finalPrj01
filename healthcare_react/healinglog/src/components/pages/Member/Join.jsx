@@ -102,14 +102,13 @@ const Join = () => {
               str="다음"
               c={() => {
                 if (isSubmitEnabled) {
-                  return '#B5B5B5';
+                  return theme.green;
                 } else {
-                  return '#D3D3D3';
+                  return theme.gray;
                 }
               }}
               fs="20"
               fc="white"
-              type="submit"
               disabled={!isSubmitEnabled}
               f={() => {
                 if (isSubmitEnabled) {
