@@ -75,7 +75,7 @@ const Pharmacy = () => {
     <div>
       <Title>의료기관 찾기</Title>
       <SubTitle>
-        병원 보건소 <Highlight>약국</Highlight>
+        병원 <Highlight>약국</Highlight> 보건소
       </SubTitle>
       <Box>
         <TitleBox>지역</TitleBox>
@@ -143,8 +143,6 @@ const Pharmacy = () => {
             ></Btn>
           </PositionedBtn>
         </ContextBox>
-        <hr></hr>
-        <hr></hr>
       </Box>
     </div>
   );
