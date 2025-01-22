@@ -4,8 +4,8 @@ import styled from 'styled-components';
 const TitleDiv = styled.div`
   font-size: 20px;
   font-weight: 900;
-  width: 100%;
-  height: 100%;
+  width: 500px;
+  height: 90px;
   box-sizing: border-box;
   padding: 20px;
   position: absolute;

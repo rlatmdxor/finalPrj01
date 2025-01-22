@@ -17,9 +17,9 @@ const CommonBtn = styled.button`
   cursor: pointer;
 `;
 
-const Btn = ({ str, f, c, fc, w, h, fs }) => {
+const Btn = ({ str, c, fc, w, h, fs }) => {
   return (
-    <CommonBtn onClick={f} c={c} fc={fc} fs={fs} w={w} h={h}>
+    <CommonBtn c={c} fc={fc} fs={fs} w={w} h={h}>
       {str}
     </CommonBtn>
   );

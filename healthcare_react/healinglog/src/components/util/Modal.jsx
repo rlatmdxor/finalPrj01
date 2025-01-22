@@ -50,12 +50,11 @@ const ContentDiv = styled.div`
 
 const Modal = ({ children, title }) => {
   const [click, setClick] = useState(false);
-  const [position, setPosition] = useState({ x: 400, y: 0 });
-  const [offset, setOffset] = useState({ x: 400, y: 0 });
+  const [position, setPosition] = useState({ x: 450, y: 150 });
+  const [offset, setOffset] = useState({ x: 450, y: 150 });
 
   const dispatch = useDispatch();
-
-  const { value } = useSelector((state) => {
+  const { modals } = useSelector((state) => {
     return state.modal;
   });
 
@@ -79,20 +78,20 @@ const Modal = ({ children, title }) => {
     });
   };
 
+  const handleClose = () => {
+    dispatch(close(title));
+  };
+
+  const displayValue = modals[title] || 'none';
+
   return (
     <>
-      <ContainerDiv display={value} key={title} position={position}>
+      <ContainerDiv key={title} position={position} display={displayValue}>
         <StyleDiv onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} onMouseDown={handleMouseDown}>
           <ModalTitle>{title}</ModalTitle>
         </StyleDiv>
 
-        <CloseBtn
-          onClick={() => {
-            dispatch(close({ title }));
-          }}
-        >
-          X
-        </CloseBtn>
+        <CloseBtn onClick={handleClose}>X</CloseBtn>
         <ContentDiv>{children}</ContentDiv>
         <BtnContainerDiv>
           <Btn f={() => {}} c={'#FF7F50'} fc={'white'} str={'등록'}></Btn>
