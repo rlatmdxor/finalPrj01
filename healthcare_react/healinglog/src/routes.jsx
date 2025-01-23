@@ -22,6 +22,7 @@ import Join2 from './components/pages/Member/Join2';
 import LoginPage from './components/pages/Member/LoginPage';
 import Mypage from './components/pages/Member/Mypage';
 import Notice from './components/pages/Notice/Notice';
+// import AdminUserManage from './components/admin/AdminUserManage';
 
 export const routes = [
   { path: '/', component: <Main /> },
@@ -47,5 +48,6 @@ export const routes = [
   { path: '/join', component: <Join /> },
   { path: '/join2', component: <Join2 /> },
   { path: '/admin/login', component: <AdminLogin /> },
+  // { path: '/admin/usermanage', component: <AdminUserManage /> },
   { path: '/board/write', component: <BoardWrite /> },
 ];
