@@ -1,6 +1,7 @@
 import AdminLogin from './components/admin/AdminLogin';
 import Main from './components/home/Main';
 import Board from './components/pages/Board/Board';
+import BoardWrite from './components/pages/Board/BoardWrite';
 import DashBoard from './components/pages/Board/DashBoard';
 import HospitalReview from './components/pages/Board/HospitalReview';
 import BloodPressure from './components/pages/CardiovascularManagement/BloodPressure/BloodPressure';
@@ -24,6 +25,8 @@ import LoginPage from './components/pages/Member/LoginPage';
 import Mypage from './components/pages/Member/Mypage';
 import Notice from './components/pages/Notice/Notice';
 import AnAerobicDetail from './components/pages/LivingHealth/Exercise/AnAerobicDetail';
+// import AdminUserManage from './components/admin/AdminUserManage';
+
 
 export const routes = [
   { path: '/', component: <Main /> },
@@ -52,4 +55,6 @@ export const routes = [
   { path: '/admin/login', component: <AdminLogin /> },
   { path: '/aerobic/:name', component: <AerobicDetail /> },
   { path: '/anaerobic/:name', component: <AnAerobicDetail /> },
+  // { path: '/admin/usermanage', component: <AdminUserManage /> },
+  { path: '/board/write', component: <BoardWrite /> },
 ];

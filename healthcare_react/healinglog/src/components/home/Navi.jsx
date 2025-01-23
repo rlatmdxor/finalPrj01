@@ -27,6 +27,7 @@ const MenuDiv = styled.div`
   border-bottom: 1px solid #7ca96d;
   border-left: 1px solid #7ca96d;
   border-right: 1px solid #7ca96d;
+  z-index: 100;
 `;
 
 const NaviDiv = styled.div`

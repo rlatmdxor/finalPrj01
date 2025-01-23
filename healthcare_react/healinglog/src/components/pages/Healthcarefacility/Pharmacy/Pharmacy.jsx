@@ -77,6 +77,7 @@ const Pharmacy = () => {
       <SubTitle>
         병원 <Highlight>약국</Highlight> 보건소
       </SubTitle>
+
       <Box>
         <TitleBox>지역</TitleBox>
 

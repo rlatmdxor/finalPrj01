@@ -38,16 +38,12 @@ const PaginationBtn = styled.button`
 
 const Pagination = ({ boardType }) => {
   const dispatch = useDispatch();
-  const { currentPage, startPage, endPage, totalCount, boardLimit } = useSelector(
-    (state) =>
-      state.paging[boardType] || {
-        currentPage: 1,
-        startPage: 1,
-        endPage: 5,
-        totalCount: 0,
-        boardLimit: 12,
-      }
-  );
+
+  const currentPage = useSelector((state) => state.paging[boardType]?.currentPage || 1);
+  const boardLimit = useSelector((state) => state.paging[boardType]?.boardLimit || 12);
+  const totalCount = useSelector((state) => state.paging[boardType]?.totalCount || 0);
+  const startPage = useSelector((state) => state.paging[boardType]?.startPage || 1);
+  const endPage = useSelector((state) => state.paging[boardType]?.endPage || 5);
 
   if (!currentPage) {
     return null;

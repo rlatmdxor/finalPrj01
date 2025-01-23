@@ -28,6 +28,7 @@ const CloseBtn = styled.button`
 
 const ContainerDiv = styled.div`
   grid-template-rows: 30px 1fr 30px;
+  z-index: 500;
   width: 500px;
   border: 1px solid gray;
   background-color: #ffffff;
@@ -42,6 +43,7 @@ const ContainerDiv = styled.div`
   margin-top: ${({ position }) => {
     return position.y;
   }}px;
+  z-index: 1000;
 `;
 
 const ContentDiv = styled.div`
@@ -95,7 +97,6 @@ const Modal = ({ children, title }) => {
         <ContentDiv>{children}</ContentDiv>
         <BtnContainerDiv>
           <Btn f={() => {}} c={'#FF7F50'} fc={'white'} str={'등록'}></Btn>
-          <Btn f={() => {}} c={'lightgray'} fc={'black'} str={'취소'}></Btn>
         </BtnContainerDiv>
       </ContainerDiv>
     </>

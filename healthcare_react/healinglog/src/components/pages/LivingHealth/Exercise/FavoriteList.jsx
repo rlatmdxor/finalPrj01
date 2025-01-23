@@ -1,26 +1,4 @@
 import React from 'react';
-<<<<<<< Updated upstream
-import styled from 'styled-components';
-
-const FavoriteList = () => {
-  return (
-    <div>
-      <Bookmark>
-        <h2>즐겨찾기</h2>
-        <Line>
-          <Star>별</Star>
-          <Content>달리기</Content>
-        </Line>
-        <Line>
-          <Star>별</Star>
-          <Content>걷기</Content>
-        </Line>
-        <Line>
-          <Star>별</Star>
-          <Content>자전거</Content>
-        </Line>
-      </Bookmark>
-=======
 import { useDispatch, useSelector } from 'react-redux';
 import { setBookmark } from '../../../../redux/aerobicSlice';
 import styled, { useTheme } from 'styled-components';
@@ -34,7 +12,6 @@ const FavoriteList = () => {
   const navigate = useNavigate();
 
   const markData = exVoList.filter((item) => item.bookmark === 'y');
-  const unmarkData = exVoList.filter((item) => item.bookmark === 'n');
 
   const handleToggleBookmark = (no) => {
     dispatch(setBookmark({ no }));
@@ -67,10 +44,6 @@ const FavoriteList = () => {
           ))}
         </Bookmark>
       )}
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
     </div>
   );
 };
@@ -106,8 +79,6 @@ const Content = styled.div`
   font-weight: bold;
 `;
 
-<<<<<<< Updated upstream
-=======
 const StarIcon = styled.img`
   width: 40px;
   height: 40px;
@@ -115,8 +86,4 @@ const StarIcon = styled.img`
   cursor: pointer;
 `;
 
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
 export default FavoriteList;

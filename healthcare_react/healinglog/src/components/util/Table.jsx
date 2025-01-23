@@ -1,15 +1,17 @@
 import React from 'react';
 import styled from 'styled-components';
 
+const LayoutDiv = styled.div`
+  display: flex;
+  margin: 20px 50px;
+`;
+
 const StyledTable = styled.table`
   width: ${(props) => props.width || '100%'};
-  border-collapse: collapse;
+  border-collapse: separate;
   border-spacing: 0;
   text-align: center;
   border: 1px solid #d0d7de;
-  outline: 1px solid #d0d7de;
-  outline-offset: -2px;
-  border-radius: 6px;
   overflow: hidden;
 
   & th {
@@ -18,7 +20,8 @@ const StyledTable = styled.table`
     font-weight: 600;
     padding: 12px 15px;
     font-size: ${(props) => props.thtextsize || '14px'};
-    border: 1px solid #fafafa;
+    border-right: 1px solid #fafafa;
+    border-bottom: 1px solid #fafafa;
   }
 
   & td {
@@ -26,7 +29,17 @@ const StyledTable = styled.table`
     color: ${(props) => props.tdtextcolor || '#393e44'};
     padding: 12px 15px;
     font-size: ${(props) => props.tdtextsize || '14px'};
-    border: 1px solid #d0d7de;
+    border-bottom: 1px solid #d0d7de;
+    border-right: 1px solid #d0d7de;
+  }
+
+  & tr:last-child td {
+    border-bottom: none;
+  }
+
+  & th:last-child,
+  & td:last-child {
+    border-right: none;
   }
 
   & tr:hover td {
@@ -36,7 +49,7 @@ const StyledTable = styled.table`
 
 const Table = ({ children, width, thbgcolor, thtextcolor, thtextsize, tdbgcolor, tdtextcolor, tdtextsize }) => {
   return (
-    <>
+    <LayoutDiv>
       <StyledTable
         width={width}
         thbgcolor={thbgcolor}
@@ -48,7 +61,7 @@ const Table = ({ children, width, thbgcolor, thtextcolor, thtextsize, tdbgcolor,
       >
         {children}
       </StyledTable>
-    </>
+    </LayoutDiv>
   );
 };
 
