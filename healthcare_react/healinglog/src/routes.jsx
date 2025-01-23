@@ -12,7 +12,9 @@ import Alc from './components/pages/LivingHealth/Alc/Alc';
 import Cigarette from './components/pages/LivingHealth/Cigarette/Cigarette';
 import Diet from './components/pages/LivingHealth/Diet/Diet';
 import Drug from './components/pages/LivingHealth/Drug/Drug';
-import Exercise from './components/pages/LivingHealth/Exercise/Exercise';
+import Aerobic from './components/pages/LivingHealth/Exercise/Aerobic';
+import AnAerobic from './components/pages/LivingHealth/Exercise/AnAerobic';
+import AerobicDetail from './components/pages/LivingHealth/Exercise/AerobicDetail';
 import Sleep from './components/pages/LivingHealth/Sleep/Sleep';
 import FindIdPage from './components/pages/Member/FindIdPage';
 import FindPwdPage from './components/pages/Member/FindPwdPage';
@@ -21,6 +23,7 @@ import Join2 from './components/pages/Member/Join2';
 import LoginPage from './components/pages/Member/LoginPage';
 import Mypage from './components/pages/Member/Mypage';
 import Notice from './components/pages/Notice/Notice';
+import AnAerobicDetail from './components/pages/LivingHealth/Exercise/AnAerobicDetail';
 
 export const routes = [
   { path: '/', component: <Main /> },
@@ -28,7 +31,8 @@ export const routes = [
   { path: '/login', component: <LoginPage /> },
   { path: '/sleep', component: <Sleep /> },
   { path: '/diet', component: <Diet /> },
-  { path: '/exercise', component: <Exercise /> },
+  { path: '/aerobic', component: <Aerobic /> },
+  { path: '/anaerobic', component: <AnAerobic /> },
   { path: '/alc', component: <Alc /> },
   { path: '/cigarette', component: <Cigarette /> },
   { path: '/drug', component: <Drug /> },
@@ -46,4 +50,6 @@ export const routes = [
   { path: '/join', component: <Join /> },
   { path: '/join2', component: <Join2 /> },
   { path: '/admin/login', component: <AdminLogin /> },
+  { path: '/aerobic/:name', component: <AerobicDetail /> },
+  { path: '/anaerobic/:name', component: <AnAerobicDetail /> },
 ];

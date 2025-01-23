@@ -94,7 +94,7 @@ const Navi = () => {
           <MenuLayoutDiv1>
             <LinkTag to={'sleep'}>수면</LinkTag>
             <LinkTag to={'diet'}>식단</LinkTag>
-            <LinkTag to={'exercise'}>운동</LinkTag>
+            <LinkTag to={'aerobic'}>운동</LinkTag>
             <LinkTag to={'alc'}>음주</LinkTag>
             <LinkTag to={'cigarette'}>흡연</LinkTag>
             <LinkTag to={'drug'}>복용약</LinkTag>

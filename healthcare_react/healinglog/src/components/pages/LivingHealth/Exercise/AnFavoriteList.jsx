@@ -1,35 +1,13 @@
 import React from 'react';
-<<<<<<< Updated upstream
-import styled from 'styled-components';
-
-const FavoriteList = () => {
-  return (
-    <div>
-      <Bookmark>
-        <h2>즐겨찾기</h2>
-        <Line>
-          <Star>별</Star>
-          <Content>달리기</Content>
-        </Line>
-        <Line>
-          <Star>별</Star>
-          <Content>걷기</Content>
-        </Line>
-        <Line>
-          <Star>별</Star>
-          <Content>자전거</Content>
-        </Line>
-      </Bookmark>
-=======
 import { useDispatch, useSelector } from 'react-redux';
 import { setBookmark } from '../../../../redux/aerobicSlice';
 import styled, { useTheme } from 'styled-components';
 import Btn from '../../../util/Btn';
 import { useNavigate } from 'react-router-dom';
 
-const FavoriteList = () => {
+const AnFavoriteList = () => {
   const dispatch = useDispatch();
-  const exVoList = useSelector((state) => state.aerobic);
+  const exVoList = useSelector((state) => state.anAerobic);
   const theme = useTheme();
   const navigate = useNavigate();
 
@@ -58,7 +36,7 @@ const FavoriteList = () => {
                     c={theme.gray}
                     fs={'14'}
                     f={() => {
-                      navigate(`/aerobic/${vo.name}`);
+                      navigate(`/anaerobic/${vo.name}`);
                     }}
                   />
                 </div>
@@ -67,17 +45,14 @@ const FavoriteList = () => {
           ))}
         </Bookmark>
       )}
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
     </div>
   );
 };
 
 const Bookmark = styled.div`
   display: grid;
-  grid-template-rows: 1fr 50px 50px 50px;
+  grid-template-rows: 1fr;
+  grid-auto-rows: 50px;
   justify-self: center;
   align-self: center;
 `;
@@ -98,6 +73,7 @@ const Star = styled.div`
 
 const Content = styled.div`
   display: grid;
+  grid-template-columns: 10fr 1fr;
   justify-items: center;
   align-items: center;
   background-color: rgba(169, 205, 147, 0.2);
@@ -106,8 +82,6 @@ const Content = styled.div`
   font-weight: bold;
 `;
 
-<<<<<<< Updated upstream
-=======
 const StarIcon = styled.img`
   width: 40px;
   height: 40px;
@@ -115,8 +89,4 @@ const StarIcon = styled.img`
   cursor: pointer;
 `;
 
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-export default FavoriteList;
+export default AnFavoriteList;
