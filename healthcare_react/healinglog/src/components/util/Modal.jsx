@@ -42,6 +42,7 @@ const ContainerDiv = styled.div`
   margin-top: ${({ position }) => {
     return position.y;
   }}px;
+  z-index: 1000;
 `;
 
 const ContentDiv = styled.div`
