@@ -6,15 +6,28 @@ import Pagination from '../../util/Pagination';
 import { useSelector, useDispatch } from 'react-redux';
 import { setTotalCount, resetPaging } from '../../../redux/pagingSlice';
 import SearchBar from '../../util/SearchBar';
-import SelectedBar from '../../util/SelectedBar';
 import Table from '../../util/Table';
+import { useNavigate } from 'react-router-dom';
 
 const SearchDiv = styled.div`
   display: flex;
-  gap: 10px;
   justify-content: end;
+  gap: 5px;
   align-items: center;
   margin: 5px 50px;
+`;
+
+const SelectBox = styled.select`
+  width: ${(props) => props.width || '100px'};
+  height: 40px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin: 0px 3px;
+  &:focus {
+    border-color: #007bff;
+    outline: none;
+  }
 `;
 
 const BottomDiv = styled.div`
@@ -101,7 +114,8 @@ const Board = () => {
 
   const dispatch = useDispatch();
 
-  const { currentPage, boardLimit } = useSelector((state) => state.paging[boardType] || {});
+  const currentPage = useSelector((state) => state.paging[boardType]?.currentPage || 1);
+  const boardLimit = useSelector((state) => state.paging[boardType]?.boardLimit || 12);
 
   useEffect(() => {
     dispatch(setTotalCount({ boardType, totalCount: dataVoList.length }));
@@ -111,16 +125,43 @@ const Board = () => {
   const offset = (currentPage - 1) * boardLimit;
   const data = dataVoList.slice(offset, offset + boardLimit);
 
-  const order = {
-    label: '정렬',
-    options: ['최신순', '추천수많은순'],
+  const searchFilter = {
+    order: ['최신순', '오래된순', '조회순', '추천순'],
+    category: ['카테고리 전체', '병원', '약국', '생활'],
+    searchType: ['제목', '내용', '제목+내용'],
+  };
+
+  const navigate = useNavigate();
+
+  const handleWriteClick = () => {
+    navigate('/board/write');
   };
 
   return (
     <div>
       <Title>꿀팁게시판</Title>
       <SearchDiv>
-        <SelectedBar label={order.label} options={order.options} />
+        <SelectBox>
+          {searchFilter.order.map((option, idx) => (
+            <option key={idx} value={option}>
+              {option}
+            </option>
+          ))}
+        </SelectBox>
+        <SelectBox width="130px">
+          {searchFilter.category.map((option, idx) => (
+            <option key={idx} value={option}>
+              {option}
+            </option>
+          ))}
+        </SelectBox>
+        <SelectBox>
+          {searchFilter.searchType.map((option, idx) => (
+            <option key={idx} value={option}>
+              {option}
+            </option>
+          ))}
+        </SelectBox>
         <SearchBar />
       </SearchDiv>
       <Table>
@@ -160,7 +201,7 @@ const Board = () => {
           <Pagination boardType={boardType} />
         </div>
         <div>
-          <Btn str={'등록'} c={'#FF7F50'} fc={'#ffffff'} h={'40'} />
+          <Btn str={'등록'} c={'#FF7F50'} fc={'#ffffff'} h={'40'} f={handleWriteClick} />
         </div>
       </BottomDiv>
     </div>

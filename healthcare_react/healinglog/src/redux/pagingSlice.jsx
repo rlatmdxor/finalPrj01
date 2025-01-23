@@ -2,15 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const pagingSlice = createSlice({
   name: 'paging',
-  initialState: {
-    totalCount: 0,
-    pageLimit: 5,
-    boardLimit: 12,
-    currentPage: 1,
-    startPage: 1,
-    endPage: 5,
-    maxPage: 1,
-  },
+  initialState: {},
   reducers: {
     setTotalCount: (state, action) => {
       const { boardType, totalCount } = action.payload;
