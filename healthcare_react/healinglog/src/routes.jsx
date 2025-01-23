@@ -1,6 +1,7 @@
 import AdminLogin from './components/admin/AdminLogin';
 import Main from './components/home/Main';
 import Board from './components/pages/Board/Board';
+import BoardWrite from './components/pages/Board/BoardWrite';
 import DashBoard from './components/pages/Board/DashBoard';
 import HospitalReview from './components/pages/Board/HospitalReview';
 import BloodPressure from './components/pages/CardiovascularManagement/BloodPressure/BloodPressure';
@@ -48,4 +49,5 @@ export const routes = [
   { path: '/join2', component: <Join2 /> },
   { path: '/admin/login', component: <AdminLogin /> },
   // { path: '/admin/usermanage', component: <AdminUserManage /> },
+  { path: '/board/write', component: <BoardWrite /> },
 ];
