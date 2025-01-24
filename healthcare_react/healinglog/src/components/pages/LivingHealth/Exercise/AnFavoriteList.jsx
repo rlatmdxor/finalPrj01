@@ -5,14 +5,13 @@ import styled, { useTheme } from 'styled-components';
 import Btn from '../../../util/Btn';
 import { useNavigate } from 'react-router-dom';
 
-const AnFavoriteList = () => {
+const AnFavoriteList = ({ f }) => {
   const dispatch = useDispatch();
   const exVoList = useSelector((state) => state.anAerobic);
   const theme = useTheme();
   const navigate = useNavigate();
 
   const markData = exVoList.filter((item) => item.bookmark === 'y');
-  const unmarkData = exVoList.filter((item) => item.bookmark === 'n');
 
   const handleToggleBookmark = (no) => {
     dispatch(setBookmark({ no }));
@@ -29,7 +28,7 @@ const AnFavoriteList = () => {
                 <StarIcon src="/img/Star.webp" onClick={() => handleToggleBookmark(vo.no)} />
               </Star>
               <Content>
-                {vo.name}
+                <div onClick={() => f(vo.name)}>{vo.name}</div>
                 <div style={{ marginRight: '20px' }}>
                   <Btn
                     str={'상세조회'}

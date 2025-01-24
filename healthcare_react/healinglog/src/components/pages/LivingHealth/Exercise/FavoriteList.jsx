@@ -50,7 +50,8 @@ const FavoriteList = () => {
 
 const Bookmark = styled.div`
   display: grid;
-  grid-template-rows: 1fr 50px 50px 50px;
+  grid-template-rows: 1fr;
+  grid-auto-rows: 50px;
   justify-self: center;
   align-self: center;
 `;
@@ -71,6 +72,7 @@ const Star = styled.div`
 
 const Content = styled.div`
   display: grid;
+  grid-template-columns: 10fr 1fr;
   justify-items: center;
   align-items: center;
   background-color: rgba(169, 205, 147, 0.2);
