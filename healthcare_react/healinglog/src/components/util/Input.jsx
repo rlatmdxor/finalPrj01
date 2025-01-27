@@ -16,11 +16,26 @@ const InputTag = styled.input`
   box-sizing: border-box;
 `;
 
-const Input = ({ type, placeholder, size, mb, mt, ml, mr, title }) => {
+const Input = ({ type, placeholder, size, mb, mt, ml, mr, title, value, disabled, min, max, step, f }) => {
   return (
     <>
       {title}
-      <InputTag type={type} placeholder={placeholder} size={size} mb={mb} mt={mt} ml={ml} mr={mr} />
+      <InputTag
+        disabled={disabled}
+        value={value}
+        type={type}
+        placeholder={placeholder}
+        size={size}
+        mb={mb}
+        mt={mt}
+        ml={ml}
+        mr={mr}
+        min={min}
+        max={max}
+        step={step}
+        onChange={f}
+        // onChange={handleChange}
+      />
     </>
   );
 };

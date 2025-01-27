@@ -50,7 +50,7 @@ const ContentDiv = styled.div`
   padding: 30px;
 `;
 
-const Modal = ({ children, title }) => {
+const Modal = ({ children, title, f }) => {
   const [click, setClick] = useState(false);
   const [position, setPosition] = useState({ x: 450, y: 150 });
   const [offset, setOffset] = useState({ x: 450, y: 150 });
@@ -96,7 +96,7 @@ const Modal = ({ children, title }) => {
         <CloseBtn onClick={handleClose}>X</CloseBtn>
         <ContentDiv>{children}</ContentDiv>
         <BtnContainerDiv>
-          <Btn f={() => {}} c={'#FF7F50'} fc={'white'} str={'등록'}></Btn>
+          <Btn f={f} c={'#FF7F50'} fc={'white'} str={'등록'}></Btn>
         </BtnContainerDiv>
       </ContainerDiv>
     </>
