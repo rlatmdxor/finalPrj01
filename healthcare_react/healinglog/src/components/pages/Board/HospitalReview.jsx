@@ -6,13 +6,27 @@ import Pagination from '../../util/Pagination';
 import { useSelector, useDispatch } from 'react-redux';
 import { setTotalCount, resetPaging } from '../../../redux/pagingSlice';
 import Table from '../../util/Table';
+import SearchBar from '../../util/SearchBar';
 
 const SearchDiv = styled.div`
   display: flex;
-  gap: 10px;
   justify-content: end;
+  gap: 5px;
   align-items: center;
-  margin: 20px 50px;
+  margin: 5px 50px;
+`;
+
+const SelectBox = styled.select`
+  width: ${(props) => props.width || '100px'};
+  height: 40px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin: 0px 3px;
+  &:focus {
+    border-color: #007bff;
+    outline: none;
+  }
 `;
 
 const BottomDiv = styled.div`
@@ -55,12 +69,30 @@ const HospitalReview = () => {
   const offset = (currentPage - 1) * boardLimit;
   const data = dummyDataVo.slice(offset, offset + boardLimit);
 
+  const searchFilter = {
+    order: ['최신순', '오래된순', '조회순', '별점순'],
+    searchType: ['병원명', '제목', '내용', '제목+내용'],
+  };
+
   return (
     <div>
       <Title>병원리뷰게시판</Title>
       <SearchDiv>
-        <div>zzz</div>
-        <div>zzz</div>
+        <SelectBox>
+          {searchFilter.order.map((option, idx) => (
+            <option key={idx} value={option}>
+              {option}
+            </option>
+          ))}
+        </SelectBox>
+        <SelectBox>
+          {searchFilter.searchType.map((option, idx) => (
+            <option key={idx} value={option}>
+              {option}
+            </option>
+          ))}
+        </SelectBox>
+        <SearchBar />
       </SearchDiv>
       <Table>
         <thead>

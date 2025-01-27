@@ -3,20 +3,23 @@ import Title from '../../../util/Title';
 import Navi from '../../../util/Navi';
 import styled from 'styled-components';
 import FavoriteList from './FavoriteList';
+import AerobicList from './AerobicList';
 
-const Exercise = () => {
+const Aerobic = () => {
   return (
     <div>
       <Container>
         <Title>운동</Title>
         <NaviContainer>
-          <Navi target="exercise" tag={'유산소'}></Navi>
-          <Navi target="exercise2" tag={'무산소'}></Navi>
+          <Navi target="aerobic" tag={'유산소'}></Navi>
+          <Navi target="anaerobic" tag={'무산소'}></Navi>
           <Navi target="exlist" tag={'내역 관리'}></Navi>
           <Navi target="report" tag={'리포트'}></Navi>
         </NaviContainer>
-        <BlankSpace></BlankSpace>
-        <FavoriteList></FavoriteList>
+        <BlankSpace />
+        <FavoriteList />
+        <BlankSpace />
+        <AerobicList />
       </Container>
     </div>
   );
@@ -37,4 +40,4 @@ const NaviContainer = styled.div`
   grid-template-columns: 3fr 3fr 4fr 3fr;
 `;
 
-export default Exercise;
+export default Aerobic;

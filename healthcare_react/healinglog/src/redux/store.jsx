@@ -4,7 +4,10 @@ import selectReducer from './selectSlice';
 import pagingReducer from './pagingSlice';
 import modalReducer from './modalSlice';
 import selectionReducer from './selectSlice';
-// import joinReducer from './joinSlice';
+import JoinReducer from './JoinSlice';
+import aerobicReducer from './aerobicSlice';
+import anAerobicReducer from './anAerobicSlice';
+
 
 const store = configureStore({
   reducer: {
@@ -13,7 +16,9 @@ const store = configureStore({
     paging: pagingReducer,
     modal: modalReducer,
     selection: selectionReducer,
-    // join: joinReducer,
+    join: JoinReducer,
+    aerobic: aerobicReducer,
+    anAerobic: anAerobicReducer,
   },
 });
 
