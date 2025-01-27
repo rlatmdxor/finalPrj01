@@ -160,9 +160,6 @@ const AlcReport = () => {
           <Navi target="alc/report" tag={'리포트'}></Navi>
         </NaviContainer>
       </MarginTitle>
-      {/* <SubTitle>
-        캘린더&nbsp;&nbsp;<Highlight>리포트</Highlight>
-      </SubTitle> */}
       {/* <Title>기간별 음주율</Title> */}
 
       <ChartMargin>
