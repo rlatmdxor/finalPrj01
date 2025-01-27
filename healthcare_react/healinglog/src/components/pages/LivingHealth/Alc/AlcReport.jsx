@@ -1,22 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { data } from 'react-router-dom';
-
 import styled from 'styled-components';
 
 import Title from '../../../util/Title';
-import SelectedBar from '../../../util/SelectedBar';
-import Calendar from '../../../util/Calendar';
-import Modal from '../../../util/Modal';
-import Btn from '../../../util/Btn';
-import InputTag from '../../../util/Input';
-import Navi from '../../../util/Navi';
+import Chart from '../../../util/Chart';
 import Table from '../../../util/Table';
+import Btn from '../../../util/Btn';
 import Pagination from '../../../util/Pagination';
+import Navi from '../../../util/Navi';
+import Modal from '../../../util/Modal';
+import InputTag from '../../../util/Input';
+import ModalTitle from '../../../util/ModalTitle';
 
-import { setSelection } from '../../../../redux/selectSlice';
-import { open } from '../../../../redux/modalSlice';
 import { setTotalCount, resetPaging } from '../../../../redux/pagingSlice';
+import { open } from '../../../../redux/modalSlice';
 
 const MarginTitle = styled.div`
   margin-bottom: 50px;
@@ -31,6 +28,22 @@ const NaviContainer = styled.div`
   grid-template-columns: 3fr 3fr; // 글자수만큼 fr 주면 됩니다. ex) 유산소 3글자니까 3fr
 `;
 
+const SearchDiv = styled.div`
+  display: flex;
+  gap: 10px;
+  justify-content: end;
+  align-items: center;
+  margin: 20px 50px;
+`;
+
+const ChartMargin = styled.div`
+  display: flex;
+  justify-content: center; /* 가로 중앙 정렬 */
+  align-items: center; /* 세로 중앙 정렬 (필요 시 추가) */
+  margin: 0 auto; /* 블록 요소의 중앙 정렬 */
+  width: fit-content; /* 내용물 크기에 맞게 너비 조정 */
+`;
+
 const BottomDiv = styled.div`
   display: flex;
   margin: 30px 50px 50px 50px;
@@ -38,11 +51,68 @@ const BottomDiv = styled.div`
   align-items: center;
 `;
 
-const Alc = () => {
-  const boardType = 'AlcReport';
-  const dispatch = useDispatch();
+const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
+const dataset = [
+  {
+    // 차트에서 그래프가 나타내는 이름 표시 ex)수축기 혈압 , 이완기 혈압
+    // Bar , Pie , Doughnut에서는 마우스를 해당 부분에 호버하면 이 label의 이름이 표시된다.
+    label: 'tnftnftnf',
 
-  // 데이터 목록을 useEffect 전에 선언
+    data: [12000, 15000, 8000, 18000, 22000, 13000, 17000], // 데이터 값 위의 labels와 같은 갯수 넣어야됨
+    backgroundColor: [
+      'rgba(255, 99, 132, 0.2)',
+      'rgba(54, 162, 235, 0.2)',
+      'rgba(255, 206, 86, 0.2)',
+      'rgba(75, 192, 192, 0.2)',
+      'rgba(153, 102, 255, 0.2)',
+      'rgba(255, 159, 64, 0.2)',
+      'rgba(201, 203, 207, 0.2)',
+    ], // 배경색
+    borderColor: [
+      'rgba(255, 99, 132, 1)',
+      'rgba(54, 162, 235, 1)',
+      'rgba(255, 206, 86, 1)',
+      'rgba(75, 192, 192, 1)',
+      'rgba(153, 102, 255, 1)',
+      'rgba(255, 159, 64, 1)',
+      'rgba(201, 203, 207, 1)',
+    ], // 테두리 색상
+    borderWidth: 1, // 테두리 두께
+  },
+];
+
+const AlcReport = () => {
+  const boardType = 'AlcReport';
+
+  const [selectedDrink, setSelectedDrink] = useState(null);
+  const [alcoholAmount, setAlcoholAmount] = useState('');
+  const [drinkDate, setDrinkDate] = useState('');
+  const [alcoholIntake, setAlcoholIntake] = useState(0);
+
+  const alcoholOptions = [
+    { name: '소주', alc: 17, std: 50 },
+    { name: '맥주', alc: 5, std: 250 },
+    { name: '막걸리', alc: 6, std: 200 },
+    { name: '와인', alc: 12, std: 150 },
+    { name: '칵테일', alc: 10, std: 60 },
+  ];
+
+  // 테이블에서 술 선택 시 상태 업데이트
+  const handleDrinkSelection = (drink) => {
+    setSelectedDrink(drink);
+  };
+
+  // 알코올 섭취량 계산
+  const calculateAlcoholIntake = () => {
+    if (selectedDrink && alcoholAmount) {
+      const intake = (selectedDrink.alc / 100) * parseFloat(alcoholAmount);
+      setAlcoholIntake(intake.toFixed(2));
+    } else {
+      setAlcoholIntake(0);
+    }
+  };
+
+  // 게시판 목록 데이터
   const dataVoList = [
     { no: 1, date: '01/16', type: '소주', amount: 50, alc: 17 },
     { no: 2, date: '01/17', type: '맥주', amount: 500, alc: 5 },
@@ -60,7 +130,8 @@ const Alc = () => {
     { no: 14, date: '01/23', type: '소주', amount: 100, alc: 17 },
   ];
 
-  // Redux 상태 가져오기
+  const dispatch = useDispatch();
+
   const { currentPage, boardLimit } = useSelector((state) => state.paging[boardType] || {});
 
   useEffect(() => {
@@ -68,44 +139,17 @@ const Alc = () => {
     dispatch(resetPaging({ boardType }));
   }, [boardType, dataVoList.length, dispatch]);
 
-  // 페이지네이션 로직
-  const offset = (currentPage - 1) * (boardLimit || 5);
-  const data = dataVoList.slice(offset, offset + (boardLimit || 5));
+  const offset = (currentPage - 1) * boardLimit;
+  const data = dataVoList.slice(offset, offset + boardLimit);
 
-  // 술 옵션 설정
-  const alcoholOptions = [
-    { name: '소주', alc: 17, std: 50 },
-    { name: '맥주', alc: 5, std: 250 },
-    { name: '막걸리', alc: 6, std: 200 },
-    { name: '와인', alc: 12, std: 150 },
-    { name: '칵테일', alc: 10, std: 60 },
-  ];
-
-  // 상태 관리
-  const [selectedDrink, setSelectedDrink] = useState(null);
-  const [alcoholAmount, setAlcoholAmount] = useState('');
-  const [drinkDate, setDrinkDate] = useState('');
-  const [alcoholIntake, setAlcoholIntake] = useState(0);
-
-  // 테이블에서 술 선택 시 상태 업데이트
-  const handleDrinkSelection = (drink) => {
-    setSelectedDrink(drink);
-  };
-
-  // 알코올 섭취량 계산
-  const calculateAlcoholIntake = () => {
-    if (selectedDrink && alcoholAmount) {
-      const intake = (selectedDrink.alc / 100) * parseFloat(alcoholAmount);
-      setAlcoholIntake(intake.toFixed(2));
-    } else {
-      setAlcoholIntake(0);
-    }
-  };
-
-  // 선택된 음료 로그 출력
-  useEffect(() => {
-    console.log('선택된 술:', selectedDrink);
-  }, [selectedDrink]);
+  const NaviContainer = styled.div`
+    display: grid;
+    position: relative;
+    width: 400px; // 항목수에 비례해서 주시면 됩니다.
+    top: 20px;
+    left: 40px;
+    grid-template-columns: 3fr 3fr; // 글자수만큼 fr 주면 됩니다. ex) 유산소 3글자니까 3fr
+  `;
 
   return (
     <div>
@@ -116,9 +160,23 @@ const Alc = () => {
           <Navi target="alc/report" tag={'리포트'}></Navi>
         </NaviContainer>
       </MarginTitle>
-      {/* <Title>으악</Title> */}
+      {/* <SubTitle>
+        캘린더&nbsp;&nbsp;<Highlight>리포트</Highlight>
+      </SubTitle> */}
+      {/* <Title>기간별 음주율</Title> */}
 
-      <Calendar></Calendar>
+      <ChartMargin>
+        <Chart
+          chartType="Bar" // 차트 타입지정 Bar , Line , Pie , Doughnut 중 택1
+          labels={labels} // 위에서 작성한 x축의 데이터
+          dataset={dataset} // 위에서 작성한 차트의 데이터
+          width={800} // 차트 가로 사이즈임
+          height={400} // 차트 세로 사이즈임
+          // margin={20}
+          xAxisColor="rgba(75, 192, 192, 1)" // Bar , Line 에만 사용되고 x축 글씨색상임
+          yAxisColor="rgba(255, 99, 132, 1)" // Bar , Line 에만 사용되고 y축 글씨색상임
+        />
+      </ChartMargin>
 
       <Modal title="음주">
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
@@ -249,7 +307,6 @@ const Alc = () => {
             fc={'#ffffff'}
             h={'40'}
             onClick={() => {
-              console.log('123123');
               dispatch(open({ title: '음주', value: 'block' }));
             }}
           /> */}
@@ -267,4 +324,4 @@ const Alc = () => {
   );
 };
 
-export default Alc;
+export default AlcReport;
