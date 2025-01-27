@@ -33,8 +33,11 @@ const Chart = ({
   options = {}, // 추가 옵션
   width = 600, // 차트 가로 크기
   height = 400, // 차트 세로 크기
-  xAxisColor = '#000', // x축 색상 (Bar, Line에서만 사용)
-  yAxisColor = '#000', // y축 색상 (Bar, Line에서만 사용)
+  xAxisColor = '#000',
+  yAxisColor = '#000',
+  yMax = null, // Y축 최대값 (선택 사항)
+  yMin = null, // Y축 최소값 (선택 사항)
+  yUnit = '', // Y축 숫자 단위 (선택 사항)
 }) => {
   // 차트 데이터 생성
   const data = {
@@ -55,8 +58,19 @@ const Chart = ({
               grid: { color: xAxisColor },
             },
             y: {
-              ticks: { color: yAxisColor },
+              ticks: {
+                color: yAxisColor,
+                callback: function (value) {
+                  return `${value}${yUnit}`; // 숫자 뒤에 단위 추가
+                },
+              },
               grid: { color: yAxisColor },
+              ...(yMax !== null || yMin !== null
+                ? {
+                    min: yMin !== null ? yMin : undefined,
+                    max: yMax !== null ? yMax : undefined,
+                  }
+                : {}),
             },
           },
         }

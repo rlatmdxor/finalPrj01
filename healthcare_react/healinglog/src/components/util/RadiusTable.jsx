@@ -1,6 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
 
+const LayoutDiv = styled.div`
+  display: flex;
+  margin: 20px 50px;
+`;
+
 const StyledTable = styled.table`
   width: ${(props) => props.width || '100%'};
   border-collapse: collapse;
@@ -47,18 +52,20 @@ const RadiusTable = ({
 }) => {
   return (
     <>
-      <StyledTable
-        width={width}
-        radius={radius}
-        thbgcolor={thbgcolor}
-        thtextcolor={thtextcolor}
-        thtextsize={thtextsize}
-        tdbgcolor={tdbgcolor}
-        tdtextcolor={tdtextcolor}
-        tdtextsize={tdtextsize}
-      >
-        {children}
-      </StyledTable>
+      <LayoutDiv>
+        <StyledTable
+          width={width}
+          radius={radius}
+          thbgcolor={thbgcolor}
+          thtextcolor={thtextcolor}
+          thtextsize={thtextsize}
+          tdbgcolor={tdbgcolor}
+          tdtextcolor={tdtextcolor}
+          tdtextsize={tdtextsize}
+        >
+          {children}
+        </StyledTable>
+      </LayoutDiv>
     </>
   );
 };

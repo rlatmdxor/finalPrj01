@@ -6,6 +6,7 @@ import DashBoard from './components/pages/Board/DashBoard';
 import HospitalReview from './components/pages/Board/HospitalReview';
 import BloodPressure from './components/pages/CardiovascularManagement/BloodPressure/BloodPressure';
 import BloodSugar from './components/pages/CardiovascularManagement/BloodSugar/BloodSugar';
+import InsulinPoint from './components/pages/CardiovascularManagement/BloodSugar/InsulinPoint';
 import Hospital from './components/pages/Healthcarefacility/Hospital/Hospital';
 import Pharmacy from './components/pages/Healthcarefacility/Pharmacy/Pharmacy';
 import PulbicHealthCenter from './components/pages/Healthcarefacility/PublicHealthCenter/PulbicHealthCenter';
@@ -43,6 +44,7 @@ export const routes = [
   { path: '/drug', component: <Drug /> },
   { path: '/drug1', component: <Drug1 /> },
   { path: '/bloodpressure', component: <BloodPressure /> },
+  { path: '/insulin', component: <InsulinPoint /> },
   { path: '/bloodsugar', component: <BloodSugar /> },
   { path: '/hospital', component: <Hospital /> },
   { path: '/pharmacy', component: <Pharmacy /> },
