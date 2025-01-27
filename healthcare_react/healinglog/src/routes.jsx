@@ -15,7 +15,6 @@ import Cigarette from './components/pages/LivingHealth/Cigarette/Cigarette';
 import Diet from './components/pages/LivingHealth/Diet/Diet';
 import Drug from './components/pages/LivingHealth/Drug/Drug';
 import Drug1 from './components/pages/LivingHealth/Drug/Drug1';
-import Exercise from './components/pages/LivingHealth/Exercise/Exercise';
 import Aerobic from './components/pages/LivingHealth/Exercise/Aerobic';
 import AnAerobic from './components/pages/LivingHealth/Exercise/AnAerobic';
 import AerobicDetail from './components/pages/LivingHealth/Exercise/AerobicDetail';

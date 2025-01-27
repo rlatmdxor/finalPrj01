@@ -1,14 +1,20 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Title from '../../../util/Title';
 import Navi from '../../../util/Navi';
 import Btn from '../../../util/Btn';
+import { useDispatch } from 'react-redux';
+import { close } from '../../../../redux/modalSlice';
 
 const Exercising = () => {
   const location = useLocation();
   const theme = useTheme();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(close('운동시작'));
+  });
   const { title, hours, minutes, sets, repeats, rangeValue } = location.state || {};
 
   return (
@@ -16,8 +22,8 @@ const Exercising = () => {
       <Container>
         <Title>운동</Title>
         <NaviContainer>
-          <Navi target="aerobic" tag={'유산소'} selected={minutes ? 'selected' : undefined}></Navi>
-          <Navi target="anaerobic" tag={'무산소'}></Navi>
+          <Navi target="aerobic" tag={'유산소'} selected={minutes || hours ? 'selected' : undefined}></Navi>
+          <Navi target="anaerobic" tag={'무산소'} selected={sets || repeats ? 'selected' : undefined}></Navi>
           <Navi target="exhistory" tag={'내역 관리'}></Navi>
           <Navi target="exreport" tag={'리포트'}></Navi>
         </NaviContainer>

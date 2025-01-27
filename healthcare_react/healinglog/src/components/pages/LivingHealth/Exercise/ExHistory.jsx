@@ -1,12 +1,18 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Calendar from '../../../util/Calendar';
 import Modal from '../../../util/Modal';
 import Input from '../../../util/Input';
 import Title from '../../../util/Title';
 import Navi from '../../../util/Navi';
 import styled from 'styled-components';
+import { useDispatch } from 'react-redux';
+import { close } from '../../../../redux/modalSlice';
 
 const ExHistory = () => {
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(close('운동시작'));
+  });
   const events = {
     '2025-1-8': ['30분', '달리기'],
     '2025-1-9': ['2시간', '걷기'],
