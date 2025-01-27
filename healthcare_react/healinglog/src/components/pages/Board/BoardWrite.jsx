@@ -10,11 +10,11 @@ const LayoutDiv = styled.div`
 
   & .header {
     margin-top: 18px;
-    margin-bottom: 15px;
+    margin-bottom: 14px;
     margin-left: 2px;
-    font-size: 17px;
+    font-size: 16px;
     font-weight: 600;
-    color: #24292f;
+    color: #353535;
   }
 `;
 
@@ -35,7 +35,7 @@ const FormDiv = styled.div`
     font-size: 14px;
     padding: 2px 0px;
     text-align: center;
-    height: 33px;
+    height: 35px;
   }
 
   & .form-input {
@@ -48,7 +48,7 @@ const FormDiv = styled.div`
   input {
     box-sizing: border-box;
     width: 100%;
-    height: 34px;
+    height: 35px;
     font-size: 14px;
     border: 1px solid #ccc;
     padding: 0px 8px;
@@ -105,7 +105,7 @@ const BoardWrite = () => {
         </FormDiv>
         <ButtonDiv>
           <Btn str={'등록'} c={'#FF7F50'} fc={'#ffffff'} h={'40'} />
-          <Btn str={'취소'} c={'#D9D9D9'} fc={'#24292f'} h={'40'} f={handleCancleClick} />
+          <Btn str={'취소'} c={'#D9D9D9'} fc={'#3d4147'} h={'40'} f={handleCancleClick} />
         </ButtonDiv>
       </LayoutDiv>
     </div>

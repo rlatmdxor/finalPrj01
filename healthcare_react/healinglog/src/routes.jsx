@@ -27,8 +27,9 @@ import LoginPage from './components/pages/Member/LoginPage';
 import Mypage from './components/pages/Member/Mypage';
 import Notice from './components/pages/Notice/Notice';
 import AnAerobicDetail from './components/pages/LivingHealth/Exercise/AnAerobicDetail';
+import DietCal from './components/pages/LivingHealth/Diet/DietCal';
+import DietReport from './components/pages/LivingHealth/Diet/DietReport';
 // import AdminUserManage from './components/admin/AdminUserManage';
-
 
 export const routes = [
   { path: '/', component: <Main /> },
@@ -36,6 +37,8 @@ export const routes = [
   { path: '/login', component: <LoginPage /> },
   { path: '/sleep', component: <Sleep /> },
   { path: '/diet', component: <Diet /> },
+  { path: '/dietcalendar', component: <DietCal /> },
+  { path: '/dietreport', component: <DietReport /> },
   { path: '/aerobic', component: <Aerobic /> },
   { path: '/anaerobic', component: <AnAerobic /> },
   { path: '/alc', component: <Alc /> },

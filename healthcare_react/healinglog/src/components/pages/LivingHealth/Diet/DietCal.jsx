@@ -12,7 +12,7 @@ const NaviContainer = styled.div`
   grid-template-columns: 4fr 3fr 3fr;
 `;
 
-const Diet = () => {
+const DietCal = () => {
   return (
     <div>
       <Title>식단</Title>
@@ -25,4 +25,4 @@ const Diet = () => {
   );
 };
 
-export default Diet;
+export default DietCal;
