@@ -49,7 +49,7 @@ const ContentDiv = styled.div`
   padding: 30px;
 `;
 
-const Modal = ({ children, title }) => {
+const Modal = ({ children, title, type }) => {
   const [click, setClick] = useState(false);
   const [position, setPosition] = useState({ x: 450, y: 150 });
   const [offset, setOffset] = useState({ x: 450, y: 150 });
@@ -94,8 +94,18 @@ const Modal = ({ children, title }) => {
 
         <CloseBtn onClick={handleClose}>X</CloseBtn>
         <ContentDiv>{children}</ContentDiv>
+
         <BtnContainerDiv>
-          <Btn f={() => {}} c={'#FF7F50'} fc={'white'} str={'등록'}></Btn>
+          {type === 'edit' ? (
+            <>
+              <Btn f={() => {}} c={'#7ca96d'} fc={'white'} str={'수정'}></Btn>{' '}
+              <Btn f={() => {}} c={'lightgray'} fc={'black'} str={'삭제'}></Btn>
+            </>
+          ) : type === 'add' ? (
+            <Btn f={() => {}} c={'#FF7F50'} fc={'white'} str={'등록'}></Btn>
+          ) : (
+            <Btn f={() => {}} c={'#FF7F50'} fc={'white'} str={'시작'}></Btn>
+          )}
         </BtnContainerDiv>
       </ContainerDiv>
     </>
