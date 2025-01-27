@@ -13,6 +13,8 @@ import Alc from './components/pages/LivingHealth/Alc/Alc';
 import Cigarette from './components/pages/LivingHealth/Cigarette/Cigarette';
 import Diet from './components/pages/LivingHealth/Diet/Diet';
 import Drug from './components/pages/LivingHealth/Drug/Drug';
+import Drug1 from './components/pages/LivingHealth/Drug/Drug1';
+import Exercise from './components/pages/LivingHealth/Exercise/Exercise';
 import Aerobic from './components/pages/LivingHealth/Exercise/Aerobic';
 import AnAerobic from './components/pages/LivingHealth/Exercise/AnAerobic';
 import AerobicDetail from './components/pages/LivingHealth/Exercise/AerobicDetail';
@@ -39,6 +41,7 @@ export const routes = [
   { path: '/alc', component: <Alc /> },
   { path: '/cigarette', component: <Cigarette /> },
   { path: '/drug', component: <Drug /> },
+  { path: '/drug1', component: <Drug1 /> },
   { path: '/bloodpressure', component: <BloodPressure /> },
   { path: '/bloodsugar', component: <BloodSugar /> },
   { path: '/hospital', component: <Hospital /> },

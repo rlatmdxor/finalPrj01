@@ -16,11 +16,11 @@ const InputTag = styled.input`
   box-sizing: border-box;
 `;
 
-const Input = ({ type, placeholder, size, mb, mt, ml, mr, title }) => {
+const Input = ({ type, placeholder, size, mb, mt, ml, mr, title, name }) => {
   return (
     <>
       {title}
-      <InputTag type={type} placeholder={placeholder} size={size} mb={mb} mt={mt} ml={ml} mr={mr} />
+      <InputTag name={name} type={type} placeholder={placeholder} size={size} mb={mb} mt={mt} ml={ml} mr={mr} />
     </>
   );
 };

@@ -7,14 +7,15 @@ import Modal from '../../../util/Modal';
 import InputTag from '../../../util/Input';
 import { useDispatch, useSelector } from 'react-redux';
 import { open } from '../../../../redux/modalSlice';
-import Table from '../../../common/Table';
 import { resetPaging, setTotalCount } from '../../../../redux/pagingSlice';
-import BoardList from '../../../common/BoardList';
 import DateBtn from '../../../util/DateBtn';
+import Table from '../../../util/Table';
 
-const BtnDiv = styled.div`
+const BtnContainer = styled.div`
+  display: flex;
   margin-top: 30px;
-  margin-left: 1100px;
+  margin-left: 1030px;
+  gap: 15px;
 `;
 
 const DataDiv = styled.div`
@@ -27,27 +28,23 @@ const CharDiv = styled.div`
   margin-top: 30px;
 `;
 
+const TableDiv = styled.div`
+  margin-left: 135px;
+`;
+
 const Sleep = () => {
   const dataBtn = ['일', '주', '월'];
   const dispatch = useDispatch();
   const boardType = 'honeyTip';
 
   const dataVoList = [
-    { no: 15, category: '생활', title: '제목333333333333333333', votes: 36, writer: '홍길동', date: '2025-01-18' },
-    { no: 14, category: '생활', title: '제목333333333333333333', votes: 36, writer: '홍길동', date: '2025-01-18' },
-    { no: 13, category: '생활', title: '제목333333333333333333', votes: 36, writer: '홍길동', date: '2025-01-18' },
-    { no: 12, category: '생활', title: '제목333333333333333333', votes: 36, writer: '홍길동', date: '2025-01-18' },
-    { no: 11, category: '생활', title: '제목333333333333333333', votes: 36, writer: '홍길동', date: '2025-01-18' },
-    { no: 10, category: '생활', title: '제목333333333333333333', votes: 36, writer: '홍길동', date: '2025-01-18' },
-    { no: 9, category: '생활', title: '제목333333333333333333', votes: 36, writer: '홍길동', date: '2025-01-18' },
-    { no: 8, category: '병원', title: '제목11111111111111111', votes: 15, writer: '홍길동', date: '2025-01-18' },
-    { no: 7, category: '보험', title: '제목222222222222222222', votes: 25, writer: '홍길동', date: '2025-01-18' },
-    { no: 6, category: '생활', title: '제목333333333333333333', votes: 36, writer: '홍길동', date: '2025-01-18' },
-    { no: 5, category: '생활', title: '제목333333333333333333', votes: 36, writer: '홍길동', date: '2025-01-18' },
-    { no: 4, category: '생활', title: '제목333333333333333333', votes: 36, writer: '홍길동', date: '2025-01-18' },
-    { no: 3, category: '생활', title: '제목333333333333333333', votes: 36, writer: '홍길동', date: '2025-01-18' },
-    { no: 2, category: '생활', title: '제목333333333333333333', votes: 36, writer: '홍길동', date: '2025-01-18' },
-    { no: 1, category: '생활', title: '제목333333333333333333', votes: 36, writer: '홍길동', date: '2025-01-18' },
+    { no: '월', startTime: '22:00', endTime: '07:00', runTime: '630분', date: '2025-01-18' },
+    { no: '화', startTime: '22:00', endTime: '07:00', runTime: '630분', date: '2025-01-18' },
+    { no: '수', startTime: '22:00', endTime: '07:00', runTime: '630분', date: '2025-01-18' },
+    { no: '목', startTime: '22:00', endTime: '07:00', runTime: '630분', date: '2025-01-18' },
+    { no: '금', startTime: '22:00', endTime: '07:00', runTime: '630분', date: '2025-01-18' },
+    { no: '토', startTime: '22:00', endTime: '07:00', runTime: '630분', date: '2025-01-18' },
+    { no: '일', startTime: '22:00', endTime: '07:00', runTime: '630분', date: '2025-01-18' },
   ];
   const { currentPage, boardLimit } = useSelector((state) => state.paging[boardType] || {});
 
@@ -89,10 +86,15 @@ const Sleep = () => {
 
   return (
     <div>
-      <Modal title="수면">
+      <Modal title="수면 등록" type={'add'}>
         <InputTag type="date" plcaeholder="날짜" title="날짜" size={'size3'} mb={'10'} mt={'5'}></InputTag>
+        <InputTag type="time" title="수면 시작 시간" size={'size3'} mb={'10'} mt={'5'}></InputTag>
+        <InputTag type="time" title="수면 종료 시간" size={'size3'} mb={'10'} mt={'5'}></InputTag>
+      </Modal>
+      <Modal title="수면 수정" type={'edit'}>
         <InputTag type="date" plcaeholder="날짜" title="날짜" size={'size3'} mb={'10'} mt={'5'}></InputTag>
-        <InputTag type="date" plcaeholder="날짜" title="날짜" size={'size3'} mb={'10'} mt={'5'}></InputTag>
+        <InputTag type="time" title="수면 시작 시간" size={'size3'} mb={'10'} mt={'5'}></InputTag>
+        <InputTag type="time" title="수면 종료 시간" size={'size3'} mb={'10'} mt={'5'}></InputTag>
       </Modal>
       <Title>수면</Title>
       <DataDiv>
@@ -109,45 +111,53 @@ const Sleep = () => {
           yAxisColor="rgba(255, 99, 132, 1)"
         />
       </CharDiv>
-      <BtnDiv
-        onClick={() => {
-          dispatch(open({ title: '수면', value: 'block' }));
-        }}
-      >
-        <Btn str={'등록'} c={'#FF7F50'} fc={'white'}></Btn>
-      </BtnDiv>
-
-      <BoardList>
-        <thead>
-          <tr>
-            <th>번호</th>
-            <th>카테고리</th>
-            <th>제목</th>
-            <th>추천수</th>
-            <th>작성자</th>
-            <th>등록일자</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data.map((vo) => {
-            return (
-              <tr
-                key={vo.no}
-                onClick={() => {
-                  window.location.href = `/board?bno=${vo.no}`;
-                }}
-              >
-                <td>{vo.no}</td>
-                <td>{vo.category}</td>
-                <td>{vo.title}</td>
-                <td>{vo.votes}</td>
-                <td>{vo.writer}</td>
-                <td>{vo.date}</td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </BoardList>
+      <BtnContainer>
+        <div
+          onClick={() => {
+            dispatch(open({ title: '수면 등록', value: 'block' }));
+          }}
+        >
+          <Btn str={'등록'} c={'#FF7F50'} fc={'white'}></Btn>
+        </div>
+        <div
+          onClick={() => {
+            dispatch(open({ title: '수면 수정', value: 'block' }));
+          }}
+        >
+          <Btn str={'수정'} c={'#7ca96d'} fc={'white'}></Btn>
+        </div>
+      </BtnContainer>
+      <TableDiv>
+        <Table width={'1000px'}>
+          <thead>
+            <tr>
+              <th></th>
+              <th>수면 시작 시간</th>
+              <th>수면 종료 시간</th>
+              <th>수면 지속 시간</th>
+              <th>날짜</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.map((vo) => {
+              return (
+                <tr
+                  key={vo.no}
+                  onClick={() => {
+                    window.location.href = `/board?bno=${vo.no}`;
+                  }}
+                >
+                  <td>{vo.no}</td>
+                  <td>{vo.startTime}</td>
+                  <td>{vo.endTime}</td>
+                  <td>{vo.runTime}</td>
+                  <td>{vo.date}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </Table>
+      </TableDiv>
     </div>
   );
 };
