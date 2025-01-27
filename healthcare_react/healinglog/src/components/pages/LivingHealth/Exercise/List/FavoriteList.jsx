@@ -1,18 +1,17 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setBookmark } from '../../../../redux/aerobicSlice';
+import { setBookmark } from '../../../../../redux/aerobicSlice';
 import styled, { useTheme } from 'styled-components';
-import Btn from '../../../util/Btn';
+import Btn from '../../../../util/Btn';
 import { useNavigate } from 'react-router-dom';
 
-const AerobicList = () => {
+const FavoriteList = ({ f }) => {
   const dispatch = useDispatch();
   const exVoList = useSelector((state) => state.aerobic);
   const theme = useTheme();
   const navigate = useNavigate();
 
   const markData = exVoList.filter((item) => item.bookmark === 'y');
-  const unmarkData = exVoList.filter((item) => item.bookmark === 'n');
 
   const handleToggleBookmark = (no) => {
     dispatch(setBookmark({ no }));
@@ -20,32 +19,42 @@ const AerobicList = () => {
 
   return (
     <div>
-      <ExList>
-        <h2>운동 목록</h2>
-        {unmarkData.map((vo) => (
-          <Line key={vo.no}>
-            <Star>
-              <StarIcon src="/img/EmptyStar.webp" onClick={() => handleToggleBookmark(vo.no)} />
-            </Star>
-            <Content>
-              {vo.name}
-              <div style={{ marginRight: '20px' }}>
-                <Btn
-                  str={'상세조회'}
-                  c={theme.gray}
-                  fs={'14'}
-                  f={() => {
-                    navigate(`/aerobic/${vo.name}`);
-                  }}
-                />
-              </div>
-            </Content>
-          </Line>
-        ))}
-      </ExList>
+      {markData.length > 0 && (
+        <Bookmark>
+          <h2>즐겨찾기</h2>
+          {markData.map((vo) => (
+            <Line key={vo.no}>
+              <Star>
+                <StarIcon src="/img/Star.webp" onClick={() => handleToggleBookmark(vo.no)} />
+              </Star>
+              <Content>
+                <div onClick={() => f(vo.name)}>{vo.name}</div>
+                <div style={{ marginRight: '20px' }}>
+                  <Btn
+                    str={'상세조회'}
+                    c={theme.gray}
+                    fs={'14'}
+                    f={() => {
+                      navigate(`/aerobic/${vo.name}`);
+                    }}
+                  />
+                </div>
+              </Content>
+            </Line>
+          ))}
+        </Bookmark>
+      )}
     </div>
   );
 };
+
+const Bookmark = styled.div`
+  display: grid;
+  grid-template-rows: 1fr;
+  grid-auto-rows: 50px;
+  justify-self: center;
+  align-self: center;
+`;
 
 const Line = styled.div`
   display: grid;
@@ -79,13 +88,4 @@ const StarIcon = styled.img`
   cursor: pointer;
 `;
 
-const ExList = styled.div`
-  display: grid;
-  grid-template-rows: 1fr;
-  grid-auto-rows: 50px;
-  justify-self: center;
-  align-self: center;
-  margin-bottom: 100px;
-`;
-
-export default AerobicList;
+export default FavoriteList;

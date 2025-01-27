@@ -28,6 +28,9 @@ import LoginPage from './components/pages/Member/LoginPage';
 import Mypage from './components/pages/Member/Mypage';
 import Notice from './components/pages/Notice/Notice';
 import AnAerobicDetail from './components/pages/LivingHealth/Exercise/AnAerobicDetail';
+import ExHistory from './components/pages/LivingHealth/Exercise/ExHistory';
+import ExReport from './components/pages/LivingHealth/Exercise/ExReport';
+import Exercising from './components/pages/LivingHealth/Exercise/Exercising';
 import DietCal from './components/pages/LivingHealth/Diet/DietCal';
 import DietReport from './components/pages/LivingHealth/Diet/DietReport';
 // import AdminUserManage from './components/admin/AdminUserManage';
@@ -63,6 +66,9 @@ export const routes = [
   { path: '/admin/login', component: <AdminLogin /> },
   { path: '/aerobic/:name', component: <AerobicDetail /> },
   { path: '/anaerobic/:name', component: <AnAerobicDetail /> },
+  { path: '/exhistory', component: <ExHistory /> },
+  { path: '/exreport', component: <ExReport /> },
+  { path: '/exercising/:name', component: <Exercising /> },
   // { path: '/admin/usermanage', component: <AdminUserManage /> },
   { path: '/board/write', component: <BoardWrite /> },
 ];

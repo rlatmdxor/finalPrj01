@@ -1,11 +1,11 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setBookmark } from '../../../../redux/aerobicSlice';
+import { setBookmark } from '../../../../../redux/aerobicSlice';
 import styled, { useTheme } from 'styled-components';
-import Btn from '../../../util/Btn';
+import Btn from '../../../../util/Btn';
 import { useNavigate } from 'react-router-dom';
 
-const ArmExList = () => {
+const ArmExList = ({ f }) => {
   const dispatch = useDispatch();
   const exVoList = useSelector((state) => state.anAerobic);
   const theme = useTheme();
@@ -27,7 +27,7 @@ const ArmExList = () => {
               <StarIcon src="/img/EmptyStar.webp" onClick={() => handleToggleBookmark(vo.no)} />
             </Star>
             <Content>
-              {vo.name}
+              <div onClick={() => f(vo.name)}>{vo.name}</div>
               <div style={{ marginRight: '20px' }}>
                 <Btn
                   str={'상세조회'}

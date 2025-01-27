@@ -1,17 +1,17 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setBookmark } from '../../../../redux/aerobicSlice';
+import { setBookmark } from '../../../../../redux/aerobicSlice';
 import styled, { useTheme } from 'styled-components';
-import Btn from '../../../util/Btn';
+import Btn from '../../../../util/Btn';
 import { useNavigate } from 'react-router-dom';
 
-const LegExList = () => {
+const CoreExList = ({ f }) => {
   const dispatch = useDispatch();
   const exVoList = useSelector((state) => state.anAerobic);
   const theme = useTheme();
   const navigate = useNavigate();
 
-  const legData = exVoList.filter((item) => item.part === 'leg' && item.bookmark === 'n');
+  const coreData = exVoList.filter((item) => item.part === 'core' && item.bookmark === 'n');
 
   const handleToggleBookmark = (no) => {
     dispatch(setBookmark({ no }));
@@ -20,14 +20,14 @@ const LegExList = () => {
   return (
     <div>
       <ExList>
-        <h2>다리</h2>
-        {legData.map((vo) => (
+        <h2>코어</h2>
+        {coreData.map((vo) => (
           <Line key={vo.no}>
             <Star>
               <StarIcon src="/img/EmptyStar.webp" onClick={() => handleToggleBookmark(vo.no)} />
             </Star>
             <Content>
-              {vo.name}
+              <div onClick={() => f(vo.name)}>{vo.name}</div>
               <div style={{ marginRight: '20px' }}>
                 <Btn
                   str={'상세조회'}
@@ -87,4 +87,4 @@ const ExList = styled.div`
   margin-bottom: 100px;
 `;
 
-export default LegExList;
+export default CoreExList;
