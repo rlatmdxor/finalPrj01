@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Title from '../../../util/Title';
 import Navi from '../../../util/Navi';
 import styled from 'styled-components';
@@ -7,7 +7,7 @@ import AerobicList from './List/AerobicList';
 import Modal from '../../../util/Modal';
 import Input from '../../../util/Input';
 import { useDispatch } from 'react-redux';
-import { open } from '../../../../redux/modalSlice';
+import { close, open } from '../../../../redux/modalSlice';
 import { useNavigate } from 'react-router-dom';
 
 const Aerobic = () => {
@@ -26,6 +26,10 @@ const Aerobic = () => {
       },
     });
   };
+
+  useEffect(() => {
+    dispatch(close('운동시작'));
+  });
 
   return (
     <div>

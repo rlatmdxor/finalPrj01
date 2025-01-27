@@ -1,7 +1,14 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
+import { close } from '../../../../redux/modalSlice';
 
 const AnAerobicDetail = () => {
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(close('운동시작'));
+  });
+
   const { name } = useParams();
 
   return (

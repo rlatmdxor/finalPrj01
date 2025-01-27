@@ -1,10 +1,17 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import Navi from '../../../util/Navi';
 import Title from '../../../util/Title';
 import Chart from '../../../util/Chart';
+import { useDispatch } from 'react-redux';
+import { close } from '../../../../redux/modalSlice';
 
 const ExReport = () => {
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(close('운동시작'));
+  });
+
   const labels = [
     'January',
     'February',
@@ -87,7 +94,7 @@ const ExReport = () => {
               xAxisColor="rgba(54, 162, 235, 1)" // x축 색상
               yAxisColor="rgba(255, 159, 64, 1)" // y축 색상
               // yMin={}     // y축 최소값 음수가 필요한거 아니면 주석 유지하면됨
-              yMax={''} // y축 최댓값 설정안하면 자동 스케일링됨
+              // yMax={''} // y축 최댓값 설정안하면 자동 스케일링됨
               // yUnit={}       // y축에 표시될 수치의 단위를 입력할 수 있음 안쓰면 자동으로 공백처리
             />
           </ChartPosition>

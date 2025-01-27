@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Title from '../../../util/Title';
 import Navi from '../../../util/Navi';
 import styled from 'styled-components';
@@ -7,10 +7,9 @@ import LegExList from './List/LegExList';
 import ArmExList from './List/ArmExList';
 import CoreExList from './List/CoreExList';
 import Modal from '../../../util/Modal';
-
 import Input from '../../../util/Input';
 import { useDispatch } from 'react-redux';
-import { open } from '../../../../redux/modalSlice';
+import { close, open } from '../../../../redux/modalSlice';
 import { useNavigate } from 'react-router-dom';
 
 const AnAerobic = () => {
@@ -31,6 +30,10 @@ const AnAerobic = () => {
       },
     });
   };
+
+  useEffect(() => {
+    dispatch(close('운동시작'));
+  });
 
   return (
     <div>
@@ -115,7 +118,12 @@ const AnAerobic = () => {
           <Navi target="exreport" tag={'리포트'}></Navi>
         </NaviContainer>
         <BlankSpace />
-        <AnFavoriteList />
+        <AnFavoriteList
+          f={(name) => {
+            setModalTitle(name);
+            dispatch(open({ title: '운동시작', value: 'block' }));
+          }}
+        />
         <BlankSpace />
         <ListContainer>
           <ArmExList
