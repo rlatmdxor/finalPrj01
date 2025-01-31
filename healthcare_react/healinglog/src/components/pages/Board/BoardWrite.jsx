@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Title from '../../util/Title';
 import BoardEditor from '../../util/BoardEditor';
 import styled from 'styled-components';
@@ -12,7 +12,7 @@ const LayoutDiv = styled.div`
     margin-top: 18px;
     margin-bottom: 14px;
     margin-left: 2px;
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 600;
     color: #353535;
   }
@@ -76,6 +76,21 @@ const BoardWrite = () => {
     navigate('/board');
   };
 
+  const [title, setTitle] = useState('');
+  const [category, setCategory] = useState('');
+  const [content, setContent] = useState('');
+
+  const handleChangeContent = (newContent) => {
+    setContent(newContent);
+  };
+
+  const handleEnrollBoard = () => {
+    // fetch 함수
+    console.log('category : ' + category);
+    console.log('title : ' + title);
+    console.log('content : ' + content);
+  };
+
   return (
     <div>
       <Title>꿀팁게시판</Title>
@@ -84,7 +99,8 @@ const BoardWrite = () => {
         <FormDiv>
           <div className="form-label">카테고리</div>
           <div className="form-input">
-            <select>
+            <select value={category} onChange={(e) => setCategory(e.target.value)}>
+              <option>-- 카테고리 선택 --</option>
               <option>병원</option>
               <option>약국</option>
               <option>생할</option>
@@ -93,10 +109,15 @@ const BoardWrite = () => {
           </div>
           <div className="form-label">제목</div>
           <div className="form-input">
-            <input type="text" name="title" placeholder="제목을 입력하세요." />
+            <input
+              type="text"
+              placeholder="제목을 입력하세요."
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
           </div>
           <div className="form-editor">
-            <BoardEditor />
+            <BoardEditor onChangeContent={handleChangeContent} />
           </div>
           <div className="form-label">첨부파일</div>
           <div className="form-input">
@@ -104,7 +125,7 @@ const BoardWrite = () => {
           </div>
         </FormDiv>
         <ButtonDiv>
-          <Btn str={'등록'} c={'#FF7F50'} fc={'#ffffff'} h={'40'} />
+          <Btn str={'등록'} c={'#FF7F50'} fc={'#ffffff'} h={'40'} f={handleEnrollBoard} />
           <Btn str={'취소'} c={'#D9D9D9'} fc={'#3d4147'} h={'40'} f={handleCancleClick} />
         </ButtonDiv>
       </LayoutDiv>

@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { convertToRaw } from 'draft-js';
+import { convertToRaw, RichUtils } from 'draft-js';
 import Editor, { createEditorStateWithText } from '@draft-js-plugins/editor';
 import createTextAlignmentPlugin from '@draft-js-plugins/text-alignment';
 import createLinkPlugin from '@draft-js-plugins/anchor';
@@ -35,6 +35,20 @@ const LayoutDiv = styled.div`
   height: 100%;
 `;
 
+const ToolbarDiv = styled.div`
+  & > div {
+    display: flex;
+    background-color: #fbfbfb;
+    align-items: center;
+  }
+
+  & .toolbar-select {
+    width: 80px;
+    height: 26px;
+    margin: 0px 10px;
+  }
+`;
+
 const ContentDiv = styled.div`
   width: 100%;
   height: 100%;
@@ -50,7 +64,7 @@ const ContentDiv = styled.div`
   }
 `;
 
-const BoardEditor = () => {
+const BoardEditor = ({ onChangeContent }) => {
   const [editorState, setEditorState] = useState(() => createEditorStateWithText(text));
   const [isFocused, setIsFocused] = useState(false);
 
@@ -63,16 +77,16 @@ const BoardEditor = () => {
     }
   };
 
-  const saveContent = () => {
-    const rawContent = convertToRaw(editorState.getCurrentContent());
-    console.log(rawContent);
-    console.log('Saved Content:', JSON.stringify(rawContent));
+  const handleEditorChange = (newEditorState) => {
+    setEditorState(newEditorState);
+    const rawContent = JSON.stringify(convertToRaw(newEditorState.getCurrentContent()));
+    onChangeContent(rawContent);
   };
 
   return (
     <LayoutDiv className="editor" onClick={focus}>
-      <div>
-        <Toolbar>
+      <ToolbarDiv>
+        <Toolbar className="toolbar">
           {(externalProps) => (
             <>
               <ItalicButton {...externalProps} />
@@ -85,15 +99,14 @@ const BoardEditor = () => {
               <UnorderedListButton {...externalProps} />
               <OrderedListButton {...externalProps} />
               <linkPlugin.LinkButton {...externalProps} />
-              <button onClick={saveContent}>Save Content</button>
             </>
           )}
         </Toolbar>
-      </div>
+      </ToolbarDiv>
       <ContentDiv>
         <Editor
           editorState={editorState}
-          onChange={setEditorState}
+          onChange={handleEditorChange}
           plugins={plugins}
           ref={editorRef}
           placeholder={isFocused ? '' : '내용을 입력해주세요.'}
