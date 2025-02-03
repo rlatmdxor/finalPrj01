@@ -30,6 +30,13 @@ const NaviContainer = styled.div`
   grid-template-columns: 3fr 3fr; // 글자수만큼 fr 주면 됩니다. ex) 유산소 3글자니까 3fr
 `;
 
+const BtnContainer = styled.div`
+  display: flex;
+  position: absolute;
+  margin-left: 1045px;
+  gap: 15px;
+`;
+
 const BottomDiv = styled.div`
   display: flex;
   margin: 30px 50px 50px 50px;
@@ -134,6 +141,16 @@ const Cigarette = () => {
           })}
         </tbody>
       </Table>
+
+      <BtnContainer>
+        <div
+          onClick={() => {
+            dispatch(open({ title: '복용약 등록', value: 'block' }));
+          }}
+        >
+          <Btn str={'등록'} c={'#FF7F50'} fc={'white'}></Btn>
+        </div>
+      </BtnContainer>
       <BottomDiv>
         <div></div>
         <div>
