@@ -3,7 +3,10 @@ import styled from 'styled-components';
 
 const LayoutDiv = styled.div`
   display: flex;
-  margin: 20px 50px;
+  margin-top: ${(props) => props.width || '20px'};
+  margin-bottom: ${(props) => props.width || '20px'};
+  margin-left: ${(props) => props.width || '50px'};
+  margin-right: ${(props) => props.width || '50px'};
 `;
 
 const StyledTable = styled.table`
@@ -47,11 +50,28 @@ const StyledTable = styled.table`
   }
 `;
 
-const Table = ({ children, width, thbgcolor, thtextcolor, thtextsize, tdbgcolor, tdtextcolor, tdtextsize }) => {
+const Table = ({
+  children,
+  width,
+  mt,
+  mb,
+  ml,
+  mr,
+  thbgcolor,
+  thtextcolor,
+  thtextsize,
+  tdbgcolor,
+  tdtextcolor,
+  tdtextsize,
+}) => {
   return (
     <LayoutDiv>
       <StyledTable
         width={width}
+        mt={mt}
+        mb={mb}
+        ml={ml}
+        mr={mr}
         thbgcolor={thbgcolor}
         thtextcolor={thtextcolor}
         thtextsize={thtextsize}
