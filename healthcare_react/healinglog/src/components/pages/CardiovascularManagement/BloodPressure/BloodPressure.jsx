@@ -12,6 +12,7 @@ import { open } from '../../../../redux/modalSlice';
 import Pagination from '../../../util/Pagination';
 import DateBtn from '../../../util/DateBtn';
 import useFetch from '../../../hook/useFetch';
+import ContentLayout from '../../../util/ContentLayout';
 
 const LayDiv = styled.div`
   height: 100px;
@@ -47,6 +48,7 @@ const BloodPressure = () => {
   };
 
   const [dataVoList, setVoList] = useState([]);
+
   const boardType = 'bloodPressure';
   const { currentPage, boardLimit } = useSelector((state) => state.paging[boardType] || {});
   const offset = (currentPage - 1) * boardLimit;
@@ -68,19 +70,10 @@ const BloodPressure = () => {
       .catch((error) => console.error('데이터 불러오기 실패:', error));
   }, [currentPage, boardLimit]); // currentPage, boardLimit 변경 시 실행
 
-  // const { data: dataVoList } = useFetch(url, options);
-
   const dataBtn = ['일', '주', '월'];
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    if (dataVoList && dataVoList.length > 0) {
-      return dispatch(setTotalCount({ boardType, totalCount: dataVoList.length }));
-    }
-    dispatch(resetPaging({ boardType }));
-  }, [dispatch]);
-
-  const labels = ['월', '화', '수', '목', '금', '토', '일'];
+  const labels = ['2025-02-04-12:00', '2025-02-04-12:00', '2025-02-04-12:00', '2025-02-04-12:00', '2025-02-04-12:00'];
   const dataset = [
     {
       // 차트에서 그래프가 나타내는 이름 표시 ex)수축기 혈압 , 이완기 혈압
@@ -111,74 +104,91 @@ const BloodPressure = () => {
   ];
 
   return (
-    <div>
+    <>
       <Title>혈압</Title>
-      <LayDiv></LayDiv>
+      <div></div>
 
-      <DataDiv>
-        <DateBtn dataBtn={dataBtn}></DateBtn>
-      </DataDiv>
-      <CharDiv>
-        <Chart
-          chartType="Line" // 차트 타입지정
-          labels={labels} // 위랑 동일
-          dataset={dataset} // 위랑 동일
-          width={100} // 위랑 동일
-          height={450} // 위랑 동일
-          xAxisColor="rgba(54, 162, 235, 1)" // 위랑 동일
-          yAxisColor="rgba(255, 159, 64, 1)" // 위랑 동일
-          yMax={200}
-        />
-      </CharDiv>
-      {/* 전부다 위와 동일한데 dataset에서 배경색을 지정해야함 */}
+      <ContentLayout>
+        <DataDiv>
+          <DateBtn dataBtn={dataBtn}></DateBtn>
+        </DataDiv>
+        <CharDiv>
+          <Chart
+            chartType="Line" // 차트 타입지정
+            labels={labels} // 위랑 동일
+            dataset={dataset} // 위랑 동일
+            width={100} // 위랑 동일
+            height={450} // 위랑 동일
+            xAxisColor="rgba(54, 162, 235, 1)" // 위랑 동일
+            yAxisColor="rgba(255, 159, 64, 1)" // 위랑 동일
+            yMax={200}
+            xLabelVisible={true} // 추가: X축 라벨 표시 여부 (기본값: true)
+          />
+        </CharDiv>
+        {/* 전부다 위와 동일한데 dataset에서 배경색을 지정해야함 */}
 
-      <LayDiv></LayDiv>
+        <LayDiv></LayDiv>
 
-      <BtnContainer>
-        <div
-          onClick={() => {
-            dispatch(open({ title: '수면 등록', value: 'block' }));
-          }}
-        >
-          <Btn str={'등록'} c={'#FF7F50'} fc={'white'}></Btn>
-        </div>
-      </BtnContainer>
+        <BtnContainer>
+          <div
+            onClick={() => {
+              dispatch(open({ title: '수면 등록', value: 'block' }));
+            }}
+          >
+            <Btn str={'등록'} c={'#FF7F50'} fc={'white'}></Btn>
+          </div>
+        </BtnContainer>
 
-      <RadiusTable width="" thBgColor="" radius="0px">
-        <thead>
-          <tr>
-            <th>측정일</th>
-            <th>측정시간</th>
-            <th>이완기</th>
-            <th>수축기</th>
-            <th>맥박/분</th>
-            <th>특이사항</th>
-          </tr>
-        </thead>
-        <tbody>
-          {dataVoList?.map((vo) => {
-            return (
-              <tr
-                key={vo.no}
-                onClick={() => {
-                  window.location.href = `/board?bno=${vo.no}`;
-                }}
-              >
-                <td rowSpan="2">{vo.day}</td>
-                <td>{vo.time}</td>
-                <td>{vo.diastole}</td>
-                <td>{vo.systole}</td>
-                <td>{vo.pulse}</td>
-                <td>{vo.note}</td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </RadiusTable>
-      <Pagination boardType={boardType}></Pagination>
-      <LayDiv></LayDiv>
-      <LayDiv></LayDiv>
-    </div>
+        <RadiusTable width="" thBgColor="" radius="0px">
+          <thead>
+            <tr>
+              <th>측정일</th>
+              <th>측정시간</th>
+              <th>이완기</th>
+              <th>수축기</th>
+              <th>맥박/분</th>
+              <th>특이사항</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {Object.entries(
+              dataVoList.reduce((acc, vo) => {
+                if (!acc[vo.day]) acc[vo.day] = [];
+                acc[vo.day].push(vo);
+                return acc;
+              }, {})
+            ).map(([day, records]) =>
+              records.map((vo, index) => (
+                <tr
+                  key={vo.no}
+                  onClick={() => {
+                    window.location.href = `/board?bno=${vo.no}`;
+                  }}
+                >
+                  {index === 0 && (
+                    <td
+                      rowSpan={records.length}
+                      style={{ verticalAlign: 'middle', fontWeight: 'bold', textAlign: 'center' }}
+                    >
+                      {day}
+                    </td>
+                  )}
+                  <td>{vo.time}</td>
+                  <td>{vo.diastole}</td>
+                  <td>{vo.systole}</td>
+                  <td>{vo.pulse}</td>
+                  <td>{vo.note}</td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </RadiusTable>
+        <Pagination boardType={boardType}></Pagination>
+        <LayDiv></LayDiv>
+        <LayDiv></LayDiv>
+      </ContentLayout>
+    </>
   );
 };
 
