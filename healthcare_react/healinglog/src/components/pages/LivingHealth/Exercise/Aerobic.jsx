@@ -56,74 +56,73 @@ const Aerobic = () => {
           }}
         />
         <BlankSpace />
-
-        <Modal title="운동시작" type={'exercise'} f={handleRegister}>
-          <Input
-            type="text"
-            plcaeholder="value"
-            title="운동명"
-            size={'size3'}
-            mb={'10'}
-            mt={'5'}
-            value={modalTitle}
-            disabled={true}
-          ></Input>
-          <Input
-            type="number"
-            placeholder="VALUE"
-            title="시간"
-            size={'size3'}
-            mb={'10'}
-            mt={'5'}
-            f={(e) => {
-              let inputValue = Number(e.target.value);
-
-              if (inputValue < 0) {
-                inputValue = 0;
-              }
-
-              if (inputValue > 11) {
-                inputValue = 11;
-              }
-
-              setHours(inputValue);
-
-              if (inputValue === 0 && minutes < 1) {
-                setMinutes(1);
-              }
-            }}
-            value={hours}
-            disabled={false}
-          />
-          <Input
-            type="number"
-            placeholder="VALUE"
-            title="분"
-            size={'size3'}
-            mb={'10'}
-            mt={'5'}
-            f={(e) => {
-              let inputValue = Number(e.target.value);
-
-              if (inputValue < 0) {
-                inputValue = 0;
-              }
-
-              if (inputValue > 59) {
-                inputValue = 59;
-              }
-
-              if (hours === 0 && inputValue < 1) {
-                inputValue = 1;
-              }
-
-              setMinutes(inputValue);
-            }}
-            value={minutes}
-            disabled={false}
-          />
-        </Modal>
       </ContentLayout>
+      <Modal title="운동시작" type={'exercise'} f={handleRegister}>
+        <Input
+          type="text"
+          plcaeholder="value"
+          title="운동명"
+          size={'size3'}
+          mb={'10'}
+          mt={'5'}
+          value={modalTitle}
+          disabled={true}
+        ></Input>
+        <Input
+          type="number"
+          placeholder="VALUE"
+          title="시간"
+          size={'size3'}
+          mb={'10'}
+          mt={'5'}
+          f={(e) => {
+            let inputValue = Number(e.target.value);
+
+            if (inputValue < 0) {
+              inputValue = 0;
+            }
+
+            if (inputValue > 11) {
+              inputValue = 11;
+            }
+
+            setHours(inputValue);
+
+            if (inputValue === 0 && minutes < 1) {
+              setMinutes(1);
+            }
+          }}
+          value={hours}
+          disabled={false}
+        />
+        <Input
+          type="number"
+          placeholder="VALUE"
+          title="분"
+          size={'size3'}
+          mb={'10'}
+          mt={'5'}
+          f={(e) => {
+            let inputValue = Number(e.target.value);
+
+            if (inputValue < 0) {
+              inputValue = 0;
+            }
+
+            if (inputValue > 59) {
+              inputValue = 59;
+            }
+
+            if (hours === 0 && inputValue < 1) {
+              inputValue = 1;
+            }
+
+            setMinutes(inputValue);
+          }}
+          value={minutes}
+          disabled={false}
+        />
+      </Modal>
     </>
   );
 };
