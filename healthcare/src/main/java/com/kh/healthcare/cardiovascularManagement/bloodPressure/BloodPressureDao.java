@@ -18,6 +18,9 @@ public class BloodPressureDao {
     }
 
     public List<BloodPressureVo> bloodPressureList(String memberNo) {
-        return mapper.bloodPressureList(memberNo);
+
+        List<BloodPressureVo> voList = mapper.bloodPressureList(memberNo);
+        System.out.println("voList = " + voList);
+        return voList;
     }
 }
