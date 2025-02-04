@@ -10,27 +10,30 @@ import { open } from '../../../../redux/modalSlice';
 import { resetPaging, setTotalCount } from '../../../../redux/pagingSlice';
 import DateBtn from '../../../util/DateBtn';
 import Table from '../../../util/Table';
+import Navi from '../../../util/Navi';
+import ContentLayout from '../../../util/ContentLayout';
 
+const NaviContainer = styled.div`
+  display: grid;
+  position: relative;
+  width: 400px;
+  top: 20px;
+  left: 40px;
+  margin-bottom: 100px;
+  grid-template-columns: 3fr 7fr;
+`;
 const BtnContainer = styled.div`
   display: flex;
   margin-top: 30px;
-  margin-left: 1030px;
+  margin-left: 1110px;
   gap: 15px;
 `;
 
-const DataDiv = styled.div`
-  margin-left: 1100px;
-  margin-bottom: -30px;
-`;
-
 const CharDiv = styled.div`
-  margin-left: 180px;
   margin-top: 30px;
 `;
 
-const TableDiv = styled.div`
-  margin-left: 135px;
-`;
+const TableDiv = styled.div``;
 
 const Sleep = () => {
   const dataBtn = ['일', '주', '월'];
@@ -85,80 +88,80 @@ const Sleep = () => {
   ];
 
   return (
-    <div>
-      <Modal title="수면 등록" type={'add'}>
-        <InputTag type="date" plcaeholder="날짜" title="날짜" size={'size3'} mb={'10'} mt={'5'}></InputTag>
-        <InputTag type="time" title="수면 시작 시간" size={'size3'} mb={'10'} mt={'5'}></InputTag>
-        <InputTag type="time" title="수면 종료 시간" size={'size3'} mb={'10'} mt={'5'}></InputTag>
-      </Modal>
-      <Modal title="수면 수정" type={'edit'}>
-        <InputTag type="date" plcaeholder="날짜" title="날짜" size={'size3'} mb={'10'} mt={'5'}></InputTag>
-        <InputTag type="time" title="수면 시작 시간" size={'size3'} mb={'10'} mt={'5'}></InputTag>
-        <InputTag type="time" title="수면 종료 시간" size={'size3'} mb={'10'} mt={'5'}></InputTag>
-      </Modal>
+    <>
       <Title>수면</Title>
-      <DataDiv>
-        <DateBtn dataBtn={dataBtn}></DateBtn>
-      </DataDiv>
-      <CharDiv>
-        <Chart
-          chartType="Bar"
-          labels={labels}
-          dataset={dataset}
-          width={1000}
-          height={400}
-          xAxisColor="rgba(75, 192, 192, 1)"
-          yAxisColor="rgba(255, 99, 132, 1)"
-        />
-      </CharDiv>
-      <BtnContainer>
-        <div
-          onClick={() => {
-            dispatch(open({ title: '수면 등록', value: 'block' }));
-          }}
-        >
-          <Btn str={'등록'} c={'#FF7F50'} fc={'white'}></Btn>
+      <div></div>
+      {/* <NaviContainer>
+        <Navi target="drug" tag={'복용중'}></Navi>
+        <Navi target="drug1" tag={'과거 먹은 약'}></Navi>
+      </NaviContainer> */}
+      <ContentLayout>
+        <Modal title="수면 등록" type={'add'}>
+          <InputTag type="date" plcaeholder="날짜" title="날짜" size={'size3'} mb={'10'} mt={'5'}></InputTag>
+          <InputTag type="time" title="수면 시작 시간" size={'size3'} mb={'10'} mt={'5'}></InputTag>
+          <InputTag type="time" title="수면 종료 시간" size={'size3'} mb={'10'} mt={'5'}></InputTag>
+        </Modal>
+        <Modal title="수면 수정" type={'edit'}>
+          <InputTag type="date" plcaeholder="날짜" title="날짜" size={'size3'} mb={'10'} mt={'5'}></InputTag>
+          <InputTag type="time" title="수면 시작 시간" size={'size3'} mb={'10'} mt={'5'}></InputTag>
+          <InputTag type="time" title="수면 종료 시간" size={'size3'} mb={'10'} mt={'5'}></InputTag>
+        </Modal>
+        <div>
+          <DateBtn dataBtn={dataBtn}></DateBtn>
         </div>
-        <div
-          onClick={() => {
-            dispatch(open({ title: '수면 수정', value: 'block' }));
-          }}
-        >
-          <Btn str={'수정'} c={'#7ca96d'} fc={'white'}></Btn>
-        </div>
-      </BtnContainer>
-      <TableDiv>
-        <Table width={'1000px'}>
-          <thead>
-            <tr>
-              <th></th>
-              <th>수면 시작 시간</th>
-              <th>수면 종료 시간</th>
-              <th>수면 지속 시간</th>
-              <th>날짜</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((vo) => {
-              return (
-                <tr
-                  key={vo.no}
-                  onClick={() => {
-                    window.location.href = `/board?bno=${vo.no}`;
-                  }}
-                >
-                  <td>{vo.no}</td>
-                  <td>{vo.startTime}</td>
-                  <td>{vo.endTime}</td>
-                  <td>{vo.runTime}</td>
-                  <td>{vo.date}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </Table>
-      </TableDiv>
-    </div>
+        <CharDiv>
+          <Chart
+            chartType="Bar"
+            labels={labels}
+            dataset={dataset}
+            width={100}
+            height={400}
+            xAxisColor="rgba(75, 192, 192, 1)"
+            yAxisColor="rgba(255, 99, 132, 1)"
+          />
+        </CharDiv>
+        <BtnContainer>
+          <div
+            onClick={() => {
+              dispatch(open({ title: '수면 등록', value: 'block' }));
+            }}
+          >
+            <Btn str={'등록'} c={'#FF7F50'} fc={'white'}></Btn>
+          </div>
+        </BtnContainer>
+        <TableDiv>
+          <Table width={'100%'}>
+            <thead>
+              <tr>
+                <th></th>
+                <th>수면 시작 시간</th>
+                <th>수면 종료 시간</th>
+                <th>수면 지속 시간</th>
+                <th>날짜</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.map((vo) => {
+                return (
+                  <tr
+                    key={vo.no}
+                    onClick={() => {
+                      dispatch(open({ title: '수면 수정', value: 'block' }));
+                    }}
+                  >
+                    <td>{vo.no}</td>
+                    <td>{vo.startTime}</td>
+                    <td>{vo.endTime}</td>
+                    <td>{vo.runTime}</td>
+                    <td>{vo.date}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </Table>
+        </TableDiv>
+      </ContentLayout>
+    </>
   );
 };
 

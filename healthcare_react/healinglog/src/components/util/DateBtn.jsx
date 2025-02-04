@@ -13,16 +13,23 @@ const StyleBtn = styled.button`
   cursor: pointer;
 `;
 
+const DataDiv = styled.div`
+  display: flex;
+  justify-content: end;
+`;
+
 const DateBtn = ({ dataBtn }) => {
   const [activeIndex, setActiveIndex] = useState(0);
 
   return (
     <>
-      {dataBtn.map((label, index) => (
-        <StyleBtn key={index} isActive={activeIndex === index} onClick={() => setActiveIndex(index)}>
-          {label}
-        </StyleBtn>
-      ))}
+      <DataDiv>
+        {dataBtn.map((label, index) => (
+          <StyleBtn key={index} isActive={activeIndex === index} onClick={() => setActiveIndex(index)}>
+            {label}
+          </StyleBtn>
+        ))}
+      </DataDiv>
     </>
   );
 };

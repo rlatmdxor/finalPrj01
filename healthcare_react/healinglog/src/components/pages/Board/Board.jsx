@@ -32,7 +32,7 @@ const SelectBox = styled.select`
 
 const BottomDiv = styled.div`
   display: flex;
-  margin: 30px 50px 50px 50px;
+  /* margin: 30px 50px 50px 50px; */
   justify-content: space-between;
   align-items: center;
 `;

@@ -3,7 +3,7 @@ import styled from 'styled-components';
 
 const LayoutDiv = styled.div`
   display: flex;
-  margin: 20px 50px;
+  margin-bottom: 20px;
 `;
 
 const StyledTable = styled.table`

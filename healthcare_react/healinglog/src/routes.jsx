@@ -28,8 +28,9 @@ import LoginPage from './components/pages/Member/LoginPage';
 import Mypage from './components/pages/Member/Mypage';
 import Notice from './components/pages/Notice/Notice';
 import AnAerobicDetail from './components/pages/LivingHealth/Exercise/AnAerobicDetail';
-// import AdminUserManage from './components/admin/AdminUserManage';
-
+import AdminUserManage from './components/admin/AdminUserManage';
+import AlcReport from './components/pages/LivingHealth/Alc/AlcReport';
+import CigaretteReport from './components/pages/LivingHealth/Cigarette/CigaretteReport';
 
 export const routes = [
   { path: '/', component: <Main /> },
@@ -60,6 +61,8 @@ export const routes = [
   { path: '/admin/login', component: <AdminLogin /> },
   { path: '/aerobic/:name', component: <AerobicDetail /> },
   { path: '/anaerobic/:name', component: <AnAerobicDetail /> },
-  // { path: '/admin/usermanage', component: <AdminUserManage /> },
   { path: '/board/write', component: <BoardWrite /> },
+  { path: '/admin/usermanage', component: <AdminUserManage /> },
+  { path: '/alc/report', component: <AlcReport /> },
+  { path: '/cigarette/report', component: <CigaretteReport /> },
 ];
