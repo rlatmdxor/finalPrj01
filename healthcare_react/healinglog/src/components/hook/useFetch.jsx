@@ -9,7 +9,7 @@ const useFetch = (url, options) => {
       .then((data) => {
         setData(data);
       });
-  }, [url, options]);
+  }, [data]);
 
   return { data, setData }; // 데이터와 갱신 함수를 반환
 };

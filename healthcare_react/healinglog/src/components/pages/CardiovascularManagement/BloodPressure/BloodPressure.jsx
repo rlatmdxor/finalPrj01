@@ -1,13 +1,27 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Modal from '../../../util/Modal'; // 모달 컴포넌트
 import Input from '../../../util/Input'; // 입력 컴포넌트
 import Title from '../../../util/Title';
 import Chart from '../../../util/Chart';
 import styled from 'styled-components';
 import RadiusTable from '../../../util/RadiusTable';
+import { useDispatch, useSelector } from 'react-redux';
+import { resetPaging, setTotalCount } from '../../../../redux/pagingSlice';
+import Btn from '../../../util/Btn';
+import { open } from '../../../../redux/modalSlice';
+import Pagination from '../../../util/Pagination';
+import DateBtn from '../../../util/DateBtn';
+import useFetch from '../../../hook/useFetch';
 
 const LayDiv = styled.div`
-  height: 150px;
+  height: 100px;
+`;
+
+const BtnContainer = styled.div`
+  display: flex;
+  margin-top: 30px;
+  margin-left: 1030px;
+  gap: 15px;
 `;
 
 const CharDiv = styled.div`
@@ -15,7 +29,57 @@ const CharDiv = styled.div`
   margin-top: 30px;
 `;
 
+const DataDiv = styled.div`
+  margin-left: 1100px;
+  margin-bottom: -30px;
+`;
+
 const BloodPressure = () => {
+  const url = 'http://127.0.0.1:80/api/bloodPressure/list';
+  const options = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      memberNo: '1',
+    }),
+  };
+
+  const [dataVoList, setVoList] = useState([]);
+  const boardType = 'bloodPressure';
+  const { currentPage, boardLimit } = useSelector((state) => state.paging[boardType] || {});
+  const offset = (currentPage - 1) * boardLimit;
+  console.log(dataVoList);
+
+  useEffect(() => {
+    fetch(url, options)
+      .then((resp) => resp.json())
+      .then((data) => {
+        if (data.length > 0) {
+          dispatch(setTotalCount({ boardType, totalCount: data.length }));
+          const pagedData = data.slice(offset, offset + boardLimit);
+          setVoList(pagedData);
+        } else {
+          dispatch(resetPaging({ boardType }));
+          setVoList([]); // 데이터가 없을 경우 초기화
+        }
+      })
+      .catch((error) => console.error('데이터 불러오기 실패:', error));
+  }, [currentPage, boardLimit]); // currentPage, boardLimit 변경 시 실행
+
+  // const { data: dataVoList } = useFetch(url, options);
+
+  const dataBtn = ['일', '주', '월'];
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (dataVoList && dataVoList.length > 0) {
+      return dispatch(setTotalCount({ boardType, totalCount: dataVoList.length }));
+    }
+    dispatch(resetPaging({ boardType }));
+  }, [dispatch]);
+
   const labels = ['월', '화', '수', '목', '금', '토', '일'];
   const dataset = [
     {
@@ -50,12 +114,16 @@ const BloodPressure = () => {
     <div>
       <Title>혈압</Title>
       <LayDiv></LayDiv>
+
+      <DataDiv>
+        <DateBtn dataBtn={dataBtn}></DateBtn>
+      </DataDiv>
       <CharDiv>
         <Chart
           chartType="Line" // 차트 타입지정
           labels={labels} // 위랑 동일
           dataset={dataset} // 위랑 동일
-          width={1100} // 위랑 동일
+          width={100} // 위랑 동일
           height={450} // 위랑 동일
           xAxisColor="rgba(54, 162, 235, 1)" // 위랑 동일
           yAxisColor="rgba(255, 159, 64, 1)" // 위랑 동일
@@ -66,10 +134,20 @@ const BloodPressure = () => {
 
       <LayDiv></LayDiv>
 
+      <BtnContainer>
+        <div
+          onClick={() => {
+            dispatch(open({ title: '수면 등록', value: 'block' }));
+          }}
+        >
+          <Btn str={'등록'} c={'#FF7F50'} fc={'white'}></Btn>
+        </div>
+      </BtnContainer>
+
       <RadiusTable width="" thBgColor="" radius="0px">
         <thead>
           <tr>
-            <th colSpan="2">측정일</th>
+            <th>측정일</th>
             <th>측정시간</th>
             <th>이완기</th>
             <th>수축기</th>
@@ -78,131 +156,28 @@ const BloodPressure = () => {
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td rowSpan="2">2025-01-27 (월)</td>
-            <td>아침</td>
-            <td>07:00</td>
-            <td>80 mmHg</td>
-            <td>120 mmHg</td>
-            <td>95 회</td>
-            <td>특이사항입니당</td>
-          </tr>
-          <tr>
-            <td>저녁</td>
-            <td>07:00</td>
-            <td>80 mmHg</td>
-            <td>120 mmHg</td>
-            <td>95 회</td>
-            <td>특이사항입니당</td>
-          </tr>
-          <tr>
-            <td rowSpan="2">2025-01-26 (일)</td>
-            <td>아침</td>
-            <td>07:00</td>
-            <td>80 mmHg</td>
-            <td>120 mmHg</td>
-            <td>95 회</td>
-            <td>특이사항입니당</td>
-          </tr>
-          <tr>
-            <td>저녁</td>
-            <td>07:00</td>
-            <td>80 mmHg</td>
-            <td>120 mmHg</td>
-            <td>95 회</td>
-            <td>특이사항입니당</td>
-          </tr>
+          {dataVoList?.map((vo) => {
+            return (
+              <tr
+                key={vo.no}
+                onClick={() => {
+                  window.location.href = `/board?bno=${vo.no}`;
+                }}
+              >
+                <td rowSpan="2">{vo.day}</td>
+                <td>{vo.time}</td>
+                <td>{vo.diastole}</td>
+                <td>{vo.systole}</td>
+                <td>{vo.pulse}</td>
+                <td>{vo.note}</td>
+              </tr>
+            );
+          })}
         </tbody>
-        <tbody>
-          <tr>
-            <td rowSpan="2">2025-01-25 (토)</td>
-            <td>아침</td>
-            <td>07:00</td>
-            <td>80 mmHg</td>
-            <td>120 mmHg</td>
-            <td>95 회</td>
-            <td>특이사항입니당</td>
-          </tr>
-          <tr>
-            <td>저녁</td>
-            <td>07:00</td>
-            <td>80 mmHg</td>
-            <td>120 mmHg</td>
-            <td>95 회</td>
-            <td>특이사항입니당</td>
-          </tr>
-          <tr>
-            <td rowSpan="2">2025-01-24 (금)</td>
-            <td>아침</td>
-            <td>07:00</td>
-            <td>80 mmHg</td>
-            <td>120 mmHg</td>
-            <td>95 회</td>
-            <td>특이사항입니당</td>
-          </tr>
-          <tr>
-            <td>저녁</td>
-            <td>07:00</td>
-            <td>80 mmHg</td>
-            <td>120 mmHg</td>
-            <td>95 회</td>
-            <td>특이사항입니당</td>
-          </tr>
-        </tbody>
-        <tbody>
-          <tr>
-            <td rowSpan="2">2025-01-23 (목)</td>
-            <td>아침</td>
-            <td>07:00</td>
-            <td>80 mmHg</td>
-            <td>120 mmHg</td>
-            <td>95 회</td>
-            <td>특이사항입니당</td>
-          </tr>
-          <tr>
-            <td>저녁</td>
-            <td>07:00</td>
-            <td>80 mmHg</td>
-            <td>120 mmHg</td>
-            <td>95 회</td>
-            <td>특이사항입니당</td>
-          </tr>
-        </tbody>
-        <tr>
-          <td rowSpan="2">2025-01-22 (수)</td>
-          <td>아침</td>
-          <td>07:00</td>
-          <td>80 mmHg</td>
-          <td>120 mmHg</td>
-          <td>95 회</td>
-          <td>특이사항입니당</td>
-        </tr>
-        <tr>
-          <td>저녁</td>
-          <td>07:00</td>
-          <td>80 mmHg</td>
-          <td>120 mmHg</td>
-          <td>95 회</td>
-          <td>특이사항입니당</td>
-        </tr>
-        <tr>
-          <td rowSpan="2">2025-01-21 (화)</td>
-          <td>아침</td>
-          <td>07:00</td>
-          <td>80 mmHg</td>
-          <td>120 mmHg</td>
-          <td>95 회</td>
-          <td>특이사항입니당</td>
-        </tr>
-        <tr>
-          <td>저녁</td>
-          <td>07:00</td>
-          <td>80 mmHg</td>
-          <td>120 mmHg</td>
-          <td>95 회</td>
-          <td>특이사항입니당</td>
-        </tr>
       </RadiusTable>
+      <Pagination boardType={boardType}></Pagination>
+      <LayDiv></LayDiv>
+      <LayDiv></LayDiv>
     </div>
   );
 };

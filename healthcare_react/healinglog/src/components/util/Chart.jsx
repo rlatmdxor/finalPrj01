@@ -31,7 +31,7 @@ const Chart = ({
   labels = [], // X축 라벨
   dataset = [], // 데이터셋
   options = {}, // 추가 옵션
-  width = 600, // 차트 가로 크기
+  width = 100, // 차트 가로 크기
   height = 400, // 차트 세로 크기
   xAxisColor = '#000',
   yAxisColor = '#000',
@@ -97,7 +97,7 @@ const Chart = ({
   }
 
   return (
-    <div style={{ width: `${width}px`, height: `${height}px` }}>
+    <div style={{ width: `${width}%`, height: `${height}px` }}>
       <ChartComponent data={data} options={mergedOptions} />
     </div>
   );
