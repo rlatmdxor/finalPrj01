@@ -9,6 +9,7 @@ import Input from '../../../util/Input';
 import { useDispatch } from 'react-redux';
 import { close, open } from '../../../../redux/modalSlice';
 import { useNavigate } from 'react-router-dom';
+import ContentLayout from '../../../util/ContentLayout';
 
 const Aerobic = () => {
   const dispatch = useDispatch();
@@ -32,8 +33,30 @@ const Aerobic = () => {
   });
 
   return (
-    <div>
-      <Container>
+    <>
+      <Title>운동</Title>
+      <NaviContainer>
+        <Navi target="aerobic" tag={'유산소'}></Navi>
+        <Navi target="anaerobic" tag={'무산소'}></Navi>
+        <Navi target="exhistory" tag={'내역 관리'}></Navi>
+        <Navi target="exreport" tag={'리포트'}></Navi>
+      </NaviContainer>
+      <ContentLayout>
+        <FavoriteList
+          f={(name) => {
+            setModalTitle(name);
+            dispatch(open({ title: '운동시작', value: 'block' }));
+          }}
+        />
+
+        <AerobicList
+          f={(name) => {
+            setModalTitle(name);
+            dispatch(open({ title: '운동시작', value: 'block' }));
+          }}
+        />
+        <BlankSpace />
+
         <Modal title="운동시작" type={'exercise'} f={handleRegister}>
           <Input
             type="text"
@@ -100,37 +123,14 @@ const Aerobic = () => {
             disabled={false}
           />
         </Modal>
-
-        <Title>운동</Title>
-        <NaviContainer>
-          <Navi target="aerobic" tag={'유산소'}></Navi>
-          <Navi target="anaerobic" tag={'무산소'}></Navi>
-          <Navi target="exhistory" tag={'내역 관리'}></Navi>
-          <Navi target="exreport" tag={'리포트'}></Navi>
-        </NaviContainer>
-        <BlankSpace />
-        <FavoriteList
-          f={(name) => {
-            setModalTitle(name);
-            dispatch(open({ title: '운동시작', value: 'block' }));
-          }}
-        />
-        <BlankSpace />
-        <AerobicList
-          f={(name) => {
-            setModalTitle(name);
-            dispatch(open({ title: '운동시작', value: 'block' }));
-          }}
-        />
-      </Container>
-    </div>
+      </ContentLayout>
+    </>
   );
 };
 
-const Container = styled.div``;
-
 const BlankSpace = styled.div`
-  height: 60px;
+  display: grid;
+  height: 50px;
 `;
 
 const NaviContainer = styled.div`

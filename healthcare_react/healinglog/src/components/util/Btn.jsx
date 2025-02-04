@@ -16,14 +16,15 @@ const CommonBtn = styled.button`
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  margin-top: 30px;
-  margin-bottom: 30px;
-  margin-right: 50px;
+  margin-top: ${({ mt }) => (mt ? `${mt}px` : '30px')};
+  margin-bottom: ${({ mb }) => (mb ? `${mb}px` : '30px')};
+  margin-left: ${({ ml }) => (ml ? `${ml}px` : '0px')};
+  margin-right: ${({ mr }) => (mr ? `${mr}px` : '50px')};
 `;
 
-const Btn = ({ type, str, f, c, fc, w, h, fs }) => {
+const Btn = ({ type, str, f, c, fc, w, h, fs, mt, mb, ml, mr }) => {
   return (
-    <CommonBtn type={type || 'button'} onClick={f} c={c} fc={fc} fs={fs} w={w} h={h}>
+    <CommonBtn type={type || 'button'} onClick={f} c={c} fc={fc} fs={fs} w={w} h={h} mt={mt} mb={mb} ml={ml} mr={mr}>
       {str}
     </CommonBtn>
   );

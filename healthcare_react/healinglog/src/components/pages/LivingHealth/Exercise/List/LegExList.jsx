@@ -36,6 +36,10 @@ const LegExList = ({ f }) => {
                   f={() => {
                     navigate(`/anaerobic/${vo.name}`);
                   }}
+                  mt={'0'}
+                  mb={'0'}
+                  mr={'0'}
+                  ml={'0'}
                 />
               </div>
             </Content>
@@ -84,7 +88,8 @@ const ExList = styled.div`
   grid-auto-rows: 50px;
   justify-self: center;
   align-self: center;
-  margin-bottom: 100px;
+  margin-bottom: 50px;
+  row-gap: 3px;
 `;
 
 export default LegExList;

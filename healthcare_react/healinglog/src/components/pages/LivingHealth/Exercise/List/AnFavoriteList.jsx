@@ -37,6 +37,10 @@ const AnFavoriteList = ({ f }) => {
                     f={() => {
                       navigate(`/anaerobic/${vo.name}`);
                     }}
+                    mt={'0'}
+                    mb={'0'}
+                    mr={'0'}
+                    ml={'0'}
                   />
                 </div>
               </Content>
@@ -54,6 +58,8 @@ const Bookmark = styled.div`
   grid-auto-rows: 50px;
   justify-self: center;
   align-self: center;
+  row-gap: 3px;
+  margin-bottom: 50px;
 `;
 
 const Line = styled.div`

@@ -1,10 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import Navi from '../../../util/Navi';
 import Title from '../../../util/Title';
 import Chart from '../../../util/Chart';
 import { useDispatch } from 'react-redux';
 import { close } from '../../../../redux/modalSlice';
+import ContentLayout from '../../../util/ContentLayout';
 
 const ExReport = () => {
   const dispatch = useDispatch();
@@ -56,7 +57,7 @@ const ExReport = () => {
   ];
 
   return (
-    <div>
+    <>
       <Title>운동</Title>
       <NaviContainer>
         <Navi target="aerobic" tag={'유산소'}></Navi>
@@ -64,7 +65,7 @@ const ExReport = () => {
         <Navi target="exhistory" tag={'내역 관리'}></Navi>
         <Navi target="exreport" tag={'리포트'}></Navi>
       </NaviContainer>
-      <Container>
+      <ContentLayout>
         <BlankSpace />
 
         <ChartContainer>
@@ -74,7 +75,7 @@ const ExReport = () => {
               chartType="Bar" // 차트 타입지정 Bar , Line , Pie , Doughnut 중 택1
               labels={labels} // 위에서 작성한 x축의 데이터
               dataset={dataset} // 위에서 작성한 차트의 데이터
-              width={1100} // 차트 가로 사이즈임
+              width={100} // 차트 가로 사이즈임
               height={400} // 차트 세로 사이즈임
               xAxisColor="rgba(75, 192, 192, 1)" // Bar , Line 에만 사용되고 x축 글씨색상임
               yAxisColor="rgba(255, 99, 132, 1)" // Bar , Line 에만 사용되고 y축 글씨색상임
@@ -89,7 +90,7 @@ const ExReport = () => {
               chartType="Bar" // 차트 타입지정
               labels={labels} // 위랑 동일
               dataset={dataset} // 위랑 동일
-              width={1100} // 위랑 동일
+              width={100} // 위랑 동일
               height={400} // 위랑 동일
               xAxisColor="rgba(54, 162, 235, 1)" // x축 색상
               yAxisColor="rgba(255, 159, 64, 1)" // y축 색상
@@ -104,36 +105,67 @@ const ExReport = () => {
         <ChartContainer>
           <TitleTag>즐겨찾기 운동 성장 추이</TitleTag>
           <ChartPosition>
-            <Chart chartType="Line" labels={labels} dataset={dataset} width={1100} height={500} />
+            <Chart chartType="Line" labels={labels} dataset={dataset} width={100} height={500} />
           </ChartPosition>
         </ChartContainer>
 
         <CircleContainer>
           <ChartContainer>
-            <TitleTag>운동 유형별 운동 시간</TitleTag>
+            <TitleTag2>운동 유형별 운동 시간</TitleTag2>
             <ChartPosition>
-              <Chart chartType="Pie" labels={labels} dataset={dataset} width={450} height={450} />
+              <ChartWithHoverEffect
+                chartType="Pie"
+                labels={labels}
+                dataset={dataset}
+                initialWidth={90}
+                hoverWidth={100}
+                height={600}
+              />
             </ChartPosition>
           </ChartContainer>
 
           <ChartContainer>
-            <TitleTag>운동 종류별 운동 시간</TitleTag>
+            <TitleTag2>운동 종류별 운동 시간</TitleTag2>
             <ChartPosition>
-              <Chart chartType="Doughnut" labels={labels} dataset={dataset} width={450} height={450} />
+              <ChartWithHoverEffect
+                chartType="Doughnut"
+                labels={labels}
+                dataset={dataset}
+                initialWidth={90}
+                hoverWidth={100}
+                height={600}
+              />
             </ChartPosition>
           </ChartContainer>
         </CircleContainer>
-      </Container>
+        <BlankSpace />
+      </ContentLayout>
+    </>
+  );
+};
+
+const ChartWithHoverEffect = ({ chartType, labels, dataset, initialWidth, hoverWidth, height }) => {
+  const [width, setWidth] = useState(90);
+
+  return (
+    <div
+      onMouseEnter={() => setWidth(hoverWidth)}
+      onMouseLeave={() => setWidth(initialWidth)}
+      style={{
+        display: 'grid',
+        width: `${width}%`,
+        justifyItems: 'center',
+        transition: 'width 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+      }}
+    >
+      <Chart chartType={chartType} labels={labels} dataset={dataset} width={width - 10} height={height} />
     </div>
   );
 };
 
-const Container = styled.div`
-  display: grid;
-`;
-
 const BlankSpace = styled.div`
   height: 100px;
+  width: 100%;
 `;
 
 const NaviContainer = styled.div`
@@ -147,22 +179,28 @@ const NaviContainer = styled.div`
 
 const ChartContainer = styled.div`
   display: grid;
+  width: 100%;
   margin-bottom: 50px;
   justify-self: center;
 `;
 
 const TitleTag = styled.h1`
   display: grid;
-  position: relative;
+`;
+
+const TitleTag2 = styled.h1`
+  display: grid;
+  justify-self: center;
 `;
 
 const ChartPosition = styled.div`
   display: grid;
+  justify-items: center;
 `;
 
 const CircleContainer = styled.div`
   display: grid;
-  width: 1100px;
+  width: 100%;
   justify-self: center;
   grid-template-columns: 1fr 1fr;
 `;
