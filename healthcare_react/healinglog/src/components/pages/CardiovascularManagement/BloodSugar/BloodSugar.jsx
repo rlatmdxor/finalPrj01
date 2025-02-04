@@ -1,17 +1,62 @@
-import React from 'react';
-import Title from '../../../util/Title';
+import React, { useEffect } from 'react';
 import Modal from '../../../util/Modal'; // 모달 컴포넌트
 import Input from '../../../util/Input'; // 입력 컴포넌트
+import Title from '../../../util/Title';
 import Chart from '../../../util/Chart';
-import Table from '../../../util/Table';
 import styled from 'styled-components';
+import RadiusTable from '../../../util/RadiusTable';
+import { useDispatch, useSelector } from 'react-redux';
+import { resetPaging, setTotalCount } from '../../../../redux/pagingSlice';
+import Btn from '../../../util/Btn';
+import { open } from '../../../../redux/modalSlice';
+import Pagination from '../../../util/Pagination';
+import DateBtn from '../../../util/DateBtn';
+
+const LayDiv = styled.div`
+  height: 100px;
+`;
+
+const BtnContainer = styled.div`
+  display: flex;
+  margin-top: 30px;
+  margin-left: 1030px;
+  gap: 15px;
+`;
 
 const CharDiv = styled.div`
-  margin-left: 180px;
+  margin-left: 130px;
   margin-top: 30px;
 `;
 
+const DataDiv = styled.div`
+  margin-left: 1100px;
+  margin-bottom: -30px;
+`;
+
 const BloodSugar = () => {
+  const dataBtn = ['일', '주', '월'];
+  const dispatch = useDispatch();
+  const boardType = 'bloodPressure';
+
+  const dataVoList = [
+    { no: '월', startTime: '22:00', endTime: '07:00', runTime: '630분', date: '2025-01-18' },
+    { no: '화', startTime: '22:00', endTime: '07:00', runTime: '630분', date: '2025-01-18' },
+    { no: '수', startTime: '22:00', endTime: '07:00', runTime: '630분', date: '2025-01-18' },
+    { no: '목', startTime: '22:00', endTime: '07:00', runTime: '630분', date: '2025-01-18' },
+    { no: '금', startTime: '22:00', endTime: '07:00', runTime: '630분', date: '2025-01-18' },
+    { no: '토', startTime: '22:00', endTime: '07:00', runTime: '630분', date: '2025-01-18' },
+    { no: '일', startTime: '22:00', endTime: '07:00', runTime: '630분', date: '2025-01-18' },
+  ];
+  const { currentPage, boardLimit } = useSelector((state) => state.paging[boardType] || {});
+
+  useEffect(() => {
+    dispatch(setTotalCount({ boardType, totalCount: dataVoList.length }));
+    dispatch(resetPaging({ boardType }));
+  }, [dataVoList.length, dispatch]);
+
+  const offset = (currentPage - 1) * boardLimit;
+  const data = dataVoList.slice(offset, offset + boardLimit);
+
   const labels = ['월', '화', '수', '목', '금', '토', '일'];
   const dataset = [
     {
@@ -43,15 +88,20 @@ const BloodSugar = () => {
   ];
 
   return (
-    <>
+    <div>
       <Title>혈당</Title>
+      <LayDiv></LayDiv>
+
+      <DataDiv>
+        <DateBtn dataBtn={dataBtn}></DateBtn>
+      </DataDiv>
       <CharDiv>
         <Chart
           chartType="Line" // 차트 타입지정
           labels={labels} // 위랑 동일
           dataset={dataset} // 위랑 동일
-          width={900} // 위랑 동일
-          height={400} // 위랑 동일
+          width={100} // 위랑 동일
+          height={450} // 위랑 동일
           xAxisColor="rgba(54, 162, 235, 1)" // 위랑 동일
           yAxisColor="rgba(255, 159, 64, 1)" // 위랑 동일
           yMax={200}
@@ -59,46 +109,19 @@ const BloodSugar = () => {
       </CharDiv>
       {/* 전부다 위와 동일한데 dataset에서 배경색을 지정해야함 */}
 
-      <Table width="" thBgColor="">
-        <thead>
-          <tr>
-            <th>일자</th>
-            <th>술종류</th>
-            <th>마신 량(cc)</th>
-            <th>도수</th>
-            <th>표준 잔</th>
-            <th>마신 알코올 량</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>2024-01-10</td>
-            <td>소주</td>
-            <td>150</td>
-            <td>20</td>
-            <td>3</td>
-            <td>24</td>
-          </tr>
-          <tr>
-            <td>2024-01-11</td>
-            <td>소주</td>
-            <td>150</td>
-            <td>20</td>
-            <td>3</td>
-            <td>24</td>
-          </tr>
-          <tr>
-            <td>2024-01-12</td>
-            <td>소주</td>
-            <td>150</td>
-            <td>20</td>
-            <td>3</td>
-            <td>24</td>
-          </tr>
-        </tbody>
-      </Table>
+      <LayDiv></LayDiv>
 
-      <Table width="" thBgColor="">
+      <BtnContainer>
+        <div
+          onClick={() => {
+            dispatch(open({ title: '수면 등록', value: 'block' }));
+          }}
+        >
+          <Btn str={'등록'} c={'#FF7F50'} fc={'white'}></Btn>
+        </div>
+      </BtnContainer>
+
+      {/* <RadiusTable width="" thBgColor="" radius="0px">
         <thead>
           <tr>
             <th colSpan="2">측정일</th>
@@ -111,7 +134,7 @@ const BloodSugar = () => {
         </thead>
         <tbody>
           <tr>
-            <td rowSpan="2">2025-01-02 (목)</td>
+            <td rowSpan="2">2025-01-27 (월)</td>
             <td>아침</td>
             <td>07:00</td>
             <td>80 mmHg</td>
@@ -128,7 +151,7 @@ const BloodSugar = () => {
             <td>특이사항입니당</td>
           </tr>
           <tr>
-            <td rowSpan="2">2025-01-01 (수)</td>
+            <td rowSpan="2">2025-01-26 (일)</td>
             <td>아침</td>
             <td>07:00</td>
             <td>80 mmHg</td>
@@ -145,103 +168,100 @@ const BloodSugar = () => {
             <td>특이사항입니당</td>
           </tr>
         </tbody>
-      </Table>
-
-      <Table width="" thBgColor="">
-        <thead>
-          <tr>
-            <th colSpan="4">닉네임 님의 현재 복용약</th>
-          </tr>
-        </thead>
         <tbody>
           <tr>
-            <td rowSpan="3">1</td>
-            <td rowSpan="2">복용 약 사진</td>
-            <td>타이레놀</td>
-            <td rowSpan="3">삭제</td>
+            <td rowSpan="2">2025-01-25 (토)</td>
+            <td>아침</td>
+            <td>07:00</td>
+            <td>80 mmHg</td>
+            <td>120 mmHg</td>
+            <td>95 회</td>
+            <td>특이사항입니당</td>
           </tr>
           <tr>
-            <td>1. 해열 및 감기에 의한 동통(통증)과 두통, 치통, 근육통, 허리동통(통증), 생리통, 관절통의 완화</td>
+            <td>저녁</td>
+            <td>07:00</td>
+            <td>80 mmHg</td>
+            <td>120 mmHg</td>
+            <td>95 회</td>
+            <td>특이사항입니당</td>
           </tr>
           <tr>
-            <td>해열 진통제</td>
-            <td>1회 1정 / 3회</td>
+            <td rowSpan="2">2025-01-24 (금)</td>
+            <td>아침</td>
+            <td>07:00</td>
+            <td>80 mmHg</td>
+            <td>120 mmHg</td>
+            <td>95 회</td>
+            <td>특이사항입니당</td>
           </tr>
           <tr>
-            <td rowSpan="3">2</td>
-            <td rowSpan="2">복용 약 사진</td>
-            <td>타이레놀</td>
-            <td rowSpan="3">삭제</td>
-          </tr>
-          <tr>
-            <td>1. 해열 및 감기에 의한 동통(통증)과 두통, 치통, 근육통, 허리동통(통증), 생리통, 관절통의 완화</td>
-          </tr>
-          <tr>
-            <td>해열 진통제</td>
-            <td>1회 1정 / 3회</td>
+            <td>저녁</td>
+            <td>07:00</td>
+            <td>80 mmHg</td>
+            <td>120 mmHg</td>
+            <td>95 회</td>
+            <td>특이사항입니당</td>
           </tr>
         </tbody>
-      </Table>
-
-      <Table width="" thBgColor="">
-        <thead>
-          <tr>
-            <th colSpan="3">약 상세정보</th>
-          </tr>
-        </thead>
         <tbody>
           <tr>
-            <td rowSpan="3">기본정보</td>
-            <td rowSpan="3">약 사진</td>
-            <td>타이레놀</td>
+            <td rowSpan="2">2025-01-23 (목)</td>
+            <td>아침</td>
+            <td>07:00</td>
+            <td>80 mmHg</td>
+            <td>120 mmHg</td>
+            <td>95 회</td>
+            <td>특이사항입니당</td>
           </tr>
           <tr>
-            <td>해열 진통 소염제</td>
-          </tr>
-          <tr>
-            <td>1회 1정 / 3회</td>
-          </tr>
-          <tr>
-            <td rowSpan="4">세부정보</td>
-            <td>효능</td>
-            <td>1. 해열 및 감기에 의한 동통(통증)과 두통, 치통, 근육통, 허리동통(통증), 생리통, 관절통의 완화</td>
-          </tr>
-          <tr>
-            <td>부작용</td>
-            <td>
-              <div>
-                1) 쇽: 쇽, 아나필락시양 증상(과민성유사증상: 호흡곤란, 온몸이 붉어짐, 혈관부기, 두드러기 등), 천식발작
-              </div>
-              <div>
-                2) 혈액: 혈소판 감소, 과립구감소, 용혈성빈혈, 메트헤모글로빈혈증, 혈소판기능 저하(출혈시간 연장), 청색증
-              </div>
-              <div>3) 과민증: 과민증상(얼굴부기, 호흡곤란, 땀이 남, 저혈압, 쇽)</div>
-              <div>
-                4) 소화기: 구역, 구토, 식욕부진, 장기복용시 위장출혈, 소화성궤양, 천공(뚫림) 등의 위장관계 이상반응
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td>금기사항</td>
-            <td>
-              <div>1) 이 약에 과민증 환자</div>
-              <div>2) 소화성궤양 환자</div>
-              <div>3) 심한 혈액 이상 환자</div>
-              <div>4) 심한 간장애 환자</div>
-            </td>
-          </tr>
-          <tr>
-            <td>주의사항</td>
-            <td>
-              <div>1) 간장애 또는 그 병력이 있는 환자</div>
-              <div>2) 신장(콩팥)장애 또는 그 병력이 있는 환자</div>
-              <div>3) 소화성궤양의 병력이 있는 환자</div>
-              <div>4) 혈액이상 또는 그 병력이 있는 환자</div>
-            </td>
+            <td>저녁</td>
+            <td>07:00</td>
+            <td>80 mmHg</td>
+            <td>120 mmHg</td>
+            <td>95 회</td>
+            <td>특이사항입니당</td>
           </tr>
         </tbody>
-      </Table>
-    </>
+        <tr>
+          <td rowSpan="2">2025-01-22 (수)</td>
+          <td>아침</td>
+          <td>07:00</td>
+          <td>80 mmHg</td>
+          <td>120 mmHg</td>
+          <td>95 회</td>
+          <td>특이사항입니당</td>
+        </tr>
+        <tr>
+          <td>저녁</td>
+          <td>07:00</td>
+          <td>80 mmHg</td>
+          <td>120 mmHg</td>
+          <td>95 회</td>
+          <td>특이사항입니당</td>
+        </tr>
+        <tr>
+          <td rowSpan="2">2025-01-21 (화)</td>
+          <td>아침</td>
+          <td>07:00</td>
+          <td>80 mmHg</td>
+          <td>120 mmHg</td>
+          <td>95 회</td>
+          <td>특이사항입니당</td>
+        </tr>
+        <tr>
+          <td>저녁</td>
+          <td>07:00</td>
+          <td>80 mmHg</td>
+          <td>120 mmHg</td>
+          <td>95 회</td>
+          <td>특이사항입니당</td>
+        </tr>
+      </RadiusTable> */}
+      <Pagination boardType={boardType}></Pagination>
+      <LayDiv></LayDiv>
+      <LayDiv></LayDiv>
+    </div>
   );
 };
 

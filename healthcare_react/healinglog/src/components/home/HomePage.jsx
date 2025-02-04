@@ -4,10 +4,9 @@ import Sider2 from './Sider2';
 import Header from './Header';
 import styled from 'styled-components';
 import Footer from './Footer';
-
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-
 import { routes } from '../../routes';
+import ScrollToTop from '../util/ScrollToTop';
 
 const Layout = styled.div`
   display: grid;
@@ -30,6 +29,7 @@ const HomePage = () => {
         <Header></Header>
         <Sider></Sider>
         <MainContainer>
+          <ScrollToTop />
           <Routes>
             {routes.map(({ path, component }) => (
               <Route key={path} path={path} element={component} />

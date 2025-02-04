@@ -15,7 +15,6 @@ import Cigarette from './components/pages/LivingHealth/Cigarette/Cigarette';
 import Diet from './components/pages/LivingHealth/Diet/Diet';
 import Drug from './components/pages/LivingHealth/Drug/Drug';
 import Drug1 from './components/pages/LivingHealth/Drug/Drug1';
-import Exercise from './components/pages/LivingHealth/Exercise/Exercise';
 import Aerobic from './components/pages/LivingHealth/Exercise/Aerobic';
 import AnAerobic from './components/pages/LivingHealth/Exercise/AnAerobic';
 import AerobicDetail from './components/pages/LivingHealth/Exercise/AerobicDetail';
@@ -31,6 +30,12 @@ import AnAerobicDetail from './components/pages/LivingHealth/Exercise/AnAerobicD
 import AdminUserManage from './components/admin/AdminUserManage';
 import AlcReport from './components/pages/LivingHealth/Alc/AlcReport';
 import CigaretteReport from './components/pages/LivingHealth/Cigarette/CigaretteReport';
+import ExHistory from './components/pages/LivingHealth/Exercise/ExHistory';
+import ExReport from './components/pages/LivingHealth/Exercise/ExReport';
+import Exercising from './components/pages/LivingHealth/Exercise/Exercising';
+import DietCal from './components/pages/LivingHealth/Diet/DietCal';
+import DietReport from './components/pages/LivingHealth/Diet/DietReport';
+
 
 export const routes = [
   { path: '/', component: <Main /> },
@@ -38,6 +43,8 @@ export const routes = [
   { path: '/login', component: <LoginPage /> },
   { path: '/sleep', component: <Sleep /> },
   { path: '/diet', component: <Diet /> },
+  { path: '/dietcalendar', component: <DietCal /> },
+  { path: '/dietreport', component: <DietReport /> },
   { path: '/aerobic', component: <Aerobic /> },
   { path: '/anaerobic', component: <AnAerobic /> },
   { path: '/alc', component: <Alc /> },
@@ -61,6 +68,9 @@ export const routes = [
   { path: '/admin/login', component: <AdminLogin /> },
   { path: '/aerobic/:name', component: <AerobicDetail /> },
   { path: '/anaerobic/:name', component: <AnAerobicDetail /> },
+  { path: '/exhistory', component: <ExHistory /> },
+  { path: '/exreport', component: <ExReport /> },
+  { path: '/exercising/:name', component: <Exercising /> },
   { path: '/board/write', component: <BoardWrite /> },
   { path: '/admin/usermanage', component: <AdminUserManage /> },
   { path: '/alc/report', component: <AlcReport /> },

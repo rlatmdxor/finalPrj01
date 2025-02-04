@@ -4,7 +4,7 @@ import { setSelection } from '../../../../redux/selectSlice';
 import SelectedBar from '../../../util/SelectedBar';
 import styled, { ThemeProvider, useTheme } from 'styled-components';
 import Btn from '../../../util/Btn';
-import Table from '../../../common/Table';
+import Table from '../../../util/Table';
 // import BoardList from '../../../common/BoardList';
 // import Pagination from '../../../util/Pagination';
 
