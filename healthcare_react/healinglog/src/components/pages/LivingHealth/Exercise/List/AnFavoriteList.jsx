@@ -1,13 +1,13 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setBookmark } from '../../../../redux/aerobicSlice';
+import { setBookmark } from '../../../../../redux/aerobicSlice';
 import styled, { useTheme } from 'styled-components';
-import Btn from '../../../util/Btn';
+import Btn from '../../../../util/Btn';
 import { useNavigate } from 'react-router-dom';
 
-const FavoriteList = () => {
+const AnFavoriteList = ({ f }) => {
   const dispatch = useDispatch();
-  const exVoList = useSelector((state) => state.aerobic);
+  const exVoList = useSelector((state) => state.anAerobic);
   const theme = useTheme();
   const navigate = useNavigate();
 
@@ -28,14 +28,14 @@ const FavoriteList = () => {
                 <StarIcon src="/img/Star.webp" onClick={() => handleToggleBookmark(vo.no)} />
               </Star>
               <Content>
-                {vo.name}
+                <div onClick={() => f(vo.name)}>{vo.name}</div>
                 <div style={{ marginRight: '20px' }}>
                   <Btn
                     str={'상세조회'}
                     c={theme.gray}
                     fs={'14'}
                     f={() => {
-                      navigate(`/aerobic/${vo.name}`);
+                      navigate(`/anaerobic/${vo.name}`);
                     }}
                   />
                 </div>
@@ -50,7 +50,8 @@ const FavoriteList = () => {
 
 const Bookmark = styled.div`
   display: grid;
-  grid-template-rows: 1fr 50px 50px 50px;
+  grid-template-rows: 1fr;
+  grid-auto-rows: 50px;
   justify-self: center;
   align-self: center;
 `;
@@ -71,6 +72,7 @@ const Star = styled.div`
 
 const Content = styled.div`
   display: grid;
+  grid-template-columns: 10fr 1fr;
   justify-items: center;
   align-items: center;
   background-color: rgba(169, 205, 147, 0.2);
@@ -86,4 +88,4 @@ const StarIcon = styled.img`
   cursor: pointer;
 `;
 
-export default FavoriteList;
+export default AnFavoriteList;

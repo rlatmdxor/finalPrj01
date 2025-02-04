@@ -1,18 +1,17 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setBookmark } from '../../../../redux/aerobicSlice';
+import { setBookmark } from '../../../../../redux/aerobicSlice';
 import styled, { useTheme } from 'styled-components';
-import Btn from '../../../util/Btn';
+import Btn from '../../../../util/Btn';
 import { useNavigate } from 'react-router-dom';
 
-const AnFavoriteList = () => {
+const FavoriteList = ({ f }) => {
   const dispatch = useDispatch();
-  const exVoList = useSelector((state) => state.anAerobic);
+  const exVoList = useSelector((state) => state.aerobic);
   const theme = useTheme();
   const navigate = useNavigate();
 
   const markData = exVoList.filter((item) => item.bookmark === 'y');
-  const unmarkData = exVoList.filter((item) => item.bookmark === 'n');
 
   const handleToggleBookmark = (no) => {
     dispatch(setBookmark({ no }));
@@ -29,14 +28,14 @@ const AnFavoriteList = () => {
                 <StarIcon src="/img/Star.webp" onClick={() => handleToggleBookmark(vo.no)} />
               </Star>
               <Content>
-                {vo.name}
+                <div onClick={() => f(vo.name)}>{vo.name}</div>
                 <div style={{ marginRight: '20px' }}>
                   <Btn
                     str={'상세조회'}
                     c={theme.gray}
                     fs={'14'}
                     f={() => {
-                      navigate(`/anaerobic/${vo.name}`);
+                      navigate(`/aerobic/${vo.name}`);
                     }}
                   />
                 </div>
@@ -89,4 +88,4 @@ const StarIcon = styled.img`
   cursor: pointer;
 `;
 
-export default AnFavoriteList;
+export default FavoriteList;

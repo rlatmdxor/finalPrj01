@@ -3,7 +3,10 @@ import styled from 'styled-components';
 
 const LayoutDiv = styled.div`
   display: flex;
-  margin: 20px 50px;
+  margin-top: ${(props) => props.width || '20px'};
+  margin-bottom: ${(props) => props.width || '20px'};
+  margin-left: ${(props) => props.width || '50px'};
+  margin-right: ${(props) => props.width || '50px'};
 `;
 
 const StyledTable = styled.table`
@@ -12,8 +15,6 @@ const StyledTable = styled.table`
   border-spacing: 0;
   text-align: center;
   border: 1px solid #d0d7de;
-  outline: 1px solid #d0d7de;
-  outline-offset: -2px;
   border-radius: ${(props) => props.radius || '6px'};
   overflow: hidden;
 
@@ -23,7 +24,13 @@ const StyledTable = styled.table`
     font-weight: 600;
     padding: 12px 15px;
     font-size: ${(props) => props.thtextsize || '14px'};
-    border: 1px solid #fafafa;
+    border-top: 1px solid #d0d7de;
+    border-left: 1px solid #d0d7de;
+    border-right: 1px solid #fafafa;
+  }
+
+  & th:last-child {
+    border-right: 1px solid #d0d7de;
   }
 
   & td {
@@ -42,6 +49,10 @@ const StyledTable = styled.table`
 const RadiusTable = ({
   children,
   width,
+  mt,
+  mb,
+  ml,
+  mr,
   radius,
   thbgcolor,
   thtextcolor,
@@ -55,6 +66,10 @@ const RadiusTable = ({
       <LayoutDiv>
         <StyledTable
           width={width}
+          mt={mt}
+          mb={mb}
+          ml={ml}
+          mr={mr}
           radius={radius}
           thbgcolor={thbgcolor}
           thtextcolor={thtextcolor}

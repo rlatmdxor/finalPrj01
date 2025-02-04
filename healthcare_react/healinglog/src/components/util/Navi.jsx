@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
 
-const Navi = ({ target, tag }) => {
+const Navi = ({ target, tag, selected }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const theme = useTheme();
@@ -14,14 +14,23 @@ const Navi = ({ target, tag }) => {
   const currentPath = location.pathname;
   const isSelected = location.pathname === `/${target}`;
 
+  const isSelected2 = selected === 'selected';
+  // const isSelected2 = '1';
+
   return (
     <>
       <Container>
         <DetailWrapper>
-          <NaviBtn target={target} currentPath={currentPath} onClick={goTo} isSelected={isSelected}>
+          <NaviBtn
+            target={target}
+            currentPath={currentPath}
+            onClick={goTo}
+            isSelected={isSelected}
+            isSelected2={isSelected2}
+          >
             {tag}
           </NaviBtn>
-          {isSelected && <Indicator theme={theme} />}
+          {(isSelected || isSelected2) && <Indicator theme={theme} />}
         </DetailWrapper>
       </Container>
     </>
@@ -48,7 +57,9 @@ const NaviBtn = styled.button`
   height: 40px;
   font-size: 24px;
   /* font-weight: bold; */
-  color: ${({ target, currentPath }) => (currentPath === `/${target}` ? 'black' : '#959595')};
+  /* color: ${({ target, currentPath }) => (currentPath === `/${target}` ? 'black' : '#959595')}; */
+  color: ${({ target, currentPath, isSelected, isSelected2 }) =>
+    currentPath === `/${target}` || isSelected || isSelected2 ? 'black' : '#959595'};
   cursor: pointer;
 `;
 
