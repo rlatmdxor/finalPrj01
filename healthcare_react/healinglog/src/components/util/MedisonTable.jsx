@@ -54,6 +54,7 @@ const MedisonTable = ({ title, MediSonData }) => {
             <Th>약명</Th>
             <Th>효능</Th>
             <Th>복용법</Th>
+            <Th></Th>
           </tr>
         </thead>
         <tbody>
@@ -66,6 +67,9 @@ const MedisonTable = ({ title, MediSonData }) => {
               <Td>{medicine.name}</Td>
               <Td>{medicine.effect}</Td>
               <Td>{medicine.dosage}</Td>
+              <Td>
+                <input type="checkbox" />
+              </Td>
             </Row>
           ))}
         </tbody>

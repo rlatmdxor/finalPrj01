@@ -16,8 +16,10 @@ const CommonBtn = styled.button`
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  margin-top: 30px;
+  margin-bottom: 30px;
+  margin-right: 50px;
 `;
-
 
 const Btn = ({ type, str, f, c, fc, w, h, fs }) => {
   return (

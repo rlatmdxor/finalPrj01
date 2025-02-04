@@ -11,15 +11,15 @@ import ScrollToTop from '../util/ScrollToTop';
 const Layout = styled.div`
   display: grid;
   width: 100%;
-
   grid-template-columns: 1fr 5fr 1fr;
   grid-template-rows: 110px 1fr;
 `;
 
 const MainContainer = styled.div`
   display: grid;
+
   min-height: 834px;
-  grid-template-rows: 1fr 230px;
+  grid-template-rows: 100px 80px 1fr 230px;
 `;
 
 const HomePage = () => {
@@ -37,6 +37,7 @@ const HomePage = () => {
           </Routes>
           <Footer></Footer>
         </MainContainer>
+
         <Sider2></Sider2>
       </BrowserRouter>
     </Layout>
