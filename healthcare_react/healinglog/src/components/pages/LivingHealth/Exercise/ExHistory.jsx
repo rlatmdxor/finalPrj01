@@ -7,6 +7,7 @@ import Navi from '../../../util/Navi';
 import styled from 'styled-components';
 import { useDispatch } from 'react-redux';
 import { close } from '../../../../redux/modalSlice';
+import ContentLayout from '../../../util/ContentLayout';
 
 const ExHistory = () => {
   const dispatch = useDispatch();
@@ -20,7 +21,7 @@ const ExHistory = () => {
   };
 
   return (
-    <div>
+    <>
       <Title>운동</Title>
       <NaviContainer>
         <Navi target="aerobic" tag={'유산소'}></Navi>
@@ -29,18 +30,20 @@ const ExHistory = () => {
         <Navi target="exreport" tag={'리포트'}></Navi>
       </NaviContainer>
 
-      <BlankSpace />
+      <ContentLayout>
+        <BlankSpace />
 
-      <Modal title="캘린더 모달">
-        <div>
-          <Input type="text" placeholder="이벤트 내용을 입력하세요" size="size3" mb={20} />
-        </div>
-      </Modal>
+        <Modal title="캘린더 모달">
+          <div>
+            <Input type="text" placeholder="이벤트 내용을 입력하세요" size="size3" mb={20} />
+          </div>
+        </Modal>
 
-      <Calendar modalTitle="캘린더 모달" vo={[]} events={events} width={800} height={100} />
+        <Calendar modalTitle="캘린더 모달" vo={[]} events={events} width={800} height={100} />
 
-      <BlankSpace />
-    </div>
+        <BlankSpace />
+      </ContentLayout>
+    </>
   );
 };
 
