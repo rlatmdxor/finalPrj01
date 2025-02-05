@@ -12,6 +12,9 @@ import { useDispatch } from 'react-redux';
 import { close, open } from '../../../../redux/modalSlice';
 import { useNavigate } from 'react-router-dom';
 import ContentLayout from '../../../util/ContentLayout';
+import ChestExList from './List/ChestExList';
+import ShoulderExList from './List/ShoulderExList';
+import EtcExList from './List/EtcExList';
 
 const AnAerobic = () => {
   const dispatch = useDispatch();
@@ -34,7 +37,7 @@ const AnAerobic = () => {
 
   useEffect(() => {
     dispatch(close('운동시작'));
-  });
+  }, []);
 
   return (
     <>
@@ -74,9 +77,24 @@ const AnAerobic = () => {
           />
         </ListContainer>
         <ListContainer>
-          <ArmExList />
-          <LegExList />
-          <CoreExList />
+          <ChestExList
+            f={(name) => {
+              setModalTitle(name);
+              dispatch(open({ title: '운동시작', value: 'block' }));
+            }}
+          />
+          <ShoulderExList
+            f={(name) => {
+              setModalTitle(name);
+              dispatch(open({ title: '운동시작', value: 'block' }));
+            }}
+          />
+          <EtcExList
+            f={(name) => {
+              setModalTitle(name);
+              dispatch(open({ title: '운동시작', value: 'block' }));
+            }}
+          />
         </ListContainer>
         <BlankSpace />
       </ContentLayout>

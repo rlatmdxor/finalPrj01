@@ -30,7 +30,7 @@ const Aerobic = () => {
 
   useEffect(() => {
     dispatch(close('운동시작'));
-  });
+  }, []);
 
   return (
     <>
