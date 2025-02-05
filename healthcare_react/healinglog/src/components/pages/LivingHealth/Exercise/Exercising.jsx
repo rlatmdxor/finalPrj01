@@ -6,6 +6,7 @@ import Navi from '../../../util/Navi';
 import Btn from '../../../util/Btn';
 import { useDispatch } from 'react-redux';
 import { close } from '../../../../redux/modalSlice';
+import ContentLayout from '../../../util/ContentLayout';
 
 const Exercising = () => {
   const location = useLocation();
@@ -18,15 +19,15 @@ const Exercising = () => {
   const { title, hours, minutes, sets, repeats, rangeValue } = location.state || {};
 
   return (
-    <div>
-      <Container>
-        <Title>운동</Title>
-        <NaviContainer>
-          <Navi target="aerobic" tag={'유산소'} selected={minutes || hours ? 'selected' : undefined}></Navi>
-          <Navi target="anaerobic" tag={'무산소'} selected={sets || repeats ? 'selected' : undefined}></Navi>
-          <Navi target="exhistory" tag={'내역 관리'}></Navi>
-          <Navi target="exreport" tag={'리포트'}></Navi>
-        </NaviContainer>
+    <>
+      <Title>운동</Title>
+      <NaviContainer>
+        <Navi target="aerobic" tag={'유산소'} selected={minutes || hours ? 'selected' : undefined}></Navi>
+        <Navi target="anaerobic" tag={'무산소'} selected={sets || repeats ? 'selected' : undefined}></Navi>
+        <Navi target="exhistory" tag={'내역 관리'}></Navi>
+        <Navi target="exreport" tag={'리포트'}></Navi>
+      </NaviContainer>
+      <ContentLayout>
         <BlankSpace />
         <IngContainer>
           <h1 style={{ gridColumn: 'span 2', marginLeft: '50px', marginTop: '40px' }}>{title}</h1>
@@ -68,8 +69,8 @@ const Exercising = () => {
         </IngContainer>
 
         <BlankSpace />
-      </Container>
-    </div>
+      </ContentLayout>
+    </>
   );
 };
 

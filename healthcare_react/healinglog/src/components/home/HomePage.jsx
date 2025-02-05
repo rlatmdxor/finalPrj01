@@ -19,7 +19,7 @@ const Layout = styled.div`
 const MainContainer = styled.div`
   display: grid;
 
-  min-height: 834px;
+  min-height: 835px;
   grid-template-rows: 100px 80px 1fr 230px;
 `;
 
