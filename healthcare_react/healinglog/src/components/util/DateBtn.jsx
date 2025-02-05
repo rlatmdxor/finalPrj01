@@ -18,14 +18,34 @@ const DataDiv = styled.div`
   justify-content: end;
 `;
 
-const DateBtn = ({ dataBtn }) => {
+const Select = styled.select`
+  margin-right: 15px;
+`;
+
+const DateBtn = ({ dataBtn, onSelect, onChange }) => {
   const [activeIndex, setActiveIndex] = useState(0);
+
+  const handleSelect = () => {
+    onChange(document.querySelector('select').value);
+  };
 
   return (
     <>
       <DataDiv>
+        <Select onChange={handleSelect}>
+          <option value="Line">꺽은 선</option>
+          <option value="Bar">막대</option>
+        </Select>
+
         {dataBtn.map((label, index) => (
-          <StyleBtn key={index} isActive={activeIndex === index} onClick={() => setActiveIndex(index)}>
+          <StyleBtn
+            key={index}
+            isActive={activeIndex === index}
+            onClick={() => {
+              setActiveIndex(index);
+              onSelect(label);
+            }}
+          >
             {label}
           </StyleBtn>
         ))}
