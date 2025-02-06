@@ -16,7 +16,40 @@ const Exercising = () => {
   useEffect(() => {
     dispatch(close('운동시작'));
   });
+
   const { title, hours, minutes, sets, repeats, rangeValue } = location.state || {};
+
+  // 초기 시간(초) 계산
+  const initialSeconds = parseInt(hours, 10) * 3600 + parseInt(minutes, 10) * 60;
+
+  // 남은 시간을 초 단위로 관리하는 상태
+  const [timeLeft, setTimeLeft] = useState(initialSeconds);
+
+  // 카운트다운 타이머 효과
+  useEffect(() => {
+    // 시간이 0 이하이면 타이머 작동 중지
+    if (timeLeft <= 0) return;
+    const intervalId = setInterval(() => {
+      setTimeLeft((prevTime) => {
+        // 1초 이하라면 타이머 종료
+        if (prevTime <= 1) {
+          clearInterval(intervalId);
+          return 0;
+        }
+        return prevTime - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(intervalId);
+  }, [timeLeft]);
+
+  // 남은 시간에서 시, 분, 초 계산
+  const displayHours = Math.floor(timeLeft / 3600);
+  const displayMinutes = Math.floor((timeLeft % 3600) / 60);
+  const displaySeconds = timeLeft % 60;
+
+  // 숫자를 2자리 문자열로 변환 (예: 5 -> "05")
+  const pad = (num) => num.toString().padStart(2, '0');
 
   return (
     <>
@@ -34,7 +67,8 @@ const Exercising = () => {
           <DataCard>
             <DataTitle>운동 시간</DataTitle>
             <DataContent>
-              {hours} : {minutes}
+              {/* {hours} : {minutes} */}
+              {pad(displayHours)} : {pad(displayMinutes)} : {pad(displaySeconds)}
             </DataContent>
           </DataCard>
           <DataCard2>

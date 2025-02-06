@@ -11,6 +11,7 @@ const initialState = {
   height: '',
   weight: '',
   profile: '/img/profile.jpg',
+  gender: '',
 };
 
 const JoinSlice = createSlice({
@@ -47,6 +48,9 @@ const JoinSlice = createSlice({
     setProfile: (state, action) => {
       state.profile = action.payload;
     },
+    setGender: (state, action) => {
+      state.gender = action.payload;
+    },
   },
 });
 
@@ -61,6 +65,7 @@ export const {
   setHeight,
   setWeight,
   setProfile,
+  setGender,
 } = JoinSlice.actions;
 
 export default JoinSlice.reducer;
