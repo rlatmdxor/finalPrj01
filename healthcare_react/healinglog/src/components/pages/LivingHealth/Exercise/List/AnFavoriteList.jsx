@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setBookmark } from '../../../../../redux/aerobicSlice';
 import styled, { useTheme } from 'styled-components';
@@ -6,29 +6,62 @@ import Btn from '../../../../util/Btn';
 import { useNavigate } from 'react-router-dom';
 
 const AnFavoriteList = ({ f }) => {
-  const dispatch = useDispatch();
-  const exVoList = useSelector((state) => state.anAerobic);
+  const url = 'http://127.0.0.1:80/api/anaerobic/favlist';
+  const [data, setData] = useState([]);
+  const [bookmarkStatus, setBookmarkStatus] = useState({});
+
+  useEffect(() => {
+    fetch(url)
+      .then((resp) => resp.json())
+      .then((fetchedData) => setData(fetchedData))
+      .catch((error) => console.error('Error:', error));
+  }, [data]);
+
+  // const dispatch = useDispatch();
+  // const exVoList = useSelector((state) => state.anAerobic);
   const theme = useTheme();
   const navigate = useNavigate();
 
-  const markData = exVoList.filter((item) => item.bookmark === 'y');
+  // const markData = exVoList.filter((item) => item.bookmark === 'y');
 
   const handleToggleBookmark = (no) => {
-    dispatch(setBookmark({ no }));
+    const url = 'http://127.0.0.1:80/api/anaerobic/unmark';
+    const postData = { no: no };
+
+    fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(postData),
+    })
+      .then((resp) => resp.json())
+      .then((data) => {
+        console.log('POST 요청 성공:', data);
+        setBookmarkStatus((bookmarkStatus) => ({
+          ...bookmarkStatus,
+          [no]: data.bookmark,
+        }));
+      })
+      .catch((error) => {
+        console.error('POST 요청 에러:', error);
+      });
   };
 
   return (
     <div>
-      {markData.length > 0 && (
+      {data.length > 0 && (
         <Bookmark>
           <h2>즐겨찾기</h2>
-          {markData.map((vo) => (
+          {data.map((vo) => (
             <Line key={vo.no}>
               <Star>
                 <StarIcon src="/img/Star.webp" onClick={() => handleToggleBookmark(vo.no)} />
               </Star>
               <Content>
-                <div onClick={() => f(vo.name)}>{vo.name}</div>
+                <div onClick={() => f(vo.name)} style={{ cursor: 'pointer' }}>
+                  {vo.name}
+                </div>
                 <div style={{ marginRight: '20px' }}>
                   <Btn
                     str={'상세조회'}

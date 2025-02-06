@@ -5,8 +5,8 @@ import styled, { useTheme } from 'styled-components';
 import Btn from '../../../../util/Btn';
 import { useNavigate } from 'react-router-dom';
 
-const FavoriteList = ({ f }) => {
-  const url = 'http://127.0.0.1:80/api/aerobic/favlist';
+const ShoulderExList = ({ f }) => {
+  const url = 'http://127.0.0.1:80/api/anaerobic/shoulderlist';
   const [data, setData] = useState([]);
   const [bookmarkStatus, setBookmarkStatus] = useState({});
 
@@ -18,14 +18,14 @@ const FavoriteList = ({ f }) => {
   }, [data]);
 
   // const dispatch = useDispatch();
-  // const exVoList = useSelector((state) => state.aerobic);
+  // const exVoList = useSelector((state) => state.anAerobic);
   const theme = useTheme();
   const navigate = useNavigate();
 
-  // const markData = exVoList.filter((item) => item.bookmark === 'y');
+  // const legData = exVoList.filter((item) => item.part === 'leg' && item.bookmark === 'n');
 
   const handleToggleBookmark = (no) => {
-    const url = 'http://127.0.0.1:80/api/aerobic/unmark';
+    const url = 'http://127.0.0.1:80/api/anaerobic/markshoulder';
     const postData = { no: no };
 
     fetch(url, {
@@ -50,54 +50,42 @@ const FavoriteList = ({ f }) => {
 
   return (
     <div>
-      {data.length > 0 && (
-        <Bookmark>
-          <h2>즐겨찾기</h2>
-          {data.map((vo) => (
-            <Line key={vo.no}>
-              <Star>
-                <StarIcon src="/img/Star.webp" onClick={() => handleToggleBookmark(vo.no)} />
-              </Star>
-              <Content>
-                <div onClick={() => f(vo.name)} style={{ cursor: 'pointer' }}>
-                  {vo.name}
-                </div>
-                <div style={{ marginRight: '20px' }}>
-                  <Btn
-                    str={'상세조회'}
-                    c={theme.gray}
-                    fs={'14'}
-                    f={() => {
-                      navigate(`/aerobic/${vo.name}`);
-                    }}
-                    mt={'0'}
-                    mb={'0'}
-                    mr={'0'}
-                    ml={'0'}
-                  />
-                </div>
-              </Content>
-            </Line>
-          ))}
-        </Bookmark>
-      )}
+      <ExList>
+        <h2>어깨</h2>
+        {data.map((vo) => (
+          <Line key={vo.no}>
+            <Star>
+              <StarIcon src="/img/EmptyStar.webp" onClick={() => handleToggleBookmark(vo.no)} />
+            </Star>
+            <Content>
+              <div onClick={() => f(vo.name)} style={{ cursor: 'pointer' }}>
+                {vo.name}
+              </div>
+              <div style={{ marginRight: '20px' }}>
+                <Btn
+                  str={'상세조회'}
+                  c={theme.gray}
+                  fs={'14'}
+                  f={() => {
+                    navigate(`/anaerobic/${vo.name}`);
+                  }}
+                  mt={'0'}
+                  mb={'0'}
+                  mr={'0'}
+                  ml={'0'}
+                />
+              </div>
+            </Content>
+          </Line>
+        ))}
+      </ExList>
     </div>
   );
 };
 
-const Bookmark = styled.div`
-  display: grid;
-  grid-template-rows: 1fr;
-  grid-auto-rows: 50px;
-  justify-self: center;
-  align-self: center;
-  row-gap: 3px;
-  margin-bottom: 50px;
-`;
-
 const Line = styled.div`
   display: grid;
-  grid-template-columns: 75px 700px;
+  grid-template-columns: 75px 250px;
   justify-items: center;
 `;
 
@@ -116,7 +104,7 @@ const Content = styled.div`
   align-items: center;
   background-color: rgba(169, 205, 147, 0.2);
   width: 100%;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: bold;
 `;
 
@@ -127,4 +115,14 @@ const StarIcon = styled.img`
   cursor: pointer;
 `;
 
-export default FavoriteList;
+const ExList = styled.div`
+  display: grid;
+  grid-template-rows: 1fr;
+  grid-auto-rows: 50px;
+  justify-self: center;
+  align-self: center;
+  margin-bottom: 50px;
+  row-gap: 3px;
+`;
+
+export default ShoulderExList;

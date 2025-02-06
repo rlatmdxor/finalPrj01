@@ -39,7 +39,7 @@ const Chart = ({
   yMin = null, // Y축 최소값 (선택 사항)
   yUnit = '', // Y축 숫자 단위 (선택 사항)
   xLabelVisible = true, // 추가: X축 라벨 표시 여부 (기본값: true)
-  xLabelRotation = 90, // 추가: X축 라벨 회전 각도 (기본값: 45도)
+  xLabelRotation = 180, // 추가: X축 라벨 회전 각도 (기본값: 45도)
 }) => {
   // 차트 데이터 생성
   const data = {

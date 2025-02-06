@@ -9,7 +9,6 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/aerobic")
-//@CrossOrigin
 public class AerobicController {
 
     private final AerobicService service;
