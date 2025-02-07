@@ -16,7 +16,6 @@ public class ReportService {
 
     public List<ReportVo> list(Long memberNo) {
         System.out.println("memberNo = " + memberNo);
-        System.out.println("mapper = " + mapper);
 
         return mapper.getCigaretteReport(memberNo);
     }

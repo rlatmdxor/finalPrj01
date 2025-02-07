@@ -88,6 +88,8 @@ const CigaretteReport = () => {
       setFilteredData(filterData('week'));
     } else if (selectedRange == '월') {
       setFilteredData(filterData('month'));
+    } else if (selectedRange == '년') {
+      setFilteredData(filterData('year'));
     } else {
       setFilteredData(filterData('all'));
     }
@@ -127,6 +129,16 @@ const CigaretteReport = () => {
       });
     }
 
+    if (type === 'year') {
+      // 최근에 입력한 데이터를 기준으로 해당 년의 데이터를 가져오기
+      const currentYear = latestDate.getFullYear();
+
+      return fullData.filter((item) => {
+        const [year] = item.endDate.split('-').map(Number);
+        return year === currentYear;
+      });
+    }
+
     return fullData; // 전체 기간
   };
 
@@ -135,10 +147,14 @@ const CigaretteReport = () => {
     setFilteredData(filterData('week'));
   }, [fullData]);
 
-  const dataBtn = ['주', '월'];
+  const dataBtn = ['주', '월', '년'];
   const dispatch = useDispatch();
 
-  const labels = filteredData.map((vo) => vo.endDate);
+  // 날짜 기준 오름차순 정렬 (과거 → 현재)
+  const sortedData = [...filteredData].sort((a, b) => new Date(a.endDate) - new Date(b.endDate));
+
+  // X축: 정렬된 날짜 리스트
+  const labels = sortedData.map((vo) => vo.endDate);
 
   const getDaysConsumed = (startDate, endDate) => {
     const start = new Date(startDate);
@@ -146,15 +162,15 @@ const CigaretteReport = () => {
     return Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1; // 시작일부터 포함하여 계산
   };
 
-  const datasetData = filteredData.map((vo) => {
+  const datasetData = sortedData.map((vo) => {
     const days = getDaysConsumed(vo.startDate, vo.endDate);
-    return days > 0 ? (1 / days).toFixed(2) : 0; // 1 / 소모일수
+    return days > 0 ? parseFloat((1 / days).toFixed(2)) : 0;
   });
 
   const cigaretteList = [];
   // 차트에 들어갈 1번 데이터의 내용
   for (const vo of filteredData) {
-    cigaretteList.unshift(vo.endDate);
+    cigaretteList.push(vo.endDate);
   }
 
   const modals = useSelector((state) => state.modal.modals || {}); // 여러 모달 상태 가져오기
@@ -208,6 +224,12 @@ const CigaretteReport = () => {
     console.log('수정된 데이터:', selectedData);
     dispatch(modalClose('흡연 수정')); // 모달 닫기
   };
+
+  // ✅ datasetData에서 가장 큰 값 찾기
+  const maxValue = Math.max(...datasetData);
+
+  // ✅ yMax 값 설정 (최대값 + 0.5)
+  const yMaxValue = maxValue + 0.2;
 
   return (
     <>
@@ -281,7 +303,7 @@ const CigaretteReport = () => {
           height={450} // 위랑 동일
           xAxisColor="rgba(54, 162, 235, 1)" // 위랑 동일
           yAxisColor="rgba(255, 159, 64, 1)" // 위랑 동일
-          // yMax={200} // y축 최댓값 상황에 맏춰서 지정 아무것도 안적으면 자동으로 짜준다.
+          yMax={yMaxValue} // y축 최대값 찾아서 최대값+n값으로 지정해둠
           yMin={0} // y축 최솟값 지정 아무것도 안적으면 자동으로 짜줌 음수도 입력가능
           xLabelVisible={true} // 추가: X축 라벨 표시 여부 (기본값: true)
         />
@@ -317,7 +339,7 @@ const CigaretteReport = () => {
             페이지 찾아와서 참고 */}
             {Object.entries(
               pagedData.reduce((acc, vo) => {
-                if (!acc[vo.endDate]) acc[vo.endDate] = [];
+                if (!acc[vo.no]) acc[vo.endDate] = [];
                 acc[vo.endDate].push(vo);
                 return acc;
               }, {})
@@ -332,9 +354,9 @@ const CigaretteReport = () => {
                   {index === 0 && (
                     <td
                       rowSpan={records.length}
-                      style={{ verticalAlign: 'middle', fontWeight: 'bold', textAlign: 'center' }}
+                      // style={{ verticalAlign: 'middle', fontWeight: 'bold', textAlign: 'center' }}
                     >
-                      {vo.no}
+                      {vo.endDate}
                     </td>
                   )}
                   <td>{vo.cigaretteName}</td>
