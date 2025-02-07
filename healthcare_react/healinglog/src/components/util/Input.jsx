@@ -16,7 +16,7 @@ const InputTag = styled.input`
   box-sizing: border-box;
 `;
 
-const Input = ({ type, placeholder, size, mb, mt, ml, mr, title, value, disabled, min, max, step, f }) => {
+const Input = ({ name, type, placeholder, size, mb, mt, ml, mr, title, value, disabled, min, max, step, f }) => {
   return (
     <>
       {title}
@@ -24,6 +24,7 @@ const Input = ({ type, placeholder, size, mb, mt, ml, mr, title, value, disabled
         disabled={disabled}
         value={value}
         type={type}
+        name={name}
         placeholder={placeholder}
         size={size}
         mb={mb}
@@ -34,9 +35,9 @@ const Input = ({ type, placeholder, size, mb, mt, ml, mr, title, value, disabled
         max={max}
         step={step}
         onChange={f}
+        title={title}
         // onChange={handleChange}
       />
-
     </>
   );
 };

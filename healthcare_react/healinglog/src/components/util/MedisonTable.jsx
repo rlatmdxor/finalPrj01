@@ -2,9 +2,8 @@ import React from 'react';
 import styled from 'styled-components';
 
 const TableWrapper = styled.div`
-  margin: 20px;
-  margin-left: 180px;
-  width: 1020px;
+  width: 100%;
+  margin-bottom: 30px;
 `;
 
 const Title = styled.h1`

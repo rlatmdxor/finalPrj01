@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import ModalTitle from './ModalTitle';
-import Btn from './Btn';
+
 import { useDispatch, useSelector } from 'react-redux';
 import { close } from '../../redux/modalSlice';
+import { useRef } from 'react';
 
 const BtnContainerDiv = styled.div`
   display: flex;
@@ -32,7 +33,7 @@ const ContainerDiv = styled.div`
   width: 500px;
   border: 1px solid gray;
   background-color: #ffffff;
-  position: absolute;
+  position: fixed;
   border-radius: 15px;
   display: ${(props) => {
     return props.display;
@@ -47,13 +48,15 @@ const ContainerDiv = styled.div`
 `;
 
 const ContentDiv = styled.div`
-  padding: 30px;
+  padding: 30px 30px 0px 30px;
 `;
 
-const Modal = ({ children, title, type, f }) => {
+const Modal = ({ children, title }) => {
   const [click, setClick] = useState(false);
-  const [position, setPosition] = useState({ x: 450, y: 150 });
-  const [offset, setOffset] = useState({ x: 450, y: 150 });
+  const [position, setPosition] = useState({ x: 280, y: 0 });
+  const [offset, setOffset] = useState({ x: 280, y: 0 });
+
+  const contentRef = useRef(null);
 
   const dispatch = useDispatch();
   const { modals } = useSelector((state) => {
@@ -81,6 +84,10 @@ const Modal = ({ children, title, type, f }) => {
   };
 
   const handleClose = () => {
+    if (contentRef.current) {
+      const inputs = contentRef.current.querySelectorAll('input');
+      inputs.forEach((input) => (input.value = ''));
+    }
     dispatch(close(title));
   };
 
@@ -94,20 +101,7 @@ const Modal = ({ children, title, type, f }) => {
         </StyleDiv>
 
         <CloseBtn onClick={handleClose}>X</CloseBtn>
-        <ContentDiv>{children}</ContentDiv>
-
-        <BtnContainerDiv>
-          {type === 'edit' ? (
-            <>
-              <Btn f={f} c={'#7ca96d'} fc={'white'} str={'수정'}></Btn>
-              <Btn f={f} c={'lightgray'} fc={'black'} str={'삭제'}></Btn>
-            </>
-          ) : type === 'add' ? (
-            <Btn f={f} c={'#FF7F50'} fc={'white'} str={'등록'}></Btn>
-          ) : (
-            <Btn f={f} c={'#FF7F50'} fc={'white'} str={'시작'}></Btn>
-          )}
-        </BtnContainerDiv>
+        <ContentDiv ref={contentRef}>{children}</ContentDiv>
       </ContainerDiv>
     </>
   );
