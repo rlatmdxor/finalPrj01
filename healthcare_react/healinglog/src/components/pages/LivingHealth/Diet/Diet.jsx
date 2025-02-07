@@ -126,6 +126,11 @@ const Container = styled.div`
   gap: 6px;
 `;
 
+const ModalContainer = styled.div`
+  display: flex;
+  justify-content: end;
+`;
+
 const MealButton = styled.button`
   padding: 6px 12px;
   border: 1px solid ${(props) => (props.selected ? '#ff8a60' : '#cccccc')};
@@ -136,7 +141,33 @@ const MealButton = styled.button`
   cursor: pointer;
 `;
 
+const SelectedFoodListArea = styled.div`
+  margin-top: 15px;
+  margin-bottom: 10px;
+  font-size: 14px;
+`;
+
+const SelectedFoodContainer = styled.div`
+  border: 1px solid #d4d4d4;
+  padding: 9px 12px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const SelectedFoodContainerBtn = styled.div`
+  display: flex;
+  gap: 4px;
+`;
+
 const Diet = () => {
+  const [selectedMeal, setSelectedMeal] = useState(''); // 끼니 구분 선택 상태 (아침, 점심, 저녁 등)
+  const [selectedFood, setSelectedFood] = useState(''); // Autocomplete에서 선택한 음식 상태
+  const [formData, setFormData] = useState({}); // 음식 직접추가 폼데이터
+  const [foodList, setFoodList] = useState([]); // 추가된 음식 목록
+
   const dispatch = useDispatch();
 
   const handelOpenWaterModal = () => {
@@ -152,22 +183,23 @@ const Diet = () => {
   };
 
   const handleOpenFoodEnrollModal = () => {
-    dispatch(open({ title: '음식 직접입력', value: 'block' }));
+    dispatch(open({ title: '음식 직접추가', value: 'block' }));
   };
 
-  const [selectedMeal, setSelectedMeal] = useState('');
+  const handleOpenFoodEditModal = (index) => {
+    dispatch(open({ title: '음식 수정', value: 'block' }));
+    setFormData({ ...foodList[index], index });
+    console.log(formData);
+  };
 
   const options = [
     { id: 'morning', label: '아침' },
     { id: 'morningsnack', label: '오전간식' },
     { id: 'lunch', label: '점심' },
     { id: 'afternoonsnack', label: '오후간식' },
-    { id: 'evening', label: '저녁' },
+    { id: 'dinner', label: '저녁' },
     { id: 'night', label: '야식' },
   ];
-
-  const [selectedFood, setSelectedFood] = useState('');
-  const [foodList, setFoodList] = useState([]);
 
   const foodDummyData = [
     { label: '쌀밥', unit: '1공기', weight: 210, calories: 336 },
@@ -183,11 +215,9 @@ const Diet = () => {
   const handleSelectFood = (e, newValue) => {
     if (newValue) {
       setSelectedFood(newValue.label);
-      setFoodList((prevList) => [...prevList, newValue]);
+      setFoodList((prev) => [...prev, newValue]);
     }
   };
-
-  const [formData, setFormData] = useState({});
 
   const handleFoodInputChange = (e) => {
     setFormData((prev) => {
@@ -201,6 +231,26 @@ const Diet = () => {
   const handleAddFood = (e) => {
     e.preventDefault();
     setFoodList((prevList) => [...prevList, formData]);
+  };
+
+  const handleEditFood = (e) => {
+    e.preventDefault();
+    const updatedList = [];
+    for (let i = 0; i < foodList.length; i++) {
+      if (i === formData.index) {
+        updatedList.push(formData);
+      } else {
+        updatedList.push(foodList[i]);
+      }
+    }
+    setFoodList(updatedList);
+    console.log(foodList);
+  };
+
+  const handleFoodDelete = (index) => {
+    console.log(index);
+    const updatedFoodList = foodList.filter((food, i) => i !== index);
+    setFoodList(updatedFoodList);
   };
 
   return (
@@ -361,14 +411,26 @@ const Diet = () => {
             </SmallCard>
           </ContentAreaDiv>
         </ContentDiv>
+
         <h1>여기에 광고를 넣어서 돈을 벌자</h1>
 
-        <Modal title="물 등록" type={'add'}>
-          <Input type="number" plcaeholder="" title="마신 양 (ml)" size={'size2'} mb={'10'} mt={'5'} />
+        <Modal title="물 등록">
+          <Input
+            type="number"
+            placeholder="숫자만 입력해주세요"
+            title="물 섭취량 (ml)"
+            size={'size2'}
+            mb={'10'}
+            mt={'7'}
+            min={0}
+          />
+          <ModalContainer>
+            <Btn str={'등록'} mt={'0'} mb={'0'} mr={'0'} c={'#ff8a60'} fc={'white'}></Btn>
+          </ModalContainer>
         </Modal>
 
         <Modal title="체중 등록" type={'add'}>
-          <Input type="number" plcaeholder="" title="체중 (kg)" size={'size2'} mb={'10'} mt={'5'} />
+          <Input type="number" plcaeholder="" title="체중 (kg)" mb={'10'} mt={'5'} />
         </Modal>
 
         <Modal title="식단 등록" type={'add'}>
@@ -381,7 +443,7 @@ const Diet = () => {
             ))}
           </Container>
           <br />
-          <div>음식 입력</div>
+          <div>음식 추가</div>
           <Container>
             <Autocomplete
               disablePortal
@@ -430,7 +492,7 @@ const Diet = () => {
               )}
             />
             <Btn
-              str="직접입력"
+              str="직접추가"
               mt={'0'}
               mb={'0'}
               ml={'3'}
@@ -441,27 +503,85 @@ const Diet = () => {
               f={handleOpenFoodEnrollModal}
             />
           </Container>
-          <div>
-            <h3>선택된 음식 리스트:</h3>
-            <ul>
-              {foodList.map((food, index) => (
-                <li key={index}>
+          <SelectedFoodListArea>
+            {foodList.map((food, index) => (
+              <SelectedFoodContainer key={index}>
+                <div>
                   {food.label} ({food.unit} / {food.weight}g / {food.calories}kcal)
-                </li>
-              ))}
-            </ul>
-          </div>
+                </div>
+                <SelectedFoodContainerBtn>
+                  <Btn
+                    str={'수정'}
+                    w={'44'}
+                    h={'24'}
+                    mt={'0'}
+                    mb={'0'}
+                    ml={'0'}
+                    mr={'0'}
+                    fs={'13'}
+                    f={() => handleOpenFoodEditModal(index)}
+                  />
+                  <Btn
+                    str={'삭제'}
+                    w={'44'}
+                    h={'24'}
+                    mt={'0'}
+                    mb={'0'}
+                    ml={'0'}
+                    mr={'0'}
+                    fs={'13'}
+                    f={() => handleFoodDelete(index)}
+                  />
+                </SelectedFoodContainerBtn>
+              </SelectedFoodContainer>
+            ))}
+          </SelectedFoodListArea>
           <br />
-          <Input type="text" plcaeholder="" title="구분" size={'size2'} mb={'10'} mt={'5'} />
+          <Input type="text" plcaeholder="메모를 입력해주세요" title="메모" size={'size2'} mb={'10'} mt={'5'} />
+          <Input type="file" title="사진" size={'size2'} />
         </Modal>
 
-        <Modal title="음식 직접입력" type={'add'}>
+        <Modal title="음식 직접추가" type={'add'}>
           <form onSubmit={handleAddFood}>
             <input type="text" name="label" onChange={handleFoodInputChange} placeholder="음식명" />
             <input type="text" name="unit" onChange={handleFoodInputChange} placeholder="예) 1공기, 1회, 3개 등 " />
             <input type="text" name="weight" onChange={handleFoodInputChange} placeholder="양(g)" />
             <input type="text" name="calories" onChange={handleFoodInputChange} placeholder="칼로리(kcal)" />
             <input type="submit" value="음식추가" />
+          </form>
+        </Modal>
+
+        <Modal title="음식 수정" type={'edit'}>
+          <form onSubmit={handleEditFood}>
+            <input
+              type="text"
+              name="label"
+              onChange={handleFoodInputChange}
+              placeholder="음식명"
+              value={formData.label || ''}
+            />
+            <input
+              type="text"
+              name="unit"
+              onChange={handleFoodInputChange}
+              placeholder="예) 1공기, 1회, 3개 등 "
+              value={formData.unit || ''}
+            />
+            <input
+              type="text"
+              name="weight"
+              onChange={handleFoodInputChange}
+              placeholder="양(g)"
+              value={formData.weight || ''}
+            />
+            <input
+              type="text"
+              name="calories"
+              onChange={handleFoodInputChange}
+              placeholder="칼로리(kcal)"
+              value={formData.calories || ''}
+            />
+            <input type="submit" value="음식수정" />
           </form>
         </Modal>
       </ContentLayout>

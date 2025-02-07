@@ -4,7 +4,7 @@ import styled from 'styled-components';
 const InputTag = styled.input`
   display: flex;
   width: ${({ size }) =>
-    size === 'size1' ? '500px' : size === 'size2' ? '450px' : size === 'size3' ? '300px' : 'auto'};
+    size === 'size1' ? '500px' : size === 'size2' ? '440px' : size === 'size3' ? '300px' : 'auto'};
   height: ${({ size }) => (size === 'size1' ? '50px' : size === 'size2' ? '40px' : size === 'size3' ? '30px' : 'auto')};
   margin-bottom: ${({ mb }) => (mb ? `${mb}px` : '0')};
   margin-top: ${({ mt }) => (mt ? `${mt}px` : '0')};
@@ -36,7 +36,6 @@ const Input = ({ type, placeholder, size, mb, mt, ml, mr, title, value, disabled
         onChange={f}
         // onChange={handleChange}
       />
-
     </>
   );
 };
