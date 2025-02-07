@@ -25,4 +25,8 @@ public class SleepService {
     public List<SleepVo> list() {
         return mapper.list();
     }
+
+    public void edit(SleepVo vo) {
+        mapper.edit(vo);
+    }
 }

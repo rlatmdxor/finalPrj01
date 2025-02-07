@@ -6,14 +6,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { close } from '../../redux/modalSlice';
 import { useRef } from 'react';
 
-const BtnContainerDiv = styled.div`
-  display: flex;
-  justify-content: end;
-  margin-right: 10px;
-  margin-bottom: 10px;
-  gap: 10px;
-`;
-
 const StyleDiv = styled.div`
   height: 50px;
 `;
@@ -33,7 +25,7 @@ const ContainerDiv = styled.div`
   width: 500px;
   border: 1px solid gray;
   background-color: #ffffff;
-  position: fixed;
+  position: fixed;  
   border-radius: 15px;
   display: ${(props) => {
     return props.display;
