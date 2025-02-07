@@ -47,28 +47,11 @@ const StyledTable = styled.table`
   }
 `;
 
-const Table = ({
-  children,
-  width,
-  mt,
-  mb,
-  ml,
-  mr,
-  thbgcolor,
-  thtextcolor,
-  thtextsize,
-  tdbgcolor,
-  tdtextcolor,
-  tdtextsize,
-}) => {
+const Table = ({ children, width, thbgcolor, thtextcolor, thtextsize, tdbgcolor, tdtextcolor, tdtextsize }) => {
   return (
     <LayoutDiv>
       <StyledTable
         width={width}
-        mt={mt}
-        mb={mb}
-        ml={ml}
-        mr={mr}
         thbgcolor={thbgcolor}
         thtextcolor={thtextcolor}
         thtextsize={thtextsize}

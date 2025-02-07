@@ -1,4 +1,3 @@
-import React from 'react';
 import styled from 'styled-components';
 
 const CommonBtn = styled.button`
@@ -16,14 +15,26 @@ const CommonBtn = styled.button`
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  margin-top: 30px;
-  margin-bottom: 30px;
-  margin-right: 50px;
+  margin-top: ${({ mt }) => mt + 'px'};
+  margin-bottom: ${({ mb }) => mb + 'px'};
+  margin-right: ${({ mr }) => mr + 'px'};
 `;
 
-const Btn = ({ type, str, f, c, fc, w, h, fs }) => {
+const Btn = ({ type, str, f, c, fc, w, h, fs, mt, mb, mr, title }) => {
   return (
-    <CommonBtn type={type || 'button'} onClick={f} c={c} fc={fc} fs={fs} w={w} h={h}>
+    <CommonBtn
+      title={title}
+      type={type || 'button'}
+      onClick={f}
+      c={c}
+      fc={fc}
+      fs={fs}
+      w={w}
+      h={h}
+      mt={mt}
+      mb={mb}
+      mr={mr} 
+    >
       {str}
     </CommonBtn>
   );

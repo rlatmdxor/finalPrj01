@@ -14,6 +14,7 @@ const modalSlice = createSlice({
     // 일반 모달 열기
     open: (state, action) => {
       const { title, value } = action.payload; // payload: title과 display 상태
+
       state.modals[title] = value;
     },
     // 일반 모달 닫기

@@ -6,13 +6,14 @@ import styled from 'styled-components';
 
 import Navi from '../../../util/Navi';
 import MedisonTable from '../../../util/MedisonTable';
+import ContentLayout from '../../../util/ContentLayout';
 
 const TextDiv = styled.div`
   display: flex;
   position: absolute;
   font-size: 13px;
-  margin-left: 975px;
-  margin-top: 30px;
+  margin-left: 790px;
+  margin-top: 40px;
 `;
 
 const NaviContainer = styled.div`
@@ -42,16 +43,18 @@ const MediSonData = [
 
 const Drug1 = () => {
   return (
-    <div>
+    <>
       <Title> 과거 복용 약</Title>
       <NaviContainer>
         <Navi target="drug" tag={'복용중'}></Navi>
         <Navi target="drug1" tag={'과거 복용 약'}></Navi>
       </NaviContainer>
 
-      <TextDiv>* 최근 1년 간 등록된 약만 표시됩니다.</TextDiv>
-      <MedisonTable title="구승용 님의 과거 복용약" MediSonData={MediSonData} />
-    </div>
+      <ContentLayout>
+        <TextDiv>* 최근 1년 간 등록된 약만 표시됩니다.</TextDiv>
+        <MedisonTable title="구승용 님의 과거 복용약" MediSonData={MediSonData} />
+      </ContentLayout>
+    </>
   );
 };
 
