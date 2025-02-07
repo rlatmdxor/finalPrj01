@@ -21,13 +21,15 @@ const MenuDiv = styled.div`
   display: ${(props) => props.display || 'none'};
   justify-content: space-evenly;
   position: absolute;
-  width: 1330px;
-  left: 274px;
+  width: 1380px;
+  left: 50%;
+  transform: translateX(-50%);
   top: 110px;
   border-bottom: 1px solid #7ca96d;
   border-left: 1px solid #7ca96d;
   border-right: 1px solid #7ca96d;
   z-index: 100;
+  box-sizing: border-box;
 `;
 
 const NaviDiv = styled.div`

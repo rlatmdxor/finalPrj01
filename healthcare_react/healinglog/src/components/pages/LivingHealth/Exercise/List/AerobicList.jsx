@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setBookmark } from '../../../../../redux/aerobicSlice';
 import styled, { useTheme } from 'styled-components';
@@ -6,43 +6,82 @@ import Btn from '../../../../util/Btn';
 import { useNavigate } from 'react-router-dom';
 
 const AerobicList = ({ f }) => {
-  const dispatch = useDispatch();
-  const exVoList = useSelector((state) => state.aerobic);
+  const url = 'http://127.0.0.1:80/api/aerobic/list';
+  const [data, setData] = useState([]);
+  const [bookmarkStatus, setBookmarkStatus] = useState({});
+
+  useEffect(() => {
+    fetch(url)
+      .then((resp) => resp.json())
+      .then((fetchedData) => setData(fetchedData))
+      .catch((error) => console.error('Error:', error));
+  }, [data]);
+
+  // const dispatch = useDispatch();
+  // const exVoList = useSelector((state) => state.aerobic);
   const theme = useTheme();
   const navigate = useNavigate();
 
-  const markData = exVoList.filter((item) => item.bookmark === 'y');
-  const unmarkData = exVoList.filter((item) => item.bookmark === 'n');
+  // const markData = exVoList.filter((item) => item.bookmark === 'y');
+  // const unmarkData = exVoList.filter((item) => item.bookmark === 'n');
 
   const handleToggleBookmark = (no) => {
-    dispatch(setBookmark({ no }));
+    const url = 'http://127.0.0.1:80/api/aerobic/mark';
+    const postData = { no: no };
+
+    fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(postData),
+    })
+      .then((resp) => resp.json())
+      .then((data) => {
+        console.log('POST 요청 성공:', data);
+        setBookmarkStatus((bookmarkStatus) => ({
+          ...bookmarkStatus,
+          [no]: data.bookmark,
+        }));
+      })
+      .catch((error) => {
+        console.error('POST 요청 에러:', error);
+      });
   };
 
   return (
     <div>
-      <ExList>
-        <h2>운동 목록</h2>
-        {unmarkData.map((vo) => (
-          <Line key={vo.no}>
-            <Star>
-              <StarIcon src="/img/EmptyStar.webp" onClick={() => handleToggleBookmark(vo.no)} />
-            </Star>
-            <Content>
-              <div onClick={() => f(vo.name)}>{vo.name}</div>
-              <div style={{ marginRight: '20px' }}>
-                <Btn
-                  str={'상세조회'}
-                  c={theme.gray}
-                  fs={'14'}
-                  f={() => {
-                    navigate(`/aerobic/${vo.name}`);
-                  }}
-                />
-              </div>
-            </Content>
-          </Line>
-        ))}
-      </ExList>
+      {data.length > 0 && (
+        <ExList>
+          <h2>운동 목록</h2>
+          {data.map((vo) => (
+            <Line key={vo.no}>
+              <Star>
+                <StarIcon src="/img/EmptyStar.webp" onClick={() => handleToggleBookmark(vo.no)} />
+              </Star>
+              <Content>
+                <div onClick={() => f(vo.name)} style={{ cursor: 'pointer' }}>
+                  {vo.name}
+                </div>
+                <div style={{ marginRight: '20px' }}>
+                  <Btn
+                    str={'상세조회'}
+                    c={theme.gray}
+                    fs={'14'}
+                    f={() => {
+                      navigate(`/aerobic/${vo.name}`);
+                    }}
+                    mt={'0'}
+                    mb={'0'}
+                    mr={'0'}
+                    ml={'0'}
+                  />
+                </div>
+              </Content>
+            </Line>
+          ))}
+        </ExList>
+      )}
     </div>
   );
 };
@@ -85,7 +124,8 @@ const ExList = styled.div`
   grid-auto-rows: 50px;
   justify-self: center;
   align-self: center;
-  margin-bottom: 100px;
+  margin-bottom: 50px;
+  row-gap: 3px;
 `;
 
 export default AerobicList;

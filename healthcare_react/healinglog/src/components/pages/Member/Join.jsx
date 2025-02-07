@@ -4,6 +4,7 @@ import Title from '../../util/Title';
 import styled, { useTheme } from 'styled-components';
 import Btn from '../../util/Btn';
 import { useNavigate } from 'react-router-dom';
+import ContentLayout from '../../util/ContentLayout';
 
 const Join = () => {
   const [allChecked, setAllChecked] = useState(false);
@@ -32,8 +33,9 @@ const Join = () => {
   const theme = useTheme();
   return (
     <>
-      <Container>
-        <Title>회원가입</Title>
+      <Title>회원가입</Title>
+      <div></div>
+      <ContentLayout>
         <Checkbox_Container>
           <Checkbox_Group>
             <Checkbox_label>
@@ -114,7 +116,7 @@ const Join = () => {
             </Btn>
           </BtnContainer>
         </Checkbox_Container>
-      </Container>
+      </ContentLayout>
     </>
   );
 };

@@ -3,10 +3,10 @@ import styled from 'styled-components';
 
 const LayoutDiv = styled.div`
   display: flex;
-  margin-top: ${(props) => props.width || '20px'};
-  margin-bottom: ${(props) => props.width || '20px'};
-  margin-left: ${(props) => props.width || '50px'};
-  margin-right: ${(props) => props.width || '50px'};
+  /* margin-top: ${(props) => props.width || '20px'};
+  margin-bottom: ${(props) => props.width || '20px'}; */
+  /* margin-left: ${(props) => props.width || '50px'};
+  margin-right: ${(props) => props.width || '50px'}; */
 `;
 
 const StyledTable = styled.table`

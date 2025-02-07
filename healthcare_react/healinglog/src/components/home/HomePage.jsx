@@ -11,8 +11,9 @@ import ScrollToTop from '../util/ScrollToTop';
 const Layout = styled.div`
   display: grid;
   width: 100%;
-  grid-template-columns: 1fr 5fr 1fr;
+  grid-template-columns: 1fr 1380px 1fr;
   grid-template-rows: 110px 1fr;
+  box-sizing: border-box;
 `;
 
 const MainContainer = styled.div`
