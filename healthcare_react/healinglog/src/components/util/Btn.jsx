@@ -21,10 +21,11 @@ const CommonBtn = styled.button`
   margin-right: ${({ mr }) => (mr ? `${mr}px` : '50px')};
 `;
 
-const Btn = ({ type, str, f, c, fc, w, h, fs, mt, mb, mr,  ml, title }) => {
+const Btn = ({ type, str, f, c, fc, w, h, fs, mt, mb, mr, ml, title }) => {
   return (
     <CommonBtn
-      type={type || 'button'}
+      ml={ml}
+      title={title}
       type={type || 'button'}
       onClick={f}
       c={c}
@@ -34,7 +35,7 @@ const Btn = ({ type, str, f, c, fc, w, h, fs, mt, mb, mr,  ml, title }) => {
       h={h}
       mt={mt}
       mb={mb}
-      mr={mr} 
+      mr={mr}
     >
       {str}
     </CommonBtn>

@@ -25,25 +25,13 @@ const ModalContainer = styled.div`
 
 const Sleep = () => {
   const [dataVoList, setDataVoList] = useState([]);
-
-  useEffect(() => {
-    fetch('http://127.0.0.1:80/api/sleep/list', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify(),
-    })
-      .then((resp) => resp.json())
-      .then((data) => {
-        setDataVoList(data);
-      });
-  }, []);
+  const [num, setNum] = useState(0);
+  console.log('voList 처음 렌더링 :::::::::::::::: ', dataVoList);
 
   const dataBtn = ['일', '주', '월'];
   const [selectedRange, setSelectedRange] = useState('일');
   const [selectChart, setSelectChart] = useState('Line');
-  const initialInputData = { recordDate: '', sleepStart: '', sleepEnd: '' };
+  const initialInputData = { no: '', recordDate: '', sleepStart: '', sleepEnd: '' };
 
   const getChartData = () => {
     switch (selectedRange) {
@@ -114,8 +102,10 @@ const Sleep = () => {
     setInputData(initialInputData);
   };
 
+  //저장하기기////////////////////////////////swy
   const handleSubmit = (e) => {
-    console.log(inputData);
+    console.log('handleSubmit 저장하기 ###############');
+
     fetch('http://127.0.0.1:80/api/sleep/write', {
       method: 'POST',
       headers: {
@@ -123,17 +113,16 @@ const Sleep = () => {
       },
       body: JSON.stringify(inputData),
     })
-      .then((resp) => resp.json())
+      .then((resp) => resp.text())
       .then((data) => {
-        console.log(data);
+        console.log('insert clear ~~~ setNum at next line');
+        setNum((prev) => prev + 1);
       });
 
     dispatch(close(e.target.title));
   };
 
   const handleEditSubmit = (e) => {
-    console.log(inputData);
-
     fetch('http://127.0.0.1:80/api/sleep/edit', {
       method: 'POST',
       headers: {
@@ -142,11 +131,31 @@ const Sleep = () => {
       body: JSON.stringify(inputData),
     })
       .then((resp) => resp.json())
-      .then((data) => {});
-    console.log(data);
+      .then((data) => {
+        setNum((x) => {
+          return x + 1;
+        });
+      });
 
     dispatch(close(e.target.title));
   };
+
+  //select////////////////////////////////////////////////////////////////////////swy
+  useEffect(() => {
+    console.log('SELECT ********************');
+    fetch('http://127.0.0.1:80/api/sleep/list', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify(),
+    })
+      .then((resp) => resp.json())
+      .then((data) => {
+        console.log('select data :::::::::::::::::::::', data);
+        setDataVoList(data);
+      });
+  }, [num]);
 
   return (
     <>
@@ -199,7 +208,7 @@ const Sleep = () => {
           </ModalContainer>
         </Modal>
 
-        <Modal title="수면 수정" type={'edit'}>
+        <Modal title="수면 수정">
           <InputTag
             name={'recordDate'}
             type="date"
@@ -232,7 +241,16 @@ const Sleep = () => {
             f={handleChange}
           ></InputTag>
           <ModalContainer>
-            <Btn f={handleEditSubmit} mt={'10'} mb={'20'} mr={'20'} c={'#7ca96d'} fc={'white'} str={'수정'}></Btn>
+            <Btn
+              f={handleEditSubmit}
+              title={'수면 수정'}
+              mt={'10'}
+              mb={'20'}
+              mr={'20'}
+              c={'#7ca96d'}
+              fc={'white'}
+              str={'수정'}
+            ></Btn>
             <Btn mt={'10'} mb={'20'} mr={'-20'} c={'lightgray'} fc={'black'} str={'삭제'}></Btn>
           </ModalContainer>
         </Modal>
@@ -275,8 +293,8 @@ const Sleep = () => {
                 <tr
                   key={vo.no}
                   onClick={(e) => {
-                    console.log('vo', vo);
                     setInputData({
+                      no: vo.no,
                       recordDate: vo.day,
                       sleepStart: vo.startTime,
                       sleepEnd: vo.endTime,
