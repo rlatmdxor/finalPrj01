@@ -36,7 +36,6 @@ const Input = ({ type, placeholder, size, mb, mt, ml, mr, title, value, disabled
         onChange={f}
         // onChange={handleChange}
       />
-
     </>
   );
 };
