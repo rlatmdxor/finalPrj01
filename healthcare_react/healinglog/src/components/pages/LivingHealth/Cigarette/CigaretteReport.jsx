@@ -11,12 +11,12 @@ import Navi from '../../../util/Navi';
 import Table from '../../../util/Table';
 import Pagination from '../../../util/Pagination';
 
-import { setSelection } from '../../../../redux/selectSlice';
 import { open, close as modalClose } from '../../../../redux/modalSlice';
 import { setTotalCount, resetPaging } from '../../../../redux/pagingSlice';
 import ContentLayout from '../../../util/ContentLayout';
 import Chart from '../../../util/Chart';
 import DateBtn from '../../../util/DateBtn';
+import { data } from 'react-router-dom';
 
 const NaviContainer = styled.div`
   display: grid;
@@ -27,18 +27,15 @@ const NaviContainer = styled.div`
   grid-template-columns: 3fr 3fr; // 글자수만큼 fr 주면 됩니다. ex) 유산소 3글자니까 3fr
 `;
 
-const BottomDiv = styled.div`
-  display: flex;
-  margin: 30px 50px 50px 50px;
-  justify-content: space-between;
-  align-items: center;
-`;
-
 const BtnContainer = styled.div`
   display: flex;
   margin-top: 30px;
-  margin-left: 875px;
-  margin-bottom: 30px;
+  margin-left: 1030px;
+  gap: 15px;
+`;
+
+const LineDiv = styled.div`
+  height: 50px;
 `;
 
 const DataDiv = styled.div`
@@ -46,88 +43,119 @@ const DataDiv = styled.div`
 `;
 
 const CigaretteReport = () => {
-  const boardType = 'CigraetteBoard';
-  const dispatch = useDispatch();
-  const [chartData, setChartData] = useState({ daily: [], weekly: [], monthly: [] });
-  const [selectedView, setSelectedView] = useState('daily');
+  const url = 'http://127.0.0.1/api/cigarette/list';
 
-  const dataVoList = [
-    { no: 1, cigarette: '레종 블루', tar: '3', start_date: '2025-01-16', end_date: '2025-01-23' },
-    { no: 2, cigarette: '레종 블루', tar: '3', start_date: '2025-01-17', end_date: '2025-01-23' },
-    { no: 3, cigarette: '레종 블루', tar: '3', start_date: '2025-01-18', end_date: '2025-01-23' },
-    { no: 4, cigarette: '레종 블루', tar: '3', start_date: '2025-01-19', end_date: '2025-01-23' },
-    { no: 5, cigarette: '레종 블루', tar: '3', start_date: '2025-01-20', end_date: '2025-01-23' },
-    { no: 6, cigarette: '레종 블루', tar: '3', start_date: '2025-01-21', end_date: '2025-01-23' },
-    { no: 7, cigarette: '레종 블루', tar: '3', start_date: '2025-01-22', end_date: '2025-01-23' },
-    { no: 8, cigarette: '레종 블루', tar: '3', start_date: '2025-01-23', end_date: '2025-01-23' },
-    { no: 9, cigarette: '레종 블루', tar: '3', start_date: '2025-01-23', end_date: '2025-01-23' },
-    { no: 10, cigarette: '레종 블루', tar: '3', start_date: '2025-01-23', end_date: '2025-01-23' },
-    { no: 11, cigarette: '레종 블루', tar: '3', start_date: '2025-01-23', end_date: '2025-01-23' },
-    { no: 12, cigarette: '레종 블루', tar: '3', start_date: '2025-01-23', end_date: '2025-01-23' },
-    { no: 13, cigarette: '레종 블루', tar: '3', start_date: '2025-01-24', end_date: '2025-01-23' },
-    { no: 14, cigarette: '레종 블루', tar: '3', start_date: '2025-01-23', end_date: '2025-01-23' },
-  ];
-
-  //GPT시작
-
-  useEffect(() => {
-    dispatch(setTotalCount({ boardType, totalCount: dataVoList.length }));
-    dispatch(resetPaging({ boardType }));
-    processChartData();
-  }, [boardType, dataVoList.length, dispatch]);
-
-  // 🔹 일, 주, 월별 평균 소모갑수 계산
-  const processChartData = () => {
-    const dailyConsumption = {};
-    const weeklyConsumption = {};
-    const monthlyConsumption = {};
-
-    dataVoList.forEach((vo) => {
-      const startDate = new Date(vo.start_date);
-      const endDate = new Date(vo.end_date);
-      const daysConsumed = Math.ceil((endDate - startDate + 1) / (1000 * 60 * 60 * 24));
-
-      if (daysConsumed > 0) {
-        const perDay = 1 / daysConsumed;
-
-        // ✅ 일별 데이터 저장
-        for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
-          const dateStr = d.toISOString().split('T')[0]; // YYYY-MM-DD 형식
-          dailyConsumption[dateStr] = (dailyConsumption[dateStr] || 0) + perDay;
-        }
-
-        // ✅ 주별 데이터 저장 (연도 + 주차 기준)
-        const weekKey = `${startDate.getFullYear()}-W${Math.ceil(startDate.getDate() / 7)}`;
-        weeklyConsumption[weekKey] = (weeklyConsumption[weekKey] || 0) + perDay * daysConsumed;
-
-        // ✅ 월별 데이터 저장
-        const monthKey = `${startDate.getFullYear()}-${(startDate.getMonth() + 1).toString().padStart(2, '0')}`;
-        monthlyConsumption[monthKey] = (monthlyConsumption[monthKey] || 0) + perDay * daysConsumed;
-      }
-    });
-
-    // 🔹 차트 데이터로 변환
-    setChartData({
-      daily: Object.entries(dailyConsumption).map(([date, value]) => ({ date, value })),
-      weekly: Object.entries(weeklyConsumption).map(([week, value]) => ({ week, value })),
-      monthly: Object.entries(monthlyConsumption).map(([month, value]) => ({ month, value })),
-    });
+  const options = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ memberNo: '1' }),
   };
 
-  //GPT종료
+  const [fullData, setFullData] = useState([]); // 전체 데이터 저장
+  const [pagedData, setPagedData] = useState([]); // 페이징된 데이터
+  const [filteredData, setFilteredData] = useState([]); // 차트용 필터링 데이터
+  const [selectedRange, setSelectedRange] = useState('주'); // 기본값 '일'
+  const [selectChart, setSelectChart] = useState('Line'); // 그래프 모양 정하는 state
 
-  const startDate = new Date(dataVoList.start_date);
-  const endDate = new Date(dataVoList.end_date);
-  const daysConsumed = Math.ceil((endDate - startDate + 1) / (1000 * 60 * 60 * 24));
-  const Cigarette_Duration = daysConsumed / 1;
-
-  //일주월 누르면 바꾸게
-  const handleDateBtnClick = (selected) => {
-    setSelectedView(selected);
-  };
-
-  // Redux 상태 가져오기
+  const boardType = 'CigaretteReport';
   const { currentPage, boardLimit } = useSelector((state) => state.paging[boardType] || {});
+  const offset = (currentPage - 1) * boardLimit;
+
+  // fetch실행
+  useEffect(() => {
+    fetch(url, options)
+      .then((resp) => resp.json())
+      .then((data) => {
+        if (data.length > 0) {
+          dispatch(setTotalCount({ boardType, totalCount: data.length })); // 페이징 처리할때 totalCount 저장
+          setFullData(data);
+        } else {
+          dispatch(resetPaging({ boardType }));
+          setFullData([]);
+        }
+      })
+      .catch((error) => console.error('데이터 불러오기 실패:', error));
+  }, []);
+
+  // 테이블 페이징 처리
+  useEffect(() => {
+    setPagedData(fullData.slice(offset, offset + boardLimit));
+  }, [fullData, currentPage, boardLimit]);
+
+  // date버튼의 값에 따라서 그래프에 표시되는 데이터를 설정하는 부분
+  useEffect(() => {
+    if (selectedRange == '주') {
+      setFilteredData(filterData('week'));
+    } else if (selectedRange == '월') {
+      setFilteredData(filterData('month'));
+    } else {
+      setFilteredData(filterData('all'));
+    }
+  }, [selectedRange]);
+
+  // 차트용 필터링 데이터의 마지막 기록 날짜를 기준으로 최근 7일간의 데이터와 해당 날짜가 포함된 달의 데이터를 가져옴
+  const filterData = (type) => {
+    // const today = new Date(); // 오늘 날짜 가져오기
+
+    const voList = [];
+
+    for (const vo of fullData) {
+      voList.push(vo.endDate);
+    }
+
+    const latestDate = new Date(voList[0]);
+
+    if (type === 'week') {
+      // 최근에 입력한 데이터를 기준으로 최신7일간의 데이터를 가져오기
+      const oneWeekAgo = new Date(latestDate);
+      oneWeekAgo.setDate(latestDate.getDate() - 7);
+
+      return fullData.filter((item) => {
+        const itemDate = new Date(item.endDate); // 문자열을 Date 객체로 변환
+        return itemDate >= oneWeekAgo && itemDate <= latestDate; // 최신 날짜 기준 7일 이내 데이터
+      });
+    }
+
+    if (type === 'month') {
+      // 최근에 입력한 데이터를 기준으로 해당 월의 데이터를 가져오기
+      const currentYear = latestDate.getFullYear();
+      const currentMonth = latestDate.getMonth() + 1; // getMonth()는 0부터 시작
+
+      return fullData.filter((item) => {
+        const [year, month] = item.endDate.split('-').map(Number);
+        return year === currentYear && month === currentMonth;
+      });
+    }
+
+    return fullData; // 전체 기간
+  };
+
+  // 처음에 일주일 데이터 로드
+  useEffect(() => {
+    setFilteredData(filterData('week'));
+  }, [fullData]);
+
+  const dataBtn = ['주', '월'];
+  const dispatch = useDispatch();
+
+  const labels = filteredData.map((vo) => vo.endDate);
+
+  const getDaysConsumed = (startDate, endDate) => {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    return Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1; // 시작일부터 포함하여 계산
+  };
+
+  const datasetData = filteredData.map((vo) => {
+    const days = getDaysConsumed(vo.startDate, vo.endDate);
+    return days > 0 ? (1 / days).toFixed(2) : 0; // 1 / 소모일수
+  });
+
+  const cigaretteList = [];
+  // 차트에 들어갈 1번 데이터의 내용
+  for (const vo of filteredData) {
+    cigaretteList.unshift(vo.endDate);
+  }
 
   const modals = useSelector((state) => state.modal.modals || {}); // 여러 모달 상태 가져오기
   const isModalOpen = modals['흡연 수정'] === 'block'; // 특정 모달이 열려 있는지 확인
@@ -135,29 +163,17 @@ const CigaretteReport = () => {
   // ✅ 선택된 데이터 저장 초기값 빈객체로
   const [selectedData, setSelectedData] = useState({});
 
-  useEffect(() => {
-    dispatch(setTotalCount({ boardType, totalCount: dataVoList.length }));
-    dispatch(resetPaging({ boardType }));
-  }, [boardType, dataVoList.length, dispatch]);
-
-  // useEffect(() => {
-  //   if (modals['흡연 수정'] === 'block' && selectedData) {
-  //     setSelectedData((prev) => ({
-  //       ...prev,
-  //     }));
-  //   }
-  // }, [modals, selectedData]);
-
-  const dataBtn = ['일', '주', '월'];
-
-  const labels = [dataVoList.start_date];
   const dataset = [
     {
       // 차트에서 그래프가 나타내는 이름 표시 ex)수축기 혈압 , 이완기 혈압
       // Bar , Pie , Doughnut에서는 마우스를 해당 부분에 호버하면 이 label의 이름이 표시된다.
-      label: 'tnftnftnf',
+      // label: 'end_date',
 
-      data: [dataVoList.Cigarette_Duration], // 데이터 값 위의 labels와 같은 갯수 넣어야됨
+      // data: systoleList, // 위에서 뽑아온 데이터 노션내역
+
+      // data: [data.Cigarette_Duration], // 데이터 값 위의 labels와 같은 갯수 넣어야됨
+      label: '일당 소모갑 수',
+      data: datasetData,
       backgroundColor: [
         'rgba(255, 99, 132, 0.2)',
         'rgba(54, 162, 235, 0.2)',
@@ -179,9 +195,6 @@ const CigaretteReport = () => {
       borderWidth: 1, // 테두리 두께
     },
   ];
-  // 페이지네이션 로직
-  const offset = (currentPage - 1) * (boardLimit || 5);
-  const data = dataVoList.slice(offset, offset + (boardLimit || 5));
 
   // ✅ 게시글 클릭 시 수정 모달 열기
   const handleRowClick = (vo) => {
@@ -205,13 +218,6 @@ const CigaretteReport = () => {
         <InputTag type="date" placeholder="종료날짜" title="종료날짜" size={'size3'} mb={'10'} mt={'5'}></InputTag>
         <InputTag type="text" placeholder="특이사항" title="특이사항" size={'size3'} mb={'10'} mt={'5'}></InputTag>
       </Modal>
-      {/* <Modal title="흡연 수정" type={'edit'}>
-        <InputTag type="text" placeholder="담배명" title="담배명" size={'size3'} mb={'10'} mt={'5'}></InputTag>
-        <InputTag type="number" placeholder="타르량" title="타르량" size={'size3'} mb={'10'} mt={'5'}></InputTag>
-        <InputTag type="date" placeholder="시작날짜" title="시작날짜" size={'size3'} mb={'10'} mt={'5'}></InputTag>
-        <InputTag type="date" placeholder="종료날짜" title="종료날짜" size={'size3'} mb={'10'} mt={'5'}></InputTag>
-        <InputTag type="text" placeholder="특이사항" title="특이사항" size={'size3'} mb={'10'} mt={'5'}></InputTag>
-      </Modal> */}
 
       {modals['흡연 수정'] === 'block' && selectedData && (
         <Modal title="흡연 수정" type="edit" f={handleEdit}>
@@ -242,8 +248,8 @@ const CigaretteReport = () => {
             size="size3"
             mb="10"
             mt="5"
-            value={selectedData?.start_date || ''}
-            onChange={(e) => setSelectedData({ ...selectedData, start_date: e.target.value })}
+            value={selectedData?.startDate || ''}
+            onChange={(e) => setSelectedData({ ...selectedData, startDate: e.target.value })}
           />
           <InputTag
             type="date"
@@ -252,8 +258,8 @@ const CigaretteReport = () => {
             size="size3"
             mb="10"
             mt="5"
-            value={selectedData?.end_date || ''}
-            onChange={(e) => setSelectedData({ ...selectedData, end_date: e.target.value })}
+            value={selectedData?.endDate || ''}
+            onChange={(e) => setSelectedData({ ...selectedData, endDate: e.target.value })}
           />
         </Modal>
       )}
@@ -265,90 +271,38 @@ const CigaretteReport = () => {
       </NaviContainer>
 
       <ContentLayout>
-        {/* <DataDiv>
-          <DateBtn dataBtn={dataBtn}></DateBtn>
-        </DataDiv> */}
+        <DateBtn dataBtn={dataBtn} onSelect={setSelectedRange} onChange={setSelectChart}></DateBtn>
 
-        <DataDiv>
-          <DateBtn dataBtn={['일', '주', '월']} onClick={handleDateBtnClick} />
-        </DataDiv>
-
-        {/* <Chart
-          chartType="Bar" // 차트 타입지정 Bar , Line , Pie , Doughnut 중 택1
-          labels={labels} // 위에서 작성한 x축의 데이터
-          dataset={dataset} // 위에서 작성한 차트의 데이터
-          // width={100} // 차트 가로 사이즈임
-          // height={100} // 차트 세로 사이즈임
-          // margin={20}
-          xAxisColor="rgba(75, 192, 192, 1)" // Bar , Line 에만 사용되고 x축 글씨색상임
-          yAxisColor="rgba(255, 99, 132, 1)" // Bar , Line 에만 사용되고 y축 글씨색상임
-        /> */}
-
-        {/* <Chart
-          chartType="Line" // 차트 타입지정
+        <Chart
+          chartType={selectChart} // 차트 타입지정
           labels={labels} // 위랑 동일
           dataset={dataset} // 위랑 동일
-          width={600} // 위랑 동일
-          height={400} // 위랑 동일
-          xAxisColor="rgba(54, 162, 235, 1)" // x축 색상
-          yAxisColor="rgba(255, 159, 64, 1)" // y축 색상
-          // yMin={}     // y축 최소값 음수가 필요한거 아니면 주석 유지하면됨
-          yMax={1} // y축 최댓값 설정안하면 자동 스케일링됨
-          // yUnit={}       // y축에 표시될 수치의 단위를 입력할 수 있음 안쓰면 자동으로 공백처리
-        /> */}
-
-        <Chart
-          chartType="Line"
-          labels={chartData.daily?.map((d) => d.date) || []}
-          dataset={[
-            {
-              label: '일별 소모갑수',
-              data: chartData.daily?.map((d) => d.value) || [],
-              borderWidth: 2,
-            },
-          ]}
+          width={100} // 위랑 동일
+          height={450} // 위랑 동일
+          xAxisColor="rgba(54, 162, 235, 1)" // 위랑 동일
+          yAxisColor="rgba(255, 159, 64, 1)" // 위랑 동일
+          // yMax={200} // y축 최댓값 상황에 맏춰서 지정 아무것도 안적으면 자동으로 짜준다.
+          yMin={0} // y축 최솟값 지정 아무것도 안적으면 자동으로 짜줌 음수도 입력가능
+          xLabelVisible={true} // 추가: X축 라벨 표시 여부 (기본값: true)
         />
-        {/* 
-        <Chart
-          chartType="Bar"
-          labels={chartData.weekly?.map((w) => w.week) || []}
-          dataset={[
-            {
-              label: '주별 소모갑수',
-              data: chartData.weekly?.map((w) => w.value) || [],
-              borderWidth: 2,
-            },
-          ]}
-        />
-
-        <Chart
-          chartType="Bar"
-          labels={chartData.monthly?.map((m) => m.month) || []}
-          dataset={[
-            {
-              label: '월별 소모갑수',
-              data: chartData.monthly?.map((m) => m.value) || [],
-              borderWidth: 2,
-            },
-          ]}
-        /> */}
 
         <BtnContainer>
-          <div>
-            <div
-              onClick={() => {
-                dispatch(open({ title: '흡연 등록', value: 'block' }));
-              }}
-            >
-              <Btn str={'등록'} c={'#FF7F50'} fc={'white'}></Btn>
-            </div>
+          {/* <div> */}
+          <div
+            onClick={() => {
+              dispatch(open({ title: '흡연 등록', value: 'block' }));
+            }}
+          >
+            <Btn str={'등록'} c={'#FF7F50'} fc={'white'}></Btn>
           </div>
+          {/* </div> */}
         </BtnContainer>
 
+        {/* <RadiusTable width="100%" thBgColor="" radius="0px"> */}
         <Table>
           <thead>
             <tr>
-              <th>번호</th>
+              <th>기준일</th>
               <th>담배명</th>
               <th>타르수치</th>
               <th>시작날짜</th>
@@ -357,40 +311,54 @@ const CigaretteReport = () => {
               <th>일당 소모갑수</th>
             </tr>
           </thead>
+
           <tbody>
-            {data.map((vo) => {
-              const startDate = new Date(vo.start_date);
-              const endDate = new Date(vo.end_date);
-              const daysConsumed = Math.ceil((endDate - startDate + 1) / (1000 * 60 * 60 * 24));
-              return (
+            {/* 한개의 날짜에 여러개의 데이터가 속해있고 그 데이터를 묶어서 표시하고 싶을때 사용하는 방식임 잘 모르겠으면 혈압
+            페이지 찾아와서 참고 */}
+            {Object.entries(
+              pagedData.reduce((acc, vo) => {
+                if (!acc[vo.endDate]) acc[vo.endDate] = [];
+                acc[vo.endDate].push(vo);
+                return acc;
+              }, {})
+            ).map(([endDate, records]) =>
+              records.map((vo, index) => (
                 <tr
                   key={vo.no}
-                  onClick={() => {
-                    handleRowClick(vo);
-                    // window.location.href = `/board?bno=${vo.no}`;
-                  }}
+                  // onClick={() => {
+                  //   window.location.href = `/board?bno=${vo.no}`;
+                  // }}
                 >
-                  <td>{vo.no}</td>
-                  <td>{vo.cigarette}</td>
+                  {index === 0 && (
+                    <td
+                      rowSpan={records.length}
+                      style={{ verticalAlign: 'middle', fontWeight: 'bold', textAlign: 'center' }}
+                    >
+                      {vo.no}
+                    </td>
+                  )}
+                  <td>{vo.cigaretteName}</td>
                   <td>{vo.tar}</td>
-                  <td>{vo.start_date}</td>
-                  <td>{vo.end_date}</td>
-                  {/* <td>{vo.end_date - vo.start_date}</td> */}
-                  <td>{daysConsumed}일</td>
-                  <td>{daysConsumed > 0 ? (1 / daysConsumed).toFixed(2) : '-'}</td>
+                  <td>{vo.startDate}</td>
+                  <td>{vo.endDate}</td>
+                  <td>{getDaysConsumed(vo.startDate, vo.endDate)}일</td>
+                  <td>
+                    {getDaysConsumed(vo.startDate, vo.endDate) > 0
+                      ? (1 / getDaysConsumed(vo.startDate, vo.endDate)).toFixed(2)
+                      : '-'}
+                  </td>
                 </tr>
-              );
-            })}
+              ))
+            )}
           </tbody>
         </Table>
-        <BottomDiv>
-          <div></div>
-          <div>
-            <Pagination boardType={boardType} />
-          </div>
 
-          <div></div>
-        </BottomDiv>
+        <div></div>
+        <div>
+          <Pagination boardType={boardType} />
+        </div>
+
+        <div></div>
       </ContentLayout>
     </>
   );
