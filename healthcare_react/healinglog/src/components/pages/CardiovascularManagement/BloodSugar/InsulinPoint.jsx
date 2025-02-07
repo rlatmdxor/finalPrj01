@@ -4,200 +4,169 @@ import Modal from '../../../util/Modal'; // 모달 컴포넌트
 import Input from '../../../util/Input'; // 입력 컴포넌트
 import Chart from '../../../util/Chart';
 import Table from '../../../util/Table';
+import ContentLayout from '../../../util/ContentLayout';
+import Navi from '../../../util/Navi';
 import styled from 'styled-components';
 
-const CharDiv = styled.div`
-  margin-left: 180px;
-  margin-top: 30px;
+const NaviContainer = styled.div`
+  display: grid;
+  position: relative;
+  width: 300px; // 항목수에 비례해서 주시면 됩니다.
+  top: 20px;
+  left: 40px;
+  grid-template-columns: 4fr 6fr; // 글자수만큼 fr 주면 됩니다. ex) 유산소 3글자니까 3fr
+`;
+const ImageLayoutDiv = styled.div`
+  width: 100%;
+  height: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+const ImageDiv = styled.div`
+  width: 440px;
+  height: 500px;
+  background-image: url('/img/realBody.png');
+  background-repeat: no-repeat; /* 이미지 반복 방지 */
+  background-size: contain; /* 요소에 맞게 크기 조정 */
+  background-position: center; /* 중앙 정렬 */
+  display: grid;
+  grid-template-rows: 316px 1fr;
+`;
+const Div100 = styled.div`
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+`;
+const Div200 = styled.div`
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+`;
+const Div210 = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: end;
+`;
+const RightLegDiv = styled.div`
+  width: 66px;
+  height: 120px;
+  margin-bottom: 15px;
+  margin-right: 10px;
+  background-color: purple;
+`;
+const Div220 = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: end;
+`;
+const LeftLegDiv = styled.div`
+  width: 66px;
+  height: 120px;
+  margin-bottom: 15px;
+  margin-right: 10px;
+  background-color: purple;
+`;
+const Div110 = styled.div`
+  display: grid;
+  grid-template-columns: 88px 1fr 5px;
+`;
+const Div120 = styled.div`
+  display: grid;
+  grid-template-columns: 4px 1fr 95px;
+`;
+const Div111 = styled.div`
+  display: flex;
+  justify-content: end;
+  align-items: center;
+`;
+const Div123 = styled.div`
+  display: flex;
+  justify-content: start;
+  align-items: center;
+`;
+const RightArmDiv = styled.div`
+  background-color: red;
+  height: 120px;
+  width: 62px;
+  margin-top: 15px;
+`;
+const LeftArmDiv = styled.div`
+  background-color: red;
+  height: 120px;
+  width: 62px;
+  margin-top: 15px;
+`;
+const Div112 = styled.div`
+  display: flex;
+  align-items: end;
+  justify-content: end;
+`;
+const Div122 = styled.div`
+  display: flex;
+  align-items: end;
+  justify-content: start;
+`;
+const RightStomDiv = styled.div`
+  width: 120px;
+  height: 120px;
+  background-color: gray;
+`;
+const LeftStomDiv = styled.div`
+  width: 120px;
+  height: 120px;
+  background-color: gray;
 `;
 
 const InsulinPoint = () => {
+  const rightArmNumList = [1, 2, 3, 4, 5, 6, 7, 8];
+  const leftArmNumList = [1, 2, 3, 4, 5, 6, 7, 8];
+  const rightLegNumList = [1, 2, 3, 4, 5, 6, 7, 8];
+  const leftLegNumList = [1, 2, 3, 4, 5, 6, 7, 8];
+  const rightStomNumList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
+  const leftStomNumList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
+
   return (
     <>
-      <Title>인슐린 기록지</Title>
-
-      <Table width="" thBgColor="">
-        <thead>
-          <tr>
-            <th>일자</th>
-            <th>술종류</th>
-            <th>마신 량(cc)</th>
-            <th>도수</th>
-            <th>표준 잔</th>
-            <th>마신 알코올 량</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>2024-01-10</td>
-            <td>소주</td>
-            <td>150</td>
-            <td>20</td>
-            <td>3</td>
-            <td>24</td>
-          </tr>
-          <tr>
-            <td>2024-01-11</td>
-            <td>소주</td>
-            <td>150</td>
-            <td>20</td>
-            <td>3</td>
-            <td>24</td>
-          </tr>
-          <tr>
-            <td>2024-01-12</td>
-            <td>소주</td>
-            <td>150</td>
-            <td>20</td>
-            <td>3</td>
-            <td>24</td>
-          </tr>
-        </tbody>
-      </Table>
-
-      <Table width="" thBgColor="">
-        <thead>
-          <tr>
-            <th colSpan="2">측정일</th>
-            <th>측정시간</th>
-            <th>이완기</th>
-            <th>수축기</th>
-            <th>맥박/분</th>
-            <th>특이사항</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td rowSpan="2">2025-01-02 (목)</td>
-            <td>아침</td>
-            <td>07:00</td>
-            <td>80 mmHg</td>
-            <td>120 mmHg</td>
-            <td>95 회</td>
-            <td>특이사항입니당</td>
-          </tr>
-          <tr>
-            <td>저녁</td>
-            <td>07:00</td>
-            <td>80 mmHg</td>
-            <td>120 mmHg</td>
-            <td>95 회</td>
-            <td>특이사항입니당</td>
-          </tr>
-          <tr>
-            <td rowSpan="2">2025-01-01 (수)</td>
-            <td>아침</td>
-            <td>07:00</td>
-            <td>80 mmHg</td>
-            <td>120 mmHg</td>
-            <td>95 회</td>
-            <td>특이사항입니당</td>
-          </tr>
-          <tr>
-            <td>저녁</td>
-            <td>07:00</td>
-            <td>80 mmHg</td>
-            <td>120 mmHg</td>
-            <td>95 회</td>
-            <td>특이사항입니당</td>
-          </tr>
-        </tbody>
-      </Table>
-
-      <Table width="" thBgColor="">
-        <thead>
-          <tr>
-            <th colSpan="4">닉네임 님의 현재 복용약</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td rowSpan="3">1</td>
-            <td rowSpan="2">복용 약 사진</td>
-            <td>타이레놀</td>
-            <td rowSpan="3">삭제</td>
-          </tr>
-          <tr>
-            <td>1. 해열 및 감기에 의한 동통(통증)과 두통, 치통, 근육통, 허리동통(통증), 생리통, 관절통의 완화</td>
-          </tr>
-          <tr>
-            <td>해열 진통제</td>
-            <td>1회 1정 / 3회</td>
-          </tr>
-          <tr>
-            <td rowSpan="3">2</td>
-            <td rowSpan="2">복용 약 사진</td>
-            <td>타이레놀</td>
-            <td rowSpan="3">삭제</td>
-          </tr>
-          <tr>
-            <td>1. 해열 및 감기에 의한 동통(통증)과 두통, 치통, 근육통, 허리동통(통증), 생리통, 관절통의 완화</td>
-          </tr>
-          <tr>
-            <td>해열 진통제</td>
-            <td>1회 1정 / 3회</td>
-          </tr>
-        </tbody>
-      </Table>
-
-      <Table width="" thBgColor="">
-        <thead>
-          <tr>
-            <th colSpan="3">약 상세정보</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td rowSpan="3">기본정보</td>
-            <td rowSpan="3">약 사진</td>
-            <td>타이레놀</td>
-          </tr>
-          <tr>
-            <td>해열 진통 소염제</td>
-          </tr>
-          <tr>
-            <td>1회 1정 / 3회</td>
-          </tr>
-          <tr>
-            <td rowSpan="4">세부정보</td>
-            <td>효능</td>
-            <td>1. 해열 및 감기에 의한 동통(통증)과 두통, 치통, 근육통, 허리동통(통증), 생리통, 관절통의 완화</td>
-          </tr>
-          <tr>
-            <td>부작용</td>
-            <td>
-              <div>
-                1) 쇽: 쇽, 아나필락시양 증상(과민성유사증상: 호흡곤란, 온몸이 붉어짐, 혈관부기, 두드러기 등), 천식발작
-              </div>
-              <div>
-                2) 혈액: 혈소판 감소, 과립구감소, 용혈성빈혈, 메트헤모글로빈혈증, 혈소판기능 저하(출혈시간 연장), 청색증
-              </div>
-              <div>3) 과민증: 과민증상(얼굴부기, 호흡곤란, 땀이 남, 저혈압, 쇽)</div>
-              <div>
-                4) 소화기: 구역, 구토, 식욕부진, 장기복용시 위장출혈, 소화성궤양, 천공(뚫림) 등의 위장관계 이상반응
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td>금기사항</td>
-            <td>
-              <div>1) 이 약에 과민증 환자</div>
-              <div>2) 소화성궤양 환자</div>
-              <div>3) 심한 혈액 이상 환자</div>
-              <div>4) 심한 간장애 환자</div>
-            </td>
-          </tr>
-          <tr>
-            <td>주의사항</td>
-            <td>
-              <div>1) 간장애 또는 그 병력이 있는 환자</div>
-              <div>2) 신장(콩팥)장애 또는 그 병력이 있는 환자</div>
-              <div>3) 소화성궤양의 병력이 있는 환자</div>
-              <div>4) 혈액이상 또는 그 병력이 있는 환자</div>
-            </td>
-          </tr>
-        </tbody>
-      </Table>
+      <Title>혈당</Title>
+      <NaviContainer>
+        <Navi target="bloodSugar" tag={'혈당 기록'}></Navi>
+        <Navi target="insulin" tag={'인슐린 기록지'}></Navi>
+      </NaviContainer>
+      <ContentLayout>
+        <ImageLayoutDiv>
+          <ImageDiv>
+            <Div100>
+              <Div110>
+                <Div111>
+                  <RightArmDiv></RightArmDiv>
+                </Div111>
+                <Div112>
+                  <RightStomDiv></RightStomDiv>
+                </Div112>
+                <div></div>
+              </Div110>
+              <Div120>
+                <div></div>
+                <Div122>
+                  <LeftStomDiv></LeftStomDiv>
+                </Div122>
+                <Div123>
+                  <LeftArmDiv></LeftArmDiv>
+                </Div123>
+              </Div120>
+            </Div100>
+            <Div200>
+              <Div210>
+                <RightLegDiv></RightLegDiv>
+              </Div210>
+              <Div220>
+                <LeftLegDiv></LeftLegDiv>
+              </Div220>
+            </Div200>
+          </ImageDiv>
+        </ImageLayoutDiv>
+      </ContentLayout>
     </>
   );
 };

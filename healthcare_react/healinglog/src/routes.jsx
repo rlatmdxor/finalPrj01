@@ -36,7 +36,6 @@ import Exercising from './components/pages/LivingHealth/Exercise/Exercising';
 import DietCal from './components/pages/LivingHealth/Diet/DietCal';
 import DietReport from './components/pages/LivingHealth/Diet/DietReport';
 
-
 export const routes = [
   { path: '/', component: <Main /> },
   { path: '/mypage', component: <Mypage /> },
@@ -53,7 +52,7 @@ export const routes = [
   { path: '/drug1', component: <Drug1 /> },
   { path: '/bloodpressure', component: <BloodPressure /> },
   { path: '/insulin', component: <InsulinPoint /> },
-  { path: '/bloodsugar', component: <BloodSugar /> },
+  { path: '/bloodSugar', component: <BloodSugar /> },
   { path: '/hospital', component: <Hospital /> },
   { path: '/pharmacy', component: <Pharmacy /> },
   { path: '/publichealthcenter', component: <PulbicHealthCenter /> },
