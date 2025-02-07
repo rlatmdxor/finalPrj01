@@ -7,10 +7,7 @@ import java.util.List;
 
 @Mapper
 public interface ReportMapper {
-
-
-//    @Select("SELECT NO,MEMBER_NO, CIGARETTE, START_DATE, END_DATE, PACK_DURATION FROM RECORD_CIGARETTE WHERE MEMBER_NO = #{memberNo}")
-//    List<ReportVo> getCigaretteReport(Long no);
+    
 
     @Select("SELECT rc.NO," +
             " rc.MEMBER_NO," +
