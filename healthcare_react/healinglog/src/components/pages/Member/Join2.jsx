@@ -18,6 +18,7 @@ import {
 } from '../../../redux/JoinSlice';
 import { useNavigate } from 'react-router-dom';
 import ContentLayout from '../../util/ContentLayout';
+import PostCode from '../../util/PostCode';
 
 const Join2 = () => {
   const theme = useTheme();
@@ -34,7 +35,7 @@ const Join2 = () => {
   );
 
   const isSubmitEnabled = id && pwd && nick && name && address && email && residentNum;
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -57,6 +58,8 @@ const Join2 = () => {
     if (!isSubmitEnabled) {
       console.log('실패');
       console.log(formData);
+      // navigate('/');
+      return;
     }
     console.log('성공');
     console.log(formData);
@@ -94,6 +97,8 @@ const Join2 = () => {
             placeholder="value"
             className="id"
             type="text"
+            minLength="4"
+            maxLength="12"
             value={id}
             onChange={(e) => dispatch(setId(e.target.value))}
           ></JoinInput>
@@ -102,6 +107,8 @@ const Join2 = () => {
             placeholder="value"
             className="pwd"
             type="password"
+            minLength="8"
+            maxLength="16"
             value={pwd}
             onChange={(e) => dispatch(setPwd(e.target.value))}
           ></JoinInput>
@@ -110,6 +117,8 @@ const Join2 = () => {
             placeholder="value"
             className="nick"
             type="text"
+            minLength="1"
+            maxLength="8"
             value={nick}
             onChange={(e) => dispatch(setNick(e.target.value))}
           ></JoinInput>
@@ -121,41 +130,79 @@ const Join2 = () => {
             placeholder="value"
             className="name"
             type="text"
+            minLength="2"
+            maxLength="5"
             value={name}
             onChange={(e) => dispatch(setName(e.target.value))}
           ></JoinInput>
+
           <InputTitle>주소</InputTitle>
-          <JoinInput
-            placeholder="value"
-            className="address"
-            type="text"
-            value={address}
-            onChange={(e) => dispatch(setAddress(e.target.value))}
-          ></JoinInput>
+          <PostCode />
+
           <InputTitle>이메일</InputTitle>
-          <JoinInput
-            placeholder="value"
-            className="email"
-            type="email"
-            value={email}
-            onChange={(e) => dispatch(setEmail(e.target.value))}
-          ></JoinInput>
+          <EmailContainer>
+            <EmailInput
+              placeholder="value"
+              className="email1"
+              type="text"
+              maxLength="20"
+              value={email}
+              onChange={(e) => dispatch(setEmail(e.target.value))}
+            />
+            <Alpha>@</Alpha>
+            <EmailInput
+              placeholder="value"
+              className="email2"
+              type="text"
+              maxLength="12"
+              value={email}
+              onChange={(e) => dispatch(setEmail(e.target.value))}
+            />
+          </EmailContainer>
+
           <InputTitle>주민등록번호</InputTitle>
-          <JoinInput
-            placeholder="value"
-            className="residentNum"
-            type="text"
-            value={residentNum}
-            onChange={(e) => dispatch(setResidentNum(e.target.value))}
-          ></JoinInput>
+          <EmailContainer>
+            <EmailInput
+              placeholder="value"
+              className="residentNum"
+              type="text"
+              maxLength="6"
+              value={residentNum}
+              onChange={(e) => dispatch(setResidentNum(e.target.value))}
+            />
+            <Alpha>-</Alpha>
+            <EmailInput
+              placeholder="value"
+              className="residentNum"
+              type="password"
+              maxLength="7"
+              value={residentNum}
+              onChange={(e) => dispatch(setResidentNum(e.target.value))}
+            />
+          </EmailContainer>
 
           <BlankSpace />
 
           <InputTitle>성별 (선택)</InputTitle>
-          <SelectInput2 className="gender" value={gender} onChange={(e) => dispatch(setGender(e.target.value))}>
+          <SelectInput2
+            className="gender"
+            value={gender === 'm' ? '남성' : gender === 'f' ? '여성' : ''}
+            onChange={(e) => {
+              const selectedValue = e.target.value;
+              let mappedValue = '';
+
+              if (selectedValue === '남성') {
+                mappedValue = 'm';
+              } else if (selectedValue === '여성') {
+                mappedValue = 'f';
+              }
+
+              dispatch(setGender(mappedValue));
+            }}
+          >
             <option value="">선택하세요</option>
             {genderOptions.map((option) => (
-              <option key={option.value} value={option.value}>
+              <option key={option.value} value={option.label}>
                 {option.label}
               </option>
             ))}
@@ -267,6 +314,38 @@ const InputTitle = styled.div`
 
 const BlankSpace = styled.div`
   height: 50px;
+`;
+
+const EmailContainer = styled.div`
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: 200px 50px 200px;
+`;
+
+const EmailInput = styled.input`
+  box-sizing: border-box;
+  width: 200px;
+  height: 40px;
+  border-radius: 10px;
+  border: 1px solid gray;
+  padding-left: 20px;
+  margin-bottom: 10px;
+  &::placeholder {
+    color: #888;
+    font-size: 16px;
+  }
+`;
+
+const Alpha = styled.div`
+  display: grid;
+  box-sizing: border-box;
+  width: 50px;
+  height: 40px;
+  margin-bottom: 10px;
+  justify-items: center;
+  align-items: center;
+  font-weight: bold;
+  font-size: 1.2rem;
 `;
 
 const JoinInput = styled.input`
