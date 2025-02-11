@@ -1,6 +1,5 @@
 package com.kh.healthcare.exercise.aerobic;
 
-import com.kh.healthcare.cardiovascularManagement.bloodPressure.BloodPressureVo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,21 +11,21 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AerobicService {
 
-    private final AerobicDao dao;
+    private final AerobicMapper mapper;
 
     public List<AerobicVo> getData() {
-        return dao.getData();
+        return mapper.getData();
     }
 
     public List<AerobicVo> getMarkedData() {
-        return dao.getMarkedData();
+        return mapper.getMarkedData();
     }
 
     public int markData(String no) {
-        return dao.markData(no);
+        return mapper.markData(no);
     }
 
     public int unmarkData(String no) {
-        return dao.unmarkData(no);
+        return mapper.unmarkData(no);
     }
 }

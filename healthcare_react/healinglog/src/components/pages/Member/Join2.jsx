@@ -18,6 +18,7 @@ import {
   setWeight,
   setProfile,
   setGender,
+  setAddress,
 } from '../../../redux/JoinSlice';
 import { useNavigate } from 'react-router-dom';
 import ContentLayout from '../../util/ContentLayout';
@@ -50,6 +51,7 @@ const Join2 = () => {
     weight,
     profile,
     gender,
+    address,
   } = useSelector((state) => state.join);
 
   const [zoneAddress, setZoneAddress] = useState('');
@@ -61,9 +63,10 @@ const Join2 = () => {
     pwd,
     nick,
     name,
-    zoneAddress,
-    roadAddress,
-    detailAddress,
+    // zoneAddress,
+    // roadAddress,
+    // detailAddress,
+    address,
     email,
     residentNum,
     gender,
@@ -98,6 +101,7 @@ const Join2 = () => {
   useEffect(() => {
     dispatch(setEmail(emailFront + '@' + emailDomain));
     dispatch(setResidentNum(frontResidentNum + backResidentNum));
+    dispatch(setAddress(zoneAddress + ' ' + roadAddress + ' ' + detailAddress));
     console.log(formData);
     console.log(isSubmitEnabled);
   }, [emailFront, emailDomain, frontResidentNum, backResidentNum]);
@@ -114,7 +118,7 @@ const Join2 = () => {
     console.log('성공');
     console.log(formData);
 
-    fetch('https://127.0.0.1:80/api/member/join', {
+    fetch('http://127.0.0.1:80/api/member/join', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

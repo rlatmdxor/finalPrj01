@@ -41,7 +41,9 @@ const Aerobic = () => {
         <Navi target="exhistory" tag={'내역 관리'}></Navi>
         <Navi target="exreport" tag={'리포트'}></Navi>
       </NaviContainer>
+
       <ContentLayout>
+        <BlankSpace />
         <FavoriteList
           f={(name) => {
             setModalTitle(name);
