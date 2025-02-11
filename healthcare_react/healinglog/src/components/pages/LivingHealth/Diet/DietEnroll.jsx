@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import Modal from '../../../util/Modal';
 import Input from '../../../util/Input';
 import { Autocomplete, TextField } from '@mui/material';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { close, open } from '../../../../redux/modalSlice';
 import { ModalContainer } from './Diet';
 import Btn from '../../../util/Btn';
@@ -12,7 +12,7 @@ const Container = styled.div`
   display: flex;
   width: 100%;
   gap: 6px;
-  margin-top: 9px;
+  margin-top: 10px;
   margin-bottom: 15px;
 `;
 
@@ -47,20 +47,35 @@ const SelectedFoodContainerBtn = styled.div`
   gap: 4px;
 `;
 
-const DietEnroll = () => {
-  const initialInputData = {};
-  const [inputData, setInputData] = useState(initialInputData);
+const FileInput = styled.input`
+  margin: 10px 1px;
+`;
 
-  const reset = () => {
-    setInputData(initialInputData);
+const PreviewDiv = styled.div`
+  width: 100%;
+  height: 100%;
+`;
+
+const UploadedImg = styled.img`
+  width: 60%;
+  height: 60%;
+  object-fit: contain;
+`;
+
+const DietEnroll = () => {
+  const [selectedMeal, setSelectedMeal] = useState(''); // 끼니 구분 선택 상태 (아침, 점심, 저녁 등)
+  const [selectedFood, setSelectedFood] = useState(null); // Autocomplete에서 선택한 음식 상태
+
+  const initialFoodInputData = { label: '', unit: '', weight: '', calories: '' }; // 음식 직접추가 데이터
+  const [foodInputData, setFoodInputData] = useState({});
+  const foodReset = () => {
+    setFoodInputData(initialFoodInputData);
   };
 
-  const [selectedMeal, setSelectedMeal] = useState(''); // 끼니 구분 선택 상태 (아침, 점심, 저녁 등)
-  const [selectedFood, setSelectedFood] = useState(''); // Autocomplete에서 선택한 음식 상태
-
-  const initialFoodInputData = { label: '', unit: '', weight: 0, calories: 0 };
-  const [foodInputData, setFoodInputData] = useState({}); // 음식 직접추가 데이터
   const [foodList, setFoodList] = useState([]); // 추가된 음식 목록
+
+  const [imgFile, setImgFile] = useState(''); // 선택한 사진
+  const imgRef = useRef();
 
   const dispatch = useDispatch();
 
@@ -84,36 +99,67 @@ const DietEnroll = () => {
     { label: '딸기', unit: '1개', weight: 20, calories: 6 },
   ];
 
+  // 식단 등록 모달 오픈 시 데이터 초기화
+  const [isInit, setIsInit] = useState(false);
+  const modals = useSelector((state) => state.modal.modals);
+  const isOpen = modals['식단 등록'] === 'block';
+
+  useEffect(() => {
+    if (isOpen) {
+      setIsInit(false);
+      setSelectedMeal('');
+      setSelectedFood(null);
+      setFoodList([]);
+      setImgFile('');
+      setTimeout(() => {
+        setIsInit(true);
+      }, 0);
+    } else {
+      setIsInit(false);
+    }
+  }, [isOpen]);
+
   const handleOpenFoodEnrollModal = () => {
+    foodReset();
     dispatch(open({ title: '음식 직접추가', value: 'block' }));
   };
 
   const handleOpenFoodEditModal = (index) => {
     dispatch(open({ title: '음식 수정', value: 'block' }));
-    setFoodInputData({ ...foodList[index], index });
-    console.log(foodInputData);
+
+    const selectedFood = foodList[index];
+
+    setFoodInputData({
+      ...selectedFood,
+      originalWeight: selectedFood.weight,
+      originalCalories: selectedFood.calories,
+      index,
+    });
   };
 
   const handleSelectFood = (e, newValue) => {
     if (newValue) {
-      setSelectedFood(newValue.label);
+      setSelectedFood(newValue);
       setFoodList((prev) => [...prev, newValue]);
     }
   };
 
   const handleFoodInputChange = (e) => {
     setFoodInputData((prev) => {
-      return {
-        ...prev,
-        [e.target.name]: e.target.value,
-      };
+      let updatedData = { ...prev, [e.target.name]: e.target.value };
+
+      if (e.target.name == 'weight' && prev.weight && prev.calories) {
+        const newCalories = (e.target.value / prev.originalWeight) * prev.originalCalories;
+        updatedData.calories = Math.round(newCalories);
+      }
+
+      return updatedData;
     });
   };
 
   const handleAddFood = (e) => {
     setFoodList((prevList) => [...prevList, foodInputData]);
     console.log(foodInputData);
-    console.log(e.target);
     dispatch(close(e.target.title));
   };
 
@@ -128,7 +174,7 @@ const DietEnroll = () => {
       }
     }
     setFoodList(updatedList);
-    console.log(foodList);
+    dispatch(close(e.target.title));
   };
 
   const handleFoodDelete = (index) => {
@@ -136,6 +182,17 @@ const DietEnroll = () => {
     const updatedFoodList = foodList.filter((food, i) => i !== index);
     setFoodList(updatedFoodList);
   };
+
+  const handleImageSelect = () => {
+    const file = imgRef.current.files[0];
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onloadend = () => {
+      setImgFile(reader.result);
+    };
+  };
+
+  if (!isInit) return null;
 
   return (
     <>
@@ -155,6 +212,7 @@ const DietEnroll = () => {
             options={foodDummyData}
             getOptionLabel={(option) => option.label}
             onChange={handleSelectFood}
+            value={selectedFood}
             renderOption={(props, option) => (
               <li {...props} key={option.label}>
                 {option.label} ({option.unit} / {option.weight}g / {option.calories}kcal)
@@ -242,8 +300,10 @@ const DietEnroll = () => {
             </SelectedFoodContainer>
           ))}
         </SelectedFoodListArea>
-        <Input type="text" plcaeholder="메모를 입력해주세요" title="메모" size={'size2'} mb={'12'} mt={'9'} />
-        <Input type="text" placeholder="사진선택" title="사진" size={'size2'} mb={'12'} mt={'9'} />
+        <Input type="text" plcaeholder="메모를 입력해주세요" title="메모" size={'size2'} mb={'14'} mt={'7'} />
+        <div>사진</div>
+        <FileInput type="file" accept="image/*" onChange={handleImageSelect} ref={imgRef} />
+        <PreviewDiv>{imgFile ? <UploadedImg src={imgFile} alt="식단이미지" /> : ''}</PreviewDiv>
         <ModalContainer>
           <Btn str={'등록'} mt={'15'} mb={'30'} mr={'0'} c={'#ff8a60'} fc={'white'}></Btn>
         </ModalContainer>
@@ -259,6 +319,7 @@ const DietEnroll = () => {
           size={'size2'}
           mb={'12'}
           mt={'8'}
+          value={foodInputData.label}
         />
         <Input
           type="text"
@@ -269,9 +330,10 @@ const DietEnroll = () => {
           size={'size2'}
           mb={'12'}
           mt={'8'}
+          value={foodInputData.unit}
         />
         <Input
-          type="text"
+          type="number"
           name="weight"
           f={handleFoodInputChange}
           title="양 (g)"
@@ -279,9 +341,10 @@ const DietEnroll = () => {
           size={'size2'}
           mb={'12'}
           mt={'8'}
+          value={foodInputData.weight}
         />
         <Input
-          type="text"
+          type="number"
           name="calories"
           f={handleFoodInputChange}
           title="칼로리(kcal)"
@@ -289,6 +352,7 @@ const DietEnroll = () => {
           size={'size2'}
           mb={'12'}
           mt={'8'}
+          value={foodInputData.calories}
         />
         <ModalContainer>
           <Btn
@@ -304,38 +368,63 @@ const DietEnroll = () => {
         </ModalContainer>
       </Modal>
 
-      <Modal title="음식 수정" type={'edit'}>
-        <form onSubmit={handleEditFood}>
-          <input
-            type="text"
-            name="label"
-            onChange={handleFoodInputChange}
-            placeholder="음식명"
-            value={foodInputData.label || ''}
-          />
-          <input
-            type="text"
-            name="unit"
-            onChange={handleFoodInputChange}
-            placeholder="예) 1공기, 1회, 3개 등 "
-            value={foodInputData.unit || ''}
-          />
-          <input
-            type="text"
-            name="weight"
-            onChange={handleFoodInputChange}
-            placeholder="양(g)"
-            value={foodInputData.weight || ''}
-          />
-          <input
-            type="text"
-            name="calories"
-            onChange={handleFoodInputChange}
-            placeholder="칼로리(kcal)"
-            value={foodInputData.calories || ''}
-          />
-          <input type="submit" value="음식수정" />
-        </form>
+      <Modal title="음식 수정">
+        <Input
+          type="text"
+          name="label"
+          f={handleFoodInputChange}
+          title="음식명"
+          placeholder="음식명"
+          size={'size2'}
+          mb={'12'}
+          mt={'8'}
+          value={foodInputData.label}
+        />
+        <Input
+          type="text"
+          name="unit"
+          f={handleFoodInputChange}
+          title="단위"
+          placeholder="예) 1공기, 1회, 3개 등 "
+          size={'size2'}
+          mb={'12'}
+          mt={'8'}
+          value={foodInputData.unit}
+        />
+        <Input
+          type="number"
+          name="weight"
+          f={handleFoodInputChange}
+          title="양 (g)"
+          placeholder="숫자만 입력해주세요"
+          size={'size2'}
+          mb={'12'}
+          mt={'8'}
+          value={foodInputData.weight}
+        />
+        <Input
+          type="number"
+          name="calories"
+          f={handleFoodInputChange}
+          title="칼로리(kcal)"
+          placeholder="숫자만 입력해주세요"
+          size={'size2'}
+          mb={'12'}
+          mt={'8'}
+          value={foodInputData.calories}
+        />
+        <ModalContainer>
+          <Btn
+            title={'음식 수정'}
+            str={'수정'}
+            mt={'15'}
+            mb={'30'}
+            mr={'0'}
+            c={'#ff8a60'}
+            fc={'white'}
+            f={handleEditFood}
+          ></Btn>
+        </ModalContainer>
       </Modal>
     </>
   );
