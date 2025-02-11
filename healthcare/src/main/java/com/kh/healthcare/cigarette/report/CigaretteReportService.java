@@ -9,14 +9,18 @@ import java.util.List;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class ReportService {
+public class CigaretteReportService {
 
-    private final ReportMapper mapper;
+    private final CigaretteReportMapper mapper;
 
 
-    public List<ReportVo> list(Long memberNo) {
+    public List<CigaretteReportVo> list(Long memberNo) {
         System.out.println("memberNo = " + memberNo);
 
         return mapper.getCigaretteReport(memberNo);
+    }
+
+    public void write(CigaretteReportVo vo) {
+        mapper.write(vo);
     }
 }

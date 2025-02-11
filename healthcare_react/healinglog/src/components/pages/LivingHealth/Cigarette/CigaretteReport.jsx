@@ -11,12 +11,11 @@ import Navi from '../../../util/Navi';
 import Table from '../../../util/Table';
 import Pagination from '../../../util/Pagination';
 
-import { open, close as modalClose } from '../../../../redux/modalSlice';
+import { open, close } from '../../../../redux/modalSlice';
 import { setTotalCount, resetPaging } from '../../../../redux/pagingSlice';
 import ContentLayout from '../../../util/ContentLayout';
 import Chart from '../../../util/Chart';
 import DateBtn from '../../../util/DateBtn';
-import { data } from 'react-router-dom';
 
 const NaviContainer = styled.div`
   display: grid;
@@ -25,21 +24,6 @@ const NaviContainer = styled.div`
   top: 20px;
   left: 40px;
   grid-template-columns: 3fr 3fr; // 글자수만큼 fr 주면 됩니다. ex) 유산소 3글자니까 3fr
-`;
-
-const BtnContainer = styled.div`
-  display: flex;
-  margin-top: 30px;
-  margin-left: 1030px;
-  gap: 15px;
-`;
-
-const LineDiv = styled.div`
-  height: 50px;
-`;
-
-const DataDiv = styled.div`
-  margin-left: 1100px;
 `;
 
 const CigaretteReport = () => {
@@ -56,10 +40,28 @@ const CigaretteReport = () => {
   const [filteredData, setFilteredData] = useState([]); // 차트용 필터링 데이터
   const [selectedRange, setSelectedRange] = useState('주'); // 기본값 '일'
   const [selectChart, setSelectChart] = useState('Line'); // 그래프 모양 정하는 state
+  const dispatch = useDispatch();
 
   const boardType = 'CigaretteReport';
   const { currentPage, boardLimit } = useSelector((state) => state.paging[boardType] || {});
   const offset = (currentPage - 1) * boardLimit;
+
+  //모달 밖의 버튼 컨테이너
+  const BtnContainer = styled.div`
+    display: flex;
+    justify-content: end;
+    margin-right: -45px;
+  `;
+
+  //모달 안의 버튼 컨테이너
+  const ModalContainer = styled.div`
+    display: flex;
+    justify-content: end;
+  `;
+
+  useEffect(() => {
+    dispatch(resetPaging({ boardType }));
+  }, [boardType, dispatch]);
 
   // fetch실행
   useEffect(() => {
@@ -148,7 +150,6 @@ const CigaretteReport = () => {
   }, [fullData]);
 
   const dataBtn = ['주', '월', '년'];
-  const dispatch = useDispatch();
 
   // 날짜 기준 오름차순 정렬 (과거 → 현재)
   const sortedData = [...filteredData].sort((a, b) => new Date(a.endDate) - new Date(b.endDate));
@@ -172,9 +173,6 @@ const CigaretteReport = () => {
   for (const vo of filteredData) {
     cigaretteList.push(vo.endDate);
   }
-
-  const modals = useSelector((state) => state.modal.modals || {}); // 여러 모달 상태 가져오기
-  const isModalOpen = modals['흡연 수정'] === 'block'; // 특정 모달이 열려 있는지 확인
 
   // ✅ 선택된 데이터 저장 초기값 빈객체로
   const [selectedData, setSelectedData] = useState({});
@@ -212,80 +210,53 @@ const CigaretteReport = () => {
     },
   ];
 
-  // ✅ 게시글 클릭 시 수정 모달 열기
-  const handleRowClick = (vo) => {
-    console.log('✅ 클릭한 데이터:', vo);
-    setSelectedData(vo);
-    dispatch(open({ title: '흡연 수정', value: 'block' })); // Redux 상태 변경
-  };
-
-  // ✅ 수정 버튼 클릭 시 데이터 업데이트 (현재는 console.log로 확인)
-  const handleEdit = () => {
-    console.log('수정된 데이터:', selectedData);
-    dispatch(modalClose('흡연 수정')); // 모달 닫기
-  };
-
-  // ✅ datasetData에서 가장 큰 값 찾기
+  // datasetData에서 가장 큰 값 찾기
   const maxValue = Math.max(...datasetData);
 
-  // ✅ yMax 값 설정 (최대값 + 0.5)
+  // yMax 값 설정 (최대값 + 0.5)
   const yMaxValue = maxValue + 0.2;
+
+  //인풋 안 쪽에 들어가는 데이터 ~~~Vo에 들어있는 이름으로 맞춰주기
+  const initialInputData = { cigarette: '', startDate: '', endDate: '', tar: '' };
+  // 모달 안 쪽 인풋에 데이터 관리
+  const [inputData, setInputData] = useState(initialInputData);
+  // 페이징 쪽에 있는 자료 활용
+  // const data = dataVoList.slice(offset, offset + boardLimit);
+  // 화면 렌더링
+  const [num, setNum] = useState('');
+  // 인풋 데이터 초기화
+  const reset = () => {
+    setInputData(initialInputData);
+  };
+  // 인풋 입력값 받아오기
+  const handleChange = (e) => {
+    setInputData((props) => {
+      return {
+        ...props,
+        [e.target.name]: e.target.value,
+      };
+    });
+  };
+
+  // 인풋 입력값 보내기
+  const handleSubmit = (e) => {
+    fetch('http://127.0.0.1:80/api/cigarette/write', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify(inputData),
+    })
+      .then((resp) => resp.text())
+      .then((data) => {});
+    //렌
+    setNum(num - 1);
+    // 입력 후 모달 창 닫기
+    dispatch(close(e.target.title));
+  };
 
   return (
     <>
-      <Modal title="흡연 등록" type={'add'}>
-        <InputTag type="text" placeholder="담배명" title="담배명" size={'size3'} mb={'10'} mt={'5'}></InputTag>
-        <InputTag type="number" placeholder="타르량" title="타르량" size={'size3'} mb={'10'} mt={'5'}></InputTag>
-        <InputTag type="date" placeholder="시작날짜" title="시작날짜" size={'size3'} mb={'10'} mt={'5'}></InputTag>
-        <InputTag type="date" placeholder="종료날짜" title="종료날짜" size={'size3'} mb={'10'} mt={'5'}></InputTag>
-        <InputTag type="text" placeholder="특이사항" title="특이사항" size={'size3'} mb={'10'} mt={'5'}></InputTag>
-      </Modal>
-
-      {modals['흡연 수정'] === 'block' && selectedData && (
-        <Modal title="흡연 수정" type="edit" f={handleEdit}>
-          <InputTag
-            type="text"
-            placeholder="담배명"
-            title="담배명"
-            size="size3"
-            mb="10"
-            mt="5"
-            value={selectedData?.cigarette || ''}
-            onChange={(e) => setSelectedData({ ...selectedData, cigarette: e.target.value })}
-          />
-          <InputTag
-            type="number"
-            placeholder="타르량"
-            title="타르량"
-            size="size3"
-            mb="10"
-            mt="5"
-            value={selectedData?.tar || ''}
-            onChange={(e) => setSelectedData({ ...selectedData, tar: e.target.value })}
-          />
-          <InputTag
-            type="date"
-            placeholder="시작날짜"
-            title="시작날짜"
-            size="size3"
-            mb="10"
-            mt="5"
-            value={selectedData?.startDate || ''}
-            onChange={(e) => setSelectedData({ ...selectedData, startDate: e.target.value })}
-          />
-          <InputTag
-            type="date"
-            placeholder="종료날짜"
-            title="종료날짜"
-            size="size3"
-            mb="10"
-            mt="5"
-            value={selectedData?.endDate || ''}
-            onChange={(e) => setSelectedData({ ...selectedData, endDate: e.target.value })}
-          />
-        </Modal>
-      )}
-
       <Title>흡연관리</Title>
       <NaviContainer>
         <Navi target="cigarette" tag={'캘린더'}></Navi>
@@ -294,7 +265,6 @@ const CigaretteReport = () => {
 
       <ContentLayout>
         <DateBtn dataBtn={dataBtn} onSelect={setSelectedRange} onChange={setSelectChart}></DateBtn>
-
         <Chart
           chartType={selectChart} // 차트 타입지정
           labels={labels} // 위랑 동일
@@ -308,18 +278,128 @@ const CigaretteReport = () => {
           xLabelVisible={true} // 추가: X축 라벨 표시 여부 (기본값: true)
         />
 
+        <Modal title="흡연 등록">
+          <InputTag
+            type="text"
+            name="cigarette"
+            title="담배명"
+            placeholder="담배명"
+            value={inputData.cigarette}
+            size={'size3'}
+            mb={'10'}
+            mt={'5'}
+            f={handleChange}
+          ></InputTag>
+          <InputTag
+            type="date"
+            name="startDate"
+            title="시작일"
+            value={inputData.startDate}
+            size={'size3'}
+            mb={'10'}
+            mt={'5'}
+            f={handleChange}
+          ></InputTag>
+          <InputTag
+            type="date"
+            name="endDate"
+            title="다핀날"
+            value={inputData.endDate}
+            size={'size3'}
+            mb={'10'}
+            mt={'5'}
+            f={handleChange}
+          ></InputTag>
+          <InputTag
+            type="number"
+            name="tar"
+            title="타르량"
+            placeholder="타르량"
+            value={inputData.tar}
+            size={'size3'}
+            mb={'10'}
+            mt={'5'}
+            f={handleChange}
+          ></InputTag>
+
+          <ModalContainer>
+            <Btn
+              title={'흡연 등록'}
+              // 인풋 입력값 보내기
+              f={handleSubmit}
+              //margin top bottom right
+              mt={'10'}
+              mb={'20'}
+              mr={'-10'}
+              // background color
+              c={'#FF7F50'}
+              // font color
+              fc={'white'}
+              // 화면에 노출되는 버튼 안 쪽 내용
+              str={'등록'}
+            ></Btn>
+          </ModalContainer>
+        </Modal>
+
+        <Modal title="흡연 수정">
+          <InputTag
+            type="text"
+            name="cigarette"
+            title="담배명"
+            placeholder="담배명"
+            value={inputData.cigarette}
+            size={'size3'}
+            mb={'10'}
+            mt={'5'}
+            f={handleChange}
+          ></InputTag>
+          <InputTag
+            type="date"
+            name="startDate"
+            title="시작일"
+            value={inputData.startDate}
+            size={'size3'}
+            mb={'10'}
+            mt={'5'}
+            f={handleChange}
+          ></InputTag>
+          <InputTag
+            type="date"
+            name="endDate"
+            title="다핀날"
+            value={inputData.endDate}
+            size={'size3'}
+            mb={'10'}
+            mt={'5'}
+            f={handleChange}
+          ></InputTag>
+          <InputTag
+            type="number"
+            name="tar"
+            title="타르량"
+            placeholder="타르량"
+            value={inputData.tar}
+            size={'size3'}
+            mb={'10'}
+            mt={'5'}
+            f={handleChange}
+          ></InputTag>
+
+          <ModalContainer>
+            {/* <Btn f={handleEditSubmit} mt={'10'} mb={'20'} mr={'20'} c={'#7ca96d'} fc={'white'} str={'수정'}></Btn> */}
+            <Btn mt={'10'} mb={'20'} mr={'-20'} c={'lightgray'} fc={'black'} str={'삭제'}></Btn>
+          </ModalContainer>
+        </Modal>
         <BtnContainer>
-          {/* <div> */}
           <div
             onClick={() => {
+              reset();
               dispatch(open({ title: '흡연 등록', value: 'block' }));
             }}
           >
-            <Btn str={'등록'} c={'#FF7F50'} fc={'white'}></Btn>
+            <Btn mt={'50'} mr={'46'} mb={'20'} str={'등록'} c={'#FF7F50'} fc={'white'}></Btn>
           </div>
-          {/* </div> */}
         </BtnContainer>
-
         {/* <RadiusTable width="100%" thBgColor="" radius="0px"> */}
         <Table>
           <thead>
@@ -335,53 +415,30 @@ const CigaretteReport = () => {
           </thead>
 
           <tbody>
-            {/* 한개의 날짜에 여러개의 데이터가 속해있고 그 데이터를 묶어서 표시하고 싶을때 사용하는 방식임 잘 모르겠으면 혈압
-            페이지 찾아와서 참고 */}
-            {Object.entries(
-              pagedData.reduce((acc, vo) => {
-                if (!acc[vo.no]) acc[vo.endDate] = [];
-                acc[vo.endDate].push(vo);
-                return acc;
-              }, {})
-            ).map(([endDate, records]) =>
-              records.map((vo, index) => (
-                <tr
-                  key={vo.no}
-                  // onClick={() => {
-                  //   window.location.href = `/board?bno=${vo.no}`;
-                  // }}
-                >
-                  {index === 0 && (
-                    <td
-                      rowSpan={records.length}
-                      // style={{ verticalAlign: 'middle', fontWeight: 'bold', textAlign: 'center' }}
-                    >
-                      {vo.endDate}
-                    </td>
-                  )}
-                  <td>{vo.cigaretteName}</td>
-                  <td>{vo.tar}</td>
-                  <td>{vo.startDate}</td>
-                  <td>{vo.endDate}</td>
-                  <td>{getDaysConsumed(vo.startDate, vo.endDate)}일</td>
-                  <td>
-                    {getDaysConsumed(vo.startDate, vo.endDate) > 0
-                      ? (1 / getDaysConsumed(vo.startDate, vo.endDate)).toFixed(2)
-                      : '-'}
-                  </td>
-                </tr>
-              ))
-            )}
+            {pagedData.map((vo) => (
+              <tr key={vo.no}>
+                <td>{vo.endDate}</td>
+                <td>{vo.cigarette}</td>
+                <td>{vo.tar}</td>
+                <td>{vo.startDate}</td>
+                <td>{vo.endDate}</td>
+                <td>{getDaysConsumed(vo.startDate, vo.endDate)}일</td>
+                <td>
+                  {getDaysConsumed(vo.startDate, vo.endDate) > 0
+                    ? (1 / getDaysConsumed(vo.startDate, vo.endDate)).toFixed(2)
+                    : '-'}
+                </td>
+              </tr>
+            ))}
           </tbody>
         </Table>
-
         <div></div>
         <div>
           <Pagination boardType={boardType} />
         </div>
-
         <div></div>
       </ContentLayout>
+      <div></div>
     </>
   );
 };
