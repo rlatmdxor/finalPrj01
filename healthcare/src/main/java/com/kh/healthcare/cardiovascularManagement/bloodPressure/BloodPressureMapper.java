@@ -17,6 +17,7 @@ public interface BloodPressureMapper {
                 , SYSTOLE	
                 , DIASTOLE	
                 , PULSE
+                , ENROLL_DATE
             )
             VALUES
             (
@@ -25,6 +26,7 @@ public interface BloodPressureMapper {
                 , #{systole}
                 , #{diastole}
                 , #{pulse}
+                , #{enrollDate}
             )
             """)
     String bloodPressureWrite(BloodPressureVo vo);
