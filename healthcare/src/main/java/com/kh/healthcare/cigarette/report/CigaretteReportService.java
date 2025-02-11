@@ -23,4 +23,12 @@ public class CigaretteReportService {
     public void write(CigaretteReportVo vo) {
         mapper.write(vo);
     }
+
+    public void update(CigaretteReportVo vo) {
+        mapper.update(vo);
+    }
+
+    public void delete(CigaretteReportVo vo) {
+        mapper.delete(vo);
+    }
 }

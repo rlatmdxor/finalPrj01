@@ -28,5 +28,18 @@ public class CigaretteReportController {
         return "write";
     }
 
+    @PostMapping("update")
+    public String update(@RequestBody CigaretteReportVo vo){
+        service.update(vo);
+        System.out.println("vo = " + vo);
+        return "update";
+    }
+
+    @DeleteMapping("delete")
+    public String delete(@RequestBody CigaretteReportVo vo){
+        service.delete(vo);
+        return "delete";
+    }
+
 
 }

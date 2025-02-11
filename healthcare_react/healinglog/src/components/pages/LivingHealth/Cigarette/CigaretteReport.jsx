@@ -176,6 +176,7 @@ const CigaretteReport = () => {
 
   // ✅ 선택된 데이터 저장 초기값 빈객체로
   const [selectedData, setSelectedData] = useState({});
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false); // 수정 모달 상태
 
   const dataset = [
     {
@@ -253,6 +254,59 @@ const CigaretteReport = () => {
     setNum(num - 1);
     // 입력 후 모달 창 닫기
     dispatch(close(e.target.title));
+  };
+
+  //수정모달
+  const handleEditSubmit = (e) => {
+    fetch('http://127.0.0.1:80/api/cigarette/update', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify(inputData),
+    })
+      .then((resp) => {
+        if (!resp.ok) {
+          throw new Error(`HTTP error! Status: ${resp.status}`);
+        }
+        return resp.text(); // 또는 .json() (응답 형식에 따라)
+      })
+      .then((data) => {
+        console.log('수정 완료:', data);
+      })
+      .catch((error) => {
+        console.error('수정 실패:', error);
+      });
+
+    dispatch(close('흡연 수정'));
+    //렌
+    // setNum(num - 1);
+    // 입력 후 모달 창 닫기
+    // dispatch(close(e.target.title));
+  };
+
+  const handleDeleteSubmit = (e) => {
+    fetch('http://127.0.0.1/api/cigarette/delete', {
+      method: 'DELETE',
+      headers: {
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify(inputData),
+    })
+      .then((resp) => {
+        if (!resp.ok) {
+          throw new Error(`HTTP error! Status: ${resp.status}`);
+        }
+        return resp.text(); // 또는 .json() (응답 형식에 따라)
+      })
+      .then((data) => {
+        console.log('삭제 완료:', data);
+      })
+      .catch((error) => {
+        console.error('삭제 실패:', error);
+      });
+    //창닫기
+    dispatch(close('흡연 수정'));
   };
 
   return (
@@ -386,10 +440,20 @@ const CigaretteReport = () => {
           ></InputTag>
 
           <ModalContainer>
-            {/* <Btn f={handleEditSubmit} mt={'10'} mb={'20'} mr={'20'} c={'#7ca96d'} fc={'white'} str={'수정'}></Btn> */}
-            <Btn mt={'10'} mb={'20'} mr={'-20'} c={'lightgray'} fc={'black'} str={'삭제'}></Btn>
+            <Btn
+              title={'흡연 수정'}
+              f={handleEditSubmit}
+              mt={'10'}
+              mb={'20'}
+              mr={'20'}
+              c={'#7ca96d'}
+              fc={'white'}
+              str={'수정'}
+            ></Btn>
+            <Btn f={handleDeleteSubmit} mt={'10'} mb={'20'} mr={'-20'} c={'lightgray'} fc={'black'} str={'삭제'}></Btn>
           </ModalContainer>
         </Modal>
+
         <BtnContainer>
           <div
             onClick={() => {
@@ -416,7 +480,20 @@ const CigaretteReport = () => {
 
           <tbody>
             {pagedData.map((vo) => (
-              <tr key={vo.no}>
+              <tr
+                key={vo.no}
+                onClick={() => {
+                  setInputData({
+                    no: vo.no,
+                    cigarette: vo.cigarette,
+                    tar: vo.tar,
+                    startDate: vo.startDate,
+                    endDate: vo.endDate,
+                  });
+                  // 모달 열기
+                  dispatch(open({ title: '흡연 수정', value: 'block' }));
+                }}
+              >
                 <td>{vo.endDate}</td>
                 <td>{vo.cigarette}</td>
                 <td>{vo.tar}</td>

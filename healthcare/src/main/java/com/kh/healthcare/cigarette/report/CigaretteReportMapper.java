@@ -1,8 +1,6 @@
 package com.kh.healthcare.cigarette.report;
 
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
@@ -34,5 +32,22 @@ public interface CigaretteReportMapper {
             """)
     void write(CigaretteReportVo vo);
 
+    @Update("""
+            UPDATE RECORD_CIGARETTE
+            SET
+               CIGARETTE = #{cigarette},
+               TAR = #{tar},
+               START_DATE = #{startDate},
+               END_DATE = #{endDate}
+            WHERE NO = #{no}
+            """)
+    void update(CigaretteReportVo vo);
+
+
+    @Delete("""
+            DELETE RECORD_CIGARETTE
+            WHERE NO = #{no}
+            """)
+    void delete(CigaretteReportVo vo);
 }
 
