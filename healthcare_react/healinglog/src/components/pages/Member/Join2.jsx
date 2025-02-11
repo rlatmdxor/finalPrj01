@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Title from '../../util/Title';
 import styled, { useTheme } from 'styled-components';
@@ -8,9 +8,12 @@ import {
   setPwd,
   setNick,
   setName,
-  setAddress,
   setEmail,
+  setEmailFront,
+  setEmailDomain,
   setResidentNum,
+  setFrontResidentNum,
+  setBackResidentNum,
   setHeight,
   setWeight,
   setProfile,
@@ -19,10 +22,12 @@ import {
 import { useNavigate } from 'react-router-dom';
 import ContentLayout from '../../util/ContentLayout';
 import PostCode from '../../util/PostCode';
+import Profile from '../../util/Profile';
 
 const Join2 = () => {
   const theme = useTheme();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const heightOptions = Array.from({ length: 71 }, (_, i) => i + 140); // 140 ~ 210 cm
   const weightOptions = Array.from({ length: 81 }, (_, i) => i + 40); // 40 ~ 120 kg
   const genderOptions = [
@@ -30,35 +35,80 @@ const Join2 = () => {
     { value: 'female', label: '여성' },
   ];
 
-  const { id, pwd, nick, name, address, email, residentNum, height, weight, profile, gender } = useSelector(
-    (state) => state.join
-  );
+  const {
+    id,
+    pwd,
+    nick,
+    name,
+    email,
+    emailFront,
+    emailDomain,
+    residentNum,
+    frontResidentNum,
+    backResidentNum,
+    height,
+    weight,
+    profile,
+    gender,
+  } = useSelector((state) => state.join);
 
-  const isSubmitEnabled = id && pwd && nick && name && address && email && residentNum;
-  const navigate = useNavigate();
+  const [zoneAddress, setZoneAddress] = useState('');
+  const [roadAddress, setRoadAddress] = useState('');
+  const [detailAddress, setDetailAddress] = useState('');
+
+  const formData = {
+    id,
+    pwd,
+    nick,
+    name,
+    zoneAddress,
+    roadAddress,
+    detailAddress,
+    email,
+    residentNum,
+    gender,
+    height,
+    weight,
+    profile,
+  };
+
+  const isSubmitEnabled =
+    id &&
+    pwd &&
+    nick &&
+    name &&
+    zoneAddress &&
+    roadAddress &&
+    detailAddress &&
+    emailFront &&
+    emailDomain &&
+    frontResidentNum &&
+    backResidentNum;
+
+  const handleAddressComplete = (data) => {
+    setZoneAddress(data.zoneAddress);
+    setRoadAddress(data.roadAddress);
+    setDetailAddress(data.detailAddress);
+  };
+
+  const handleProfileComplete = (data) => {
+    dispatch(setProfile(data));
+  };
+
+  useEffect(() => {
+    dispatch(setEmail(emailFront + '@' + emailDomain));
+    dispatch(setResidentNum(frontResidentNum + backResidentNum));
+    console.log(formData);
+    console.log(isSubmitEnabled);
+  }, [emailFront, emailDomain, frontResidentNum, backResidentNum]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const formData = {
-      id,
-      pwd,
-      nick,
-      name,
-      address,
-      email,
-      residentNum,
-      height,
-      weight,
-      profile,
-      gender,
-    };
-
-    // 필요한 필드가 채워졌는지 확인
     if (!isSubmitEnabled) {
       console.log('실패');
-      console.log(formData);
-      // navigate('/');
+      alert('필수 입력 항목을 다시 확인하세요.');
+      // console.log(formData);
       return;
     }
     console.log('성공');
@@ -79,7 +129,7 @@ const Join2 = () => {
       })
       .then((result) => {
         console.log('성공:', result);
-        // navigate('/');
+        navigate('/');
       })
       .catch((error) => {
         console.error('전송 실패:', error);
@@ -137,7 +187,7 @@ const Join2 = () => {
           ></JoinInput>
 
           <InputTitle>주소</InputTitle>
-          <PostCode />
+          <PostCode receiveData={handleAddressComplete} />
 
           <InputTitle>이메일</InputTitle>
           <EmailContainer>
@@ -146,8 +196,8 @@ const Join2 = () => {
               className="email1"
               type="text"
               maxLength="20"
-              value={email}
-              onChange={(e) => dispatch(setEmail(e.target.value))}
+              value={emailFront}
+              onChange={(e) => dispatch(setEmailFront(e.target.value))}
             />
             <Alpha>@</Alpha>
             <EmailInput
@@ -155,8 +205,8 @@ const Join2 = () => {
               className="email2"
               type="text"
               maxLength="12"
-              value={email}
-              onChange={(e) => dispatch(setEmail(e.target.value))}
+              value={emailDomain}
+              onChange={(e) => dispatch(setEmailDomain(e.target.value))}
             />
           </EmailContainer>
 
@@ -167,8 +217,8 @@ const Join2 = () => {
               className="residentNum"
               type="text"
               maxLength="6"
-              value={residentNum}
-              onChange={(e) => dispatch(setResidentNum(e.target.value))}
+              value={frontResidentNum}
+              onChange={(e) => dispatch(setFrontResidentNum(e.target.value))}
             />
             <Alpha>-</Alpha>
             <EmailInput
@@ -176,8 +226,8 @@ const Join2 = () => {
               className="residentNum"
               type="password"
               maxLength="7"
-              value={residentNum}
-              onChange={(e) => dispatch(setResidentNum(e.target.value))}
+              value={backResidentNum}
+              onChange={(e) => dispatch(setBackResidentNum(e.target.value))}
             />
           </EmailContainer>
 
@@ -239,38 +289,10 @@ const Join2 = () => {
 
           <InputTitle>프로필 (선택)</InputTitle>
           <ProfileContainer>
-            <ProfileImg src={profile}></ProfileImg>
-            <BtnContainer>
-              <Btn
-                w={'70'}
-                h={'40'}
-                c={theme.orange}
-                str="등록"
-                fc={'white'}
-                mt={'0'}
-                mb={'0'}
-                ml={'0'}
-                mr={'0'}
-                f={(e) => dispatch(setProfile('/img/profile.jpg'))}
-              />
-            </BtnContainer>
-            <BtnContainer>
-              <Btn
-                w={'70'}
-                h={'40'}
-                c={theme.gray}
-                str="삭제"
-                fs={'18'}
-                fc={'black'}
-                mt={'0'}
-                mb={'0'}
-                ml={'0'}
-                mr={'0'}
-                f={(e) => dispatch(setProfile(''))}
-              />
-            </BtnContainer>
+            <Profile receiveData={handleProfileComplete} />
           </ProfileContainer>
           <BlankSpace />
+
           <Btn
             type="submit"
             w={'450'}
@@ -364,20 +386,8 @@ const JoinInput = styled.input`
 
 const ProfileContainer = styled.div`
   display: grid;
-  grid-template-columns: 270px 1fr 1fr 70px;
+  grid-template-columns: 250px 187.5px 1fr;
   margin-top: 10px;
-`;
-
-const ProfileImg = styled.img`
-  width: 125px;
-  height: 125px;
-`;
-
-const BtnContainer = styled.div`
-  display: grid;
-  justify-content: end;
-  align-content: end;
-  margin-bottom: 10px;
 `;
 
 const SelectInput = styled.select`
