@@ -1,12 +1,15 @@
 package com.kh.healthcare.member;
 
-import com.kh.healthcare.cardiovascularManagement.bloodPressure.BloodPressureVo;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.kh.healthcare.Aws.FileUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
@@ -15,12 +18,27 @@ import org.springframework.web.bind.annotation.RestController;
 public class MemberController {
 
     private final MemberService service;
-    
+
     //회원가입
     @PostMapping("join")
-    public int memberJoin(@RequestBody MemberVo vo){
-        System.out.println("Profile Length: " + vo.getProfile().length());
-        return service.memberJoin(vo);
+    public int memberJoin(MemberVo vo , @RequestParam(value = "profile", required = false) MultipartFile profile) throws IOException {
+        System.out.println("vo = " + vo);
+
+        // AWS S3에 프로필 업로드, URL 가져오기
+        String profileUrl = service.uploadProfile(profile);
+
+        // insert into DB
+        return service.memberJoin(vo, profileUrl);
+
     }
 
+    //로그인
+    @PostMapping("login")
+    public String login(@RequestBody MemberVo vo){
+        try{
+            return service.login(vo);
+        }catch (Exception e) {
+            throw new IllegalStateException("[MEMBER-LOGIN] LOGIN FAIL ...");
+        }
+    }
 }

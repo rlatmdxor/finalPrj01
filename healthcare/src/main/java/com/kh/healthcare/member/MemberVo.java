@@ -1,6 +1,7 @@
 package com.kh.healthcare.member;
 
 import lombok.Data;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 public class MemberVo {
@@ -16,7 +17,7 @@ public class MemberVo {
     private String gender;
     private String height;
     private String weight;
-    private String profile;
+    private String profileUrl;
     private String enrollDate;
 //    private String number;
     private String delYn;
