@@ -20,8 +20,8 @@ const WaterEnroll = () => {
           placeholder="숫자만 입력해주세요"
           title="물 섭취량 (ml)"
           size={'size2'}
-          mb={'10'}
-          mt={'9'}
+          mb={'14'}
+          mt={'7'}
           min={0}
         />
         <ModalContainer>

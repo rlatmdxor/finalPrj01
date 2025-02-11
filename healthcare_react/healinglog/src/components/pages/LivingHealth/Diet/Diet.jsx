@@ -13,6 +13,7 @@ import MyBmi from './MyBmi';
 import WaterEnroll from './WaterEnroll';
 import WeightEnroll from './WeightEnroll';
 import DietEnroll from './DietEnroll';
+import TodayDiet from './TodayDiet';
 
 const NaviContainer = styled.div`
   display: grid;
@@ -63,7 +64,7 @@ const DayDiv = styled.div`
   }
 `;
 
-const ContentAreaDiv = styled.div`
+export const ContentAreaDiv = styled.div`
   display: grid;
   width: 100%;
   grid-template-columns: 1fr 1fr 1fr;
@@ -160,68 +161,7 @@ const Diet = () => {
           <ContentAreaDiv>
             <MyBmi />
           </ContentAreaDiv>
-          <TodayDietitian>
-            <div>오늘의 식단</div>
-            <Btn
-              str={'등록'}
-              w={'60'}
-              h={'34'}
-              mt={'0'}
-              mb={'0'}
-              ml={'0'}
-              mr={'0'}
-              fs={'15'}
-              c={'#ff8a60'}
-              fc={'#ffffff'}
-              f={handleOpenDietEnrollModal}
-            />
-          </TodayDietitian>
-          <ContentAreaDiv>
-            <SmallCard>
-              <SmallTextDiv>
-                <div>아침</div>
-                <Btn str={'상세'} w={'50'} h={'25'} mt={'0'} mb={'0'} ml={'0'} mr={'0'} fs={'13'} />
-              </SmallTextDiv>
-              <BigTextDiv>2500 Kcal</BigTextDiv>
-            </SmallCard>
-            <SmallCard>
-              <SmallTextDiv>
-                <div>오전간식</div>
-                <Btn str={'상세'} w={'50'} h={'25'} mt={'0'} mb={'0'} ml={'0'} mr={'0'} fs={'13'} />
-              </SmallTextDiv>
-              <div>등록된 식단이 없습니다.</div>
-            </SmallCard>
-            <SmallCard>
-              <SmallTextDiv>
-                <div>점심</div>
-                <Btn str={'상세'} w={'50'} h={'25'} mt={'0'} mb={'0'} ml={'0'} mr={'0'} fs={'13'} />
-              </SmallTextDiv>
-              <BigTextDiv>2500 Kcal</BigTextDiv>
-            </SmallCard>
-          </ContentAreaDiv>
-          <ContentAreaDiv>
-            <SmallCard>
-              <SmallTextDiv>
-                <div>오후간식</div>
-                <Btn str={'상세'} w={'50'} h={'25'} mt={'0'} mb={'0'} ml={'0'} mr={'0'} fs={'13'} />
-              </SmallTextDiv>
-              <div>등록된 식단이 없습니다.</div>
-            </SmallCard>
-            <SmallCard>
-              <SmallTextDiv>
-                <div>저녁</div>
-                <Btn str={'상세'} w={'50'} h={'25'} mt={'0'} mb={'0'} ml={'0'} mr={'0'} fs={'13'} />
-              </SmallTextDiv>
-              <div>등록된 식단이 없습니다.</div>
-            </SmallCard>
-            <SmallCard>
-              <SmallTextDiv>
-                <div>야식</div>
-                <Btn str={'상세'} w={'50'} h={'25'} mt={'0'} mb={'0'} ml={'0'} mr={'0'} fs={'13'} />
-              </SmallTextDiv>
-              <div>등록된 식단이 없습니다.</div>
-            </SmallCard>
-          </ContentAreaDiv>
+          <TodayDiet />
         </ContentDiv>
         <WaterEnroll />
         <WeightEnroll />
