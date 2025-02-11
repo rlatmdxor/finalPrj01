@@ -20,7 +20,7 @@ public class BeanConfig {
         return new BCryptPasswordEncoder();
     }
 
-//    //커스텀 필터 등록
+//    //커스텀 필터 등록(TokenCheckFilter)
 //    @Bean
 //    public FilterRegistrationBean filterRegistrationBean(){
 //        FilterRegistrationBean<Filter> x = new FilterRegistrationBean<>(new TokenCheckFilter(jwtUtil));

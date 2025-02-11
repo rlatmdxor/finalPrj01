@@ -18,6 +18,7 @@ import {
   setWeight,
   setProfile,
   setGender,
+  setAddress,
 } from '../../../redux/JoinSlice';
 import { useNavigate } from 'react-router-dom';
 import ContentLayout from '../../util/ContentLayout';
@@ -46,10 +47,11 @@ const Join2 = () => {
     residentNum,
     frontResidentNum,
     backResidentNum,
+    gender,
     height,
     weight,
     profile,
-    gender,
+    address,
   } = useSelector((state) => state.join);
 
   const [zoneAddress, setZoneAddress] = useState('');
@@ -61,9 +63,7 @@ const Join2 = () => {
     pwd,
     nick,
     name,
-    zoneAddress,
-    roadAddress,
-    detailAddress,
+    address,
     email,
     residentNum,
     gender,
@@ -91,13 +91,10 @@ const Join2 = () => {
     setDetailAddress(data.detailAddress);
   };
 
-  const handleProfileComplete = (data) => {
-    dispatch(setProfile(data));
-  };
-
   useEffect(() => {
     dispatch(setEmail(emailFront + '@' + emailDomain));
     dispatch(setResidentNum(frontResidentNum + backResidentNum));
+    dispatch(setAddress(zoneAddress + ' ' + roadAddress + ' ' + detailAddress));
     console.log(formData);
     console.log(isSubmitEnabled);
   }, [emailFront, emailDomain, frontResidentNum, backResidentNum]);
@@ -108,18 +105,30 @@ const Join2 = () => {
     if (!isSubmitEnabled) {
       console.log('실패');
       alert('필수 입력 항목을 다시 확인하세요.');
-      // console.log(formData);
       return;
     }
     console.log('성공');
     console.log(formData);
 
-    fetch('https://127.0.0.1:80/api/member/join', {
+    const fd = new FormData();
+    fd.append('id', id);
+    fd.append('pwd', pwd);
+    fd.append('name', name);
+    fd.append('nick', nick);
+    fd.append('address', address);
+    fd.append('email', email);
+    fd.append('residentNum', residentNum);
+    fd.append('gender', gender);
+    fd.append('height', height);
+    fd.append('weight', weight);
+    fd.append('profile', profile);
+
+    fetch('http://127.0.0.1:80/api/member/join', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        // 'Content-Type': 'application/json',
       },
-      body: JSON.stringify(formData),
+      body: fd,
     })
       .then((response) => {
         if (!response.ok) {
@@ -129,7 +138,7 @@ const Join2 = () => {
       })
       .then((result) => {
         console.log('성공:', result);
-        navigate('/');
+        navigate('/login');
       })
       .catch((error) => {
         console.error('전송 실패:', error);
@@ -289,7 +298,7 @@ const Join2 = () => {
 
           <InputTitle>프로필 (선택)</InputTitle>
           <ProfileContainer>
-            <Profile receiveData={handleProfileComplete} />
+            <Profile />
           </ProfileContainer>
           <BlankSpace />
 

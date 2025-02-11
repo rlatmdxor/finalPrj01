@@ -11,61 +11,61 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AnAerobicService {
 
-    private final AnAerobicDao dao;
+    private final AnAerobicMapper mapper;
 
     public List<AnAerobicVo> getMarkedData() {
-        return dao.getMarkedData();
+        return mapper.getMarkedData();
     }
 
     public int unmarkData(String no) {
-        return dao.unmarkData(no);
+        return mapper.unmarkData(no);
     }
 
     public List<AnAerobicVo> getArmData() {
-        return dao.getArmData();
+        return mapper.getArmData();
     }
 
     public int markArmData(String no) {
-        return dao.markArmData(no);
+        return mapper.markArmData(no);
     }
 
     public List<AnAerobicVo> getCoreData() {
-        return dao.getCoreData();
+        return mapper.getCoreData();
     }
 
     public int markCoreData(String no) {
-        return dao.markCoreData(no);
+        return mapper.markCoreData(no);
     }
 
     public List<AnAerobicVo> getLegData() {
-        return dao.getLegData();
+        return mapper.getLegData();
     }
 
     public int markLegData(String no) {
-        return dao.markLegData(no);
+        return mapper.markLegData(no);
     }
 
     public List<AnAerobicVo> getChestData() {
-        return dao.getChestData();
+        return mapper.getChestData();
     }
 
     public int markChestData(String no) {
-        return dao.markChestData(no);
+        return mapper.markChestData(no);
     }
 
     public List<AnAerobicVo> getShoulderData() {
-        return dao.getShoulderData();
+        return mapper.getShoulderData();
     }
 
     public int markShoulderData(String no) {
-        return dao.markShoulderData(no);
+        return mapper.markShoulderData(no);
     }
 
     public List<AnAerobicVo> getEtcData() {
-        return dao.getEtcData();
+        return mapper.getEtcData();
     }
 
     public int markEtcData(String no) {
-        return dao.markEtcData(no);
+        return mapper.markEtcData(no);
     }
 }

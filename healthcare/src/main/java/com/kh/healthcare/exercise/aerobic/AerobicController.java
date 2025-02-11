@@ -1,6 +1,5 @@
 package com.kh.healthcare.exercise.aerobic;
 
-import com.kh.healthcare.cardiovascularManagement.bloodPressure.BloodPressureVo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

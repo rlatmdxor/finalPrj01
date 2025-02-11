@@ -6,40 +6,40 @@ import LoginInput from '../../util/LoginInput';
 
 const LoginPage = () => {
   return (
-    <div>
-      <Container>
-        <Title>로그인</Title>
-        <Layout>
-          <form
-            action=""
-            method="post"
-            style={{
-              display: 'grid',
-              gridTemplateRows: '1fr 1fr1fr',
-              boxSizing: 'border-box',
-              width: '600px',
-              height: '300px',
-            }}
-          >
-            <LoginInput type="text" placeholder="아이디" />
+    <>
+      <Title>로그인</Title>
+      <div></div>
+      <Layout>
+        <BlankSpace />
+        <form
+          action=""
+          method="post"
+          style={{
+            display: 'grid',
+            gridTemplateRows: '1fr 1fr1fr',
+            boxSizing: 'border-box',
+            width: '600px',
+            height: '300px',
+          }}
+        >
+          <LoginInput type="text" placeholder="아이디" />
 
-            <LoginInput type="password" placeholder="비밀번호" />
-            <Btn>로그인</Btn>
-          </form>
+          <LoginInput type="password" placeholder="비밀번호" />
+          <Btn>로그인</Btn>
+        </form>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', marginTop: '20px' }}>
-            <div>
-              <LinkLayout to={'/join'}>회원 가입</LinkLayout>
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', justifySelf: 'end' }}>
-              <LinkLayout to={'/findid'}>아이디 찾기</LinkLayout>
-              <LinkLayout to={'/findpwd'}>비밀번호 찾기</LinkLayout>
-            </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', marginTop: '20px' }}>
+          <div>
+            <LinkLayout to={'/join'}>회원 가입</LinkLayout>
           </div>
-          <BlankSpace />
-        </Layout>
-      </Container>
-    </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', justifySelf: 'end' }}>
+            <LinkLayout to={'/findid'}>아이디 찾기</LinkLayout>
+            <LinkLayout to={'/findpwd'}>비밀번호 찾기</LinkLayout>
+          </div>
+        </div>
+        <BlankSpace />
+      </Layout>
+    </>
   );
 };
 
@@ -50,7 +50,7 @@ const Layout = styled.div`
   display: grid;
   width: 600px;
   height: 300px;
-  margin-top: 100px;
+  /* margin-top: 100px; */
   justify-self: center;
   /* margin-left: 380px; */
 `;
@@ -77,7 +77,7 @@ const Btn = styled.button`
 `;
 
 const BlankSpace = styled.div`
-  height: 100px;
+  height: 90px;
 `;
 
 export default LoginPage;
