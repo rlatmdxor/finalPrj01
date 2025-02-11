@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useDaumPostcodePopup } from 'react-daum-postcode';
 import styled from 'styled-components';
 
-const Postcode = () => {
+const Postcode = ({ receiveData }) => {
   const open = useDaumPostcodePopup('https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js');
 
   const [zoneAddress, setZoneAddress] = useState('');
@@ -21,6 +21,15 @@ const Postcode = () => {
     setZoneAddress(data.zonecode);
     setRoadAddress(data.roadAddress);
     setDetailAddress(detailAddress);
+
+    // 부모 컴포넌트로 주소 데이터 전달
+    if (receiveData) {
+      receiveData({
+        zoneAddress: data.zonecode,
+        roadAddress: data.roadAddress,
+        detailAddress: detailAddress,
+      });
+    }
   };
 
   const handleClick = (e) => {
@@ -36,7 +45,13 @@ const Postcode = () => {
 
         <AdressInput value={roadAddress} placeholder="도로명주소" />
 
-        <AdressInput2 value={detailAddress} placeholder="상세주소" />
+        <AdressInput2
+          value={detailAddress}
+          placeholder="상세주소"
+          onChange={(e) => {
+            setDetailAddress(e.target.value);
+          }}
+        />
       </LayoutDiv>
     </>
   );
