@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { useDispatch } from 'react-redux';
-import { open } from '../../../../redux/modalSlice';
+
 import Title from '../../../util/Title';
 import Navi from '../../../util/Navi';
 import ContentLayout from '../../../util/ContentLayout';
+import TodayKcal from './TodayKcal';
 import TodayWater from './TodayWater';
 import TodayWeight from './TodayWeight';
-import TodayKcal from './TodayKcal';
 import MyBmi from './MyBmi';
-import DietEnroll from './DietEnroll';
 import TodayDiet from './TodayDiet';
 
 const NaviContainer = styled.div`
@@ -19,15 +17,6 @@ const NaviContainer = styled.div`
   top: 20px;
   left: 40px;
   grid-template-columns: 4fr 3fr 3fr;
-`;
-
-const ContentDiv = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  width: 100%;
-  margin-top: 60px;
-  margin-bottom: 60px;
 `;
 
 const DayDiv = styled.div`
@@ -41,6 +30,7 @@ const DayDiv = styled.div`
   border-radius: 5px;
   color: white;
   font-weight: bold;
+  margin-top: 60px;
   margin-bottom: 30px;
 
   & input {
@@ -113,14 +103,6 @@ export const BigCard = styled.div`
   border-radius: 6px;
 `;
 
-export const TodayDietitian = styled.div`
-  display: flex;
-  justify-content: space-between;
-  font-size: 20px;
-  margin-top: 10px;
-  margin-bottom: 20px;
-`;
-
 export const ModalContainer = styled.div`
   display: flex;
   justify-content: end;
@@ -132,12 +114,6 @@ const Diet = () => {
   const todayDate = new Date().toISOString().split('T')[0];
   const [day, setDay] = useState(todayDate);
 
-  const dispatch = useDispatch();
-
-  const handleOpenDietEnrollModal = () => {
-    dispatch(open({ title: '식단 등록', value: 'block' }));
-  };
-
   return (
     <>
       <Title>식단</Title>
@@ -147,24 +123,23 @@ const Diet = () => {
         <Navi target="dietreport" tag={'리포트'}></Navi>
       </NaviContainer>
       <ContentLayout>
-        <ContentDiv>
-          <DayDiv>
-            <button>◀</button>
-            <input type="date" value={day} />
-            <button>▶</button>
-          </DayDiv>
-          <ContentAreaDiv>
-            <TodayKcal />
-            <TodayWater day={day} />
-            <TodayWeight day={day} />
-          </ContentAreaDiv>
-          <ContentAreaDiv>
-            <MyBmi />
-          </ContentAreaDiv>
-          <TodayDiet />
-        </ContentDiv>
-        <DietEnroll />
+        <DayDiv>
+          <button>◀</button>
+          <input type="date" value={day} />
+          <button>▶</button>
+        </DayDiv>
+        <ContentAreaDiv>
+          <TodayKcal />
+          <TodayWater day={day} />
+          <TodayWeight day={day} />
+        </ContentAreaDiv>
+        <ContentAreaDiv>
+          <MyBmi />
+        </ContentAreaDiv>
+        <TodayDiet />
+        <br />
         <h1>여기에 광고를 넣어서 돈을 벌자</h1>
+        <br />
       </ContentLayout>
     </>
   );

@@ -34,14 +34,18 @@ const TodayWater = ({ day }) => {
       .then((resp) => resp.text())
       .then((data) => {
         console.log(data);
-        setAmount(data);
+        if (data) {
+          setAmount(data);
+        } else {
+          setAmount(0);
+        }
       });
   }, [day]);
 
   const handleOpenWaterModal = () => {
     setInputData((prev) => ({
       ...prev,
-      amount: amount,
+      amount: parseFloat(amount),
     }));
 
     dispatch(open({ title: '물 등록', value: 'block' }));
@@ -55,14 +59,14 @@ const TodayWater = ({ day }) => {
     setInputData((props) => {
       return {
         ...props,
-        [e.target.name]: e.target.value,
+        [e.target.name]: String(parseFloat(e.target.value)),
       };
     });
   };
 
   const handleSubmit = (e) => {
-    if (inputData.amount < 1) {
-      alert('1 이상 입력해주세요.');
+    if (inputData.amount < 0) {
+      alert('0 이상 입력해주세요.');
       return;
     }
 
@@ -100,7 +104,7 @@ const TodayWater = ({ day }) => {
             f={handleOpenWaterModal}
           />
         </SmallTextDiv>
-        <BigTextDiv>{amount ? `${amount} ml` : '- ml'}</BigTextDiv>
+        <BigTextDiv>{amount} ml</BigTextDiv>
       </SmallCard>
 
       <Modal title="물 등록">
