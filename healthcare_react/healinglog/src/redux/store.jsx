@@ -8,7 +8,6 @@ import JoinReducer from './JoinSlice';
 import aerobicReducer from './aerobicSlice';
 import anAerobicReducer from './anAerobicSlice';
 
-
 const store = configureStore({
   reducer: {
     menu: menuReducer,
