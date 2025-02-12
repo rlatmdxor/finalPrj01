@@ -81,10 +81,10 @@ public class MemberService {
         }
 
         //jwt 토큰 생성 (유저 로그인이니까 "user"값 넘김)
-        return jwtUtil.createJwtToken(dbVo.getId(), dbVo.getNick(), "user");
+        return jwtUtil.createJwtToken(dbVo.getNo(), dbVo.getId(), dbVo.getNick(), "user");
     }
 
-    // 계정 조회(로그인 할 때 사용))
+    // 계정 조회(로그인 할 때 사용)
     public MemberVo findUserById(String id){
         return mapper.findUserById(id);
     }
