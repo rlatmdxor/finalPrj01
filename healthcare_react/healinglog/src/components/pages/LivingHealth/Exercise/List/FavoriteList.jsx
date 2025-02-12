@@ -9,20 +9,22 @@ const FavoriteList = ({ f }) => {
   const url = 'http://127.0.0.1:80/api/aerobic/favlist';
   const [data, setData] = useState([]);
   const [bookmarkStatus, setBookmarkStatus] = useState({});
+  const token = localStorage.getItem('token');
 
   useEffect(() => {
-    fetch(url)
+    fetch(url, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
       .then((resp) => resp.json())
       .then((fetchedData) => setData(fetchedData))
       .catch((error) => console.error('Error:', error));
   }, [data]);
 
-  // const dispatch = useDispatch();
-  // const exVoList = useSelector((state) => state.aerobic);
   const theme = useTheme();
   const navigate = useNavigate();
-
-  // const markData = exVoList.filter((item) => item.bookmark === 'y');
 
   const handleToggleBookmark = (no) => {
     const url = 'http://127.0.0.1:80/api/aerobic/unmark';
