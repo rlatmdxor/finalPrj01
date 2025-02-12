@@ -1,17 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useDispatch } from 'react-redux';
 import { open } from '../../../../redux/modalSlice';
 import Title from '../../../util/Title';
 import Navi from '../../../util/Navi';
 import ContentLayout from '../../../util/ContentLayout';
-import Btn from '../../../util/Btn';
 import TodayWater from './TodayWater';
 import TodayWeight from './TodayWeight';
 import TodayKcal from './TodayKcal';
 import MyBmi from './MyBmi';
-import WaterEnroll from './WaterEnroll';
-import WeightEnroll from './WeightEnroll';
 import DietEnroll from './DietEnroll';
 import TodayDiet from './TodayDiet';
 
@@ -132,6 +129,9 @@ export const ModalContainer = styled.div`
 const Diet = () => {
   console.log('화면 렌더링~~');
 
+  const todayDate = new Date().toISOString().split('T')[0];
+  const [day, setDay] = useState(todayDate);
+
   const dispatch = useDispatch();
 
   const handleOpenDietEnrollModal = () => {
@@ -150,21 +150,19 @@ const Diet = () => {
         <ContentDiv>
           <DayDiv>
             <button>◀</button>
-            <input type="date" value={new Date().toISOString().split('T')[0]} />
+            <input type="date" value={day} />
             <button>▶</button>
           </DayDiv>
           <ContentAreaDiv>
             <TodayKcal />
-            <TodayWater />
-            <TodayWeight />
+            <TodayWater day={day} />
+            <TodayWeight day={day} />
           </ContentAreaDiv>
           <ContentAreaDiv>
             <MyBmi />
           </ContentAreaDiv>
           <TodayDiet />
         </ContentDiv>
-        <WaterEnroll />
-        <WeightEnroll />
         <DietEnroll />
         <h1>여기에 광고를 넣어서 돈을 벌자</h1>
       </ContentLayout>

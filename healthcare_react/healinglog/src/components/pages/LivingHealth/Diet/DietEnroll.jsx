@@ -74,7 +74,7 @@ const DietEnroll = () => {
 
   const [foodList, setFoodList] = useState([]); // 추가된 음식 목록
 
-  const [imgFile, setImgFile] = useState(''); // 선택한 사진
+  const [imgFile, setImgFile] = useState(''); // 사진 선택 상태
   const imgRef = useRef();
 
   const dispatch = useDispatch();
