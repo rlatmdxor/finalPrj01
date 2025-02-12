@@ -7,9 +7,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/cigarette")
+@RequestMapping("api/cigarette/report")
 @RequiredArgsConstructor
-@CrossOrigin
 public class CigaretteReportController {
 
     private final CigaretteReportService service;
