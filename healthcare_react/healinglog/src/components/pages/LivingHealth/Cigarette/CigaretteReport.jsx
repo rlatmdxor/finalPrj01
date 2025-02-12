@@ -27,7 +27,7 @@ const NaviContainer = styled.div`
 `;
 
 const CigaretteReport = () => {
-  const url = 'http://127.0.0.1/api/cigarette/list';
+  const url = 'http://127.0.0.1/api/cigarette/report/list';
 
   const options = {
     method: 'POST',
@@ -241,7 +241,7 @@ const CigaretteReport = () => {
 
   // 인풋 입력값 보내기
   const handleSubmit = (e) => {
-    fetch('http://127.0.0.1:80/api/cigarette/write', {
+    fetch('http://127.0.0.1:80/api/cigarette/report/write', {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
@@ -258,7 +258,7 @@ const CigaretteReport = () => {
 
   //수정모달
   const handleEditSubmit = (e) => {
-    fetch('http://127.0.0.1:80/api/cigarette/update', {
+    fetch('http://127.0.0.1:80/api/cigarette/report/update', {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
@@ -286,7 +286,7 @@ const CigaretteReport = () => {
   };
 
   const handleDeleteSubmit = (e) => {
-    fetch('http://127.0.0.1/api/cigarette/delete', {
+    fetch('http://127.0.0.1/api/cigarette/report/delete', {
       method: 'DELETE',
       headers: {
         'content-type': 'application/json',
