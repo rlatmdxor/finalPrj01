@@ -225,6 +225,10 @@ const CigaretteReport = () => {
   // const data = dataVoList.slice(offset, offset + boardLimit);
   // 화면 렌더링
   const [num, setNum] = useState('');
+
+  //토큰관련코드
+  const token = localStorage.getItem('token');
+
   // 인풋 데이터 초기화
   const reset = () => {
     setInputData(initialInputData);
@@ -245,6 +249,7 @@ const CigaretteReport = () => {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(inputData),
     })
@@ -262,6 +267,7 @@ const CigaretteReport = () => {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(inputData),
     })
@@ -290,6 +296,7 @@ const CigaretteReport = () => {
       method: 'DELETE',
       headers: {
         'content-type': 'application/json',
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(inputData),
     })

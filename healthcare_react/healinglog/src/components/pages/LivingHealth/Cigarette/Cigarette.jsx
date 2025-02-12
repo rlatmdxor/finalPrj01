@@ -26,8 +26,8 @@ const NaviContainer = styled.div`
 `;
 
 const CalContainer = styled.div`
-  margin-top: 200px;
-  padding-top: 200px;
+  /* margin-top: 200px; */
+  padding-top: 100px;
 `;
 
 const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
@@ -122,6 +122,10 @@ const Cigarette = () => {
   const [inputData, setInputData] = useState(initialInputData);
   // 페이징 쪽에 있는 자료 활용
   // const data = dataVoList.slice(offset, offset + boardLimit);
+
+  //토큰 코드
+  const token = localStorage.getItem('token');
+
   // 화면 렌더링
   const [num, setNum] = useState('');
   // 인풋 데이터 초기화
@@ -144,6 +148,7 @@ const Cigarette = () => {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(inputData),
     })
@@ -161,6 +166,7 @@ const Cigarette = () => {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(inputData),
     })
@@ -185,6 +191,7 @@ const Cigarette = () => {
       method: 'DELETE',
       headers: {
         'content-type': 'application/json',
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(inputData),
     })
