@@ -55,14 +55,14 @@ const TodayWeight = ({ day }) => {
     setInputData((props) => {
       return {
         ...props,
-        [e.target.name]: e.target.value,
+        [e.target.name]: String(parseFloat(e.target.value)),
       };
     });
   };
 
   const handleSubmit = (e) => {
-    if (inputData.amount < 1) {
-      alert('1 이상 입력해주세요.');
+    if (inputData.amount < 0) {
+      alert('0 이상 입력해주세요.');
       return;
     }
 
