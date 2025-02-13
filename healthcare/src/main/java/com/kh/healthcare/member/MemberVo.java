@@ -11,7 +11,6 @@ public class MemberVo {
     private String id;
     private String pwd;
     private String nick;
-    private String residentNum;
     private String email;
     private String address;
     private String gender;
@@ -19,6 +18,6 @@ public class MemberVo {
     private String weight;
     private String profileUrl;
     private String enrollDate;
-//    private String number;
+    private String phone;
     private String delYn;
 }
