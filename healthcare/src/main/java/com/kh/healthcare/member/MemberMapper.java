@@ -16,9 +16,9 @@ public interface MemberMapper {
                 , ID
                 , PWD
                 , NICK
-                , RESIDENT_NUM
                 , EMAIL
                 , ADDRESS
+                , PHONE
                 , HEIGHT
                 , WEIGHT
                 , PROFILE
@@ -33,9 +33,9 @@ public interface MemberMapper {
                 , #{vo.id}
                 , #{vo.pwd}
                 , #{vo.nick}
-                , #{vo.residentNum}
                 , #{vo.email}
                 , #{vo.address}
+                , #{vo.phone}
                 , #{vo.height}
                 , #{vo.weight}
                 , #{profileUrl}
@@ -61,6 +61,7 @@ public interface MemberMapper {
                 , PROFILE
                 , GENDER
                 , ENROLL_DATE
+                , PHONE
                 , DEL_YN
             FROM
                 MEMBER
@@ -69,4 +70,34 @@ public interface MemberMapper {
                 AND DEL_YN = 'N'
             """)
     MemberVo findUserById(String id);
+
+    @Select("""
+            SELECT
+                COUNT(*)
+            FROM
+                MEMBER
+            WHERE
+                ID = #{id}
+            """)
+    int duplicateIdCheck(MemberVo vo);
+
+    @Select("""
+            SELECT
+                COUNT(*)
+            FROM
+                MEMBER
+            WHERE
+                EMAIL = #{email}
+            """)
+    int duplicateEmailCheck(MemberVo vo);
+
+    @Select("""
+            SELECT
+                COUNT(*)
+            FROM
+                MEMBER
+            WHERE
+                PHONE = #{phone}
+            """)
+    int duplicatePhoneCheck(MemberVo vo);
 }

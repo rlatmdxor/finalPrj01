@@ -62,9 +62,7 @@ public class MemberService {
     // 패스워드 암호화 후, DB에 저장
     public int memberJoin(MemberVo vo, String profileUrl) {
         String encodedPwd = encoder.encode(vo.getPwd());
-        String encodedResidentNum = encoder.encode(vo.getResidentNum());
         vo.setPwd(encodedPwd);
-        vo.setResidentNum(encodedResidentNum);
         return mapper.memberJoin(vo, profileUrl);
     }
 
@@ -87,5 +85,20 @@ public class MemberService {
     // 계정 조회(로그인 할 때 사용)
     public MemberVo findUserById(String id){
         return mapper.findUserById(id);
+    }
+
+    // 아이디 중복 체크
+    public int duplicateIdCheck(MemberVo vo) {
+        return mapper.duplicateIdCheck(vo);
+    }
+
+    // 이메일 중복 체크 및 유효성 검사
+    public int duplicateEmailCheck(MemberVo vo) {
+        return mapper.duplicateEmailCheck(vo);
+    }
+
+    // 전화번호 중복 체크
+    public int duplicatePhoneCheck(MemberVo vo) {
+        return mapper.duplicatePhoneCheck(vo);
     }
 }

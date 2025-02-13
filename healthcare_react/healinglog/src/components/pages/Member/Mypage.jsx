@@ -15,6 +15,7 @@ import {
   setWeight,
   setProfile,
 } from '../../../redux/JoinSlice';
+import Profile from '../../util/Profile';
 
 const Mypage = () => {
   const theme = useTheme();
@@ -24,36 +25,14 @@ const Mypage = () => {
   );
   return (
     <>
+      <Title>마이페이지</Title>
+      <div />
       <Container>
-        <Title>마이페이지</Title>
-
         <InputContainer>
           <InputTitle>프로필 (선택)</InputTitle>
 
           <ProfileContainer>
-            <ProfileImg src={profile}></ProfileImg>
-            <BtnContainer>
-              <Btn
-                w={'70'}
-                h={'40'}
-                c={theme.orange}
-                str="등록"
-                fc={'white'}
-                fs={'18'}
-                f={(e) => dispatch(setProfile('/img/profile.jpg'))}
-              />
-            </BtnContainer>
-            <BtnContainer>
-              <Btn
-                w={'70'}
-                h={'40'}
-                c={theme.gray}
-                str="삭제"
-                fc={'black'}
-                fs={'18'}
-                f={(e) => dispatch(setProfile(''))}
-              />
-            </BtnContainer>
+            <Profile />
           </ProfileContainer>
 
           <BlankSpace></BlankSpace>
