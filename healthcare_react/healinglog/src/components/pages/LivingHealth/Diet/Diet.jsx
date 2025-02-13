@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-
 import Title from '../../../util/Title';
 import Navi from '../../../util/Navi';
 import ContentLayout from '../../../util/ContentLayout';
@@ -8,7 +7,7 @@ import TodayKcal from './TodayKcal';
 import TodayWater from './TodayWater';
 import TodayWeight from './TodayWeight';
 import MyBmi from './MyBmi';
-import TodayDiet from './TodayDiet';
+import TodayDietMeal from './TodayDietMeal';
 
 const NaviContainer = styled.div`
   display: grid;
@@ -136,7 +135,7 @@ const Diet = () => {
         <ContentAreaDiv>
           <MyBmi />
         </ContentAreaDiv>
-        <TodayDiet />
+        <TodayDietMeal day={day} />
         <br />
         <h1>여기에 광고를 넣어서 돈을 벌자</h1>
         <br />

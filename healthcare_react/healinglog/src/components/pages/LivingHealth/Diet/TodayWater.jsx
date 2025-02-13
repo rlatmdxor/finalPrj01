@@ -51,10 +51,6 @@ const TodayWater = ({ day }) => {
     dispatch(open({ title: '물 등록', value: 'block' }));
   };
 
-  const reset = () => {
-    setInputData(initialInputData);
-  };
-
   const handleChange = (e) => {
     setInputData((props) => {
       return {
@@ -81,7 +77,6 @@ const TodayWater = ({ day }) => {
         setAmount(inputData.amount);
         dispatch(close('물 등록'));
         alert('등록되었습니다.');
-        reset();
       });
   };
 
