@@ -34,7 +34,11 @@ const TodayWeight = ({ day }) => {
       .then((resp) => resp.text())
       .then((data) => {
         console.log(data);
-        setAmount(data);
+        if (data) {
+          setAmount(data);
+        } else {
+          setAmount(0);
+        }
       });
   }, [day]);
 
@@ -100,7 +104,7 @@ const TodayWeight = ({ day }) => {
             f={handleOpenWeightModal}
           />
         </SmallTextDiv>
-        <BigTextDiv>{amount ? `${amount} kg` : '- kg'}</BigTextDiv>
+        <BigTextDiv>{amount} kg</BigTextDiv>
       </SmallCard>
 
       <Modal title="체중 등록">
