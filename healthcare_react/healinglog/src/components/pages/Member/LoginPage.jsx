@@ -30,6 +30,10 @@ const LoginPage = () => {
     fetch(url, option)
       .then((resp) => resp.text())
       .then((token) => {
+        if (!token) {
+          alert('로그인에 실패했습니다.');
+          return;
+        }
         console.log('token ::: ', token);
         localStorage.setItem('token', token);
 
@@ -38,8 +42,9 @@ const LoginPage = () => {
         const nick = getPayload(token, 'nick');
         dispatch(login({ no, id, nick }));
         alert(`환영합니다 ${nick}님`);
-        navi('/');
-      });
+        navi('/dashboard');
+      })
+      .catch((error) => console.error('fetch 에러 발생:', error));
   };
 
   const { formData, handleInputChange, handleSubmit } = useFormData(initState, submitCallBack);

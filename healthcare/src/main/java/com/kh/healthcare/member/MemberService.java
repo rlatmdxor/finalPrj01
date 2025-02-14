@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.lang.reflect.Member;
 
 @Service
 @RequiredArgsConstructor
@@ -35,7 +36,7 @@ public class MemberService {
 
         if (profile == null || profile.isEmpty()) {
             // 기본 이미지 URL 설정
-            profileUrl = "https://healinglog-bucket.s3.ap-southeast-2.amazonaws.com/default_profile.jpg";
+            profileUrl = "https://healinglog-kh.s3.ap-northeast-2.amazonaws.com/default_profile.jpg";
         } else {
             System.out.println("profile = " + profile.getOriginalFilename());
 
@@ -70,10 +71,8 @@ public class MemberService {
     public String login(MemberVo vo) {
         //계정 조회
         MemberVo dbVo = findUserById(vo.getId());
-        
         //일치하는지 확인 (평문, 암호문)
         boolean isMatch = encoder.matches(vo.getPwd(), dbVo.getPwd());
-
         if(!isMatch){
             throw new IllegalStateException("로그인 실패");
         }
@@ -100,5 +99,26 @@ public class MemberService {
     // 전화번호 중복 체크
     public int duplicatePhoneCheck(MemberVo vo) {
         return mapper.duplicatePhoneCheck(vo);
+    }
+
+    // 개인 데이터 가져오기(마이페이지로)
+    public MemberVo getMyData(String token) {
+        token = token.replace("Bearer ", "");
+        String id =jwtUtil.getId(token);
+        return findUserById(id);
+    }
+
+    // 프로필 업데이트
+    public void profileChange(String token, String profileUrl) {
+        token = token.replace("Bearer ", "");
+        String id =jwtUtil.getId(token);
+        mapper.profileChange(id, profileUrl);
+    }
+
+    // 프로필 다시 가져오기
+    public String getProfile(String token) {
+        token = token.replace("Bearer ", "");
+        String id =jwtUtil.getId(token);
+        return mapper.getProfile(id);
     }
 }

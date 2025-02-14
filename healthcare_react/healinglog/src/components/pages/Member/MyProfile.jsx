@@ -1,38 +1,46 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import Btn from './Btn';
+import Btn from '../../util/Btn';
 import styled, { useTheme } from 'styled-components';
-import { setProfile } from '../../redux/JoinSlice';
+import { setProfile } from '../../../redux/JoinSlice';
 
-const Profile = () => {
+const MyProfile = () => {
   const dispatch = useDispatch();
-  const [profileImg, setProfileImg] = useState('/img/profile.jpg');
   const { profile } = useSelector((state) => state.join);
   const fileInputRef = useRef(null);
   const theme = useTheme();
 
+  const token = localStorage.getItem('token');
+
   //프로필 변경
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
-    console.log(selectedFile);
-
-    dispatch(setProfile(selectedFile));
     if (!selectedFile) return;
 
-    //밑으로는 이미지 화면 출력용
-    const reader = new FileReader();
-    reader.readAsDataURL(selectedFile); // 파일을 Base64로 변환
+    const formData = new FormData();
+    formData.append('profileImage', selectedFile);
 
-    reader.onload = () => {
-      setProfileImg(reader.result);
-    };
+    fetch('http://127.0.0.1:80/api/member/profileChange', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    })
+      .then((resp) => resp.text())
+      .then((data) => {
+        dispatch(setProfile(data));
+        console.log(data);
+
+        alert('프로필 변경 완료!');
+      });
   };
 
   //프로필 삭제
   const handleFileDelete = async () => {
     if (window.confirm('이미지를 삭제하겠습니까?')) {
       dispatch(setProfile(''));
-      setProfileImg('/img/profile.jpg');
+      localStorage.setItem('profile', 'https://healinglog-kh.s3.ap-northeast-2.amazonaws.com/default_profile.jpg');
       fileInputRef.current.value = '';
     }
   };
@@ -42,10 +50,6 @@ const Profile = () => {
       fileInputRef.current.click();
     }
   };
-
-  useEffect(() => {
-    console.log(profile);
-  }, [profile]);
 
   return (
     <>
@@ -59,8 +63,8 @@ const Profile = () => {
         />
 
         <img
-          src={profileImg}
-          alt="프로필 미리보기"
+          src={profile}
+          // alt="프로필 미리보기"
           onClick={handleImageClick}
           style={{
             width: '150px',
@@ -73,25 +77,14 @@ const Profile = () => {
         />
       </ProfileContainer>
       <BtnContainer>
-        <Btn
-          str="삭제"
-          f={handleFileDelete}
-          c={theme.gray}
-          // w={'90'}
-          // h={'50'}
-          // fs={'20'}
-          mt={'0'}
-          mb={'0'}
-          ml={'0'}
-          mr={'0'}
-        ></Btn>
+        <Btn str="삭제" f={handleFileDelete} c={theme.gray} mt={'0'} mb={'0'} ml={'0'} mr={'0'}></Btn>
       </BtnContainer>
       <div></div>
     </>
   );
 };
 
-export default Profile;
+export default MyProfile;
 
 const ProfileContainer = styled.div`
   display: grid;
