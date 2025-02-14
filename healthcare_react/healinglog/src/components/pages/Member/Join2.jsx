@@ -21,7 +21,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import ContentLayout from '../../util/ContentLayout';
 import PostCode from '../../util/PostCode';
-import Profile from '../../util/Profile';
+import Profile from './Profile';
 
 const Join2 = () => {
   const theme = useTheme();
@@ -55,12 +55,18 @@ const Join2 = () => {
     phone,
   };
 
-  const isSubmitEnabled =
-    id && pwd && nick && name && zoneAddress && roadAddress && detailAddress && emailFront && emailDomain && phone;
-
+  ////////////////////////////중복 및 유효성 검사 시작///////////////////////////////////
   //Id 중복검사를 위한 db데이터와 비교(길이 검사도 같이함)
   const [idCheckMsg, setIdCheckMsg] = useState('');
   useEffect(() => {
+    console.log(id.length);
+    console.log(idCheckMsg);
+
+    if (id.length === 0 || id.length === 1 || id.length === 2) {
+      setIdCheckMsg('');
+      return;
+    }
+
     if (id.length < 6) {
       setIdCheckMsg('아이디가 너무 짧습니다.');
       return;
@@ -92,12 +98,12 @@ const Join2 = () => {
   //닉네임 길이 검사
   const [nickCheckMsg, setNickCheckMsg] = useState('');
   useEffect(() => {
-    if (nick.length >= 1 && nick.length <= 8) {
+    if (nick.length >= 2 && nick.length <= 8) {
       setNickCheckMsg('사용 가능한 닉네임 입니다.');
     } else if (nick.length === 0 || nick.length === null || nick.length === undefined) {
       setNickCheckMsg('');
     } else {
-      setNickCheckMsg('닉네임: 1~8자의 영문 대/소문자, 숫자, 한글을 사용해 주세요.');
+      setNickCheckMsg('닉네임: 2~8자의 영문 대/소문자, 숫자, 한글을 사용해 주세요.');
     }
   }, [nick]);
 
@@ -117,7 +123,7 @@ const Join2 = () => {
   const [emailCheckMsg, setEmailCheckMsg] = useState('');
   useEffect(() => {
     if (email.length < 12) {
-      setEmailCheckMsg('아이디가 너무 짧습니다.');
+      setEmailCheckMsg('이메일이 너무 짧습니다.');
       return;
     }
 
@@ -130,7 +136,7 @@ const Join2 = () => {
     })
       .then((resp) => resp.text())
       .then((fetchedData) => setEmailCheckMsg(fetchedData));
-  }, [emailFront, emailDomain]);
+  }, [email]);
 
   //전화번호 길이 검사 && 유효성 검사
   const [phoneCheckMsg, setPhoneCheckMsg] = useState('');
@@ -149,6 +155,21 @@ const Join2 = () => {
       .then((resp) => resp.text())
       .then((fetchedData) => setPhoneCheckMsg(fetchedData));
   }, [phone]);
+  ///////////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////중복 및 유효성 검사 끝///////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////////////
+
+  //제출 활성화
+  const isSubmitEnabled =
+    idCheckMsg === '사용 가능한 아이디입니다.' &&
+    pwdCheckMsg === '사용 가능한 비밀번호 입니다.' &&
+    nickCheckMsg === '사용 가능한 닉네임 입니다.' &&
+    name &&
+    zoneAddress &&
+    roadAddress &&
+    detailAddress &&
+    emailCheckMsg === '사용 가능한 이메일입니다.' &&
+    phoneCheckMsg === '사용 가능한 전화번호입니다.';
 
   const handleAddressComplete = (data) => {
     setZoneAddress(data.zoneAddress);
@@ -186,6 +207,7 @@ const Join2 = () => {
     fd.append('weight', weight);
     fd.append('profile', profile);
     fd.append('phone', phone);
+    console.log(fd);
 
     fetch('http://127.0.0.1:80/api/member/join', {
       method: 'POST',
@@ -217,10 +239,11 @@ const Join2 = () => {
         <InputContainer>
           <InputTitle>아이디</InputTitle>
           <JoinInput
-            placeholder="6자 이상, 20자 이하"
+            placeholder="6자 이상, 15자 이하"
             className="id"
             type="text"
             value={id}
+            maxLength={15}
             onChange={(e) => dispatch(setId(e.target.value))}
           ></JoinInput>
           <CheckMsg isNoProblem={idCheckMsg === '사용 가능한 아이디입니다.'}>{idCheckMsg}</CheckMsg>
@@ -231,13 +254,14 @@ const Join2 = () => {
             className="pwd"
             type="password"
             value={pwd}
+            maxLength={16}
             onChange={(e) => dispatch(setPwd(e.target.value))}
           ></JoinInput>
           <CheckMsg isNoProblem={pwdCheckMsg === '사용 가능한 비밀번호 입니다.'}>{pwdCheckMsg}</CheckMsg>
 
           <InputTitle>닉네임</InputTitle>
           <JoinInput
-            placeholder="1자 이상, 8자 이하"
+            placeholder="2자 이상, 8자 이하"
             className="nick"
             type="text"
             value={nick}
