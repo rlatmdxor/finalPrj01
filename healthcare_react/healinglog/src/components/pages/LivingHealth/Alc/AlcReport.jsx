@@ -14,6 +14,33 @@ import InputTag from '../../../util/Input';
 import { setTotalCount, resetPaging } from '../../../../redux/pagingSlice';
 import { open, close } from '../../../../redux/modalSlice';
 import ContentLayout from '../../../util/ContentLayout';
+import DateBtn from '../../../util/DateBtn';
+
+//모달 밖의 버튼 컨테이너
+const BtnContainer = styled.div`
+  display: flex;
+  justify-content: end;
+  margin-right: -45px;
+`;
+
+//모달 안의 버튼 컨테이너
+const ModalContainer = styled.div`
+  display: flex;
+  justify-content: end;
+`;
+
+const bodyContatiner = styled.div`
+  margin-top: 20px;
+`;
+
+const NaviContainer = styled.div`
+  display: grid;
+  position: relative;
+  width: 400px; // 항목수에 비례해서 주시면 됩니다.
+  top: 20px;
+  left: 40px;
+  grid-template-columns: 3fr 3fr; // 글자수만큼 fr 주면 됩니다. ex) 유산소 3글자니까 3fr
+`;
 
 const AlcReport = () => {
   const url = 'http://127.0.0.1/api/alc/report/list';
@@ -27,12 +54,13 @@ const AlcReport = () => {
     body: JSON.stringify({ memberNo: '1' }),
   };
 
+  const dispatch = useDispatch();
+
   const [fullData, setFullData] = useState([]); // 전체 데이터 저장
   const [pagedData, setPagedData] = useState([]); // 페이징된 데이터
   const [filteredData, setFilteredData] = useState([]); // 차트용 필터링 데이터
   const [selectedRange, setSelectedRange] = useState('주'); // 기본값 '일'
   const [selectChart, setSelectChart] = useState('Line'); // 그래프 모양 정하는 state
-  const dispatch = useDispatch();
 
   const boardType = 'AlcReport';
   const { currentPage, boardLimit } = useSelector((state) => state.paging[boardType] || {});
@@ -40,36 +68,19 @@ const AlcReport = () => {
 
   const [selectedDrink, setSelectedDrink] = useState(null);
   const [alcoholAmount, setAlcoholAmount] = useState('');
-  const [drinkDate, setDrinkDate] = useState('');
+  // const [drinkDate, setDrinkDate] = useState('');
   const [alcoholIntake, setAlcoholIntake] = useState(0);
 
-  //나중엔 DB로 해야함
+  //나중엔 DB로 해야함 모달창 데이터(고도화 과정중 변경예정)
   const alcoholOptions = [
-    { name: '소주', alc: 17, std: 50 },
-    { name: '맥주', alc: 5, std: 250 },
-    { name: '막걸리', alc: 6, std: 200 },
-    { name: '와인', alc: 12, std: 150 },
-    { name: '칵테일', alc: 10, std: 60 },
+    { name: '소주', alc: 17, cc: 50 },
+    { name: '맥주', alc: 5, cc: 250 },
+    { name: '막걸리', alc: 6, cc: 200 },
+    { name: '와인', alc: 12, cc: 150 },
+    { name: '칵테일', alc: 10, cc: 60 },
   ];
 
-  //모달 밖의 버튼 컨테이너
-  const BtnContainer = styled.div`
-    display: flex;
-    justify-content: end;
-    margin-right: -45px;
-  `;
-
-  //모달 안의 버튼 컨테이너
-  const ModalContainer = styled.div`
-    display: flex;
-    justify-content: end;
-  `;
-
-  useEffect(() => {
-    dispatch(resetPaging({ boardType }));
-  }, [boardType, dispatch]);
-
-  // fetch실행
+  //fetch 실행
   useEffect(() => {
     fetch(url, options)
       .then((resp) => resp.json())
@@ -107,6 +118,7 @@ const AlcReport = () => {
   const filterData = (type) => {
     // const today = new Date(); // 오늘 날짜 가져오기
 
+    //데이터의 최근날짜
     const voList = [];
 
     for (const vo of fullData) {
@@ -121,7 +133,7 @@ const AlcReport = () => {
       oneWeekAgo.setDate(latestDate.getDate() - 7);
 
       return fullData.filter((item) => {
-        const itemDate = new Date(item.endDate); // 문자열을 Date 객체로 변환
+        const itemDate = new Date(item.enrollDate); // 문자열을 Date 객체로 변환
         return itemDate >= oneWeekAgo && itemDate <= latestDate; // 최신 날짜 기준 7일 이내 데이터
       });
     }
@@ -132,7 +144,7 @@ const AlcReport = () => {
       const currentMonth = latestDate.getMonth() + 1; // getMonth()는 0부터 시작
 
       return fullData.filter((item) => {
-        const [year, month] = item.endDate.split('-').map(Number);
+        const [year, month] = item.enrollDate.split('-').map(Number);
         return year === currentYear && month === currentMonth;
       });
     }
@@ -142,7 +154,7 @@ const AlcReport = () => {
       const currentYear = latestDate.getFullYear();
 
       return fullData.filter((item) => {
-        const [year] = item.endDate.split('-').map(Number);
+        const [year] = item.enrollDate.split('-').map(Number);
         return year === currentYear;
       });
     }
@@ -157,17 +169,46 @@ const AlcReport = () => {
 
   const dataBtn = ['주', '월', '년'];
 
-  // 날짜 기준 오름차순 정렬 (과거 → 현재)
-  const sortedData = [...filteredData].sort((a, b) => new Date(a.endDate) - new Date(b.endDate));
+  const labels = [];
 
-  // X축: 정렬된 날짜 리스트
-  const labels = sortedData.map((vo) => vo.enrollDate);
+  // 차트에 들어갈 x축 라벨
+  for (const vo of filteredData) {
+    labels.unshift(vo.enrollDate);
+  }
 
-  // const alcList = [];
+  const alcList = [];
 
-  // for (const vo of filterData) {
-  //   alcList.push(vo.enrollDate);
-  // }
+  for (const vo of filteredData) {
+    alcList.unshift(((vo.abv / 100) * vo.cc).toFixed(2));
+  }
+
+  const dataset = [
+    {
+      label: '알코올 섭취량',
+      data: alcList,
+      backgroundColor: [
+        'rgba(255, 99, 132, 0.2)',
+        'rgba(54, 162, 235, 0.2)',
+        'rgba(255, 206, 86, 0.2)',
+        'rgba(75, 192, 192, 0.2)',
+        'rgba(153, 102, 255, 0.2)',
+        'rgba(255, 159, 64, 0.2)',
+        'rgba(201, 203, 207, 0.2)',
+      ], // 배경색
+      borderColor: [
+        'rgba(255, 99, 132, 1)',
+        'rgba(54, 162, 235, 1)',
+        'rgba(255, 206, 86, 1)',
+        'rgba(75, 192, 192, 1)',
+        'rgba(153, 102, 255, 1)',
+        'rgba(255, 159, 64, 1)',
+        'rgba(201, 203, 207, 1)',
+      ], // 테두리 색상
+      borderWidth: 1, // 테두리 두께
+    },
+  ];
+
+  //모달 고도화작업중 진행 예정 시작
 
   // 테이블에서 술 선택 시 상태 업데이트
   const handleDrinkSelection = (drink) => {
@@ -183,25 +224,12 @@ const AlcReport = () => {
       setAlcoholIntake(0);
     }
   };
-
-  // 게시판 목록 데이터
-  const alcList = [];
+  // 모달 고도화작업중 진행예정 끝
 
   useEffect(() => {
     dispatch(setTotalCount({ boardType, totalCount: alcList.length }));
     dispatch(resetPaging({ boardType }));
   }, [boardType, alcList.length, dispatch]);
-
-  const data = alcList.slice(offset, offset + boardLimit);
-
-  const NaviContainer = styled.div`
-    display: grid;
-    position: relative;
-    width: 400px; // 항목수에 비례해서 주시면 됩니다.
-    top: 20px;
-    left: 40px;
-    grid-template-columns: 3fr 3fr; // 글자수만큼 fr 주면 됩니다. ex) 유산소 3글자니까 3fr
-  `;
 
   //인풋 안 쪽에 들어가는 데이터 ~~~Vo에 들어있는 이름으로 맞춰주기
   const initialInputData = { alcType: '', abv: '', cc: '', enrollDate: '' };
@@ -235,13 +263,12 @@ const AlcReport = () => {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
-        // Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(inputData),
     })
       .then((resp) => resp.text())
       .then((data) => {});
-    //렌
     setNum(num - 1);
     // 입력 후 모달 창 닫기
     dispatch(close(e.target.title));
@@ -271,12 +298,11 @@ const AlcReport = () => {
       });
 
     dispatch(close('음주 수정'));
-    //렌
     // setNum(num - 1);
     // 입력 후 모달 창 닫기
     // dispatch(close(e.target.title));
   };
-
+  //삭제모달
   const handleDeleteSubmit = (e) => {
     fetch('http://127.0.0.1/api/alc/report/delete', {
       method: 'DELETE',
@@ -302,20 +328,26 @@ const AlcReport = () => {
     dispatch(close('음주 수정'));
   };
 
+  // datasetData에서 가장 큰 값 찾기
+  const maxValue = Math.max(...alcList);
+
+  // yMax 값 설정 (최대값 + 0.5)
+  const yMaxValue = maxValue + maxValue * 0.2;
   return (
     <>
       <Title>음주관리</Title>
+
       <NaviContainer>
         <Navi target="alc" tag={'캘린더'}></Navi>
         <Navi target="alc/report" tag={'리포트'}></Navi>
       </NaviContainer>
 
       <ContentLayout>
-        {/* <DateBtn dataBtn={dataBtn} onSelect={setSelectedRange} onChange={setSelectChart}></DateBtn> */}
+        <DateBtn dataBtn={dataBtn} onSelect={setSelectedRange} onChange={setSelectChart}></DateBtn>
         <Chart
           chartType={selectChart} // 차트 타입지정
           labels={labels} // 위랑 동일
-          // dataset={dataset} // 위랑 동일
+          dataset={dataset} // 위랑 동일
           width={100} // 위랑 동일
           height={450} // 위랑 동일
           xAxisColor="rgba(54, 162, 235, 1)" // 위랑 동일
@@ -333,36 +365,40 @@ const AlcReport = () => {
                 type="text"
                 name="alcType"
                 placeholder="선택된 술종류"
+                value={inputData.alcType}
                 title="술종류"
                 size="size4"
                 mb="10"
                 mt="5"
-                // value={selectedDrink ? selectedDrink.name : '' handleChange}
                 f={handleChange}
+                // value={selectedDrink ? selectedDrink.name : ''}
               />
 
               <InputTag
                 type="number"
                 name="abv"
                 placeholder="(0~99)"
+                value={inputData.abv}
                 title="알코올 도수"
                 size="size4"
                 mb="10"
                 mt="5"
-                // value={selectedDrink ? selectedDrink.alc : ''}
                 f={handleChange}
+                // value={selectedDrink ? selectedDrink.alc : ''}
               />
 
               <InputTag
                 type="number"
                 placeholder="음주량 (ml)"
+                name="cc"
                 title="음주량(ml)"
                 size="size4"
+                value={inputData.cc}
                 mb="10"
                 mt="5"
                 // value={alcoholAmount}
-                onChange={(e) => setAlcoholAmount(e.target.value)}
-                onBlur={calculateAlcoholIntake}
+                // onChange={(e) => setAlcoholAmount(e.target.value)}
+                // onBlur={calculateAlcoholIntake}
                 f={handleChange}
               />
 
@@ -374,7 +410,7 @@ const AlcReport = () => {
                 size="size4"
                 mb="10"
                 mt="5"
-                // value={drinkDate}
+                value={inputData.enrollDate}
                 // onChange={(e) => setDrinkDate(e.target.value)}
                 f={handleChange}
               />
@@ -402,7 +438,7 @@ const AlcReport = () => {
                     >
                       <td>{drink.name}</td>
                       <td>{drink.alc}</td>
-                      <td>{drink.std}</td>
+                      <td>{drink.cc}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -415,6 +451,132 @@ const AlcReport = () => {
               </div>
             </div>
           </div>
+          <ModalContainer>
+            <Btn
+              title={'음주 등록'}
+              // 인풋 입력값 보내기
+              f={handleSubmit}
+              //margin top bottom right
+              mt={'10'}
+              mb={'20'}
+              mr={'-10'}
+              // background color
+              c={'#FF7F50'}
+              // font color
+              fc={'white'}
+              // 화면에 노출되는 버튼 안 쪽 내용
+              str={'등록'}
+            ></Btn>
+          </ModalContainer>
+        </Modal>
+
+        <Modal title="음주 수정">
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+            {/* 왼쪽 입력 폼 */}
+            <div>
+              <InputTag
+                type="text"
+                name="alcType"
+                placeholder="선택된 술종류"
+                value={inputData.alcType}
+                title="술종류"
+                size="size4"
+                mb="10"
+                mt="5"
+                f={handleChange}
+                // value={selectedDrink ? selectedDrink.name : ''}
+              />
+
+              <InputTag
+                type="number"
+                name="abv"
+                placeholder="(0~99)"
+                value={inputData.abv}
+                title="알코올 도수"
+                size="size4"
+                mb="10"
+                mt="5"
+                f={handleChange}
+                // value={selectedDrink ? selectedDrink.alc : ''}
+              />
+
+              <InputTag
+                type="number"
+                placeholder="음주량 (ml)"
+                name="cc"
+                title="음주량(ml)"
+                size="size4"
+                value={inputData.cc}
+                mb="10"
+                mt="5"
+                // value={alcoholAmount}
+                // onChange={(e) => setAlcoholAmount(e.target.value)}
+                // onBlur={calculateAlcoholIntake}
+                f={handleChange}
+              />
+
+              <InputTag
+                type="date"
+                name="enrollDate"
+                placeholder="날짜"
+                title="날짜"
+                size="size4"
+                mb="10"
+                mt="5"
+                value={inputData.enrollDate}
+                // onChange={(e) => setDrinkDate(e.target.value)}
+                f={handleChange}
+              />
+            </div>
+
+            {/* 오른쪽 설명 텍스트 */}
+            <div style={{ fontSize: '14px', color: '#555' }}>
+              <table border="0" style={{ width: '100%', textAlign: 'center' }}>
+                <thead>
+                  <tr>
+                    <th>술 종류</th>
+                    <th>도수 (%)</th>
+                    <th>한잔 (ml)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {alcoholOptions.map((drink, index) => (
+                    <tr
+                      key={index}
+                      onClick={() => handleDrinkSelection(drink)}
+                      style={{
+                        cursor: 'pointer',
+                        backgroundColor: selectedDrink?.name === drink.name ? '#FF7F50' : 'white',
+                      }}
+                    >
+                      <td>{drink.name}</td>
+                      <td>{drink.alc}</td>
+                      <td>{drink.cc}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              {/* 추가된 알코올 섭취량 표시 */}
+              <div style={{ marginTop: '20px', padding: '10px', border: '1px solid #ddd' }}>
+                <h4>섭취한 총 알코올 양:</h4>
+                <p style={{ fontSize: '20px', fontWeight: 'bold', color: '#FF7F50' }}>{alcoholIntake} ml</p>
+              </div>
+            </div>
+          </div>
+          <ModalContainer>
+            <Btn
+              title={'음주 수정'}
+              f={handleEditSubmit}
+              mt={'10'}
+              mb={'20'}
+              mr={'20'}
+              c={'#7ca96d'}
+              fc={'white'}
+              str={'수정'}
+            ></Btn>
+            <Btn f={handleDeleteSubmit} mt={'10'} mb={'20'} mr={'-20'} c={'lightgray'} fc={'black'} str={'삭제'}></Btn>
+          </ModalContainer>
         </Modal>
 
         <BtnContainer>
@@ -450,7 +612,10 @@ const AlcReport = () => {
                       cc: vo.cc,
                       abv: vo.abv,
                       alc: vo.alc,
+                      enrollDate: vo.enrollDate,
                     });
+                    //모달 열기
+                    dispatch(open({ title: '음주 수정', value: 'block' }));
                   }}
                 >
                   <td>{vo.enrollDate}</td>
@@ -463,13 +628,13 @@ const AlcReport = () => {
             })}
           </tbody>
         </Table>
-        <div></div>
         <div>
           <Pagination boardType={boardType} />
         </div>
 
         <div></div>
       </ContentLayout>
+      <div></div>
     </>
   );
 };

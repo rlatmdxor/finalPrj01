@@ -31,7 +31,10 @@ const CigaretteReport = () => {
 
   const options = {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      // Authorization: `Bearer ${token}`,
+    },
     body: JSON.stringify({ memberNo: '1' }),
   };
 
@@ -522,7 +525,6 @@ const CigaretteReport = () => {
         </div>
         <div></div>
       </ContentLayout>
-      <div></div>
     </>
   );
 };

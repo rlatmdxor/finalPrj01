@@ -22,6 +22,7 @@ public class AlcReportController {
     @PostMapping("write")
     public String write(@RequestBody AlcReportVo vo) {
         service.write(vo);
+        System.out.println("vo = " + vo);
         return "write";
     }
 

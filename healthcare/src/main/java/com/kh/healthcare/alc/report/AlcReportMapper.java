@@ -16,12 +16,13 @@ public interface AlcReportMapper {
             , TO_CHAR(ENROLL_DATE, 'YYYY-MM-DD') AS enrollDate
             FROM RECORD_ALC
             WHERE MEMBER_NO = #{memberNo}
+            ORDER BY ENROLL_DATE DESC
             """)
     List<AlcReportVo> getAlcReport(Long memberNo);
 
     @Insert("""
-            INSERT INTO RECORD_ALC 
-            (NO,
+            INSERT INTO RECORD_ALC
+            (NO
              ,MEMBER_NO
              ,ALC_TYPE
              ,ABV
@@ -30,13 +31,13 @@ public interface AlcReportMapper {
             VALUES
             (
             SEQ_RECORD_ALC.NEXTVAL
-            ,#{memberNo}
+            ,'1'
             ,#{alcType}
             ,#{abv}
             ,#{cc}
             ,#{enrollDate}
             )
-            """)
+           """)
     void write(AlcReportVo vo);
 
 
@@ -47,12 +48,13 @@ public interface AlcReportMapper {
                 ABV= #{abv},
                 CC=#{cc},
                 ENROLL_DATE =#{enrollDate}
+            WHERE NO = #{no}
             """)
     void update(AlcReportVo vo);
 
     @Delete("""
             DELETE RECORD_ALC
-            WHERE NO = #{NO}
+            WHERE NO = #{no}
             """)
     void delete(AlcReportVo vo);
 }
