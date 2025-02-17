@@ -10,6 +10,7 @@ import { useDispatch } from 'react-redux';
 
 const TodayWater = ({ day }) => {
   const dispatch = useDispatch();
+  const token = localStorage.getItem('token');
 
   const [amount, setAmount] = useState(0);
 
@@ -25,6 +26,7 @@ const TodayWater = ({ day }) => {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
         memberNo: '1',
@@ -68,7 +70,10 @@ const TodayWater = ({ day }) => {
 
     fetch('http://127.0.0.1:80/api/water/enroll', {
       method: 'POST',
-      headers: { 'content-type': 'application/json' },
+      headers: {
+        'content-type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
       body: JSON.stringify(inputData),
     })
       .then((resp) => resp.text())

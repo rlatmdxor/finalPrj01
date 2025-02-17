@@ -10,6 +10,7 @@ import { useDispatch } from 'react-redux';
 
 const TodayWeight = ({ day }) => {
   const dispatch = useDispatch();
+  const token = localStorage.getItem('token');
 
   const [amount, setAmount] = useState(0);
 
@@ -25,6 +26,7 @@ const TodayWeight = ({ day }) => {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
         memberNo: '1',
@@ -72,7 +74,10 @@ const TodayWeight = ({ day }) => {
 
     fetch('http://127.0.0.1:80/api/weight/enroll', {
       method: 'POST',
-      headers: { 'content-type': 'application/json' },
+      headers: {
+        'content-type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
       body: JSON.stringify(inputData),
     })
       .then((resp) => resp.text())
