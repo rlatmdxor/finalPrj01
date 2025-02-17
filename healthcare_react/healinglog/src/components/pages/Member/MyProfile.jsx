@@ -39,8 +39,22 @@ const MyProfile = () => {
   //프로필 삭제
   const handleFileDelete = async () => {
     if (window.confirm('이미지를 삭제하겠습니까?')) {
-      dispatch(setProfile(''));
-      localStorage.setItem('profile', 'https://healinglog-kh.s3.ap-northeast-2.amazonaws.com/default_profile.jpg');
+      dispatch(setProfile('https://healinglog-kh.s3.ap-northeast-2.amazonaws.com/default_profile.jpg'));
+
+      fetch('http://127.0.0.1:80/api/member/profileDelete', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: {},
+      })
+        .then((resp) => resp.text())
+        .then((data) => {
+          dispatch(setProfile(data));
+          console.log(data);
+
+          alert('프로필 삭제 완료!');
+        });
       fileInputRef.current.value = '';
     }
   };
