@@ -1,9 +1,6 @@
 package com.kh.healthcare.member;
 
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 @Mapper
 public interface MemberMapper {
@@ -100,4 +97,24 @@ public interface MemberMapper {
                 PHONE = #{phone}
             """)
     int duplicatePhoneCheck(MemberVo vo);
+
+    @Update("""
+            UPDATE
+                MEMBER
+            SET
+                PROFILE = #{profileUrl}
+            WHERE
+                ID = #{id}
+            """)
+    void profileChange(@Param("id") String id, @Param("profileUrl") String profileUrl);
+
+    @Select("""
+            SELECT
+                PROFILE
+            FROM
+                MEMBER
+            WHERE
+                ID = #{id}
+            """)
+    String getProfile(String id);
 }

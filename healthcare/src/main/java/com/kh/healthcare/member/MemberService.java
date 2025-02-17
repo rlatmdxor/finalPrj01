@@ -101,4 +101,26 @@ public class MemberService {
     public int duplicatePhoneCheck(MemberVo vo) {
         return mapper.duplicatePhoneCheck(vo);
     }
+
+    //마이페이지 데이터 가져오기
+    public MemberVo getMyData(String token) {
+        token = token.replace("Bearer ", "");
+        String id = jwtUtil.getId(token);
+        return mapper.findUserById(id);
+    }
+
+    //프로필 변경
+    public void profileChange(String token, String profileUrl) {
+        token = token.replace("Bearer ", "");
+        String id = jwtUtil.getId(token);
+        mapper.profileChange(id, profileUrl);
+    }
+
+    // 프로필 다시 가져오기
+    public String getProfile(String token) {
+        token = token.replace("Bearer ", "");
+        String id =jwtUtil.getId(token);
+        return mapper.getProfile(id);
+    }
+
 }

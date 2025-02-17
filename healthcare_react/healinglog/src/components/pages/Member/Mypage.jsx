@@ -20,9 +20,37 @@ import Profile from '../../util/Profile';
 const Mypage = () => {
   const theme = useTheme();
   const dispatch = useDispatch();
-  const { id, pwd, nick, name, address, email, residentNum, height, weight, profile } = useSelector(
-    (state) => state.join
-  );
+
+  const { id, pwd, nick, name, address, email, phone, height, weight, profile } = useSelector((state) => state.join);
+  const token = localStorage.getItem('token');
+
+  useEffect(() => {
+    fetch('http://127.0.0.1:80/api/member/mypage', {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((resp) => resp.json())
+      .then((data) => {
+        console.log('data : ', data);
+
+        dispatch(setId(data.id));
+        dispatch(setPwd(data.pwd));
+        dispatch(setNick(data.nick));
+        dispatch(setName(data.name));
+        dispatch(setAddress(data.address));
+        dispatch(setEmail(data.email));
+        dispatch(setPhone(data.phone));
+        dispatch(setHeight(data.height));
+        dispatch(setWeight(data.weight));
+        dispatch(setProfile(data.profile));
+      })
+      .catch((error) => {
+        console.error('fetch 오류:', error);
+      });
+  }, []);
+
   return (
     <>
       <Title>마이페이지</Title>
@@ -143,7 +171,7 @@ const BlankSpace = styled.div`
 
 const ProfileContainer = styled.div`
   display: grid;
-  grid-template-columns: 270px 1fr 1fr;
+  grid-template-columns: 270px 1fr;
   margin-top: 10px;
   width: 450px;
 `;

@@ -1,39 +1,41 @@
 package com.kh.healthcare.filter;
 
 import com.kh.healthcare.jwt.JwtUtil;
+import com.kh.healthcare.member.MemberVo;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
 @RequiredArgsConstructor
-public class TokenCheckFilter implements Filter {
+@Slf4j
+public class TokenCheckFilter extends OncePerRequestFilter {
 
-    private final BCryptPasswordEncoder encoder;
     private final JwtUtil jwtUtil;
 
     @Override
-    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-
-        HttpServletRequest req = (HttpServletRequest) servletRequest;
-        HttpServletResponse res = (HttpServletResponse) servletResponse;
-        String uri = req.getRequestURI();
-        System.out.println("req = " + req);
-
-        // 회원가입 & 로그인 요청은 필터링하지 않음
-        if (uri.contains("join") || uri.contains("login")) {
-            filterChain.doFilter(servletRequest, servletResponse);
-//            return;
-        }
+    public void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain filterChain) throws IOException, ServletException {
 
         // 헤더에서 Authorization 토큰 가져오기
         String token = req.getHeader("Authorization");
         System.out.println("token = " + token);
+
+        String uri = req.getRequestURI();
+        System.out.println("uri = " + uri);
+
+        // 회원가입 & 로그인 요청은 필터링하지 않음
+        if (uri.contains("join") || uri.contains("login")) {
+            filterChain.doFilter(req, res);
+            return;
+        }
+
+        //
+        System.out.println("허용되지않은 url");
 
         // 토큰이 없거나 잘못된 형식이면 401 응답 반환
         if (token == null || !token.startsWith("Bearer ")) {
@@ -59,17 +61,20 @@ public class TokenCheckFilter implements Filter {
             return;
         }
 
-        // JWT에서 데이터 추출
-//        String id = jwtUtil.getId(token);
-//        String nick = jwtUtil.getNick(token);
+
+        // JWT에서 데이터 추출 및 세션에 저장(인증 정보 유지)
+        String no = jwtUtil.getNo(token);
+        String id = jwtUtil.getId(token);
 //        String role = jwtUtil.getRole(token);
-//
-//        System.out.println("id = " + id);
-//        System.out.println("nick = " + nick);
-//        System.out.println("role = " + role);
+        MemberVo vo = new MemberVo();
+        vo.setNo(no);
+        vo.setId(id);
+
+        HttpSession session = req.getSession();
+        session.setAttribute("loginMemberVo", vo);
+
 
         // 필터 체인 실행 (요청을 컨트롤러로 전달)
-        filterChain.doFilter(servletRequest, servletResponse);
+        filterChain.doFilter(req, res);
     }
 }
-

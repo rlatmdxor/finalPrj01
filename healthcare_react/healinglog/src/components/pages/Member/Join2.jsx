@@ -184,7 +184,7 @@ const Join2 = () => {
     fd.append('gender', gender);
     fd.append('height', height);
     fd.append('weight', weight);
-    fd.append('profile', profile);
+    fd.append('profileImage', profile);
     fd.append('phone', phone);
 
     fetch('http://127.0.0.1:80/api/member/join', {
