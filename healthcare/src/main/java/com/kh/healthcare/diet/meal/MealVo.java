@@ -7,10 +7,7 @@ import lombok.Data;
 public class MealVo {
     private String no;
     private String dietNo;
-
-    @JsonProperty("label")
-    private String name;
-
+    private String label;
     private String unit;
     private String amount;
     private String kcal;

@@ -11,7 +11,7 @@ public class WaterController {
     private final WaterService service;
 
     @PostMapping("enroll")
-    public String waterIntakeEnroll(@RequestBody WaterVo vo){
+    public String waterIntakeEnroll(@RequestBody WaterVo vo, @RequestHeader("Authorization") String authorization){
         try {
             service.waterIntakeEnroll(vo);
             return "WATER ENROLL SUCCESS";
@@ -22,7 +22,7 @@ public class WaterController {
     }
 
     @PostMapping
-    public String getWaterIntakeByDate(@RequestBody WaterVo vo){
+    public String getWaterIntakeByDate(@RequestBody WaterVo vo, @RequestHeader("Authorization") String authorization){
         try {
             String amount = service.getWaterIntakeByDate(vo);
             return amount;

@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import Btn from './Btn';
+import Btn from '../../util/Btn';
 import styled, { useTheme } from 'styled-components';
-import { setProfile } from '../../redux/JoinSlice';
+import { setProfile } from '../../../redux/JoinSlice';
 
 const Profile = () => {
   const dispatch = useDispatch();

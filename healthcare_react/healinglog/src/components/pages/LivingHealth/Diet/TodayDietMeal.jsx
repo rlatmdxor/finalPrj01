@@ -25,17 +25,6 @@ const Container = styled.div`
   margin-bottom: 15px;
 `;
 
-const MealButton = styled.button`
-  padding: 6px 12px;
-  margin-bottom: 8px;
-  border: 1px solid ${(props) => (props.selected ? '#ff8a60' : '#cccccc')};
-  font-size: 14px;
-  border-radius: 20px;
-  background-color: ${(props) => (props.selected ? '#ff8a60' : '#ffffff')};
-  color: ${(props) => (props.selected ? '#ffffff' : '#000000')};
-  cursor: pointer;
-`;
-
 const SelectedFoodListArea = styled.div`
   margin-bottom: 25px;
   font-size: 14px;
@@ -63,6 +52,9 @@ const FileInput = styled.input`
 const PreviewDiv = styled.div`
   width: 100%;
   height: 100%;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
 `;
 
 const UploadedImg = styled.img`
@@ -71,8 +63,37 @@ const UploadedImg = styled.img`
   object-fit: contain;
 `;
 
+const DeleteImgBtn = styled.button`
+  background-color: transparent;
+  border: none;
+  color: #363636;
+  cursor: pointer;
+`;
+
 const TodayDietMeal = ({ day }) => {
   const dispatch = useDispatch();
+  const token = localStorage.getItem('token');
+
+  // 끼니별 섭취 칼로리 조회
+  const [mealKcalSummary, setMealKcalSummary] = useState([]);
+
+  useEffect(() => {
+    fetch('http://127.0.0.1:80/api/diet', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        memberNo: 1,
+        dietDay: day,
+      }),
+    })
+      .then((resp) => resp.json())
+      .then((data) => {
+        setMealKcalSummary(data);
+      });
+  }, []);
 
   // 식단 등록 폼데이터
   const initialInputData = {
@@ -81,7 +102,8 @@ const TodayDietMeal = ({ day }) => {
     mealCode: '',
     foodList: [],
     memo: '',
-    foodImg: '',
+    image: '',
+    imagePreview: '',
   };
   const [inputData, setInputData] = useState(initialInputData);
 
@@ -119,14 +141,19 @@ const TodayDietMeal = ({ day }) => {
     { label: '딸기', unit: '1개', amount: 20, kcal: 6 },
   ];
 
-  const handleOpenDietEnrollModal = () => {
+  const handleOpenDietEnrollModal = (mealCode) => {
     setInputData(initialInputData);
     setAutoCompleteValue('');
+    setInputData((prev) => ({
+      ...prev,
+      mealCode: mealCode,
+    }));
     dispatch(open({ title: '식단 등록', value: 'block' }));
   };
 
   const handleOpenFoodEnrollModal = () => {
     setFoodInputData(initialFoodInputData);
+
     dispatch(open({ title: '음식 직접추가', value: 'block' }));
   };
 
@@ -219,16 +246,31 @@ const TodayDietMeal = ({ day }) => {
 
   const handleImageChange = () => {
     const file = imgRef.current.files[0];
+
+    if (!file) {
+      return;
+    }
+
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onloadend = () => {
       setInputData((prev) => {
         return {
           ...prev,
-          foodImg: reader.result,
+          image: file,
+          imagePreview: reader.result,
         };
       });
     };
+  };
+
+  const handleImageDelete = () => {
+    setInputData((prev) => ({
+      ...prev,
+      image: '',
+      imagePreview: '',
+    }));
+    imgRef.current.value = '';
   };
 
   const handleSubmit = () => {
@@ -236,82 +278,84 @@ const TodayDietMeal = ({ day }) => {
       return;
     }
 
+    const formData = new FormData();
+    formData.append('memberNo', inputData.memberNo);
+    formData.append('dietDay', inputData.dietDay);
+    formData.append('mealCode', inputData.mealCode);
+    formData.append('foodListArr', JSON.stringify(inputData.foodList));
+    formData.append('memo', inputData.memo);
+    formData.append('f', inputData.image);
+
     fetch('http://127.0.0.1:80/api/diet/enroll', {
       method: 'POST',
       headers: {
-        'content-type': 'application/json',
+        Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(inputData),
-    })
-      .then((resp) => resp.text())
-      .then((data) => {
-        console.log(data);
-        //setAmount(inputData.amount);
-        dispatch(close('식단 등록'));
+      body: formData,
+    }).then((resp) => {
+      if (resp.status == 200) {
         alert('등록되었습니다.');
-      });
+      } else {
+        alert('오류 발생..');
+      }
+      dispatch(close('식단 등록'));
+    });
+  };
 
-    // const fd = new FormData();
-    // fd.append('dietDay', '2025-02-12');
-    // fd.append('mealCode', mealCode);
-    // fd.append('foodVoList', selectedFoodList);
-    // fd.append('f', foodImage);
-    // 등록 fecch 함수작성
-    // ...
+  // 식단 상세 조회
+  const handleOpenDietDetailModal = (mealCode) => {
+    dispatch(open({ title: '식단 상세', value: 'block' }));
   };
 
   return (
     <>
       <TodayDietArea>
         <div>오늘의 식단</div>
-        <Btn
-          str={'등록'}
-          w={'60'}
-          h={'34'}
-          mt={'0'}
-          mb={'0'}
-          ml={'0'}
-          mr={'0'}
-          fs={'15'}
-          c={'#ff8a60'}
-          fc={'#ffffff'}
-          f={handleOpenDietEnrollModal}
-        />
       </TodayDietArea>
       <ContentAreaDiv>
-        {options.map((option) => (
-          <SmallCard key={option.id}>
-            <SmallTextDiv>
-              <div>{option.label}</div>
-              <Btn str={'상세'} w={'50'} h={'25'} mt={'0'} mb={'0'} ml={'0'} mr={'0'} fs={'13'} />
-            </SmallTextDiv>
-            <BigTextDiv>300 Kcal</BigTextDiv>
-          </SmallCard>
-        ))}
+        {options.map((option) => {
+          const mealData = mealKcalSummary.find((meal) => meal.mealCode === option.id);
+          const kcal = mealData ? mealData.summaryKcal : '0';
+          return (
+            <SmallCard key={option.id}>
+              <SmallTextDiv>
+                <div>{option.label}</div>
+                {mealData ? (
+                  <Btn
+                    str={'상세'}
+                    w={'50'}
+                    h={'25'}
+                    mt={'0'}
+                    mb={'0'}
+                    ml={'0'}
+                    mr={'0'}
+                    fs={'13'}
+                    f={() => handleOpenDietDetailModal(option.id)}
+                  />
+                ) : (
+                  <Btn
+                    str={'등록'}
+                    w={'50'}
+                    h={'25'}
+                    mt={'0'}
+                    mb={'0'}
+                    ml={'0'}
+                    mr={'0'}
+                    fs={'13'}
+                    c={'#ff8a60'}
+                    fc={'#ffffff'}
+                    f={() => handleOpenDietEnrollModal(option.id)}
+                  />
+                )}
+              </SmallTextDiv>
+              <BigTextDiv>{kcal} Kcal</BigTextDiv>
+            </SmallCard>
+          );
+        })}
       </ContentAreaDiv>
 
       <Modal title="식단 등록">
-        <div>구분</div>
-        <Container>
-          {options.map(({ id, label }) => (
-            <MealButton
-              key={id}
-              name="meal"
-              selected={inputData.mealCode === id}
-              onClick={() =>
-                setInputData((prev) => {
-                  return {
-                    ...prev,
-                    mealCode: id,
-                  };
-                })
-              }
-            >
-              {label}
-            </MealButton>
-          ))}
-        </Container>
-        <div>음식 추가</div>
+        <div>{options.find((option) => option.id === inputData.mealCode)?.label || ''} 식단</div>
         <Container>
           <Autocomplete
             disablePortal
@@ -419,7 +463,153 @@ const TodayDietMeal = ({ day }) => {
         />
         <div>사진</div>
         <FileInput type="file" accept="image/*" onChange={handleImageChange} ref={imgRef} />
-        <PreviewDiv>{inputData.foodImg ? <UploadedImg src={inputData.foodImg} alt="식단이미지" /> : ''}</PreviewDiv>
+
+        <PreviewDiv>
+          {inputData.image ? (
+            <>
+              <UploadedImg src={inputData.imagePreview} alt="식단이미지" />
+              <DeleteImgBtn onClick={handleImageDelete}>✖</DeleteImgBtn>
+            </>
+          ) : (
+            ''
+          )}
+        </PreviewDiv>
+
+        <ModalContainer>
+          <Btn
+            title={'식단 등록'}
+            str={'등록'}
+            mt={'15'}
+            mb={'30'}
+            mr={'0'}
+            c={'#ff8a60'}
+            fc={'white'}
+            f={handleSubmit}
+          ></Btn>
+        </ModalContainer>
+      </Modal>
+
+      <Modal title="식단 수정">
+        <div>{options.find((option) => option.id === inputData.mealCode)?.label || ''} 식단</div>
+        <Container>
+          <Autocomplete
+            disablePortal
+            options={foodDummyData}
+            getOptionLabel={(option) => option.label || ''}
+            value={autoCompleteValue}
+            onChange={handleFoodSelect}
+            renderOption={(props, option) => (
+              <li {...props} key={option.label}>
+                {option.label} ({option.unit} / {option.amount}g / {option.kcal}kcal)
+              </li>
+            )}
+            sx={{
+              width: '100%',
+            }}
+            slotProps={{
+              listbox: {
+                sx: {
+                  fontSize: '15px',
+                },
+              },
+            }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                size="small"
+                placeholder="음식명을 입력해서 검색하세요"
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    '& fieldset': {
+                      borderColor: 'gray',
+                      borderRadius: '10px',
+                      borderWidth: '1.5px',
+                    },
+                    '&:hover fieldset': {
+                      borderColor: 'gray',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: 'black',
+                    },
+                  },
+                  '& .MuiInputBase-input': {
+                    fontSize: '15px',
+                  },
+                }}
+              />
+            )}
+          />
+          <Btn
+            str="직접추가"
+            mt={'0'}
+            mb={'0'}
+            ml={'3'}
+            mr={'0'}
+            w={'100'}
+            h={'38'}
+            fs={'14'}
+            f={handleOpenFoodEnrollModal}
+          />
+        </Container>
+        <SelectedFoodListArea>
+          {inputData.foodList.map((food, index) => (
+            <SelectedFoodContainer key={index}>
+              <div>
+                {food.label} ({food.unit} / {food.amount}g / {food.kcal}
+                kcal)
+              </div>
+              <SelectedFoodContainerBtn>
+                <Btn
+                  str={'수정'}
+                  w={'44'}
+                  h={'24'}
+                  mt={'0'}
+                  mb={'0'}
+                  ml={'0'}
+                  mr={'0'}
+                  fs={'13'}
+                  f={() => handleOpenFoodEditModal(index)}
+                />
+                <Btn
+                  str={'삭제'}
+                  w={'44'}
+                  h={'24'}
+                  mt={'0'}
+                  mb={'0'}
+                  ml={'0'}
+                  mr={'0'}
+                  fs={'13'}
+                  f={() => handleFoodDelete(index)}
+                />
+              </SelectedFoodContainerBtn>
+            </SelectedFoodContainer>
+          ))}
+        </SelectedFoodListArea>
+        <Input
+          type="text"
+          name="memo"
+          value={inputData.memo}
+          plcaeholder="메모를 입력해주세요"
+          title="메모"
+          size={'size2'}
+          mb={'14'}
+          mt={'7'}
+          f={handleMemoChange}
+        />
+        <div>사진</div>
+        <FileInput type="file" accept="image/*" onChange={handleImageChange} ref={imgRef} />
+
+        <PreviewDiv>
+          {inputData.image ? (
+            <>
+              <UploadedImg src={inputData.imagePreview} alt="식단이미지" />
+              <DeleteImgBtn onClick={handleImageDelete}>✖</DeleteImgBtn>
+            </>
+          ) : (
+            ''
+          )}
+        </PreviewDiv>
+
         <ModalContainer>
           <Btn
             title={'식단 등록'}

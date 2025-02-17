@@ -16,7 +16,7 @@ public class MemberVo {
     private String gender;
     private String height;
     private String weight;
-    private String profileUrl;
+    private String profile;
     private String enrollDate;
     private String phone;
     private String delYn;
