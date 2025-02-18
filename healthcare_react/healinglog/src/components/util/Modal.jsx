@@ -25,7 +25,7 @@ const ContainerDiv = styled.div`
   width: 500px;
   border: 1px solid gray;
   background-color: #ffffff;
-  position: fixed;  
+  position: fixed;
   border-radius: 15px;
   display: ${(props) => {
     return props.display;

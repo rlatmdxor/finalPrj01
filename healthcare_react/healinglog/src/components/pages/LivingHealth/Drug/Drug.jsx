@@ -57,7 +57,7 @@ const Drug = () => {
         <Navi target="drug" tag={'복용중'}></Navi>
         <Navi target="drug1" tag={'과거 먹은 약'}></Navi>
       </NaviContainer>
-
+    
       <ContentLayout>
         <Modal title={'복용약 등록'} type={'add'}>
           <InputTag name="submit" type="select" title="모양으로 등록" size={'size3'} mb={'10'} mt={'5'}></InputTag>
