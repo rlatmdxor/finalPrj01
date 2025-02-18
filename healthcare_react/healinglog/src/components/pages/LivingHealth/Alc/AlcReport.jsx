@@ -180,6 +180,7 @@ const AlcReport = () => {
 
   for (const vo of filteredData) {
     alcList.unshift(((vo.abv / 100) * vo.cc).toFixed(2));
+    // alcList.unshift(alcAmount);
   }
 
   const dataset = [
@@ -226,10 +227,10 @@ const AlcReport = () => {
   };
   // 모달 고도화작업중 진행예정 끝
 
-  useEffect(() => {
-    dispatch(setTotalCount({ boardType, totalCount: alcList.length }));
-    dispatch(resetPaging({ boardType }));
-  }, [boardType, alcList.length, dispatch]);
+  // useEffect(() => {
+  //   dispatch(setTotalCount({ boardType, totalCount: alcList.length }));
+  //   dispatch(resetPaging({ boardType }));
+  // }, [boardType, alcList.length, dispatch]);
 
   //인풋 안 쪽에 들어가는 데이터 ~~~Vo에 들어있는 이름으로 맞춰주기
   const initialInputData = { alcType: '', abv: '', cc: '', enrollDate: '' };
@@ -331,7 +332,7 @@ const AlcReport = () => {
   // datasetData에서 가장 큰 값 찾기
   const maxValue = Math.max(...alcList);
 
-  // yMax 값 설정 (최대값 + 0.5)
+  // yMax 값 설정
   const yMaxValue = maxValue + maxValue * 0.2;
   return (
     <>
