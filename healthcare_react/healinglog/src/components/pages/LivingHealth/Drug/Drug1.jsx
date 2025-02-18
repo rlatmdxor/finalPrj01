@@ -27,24 +27,24 @@ const NaviContainer = styled.div`
 `;
 
 const MediSonData = [
-  {
-    image: '/img/logo.png',
-    name: '타이레놀',
-    effect: '해열 및 감기에 의한 통증(두통, 치통, 근육통, 생리통, 관절통)의 완화',
-    dosage: '1회 1정 / 1일 3회',
-  },
-  {
-    image: '/img/logo.png',
-    name: '타이레놀',
-    effect: '해열 및 감기에 의한 통증(두통, 치통, 근육통, 생리통, 관절통)의 완화',
-    dosage: '1회 1정 / 1일 3회',
-  },
+  // {
+  //   image: '/img/logo.png',
+  //   name: '타이레놀',
+  //   effect: '해열 및 감기에 의한 통증(두통, 치통, 근육통, 생리통, 관절통)의 완화',
+  //   dosage: '1회 1정 / 1일 3회',
+  // },
+  // {
+  //   image: '/img/logo.png',
+  //   name: '타이레놀',
+  //   effect: '해열 및 감기에 의한 통증(두통, 치통, 근육통, 생리통, 관절통)의 완화',
+  //   dosage: '1회 1정 / 1일 3회',
+  // },
 ];
 
 const Drug1 = () => {
   return (
     <>
-      <Title> 과거 복용 약</Title>
+      <Title> 복용약</Title>
       <NaviContainer>
         <Navi target="drug" tag={'복용중'}></Navi>
         <Navi target="drug1" tag={'과거 복용 약'}></Navi>

@@ -39,7 +39,7 @@ public interface SleepMapper {
             , SLEEP_DURATION
             , TO_CHAR(RECORD_DATE , 'YYYY-MM-DD') AS DAY
             FROM SLEEP
-            ORDER BY RECORD_DATE DESC
+            ORDER BY SLEEP_START DESC
             """)
     List<SleepVo> list();
 
