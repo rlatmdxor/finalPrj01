@@ -87,7 +87,7 @@ export const SmallTextDiv = styled.div`
 export const BigTextDiv = styled.div`
   margin-left: auto;
   margin-right: auto;
-  margin-top: 11px;
+  margin-top: 7px;
   font-size: 38px;
 `;
 
@@ -108,10 +108,26 @@ export const ModalContainer = styled.div`
 `;
 
 const Diet = () => {
-  console.log('화면 렌더링~~');
-
   const todayDate = new Date().toISOString().split('T')[0];
   const [day, setDay] = useState(todayDate);
+
+  const [reRender, setReRender] = useState(0); // 화면 리렌더링용
+
+  const handleChangeDay = (e) => {
+    setDay(e.target.value);
+  };
+
+  const handlePrevDay = () => {
+    const prevDate = new Date(day);
+    prevDate.setDate(prevDate.getDate() - 1);
+    setDay(prevDate.toISOString().split('T')[0]);
+  };
+
+  const handleNextDay = () => {
+    const nextDate = new Date(day);
+    nextDate.setDate(nextDate.getDate() + 1);
+    setDay(nextDate.toISOString().split('T')[0]);
+  };
 
   return (
     <>
@@ -123,19 +139,19 @@ const Diet = () => {
       </NaviContainer>
       <ContentLayout>
         <DayDiv>
-          <button>◀</button>
-          <input type="date" value={day} />
-          <button>▶</button>
+          <button onClick={handlePrevDay}>◀</button>
+          <input type="date" name="day" value={day} onChange={handleChangeDay} />
+          <button onClick={handleNextDay}>▶</button>
         </DayDiv>
         <ContentAreaDiv>
-          <TodayKcal />
+          <TodayKcal day={day} reRender={reRender} />
           <TodayWater day={day} />
-          <TodayWeight day={day} />
+          <TodayWeight day={day} reRender={reRender} setReRender={setReRender} />
         </ContentAreaDiv>
         <ContentAreaDiv>
-          <MyBmi />
+          <MyBmi day={day} reRender={reRender} />
         </ContentAreaDiv>
-        <TodayDietMeal day={day} />
+        <TodayDietMeal day={day} reRender={reRender} setReRender={setReRender} />
         <br />
         <h1>여기에 광고를 넣어서 돈을 벌자</h1>
         <br />

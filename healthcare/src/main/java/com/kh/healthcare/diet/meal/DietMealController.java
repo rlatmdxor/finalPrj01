@@ -45,15 +45,57 @@ public class DietMealController {
     }
 
     @PostMapping
-    public List<SummaryKcalVo> getMealKcalSummary(@RequestBody DietVo vo, @RequestHeader("Authorization") String authorization){
+    public List<DietVo> dietMealDetail(@RequestBody DietVo vo, @RequestHeader("Authorization") String authorization){
         try {
-            List<SummaryKcalVo> summaryVoList = service.getMealKcalSummary(vo);
-            System.out.println("summaryVo = " + summaryVoList);
-            return summaryVoList;
+            List<DietVo> detailVoList = service.dietMealDetail(vo);
+            return detailVoList;
         }
         catch (Exception e){
             e.printStackTrace();
-            throw new IllegalStateException("[ERROR] MEAL SUMMARY VIEW FAIL..");
+            throw new IllegalStateException("[ERROR] DIET MEAL DETAIL FAIL..");
+        }
+    }
+
+    @PostMapping("edit")
+    public void dietMealEdit(DietVo vo, String foodListArr, MultipartFile f, @RequestHeader("Authorization") String authorization){
+        try {
+            if (f != null) {
+                String url = FileUtil.uploadFileToAwsS3(f , s3 , bucket);
+                System.out.println("url = " + url);
+                vo.setImage(url);
+            }
+
+            List<MealVo> foodVoList = objectMapper.readValue(foodListArr, new TypeReference<List<MealVo>>(){});
+            vo.setFoodList(foodVoList);
+
+            service.dietMealEdit(vo);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            throw new IllegalStateException("[ERROR] DIET EDIT FAIL..");
+        }
+    }
+
+    @PostMapping("delete")
+    public void dietMealDelete(@RequestBody DietVo vo, @RequestHeader("Authorization") String authorization){
+        System.out.println("vo.getNo() = " + vo.getNo());
+        try {
+            service.dietMealDelete(vo.getNo());
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            throw new IllegalStateException("[ERROR] DIET DELETE FAIL..");
+        }
+    }
+
+    @GetMapping("food")
+    public List<FoodVo> getFoodData(@RequestHeader("Authorization") String authorization){
+        try {
+            return service.getFoodData();
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            throw new IllegalStateException("[ERROR] FOOD LIST VIEW FAIL..");
         }
     }
 
