@@ -21,8 +21,9 @@ public class JwtUtil {
     }
 
     // login service 클래스에서 사용할 거임
-    public String createJwtToken(String id, String nick, String role){
+    public String createJwtToken(String no, String id, String nick, String role){
         return Jwts.builder()
+                .claim("no", no)
                 .claim("id", id)
                 .claim("nick", nick)
                 .claim("role", role)
@@ -45,6 +46,11 @@ public class JwtUtil {
     //토큰 만료 검증
     public boolean isExpire(String token) {
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getExpiration().before(new Date());
+    }
+
+    //토큰에서 값 꺼내기(넘버)
+    public String getNo(String token) {
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("no", String.class);
     }
 
     //토큰에서 값 꺼내기(아이디)

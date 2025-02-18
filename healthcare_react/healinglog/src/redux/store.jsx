@@ -7,7 +7,7 @@ import selectionReducer from './selectSlice';
 import JoinReducer from './JoinSlice';
 import aerobicReducer from './aerobicSlice';
 import anAerobicReducer from './anAerobicSlice';
-
+import MemberReducer from './MemberSlice';
 
 const store = configureStore({
   reducer: {
@@ -17,6 +17,7 @@ const store = configureStore({
     modal: modalReducer,
     selection: selectionReducer,
     join: JoinReducer,
+    member: MemberReducer,
     aerobic: aerobicReducer,
     anAerobic: anAerobicReducer,
   },

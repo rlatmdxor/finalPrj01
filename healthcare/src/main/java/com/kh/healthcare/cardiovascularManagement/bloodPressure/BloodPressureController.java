@@ -16,8 +16,8 @@ public class BloodPressureController {
     private final BloodPressureService service;
 
     @PostMapping("write")
-    public String bloodPressureWrite(@RequestBody BloodPressureVo vo){
-        return service.bloodPressureWrite(vo);
+    public void bloodPressureWrite(@RequestBody BloodPressureVo vo){
+        service.bloodPressureWrite(vo);
     }
 
     @PostMapping("list")

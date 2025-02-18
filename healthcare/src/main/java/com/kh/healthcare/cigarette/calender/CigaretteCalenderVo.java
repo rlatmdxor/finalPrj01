@@ -1,17 +1,15 @@
-package com.kh.healthcare.cigarette.report;
+package com.kh.healthcare.cigarette.calender;
 
 import lombok.Data;
 
 @Data
-public class ReportVo {
+public class CigaretteCalenderVo {
     private Long no;
     private Long memberNo;
-    private Long cigarette;
+    private String cigarette;
     private String startDate;
     private String endDate;
     private String packDuration;
-
-
-    private String cigaretteName;
     private Long tar;
+
 }

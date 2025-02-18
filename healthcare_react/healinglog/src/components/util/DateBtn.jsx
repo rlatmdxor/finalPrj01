@@ -22,7 +22,7 @@ const Select = styled.select`
   margin-right: 15px;
 `;
 
-const DateBtn = ({ dataBtn, onSelect, onChange }) => {
+const DateBtn = ({ dataBtn, onSelect, line, onChange }) => {
   const [activeIndex, setActiveIndex] = useState(0);
 
   const handleSelect = () => {
@@ -32,10 +32,19 @@ const DateBtn = ({ dataBtn, onSelect, onChange }) => {
   return (
     <>
       <DataDiv>
-        <Select onChange={handleSelect}>
-          <option value="Line">꺽은 선</option>
-          <option value="Bar">막대</option>
-        </Select>
+        {
+          (line = 'Line' ? (
+            <Select onChange={handleSelect}>
+              <option value="Bar">막대</option>
+              <option value="Line">꺽은 선</option>
+            </Select>
+          ) : (
+            <Select onChange={handleSelect}>
+              <option value="Line">꺽은 선</option>
+              <option value="Bar">막대</option>
+            </Select>
+          ))
+        }
 
         {dataBtn.map((label, index) => (
           <StyleBtn

@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import Modal from '../../../util/Modal'; // 모달 컴포넌트
-import Input from '../../../util/Input'; // 입력 컴포넌트
 import Title from '../../../util/Title';
 import Chart from '../../../util/Chart';
 import styled from 'styled-components';
@@ -8,12 +6,14 @@ import RadiusTable from '../../../util/RadiusTable';
 import { useDispatch, useSelector } from 'react-redux';
 import { resetPaging, setTotalCount } from '../../../../redux/pagingSlice';
 import Btn from '../../../util/Btn';
-import { open } from '../../../../redux/modalSlice';
 import Pagination from '../../../util/Pagination';
 import DateBtn from '../../../util/DateBtn';
 import ContentLayout from '../../../util/ContentLayout';
+import Modal from '../../../util/Modal';
+import InputTag from '../../../util/Input';
+import { close, open } from '../../../../redux/modalSlice';
 
-const BtnContainer = styled.div`
+const BtnContainer2 = styled.div`
   display: flex;
   margin-top: 30px;
   margin-left: 1030px;
@@ -22,6 +22,19 @@ const BtnContainer = styled.div`
 
 const LineDiv = styled.div`
   height: 50px;
+`;
+
+//모달 밖의 버튼 컨테이너
+const BtnContainer = styled.div`
+  display: flex;
+  justify-content: end;
+  margin-right: -45px;
+`;
+
+//모달 안의 버튼 컨테이너
+const ModalContainer = styled.div`
+  display: flex;
+  justify-content: end;
 `;
 
 const BloodPressure = () => {
@@ -38,10 +51,53 @@ const BloodPressure = () => {
   const [filteredData, setFilteredData] = useState([]); // 차트용 필터링 데이터
   const [selectedRange, setSelectedRange] = useState('주'); // 기본값 '일'
   const [selectChart, setSelectChart] = useState('Line'); // 그래프 모양 정하는 state
+  const dispatch = useDispatch();
 
+  const dataBtn = ['주', '월'];
   const boardType = 'bloodPressure';
   const { currentPage, boardLimit } = useSelector((state) => state.paging[boardType] || {});
   const offset = (currentPage - 1) * boardLimit;
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////
+  //인풋 안 쪽에 들어가는 데이터 ~~~Vo에 들어있는 이름으로 맞춰주기
+  const initialInputData = { memberNo: '1', systole: '', diastole: '', pulse: '', enrollDate: '', note: '' };
+  // 모달 안 쪽 인풋에 데이터 관리
+  const [inputData, setInputData] = useState(initialInputData);
+  // 페이징 쪽에 있는 자료 활용
+  const data = dataVoList.slice(offset, offset + boardLimit);
+  // 화면 렌더링
+  const [num, setNum] = useState('');
+  // 인풋 데이터 초기화
+  const reset = () => {
+    setInputData(initialInputData);
+  };
+  // 인풋 입력값 받아오기
+  const handleChange = (e) => {
+    setInputData((props) => {
+      return {
+        ...props,
+        [e.target.name]: e.target.value,
+      };
+    });
+  };
+
+  // 인풋 입력값 보내기
+  const handleSubmit = (e) => {
+    fetch('http://127.0.0.1:80/api/bloodPressure/write', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify(inputData),
+    })
+      .then((resp) => resp.json())
+      .then((data) => {});
+    //렌
+    setNum(num - 1);
+    // 입력 후 모달 창 닫기
+    dispatch(close(e.target.title));
+  };
+  //////////////////////////////////////////////////////////////////////////////
 
   // fetch실행
   useEffect(() => {
@@ -115,9 +171,6 @@ const BloodPressure = () => {
   useEffect(() => {
     setFilteredData(filterData('week'));
   }, [fullData]);
-
-  const dataBtn = ['주', '월'];
-  const dispatch = useDispatch();
 
   const labels = [];
 
@@ -202,6 +255,171 @@ const BloodPressure = () => {
       <div></div>
 
       <ContentLayout>
+        {/* // title 모달 위 쪽에 들어가는 제목 ,  */}
+        <Modal title="혈압 등록">
+          <InputTag
+            //type 인풋 유형 date , time, text , password ...
+            type="datetime-local"
+            step="60"
+            //vo 이름
+            name="enrollDate"
+            plcaeholder="측정시간"
+            //인풋 상단 이름
+            title="측정시간"
+            //인풋태그 사이즈
+            size={'size3'}
+            // margin bottom , top
+            mb={'10'}
+            mt={'5'}
+            // 위쪽에 만들어둔 useState
+            value={inputData.enrollDate}
+            // 입력값 저장하기
+            f={handleChange}
+          ></InputTag>
+          <InputTag
+            name="systole"
+            type="number"
+            title="압축기 혈압"
+            value={inputData.systole}
+            size={'size3'}
+            mb={'10'}
+            mt={'5'}
+            f={handleChange}
+          ></InputTag>
+          <InputTag
+            name="diastole"
+            type="number"
+            title="수축기 혈압"
+            value={inputData.diastole}
+            size={'size3'}
+            mb={'10'}
+            mt={'5'}
+            f={handleChange}
+          ></InputTag>
+          <InputTag
+            name="pulse"
+            type="number"
+            title="맥박"
+            value={inputData.pulse}
+            size={'size3'}
+            mb={'10'}
+            mt={'5'}
+            f={handleChange}
+          ></InputTag>
+          <InputTag
+            name="note"
+            type="text"
+            title="특이사항"
+            value={inputData.note}
+            size={'size3'}
+            mb={'10'}
+            mt={'5'}
+            f={handleChange}
+          ></InputTag>
+          {/* // 모달 바깥 등록 버튼 */}
+          <ModalContainer>
+            <Btn
+              //모달 title과 맞춰주기
+              title={'혈압 등록'}
+              // 인풋 입력값 보내기
+              f={handleSubmit}
+              //margin top bottom right
+              mt={'10'}
+              mb={'20'}
+              mr={'-10'}
+              // background color
+              c={'#FF7F50'}
+              // font color
+              fc={'white'}
+              // 화면에 노출되는 버튼 안 쪽 내용
+              str={'등록'}
+            ></Btn>
+          </ModalContainer>
+        </Modal>
+
+        <Modal title="혈압 수정">
+          <InputTag
+            //type 인풋 유형 date , time, text , password ...
+            type="datetime-local"
+            step="60"
+            //vo 이름
+            name="enrollDate"
+            plcaeholder="측정시간"
+            //인풋 상단 이름
+            title="측정시간"
+            //인풋태그 사이즈
+            size={'size3'}
+            // margin bottom , top
+            mb={'10'}
+            mt={'5'}
+            // 위쪽에 만들어둔 useState
+            value={inputData.enrollDate}
+            // 입력값 저장하기
+            f={handleChange}
+          ></InputTag>
+          <InputTag
+            name="systole"
+            type="number"
+            title="압축기 혈압"
+            value={inputData.systole}
+            size={'size3'}
+            mb={'10'}
+            mt={'5'}
+            f={handleChange}
+          ></InputTag>
+          <InputTag
+            name="diastole"
+            type="number"
+            title="수축기 혈압"
+            value={inputData.diastole}
+            size={'size3'}
+            mb={'10'}
+            mt={'5'}
+            f={handleChange}
+          ></InputTag>
+          <InputTag
+            name="pulse"
+            type="number"
+            title="맥박"
+            value={inputData.pulse}
+            size={'size3'}
+            mb={'10'}
+            mt={'5'}
+            f={handleChange}
+          ></InputTag>
+          <InputTag
+            name="note"
+            type="text"
+            title="특이사항"
+            value={inputData.note}
+            size={'size3'}
+            mb={'10'}
+            mt={'5'}
+            f={handleChange}
+          ></InputTag>
+
+          {/* //모달 안에 들어가는 버튼 컨테이너 */}
+          <ModalContainer>
+            <Btn f={handleEditSubmit} mt={'10'} mb={'20'} mr={'20'} c={'#7ca96d'} fc={'white'} str={'수정'}></Btn>
+            <Btn mt={'10'} mb={'20'} mr={'-20'} c={'lightgray'} fc={'black'} str={'삭제'}></Btn>
+          </ModalContainer>
+        </Modal>
+
+        {/* //모달 열기 버튼 컨테이너 */}
+        <BtnContainer>
+          <div
+            onClick={() => {
+              // 모달 안 데이터 초기화
+              reset();
+              //해달 모달 열기
+              // title : 모달 이름
+              dispatch(open({ title: '수면 등록', value: 'block' }));
+            }}
+          >
+            <Btn mt={'50'} mr={'46'} mb={'20'} str={'등록'} c={'#FF7F50'} fc={'white'}></Btn>
+          </div>
+        </BtnContainer>
+
         {/* dateBtn을 호출할때 그래프 타입을 바꿀수있는 setState (onChange) 와 단위기간을 바꿀 수 있는 setState(onSelect) 를 넘겨준다 */}
         <DateBtn dataBtn={dataBtn} onSelect={setSelectedRange} onChange={setSelectChart}></DateBtn>
 
@@ -218,7 +436,7 @@ const BloodPressure = () => {
           xLabelVisible={true} // 추가: X축 라벨 표시 여부 (기본값: true)
         />
 
-        <BtnContainer>
+        <BtnContainer2>
           <div
             onClick={() => {
               dispatch(open({ title: '수면 등록', value: 'block' }));
@@ -226,7 +444,7 @@ const BloodPressure = () => {
           >
             <Btn str={'등록'} c={'#FF7F50'} fc={'white'}></Btn>
           </div>
-        </BtnContainer>
+        </BtnContainer2>
 
         <RadiusTable width="100%" thBgColor="" radius="0px">
           <thead>
@@ -253,9 +471,19 @@ const BloodPressure = () => {
               records.map((vo, index) => (
                 <tr
                   key={vo.no}
-                  // onClick={() => {
-                  //   window.location.href = `/board?bno=${vo.no}`;
-                  // }}
+                  onClick={() => {
+                    // 버튼 클릭 시 해당 vo에 들어있는 값으로 useState값 변경
+                    setInputData({
+                      memberNo: vo.memberNo,
+                      systole: vo.systole,
+                      diastole: vo.diastole,
+                      pulse: vo.pulse,
+                      enrollDate: vo.enrollDate,
+                      note: vo.note,
+                    });
+                    // 모달 열기
+                    dispatch(open({ title: '수면 수정', value: 'block' }));
+                  }}
                 >
                   {index === 0 && (
                     <td

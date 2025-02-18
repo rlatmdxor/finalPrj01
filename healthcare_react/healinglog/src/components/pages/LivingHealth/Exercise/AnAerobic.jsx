@@ -49,6 +49,7 @@ const AnAerobic = () => {
         <Navi target="exreport" tag={'리포트'}></Navi>
       </NaviContainer>
       <ContentLayout>
+        <BlankSpace />
         <AnFavoriteList
           f={(name) => {
             setModalTitle(name);

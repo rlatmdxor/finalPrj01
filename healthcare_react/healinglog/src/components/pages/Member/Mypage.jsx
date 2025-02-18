@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Title from '../../util/Title';
 import Btn from '../../util/Btn';
 import styled, { useTheme } from 'styled-components';
@@ -10,60 +10,67 @@ import {
   setName,
   setAddress,
   setEmail,
-  setResidentNum,
+  setPhone,
   setHeight,
   setWeight,
   setProfile,
 } from '../../../redux/JoinSlice';
+import MyProfile from './MyProfile';
 
 const Mypage = () => {
   const theme = useTheme();
   const dispatch = useDispatch();
-  const { id, pwd, nick, name, address, email, residentNum, height, weight, profile } = useSelector(
-    (state) => state.join
-  );
+  const { id, pwd, nick, name, address, email, phone, height, weight, profile } = useSelector((state) => state.join);
+  const token = localStorage.getItem('token');
+
+  useEffect(() => {
+    fetch('http://127.0.0.1:80/api/member/mypage', {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((resp) => resp.json())
+      .then((data) => {
+        console.log('data : ', data);
+
+        dispatch(setId(data.id));
+        dispatch(setPwd(data.pwd));
+        dispatch(setNick(data.nick));
+        dispatch(setName(data.name));
+        dispatch(setAddress(data.address));
+        dispatch(setEmail(data.email));
+        dispatch(setPhone(data.phone));
+        dispatch(setHeight(data.height));
+        dispatch(setWeight(data.weight));
+        dispatch(setProfile(data.profile));
+      })
+      .catch((error) => {
+        console.error('fetch 오류:', error);
+      });
+  }, []);
+
+  // console.log(profile);
+
   return (
     <>
+      <Title>마이페이지</Title>
+      <div />
       <Container>
-        <Title>마이페이지</Title>
-
         <InputContainer>
           <InputTitle>프로필 (선택)</InputTitle>
-
           <ProfileContainer>
-            <ProfileImg src={profile}></ProfileImg>
-            <BtnContainer>
-              <Btn
-                w={'70'}
-                h={'40'}
-                c={theme.orange}
-                str="등록"
-                fc={'white'}
-                fs={'18'}
-                f={(e) => dispatch(setProfile('/img/profile.jpg'))}
-              />
-            </BtnContainer>
-            <BtnContainer>
-              <Btn
-                w={'70'}
-                h={'40'}
-                c={theme.gray}
-                str="삭제"
-                fc={'black'}
-                fs={'18'}
-                f={(e) => dispatch(setProfile(''))}
-              />
-            </BtnContainer>
+            <MyProfile />
           </ProfileContainer>
 
           <BlankSpace></BlankSpace>
 
           <InputTitle>아이디</InputTitle>
-          <JoinInput placeholder="value" className="id" type="text" value={'user01'} readOnly></JoinInput>
+          <JoinInput placeholder="value" className="id" type="text" value={id} readOnly></JoinInput>
           <InputTitle>비밀번호</InputTitle>
           <JoinInput placeholder="value" className="pwd" type="password" value={pwd} readOnly></JoinInput>
           <InputTitle>닉네임</InputTitle>
-          <JoinInput placeholder="value" className="nick" type="text" value={'구승용짱'} readOnly></JoinInput>
+          <JoinInput placeholder="value" className="nick" type="text" value={nick} readOnly></JoinInput>
           <GreenBtnContainer>
             <Btn
               w={'150'}
@@ -79,25 +86,13 @@ const Mypage = () => {
           <BlankSpace></BlankSpace>
 
           <InputTitle>이름</InputTitle>
-          <JoinInput placeholder="value" className="name" type="text" value={'구승용'} readOnly></JoinInput>
+          <JoinInput placeholder="value" className="name" type="text" value={name} readOnly></JoinInput>
           <InputTitle>주소</InputTitle>
           <JoinInput placeholder="value" className="address" type="text" value={address} readOnly></JoinInput>
           <InputTitle>이메일</InputTitle>
-          <JoinInput
-            placeholder="value"
-            className="email"
-            type="email"
-            value={'kooseungyong@naver.com'}
-            readOnly
-          ></JoinInput>
-          <InputTitle>주민등록번호</InputTitle>
-          <JoinInput
-            placeholder="value"
-            className="residentNum"
-            type="text"
-            value={'900101-*******'}
-            readOnly
-          ></JoinInput>
+          <JoinInput placeholder="value" className="email" type="email" value={email} readOnly></JoinInput>
+          <InputTitle>전화번호</InputTitle>
+          <JoinInput placeholder="value" className="phone" type="text" value={phone} readOnly></JoinInput>
           <GreenBtnContainer>
             <Btn
               w={'150'}
@@ -113,7 +108,7 @@ const Mypage = () => {
           <BlankSpace></BlankSpace>
 
           <InputTitle>키 (선택)</InputTitle>
-          <JoinInput placeholder="value" className="height" type="number" value={'180'} readOnly></JoinInput>
+          <JoinInput placeholder="value" className="height" type="number" value={height} readOnly></JoinInput>
           <InputTitle>몸무게 (선택)</InputTitle>
           <JoinInput placeholder="value" className="weight" type="number" value={weight} readOnly></JoinInput>
           <GreenBtnContainer>

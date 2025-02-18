@@ -7,11 +7,16 @@ const initialState = {
   name: '',
   address: '',
   email: '',
+  emailFront: '',
+  emailDomain: '',
   residentNum: '',
+  frontResidentNum: '',
+  backResidentNum: '',
   height: '',
   weight: '',
   profile: '/img/profile.jpg',
   gender: '',
+  phone: '',
 };
 
 const JoinSlice = createSlice({
@@ -36,8 +41,20 @@ const JoinSlice = createSlice({
     setEmail: (state, action) => {
       state.email = action.payload;
     },
+    setEmailFront: (state, action) => {
+      state.emailFront = action.payload;
+    },
+    setEmailDomain: (state, action) => {
+      state.emailDomain = action.payload;
+    },
     setResidentNum: (state, action) => {
       state.residentNum = action.payload;
+    },
+    setFrontResidentNum: (state, action) => {
+      state.frontResidentNum = action.payload;
+    },
+    setBackResidentNum: (state, action) => {
+      state.backResidentNum = action.payload;
     },
     setHeight: (state, action) => {
       state.height = action.payload;
@@ -51,6 +68,9 @@ const JoinSlice = createSlice({
     setGender: (state, action) => {
       state.gender = action.payload;
     },
+    setPhone: (state, action) => {
+      state.phone = action.payload;
+    },
   },
 });
 
@@ -61,11 +81,16 @@ export const {
   setName,
   setAddress,
   setEmail,
+  setEmailFront,
+  setEmailDomain,
   setResidentNum,
+  setFrontResidentNum,
+  setBackResidentNum,
   setHeight,
   setWeight,
   setProfile,
   setGender,
+  setPhone,
 } = JoinSlice.actions;
 
 export default JoinSlice.reducer;
