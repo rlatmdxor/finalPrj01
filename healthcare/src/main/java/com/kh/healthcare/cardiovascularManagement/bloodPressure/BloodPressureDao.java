@@ -13,14 +13,22 @@ public class BloodPressureDao {
 
     private final BloodPressureMapper mapper;
 
-    public String bloodPressureWrite(BloodPressureVo vo) {
+    public int bloodPressureWrite(BloodPressureVo vo) {
         return mapper.bloodPressureWrite(vo);
     }
 
     public List<BloodPressureVo> bloodPressureList(String memberNo) {
 
         List<BloodPressureVo> voList = mapper.bloodPressureList(memberNo);
-        System.out.println("voList = " + voList);
         return voList;
+    }
+
+    public int bloodPressureEdit(BloodPressureVo vo) {
+
+        return mapper.bloodPressureEdit(vo);
+    }
+
+    public void bloodPressureDelete(BloodPressureVo vo) {
+        mapper.bloodPressureDelete(vo);
     }
 }

@@ -2,6 +2,9 @@ package com.kh.healthcare.cardiovascularManagement.bloodPressure;
 
 import lombok.Data;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+
 @Data
 public class BloodPressureVo {
 
@@ -15,6 +18,7 @@ public class BloodPressureVo {
     private String time;
     private String nick;
     private String note;
+
 
 
 }

@@ -52,7 +52,7 @@ export const routes = [
   { path: '/drug1', component: <Drug1 /> },
   { path: '/bloodpressure', component: <BloodPressure /> },
   { path: '/insulin', component: <InsulinPoint /> },
-  { path: '/bloodSugar', component: <BloodSugar /> },
+  { path: '/bloodsugar', component: <BloodSugar /> },
   { path: '/hospital', component: <Hospital /> },
   { path: '/pharmacy', component: <Pharmacy /> },
   { path: '/publichealthcenter', component: <PulbicHealthCenter /> },

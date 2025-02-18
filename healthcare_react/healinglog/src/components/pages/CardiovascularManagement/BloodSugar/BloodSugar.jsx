@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import Modal from '../../../util/Modal'; // 모달 컴포넌트
-import Input from '../../../util/Input'; // 입력 컴포넌트
 import Title from '../../../util/Title';
 import Navi from '../../../util/Navi';
 import Chart from '../../../util/Chart';
@@ -9,16 +7,25 @@ import RadiusTable from '../../../util/RadiusTable';
 import { useDispatch, useSelector } from 'react-redux';
 import { resetPaging, setTotalCount } from '../../../../redux/pagingSlice';
 import Btn from '../../../util/Btn';
-import { open } from '../../../../redux/modalSlice';
 import Pagination from '../../../util/Pagination';
 import DateBtn from '../../../util/DateBtn';
 import ContentLayout from '../../../util/ContentLayout';
+import Modal from '../../../util/Modal';
+import InputTag from '../../../util/Input';
+import { close, open } from '../../../../redux/modalSlice';
+import Swal from 'sweetalert2';
 
+//모달 밖의 버튼 컨테이너
 const BtnContainer = styled.div`
   display: flex;
-  margin-top: 30px;
-  margin-left: 1030px;
-  gap: 15px;
+  justify-content: end;
+  margin-right: -45px;
+`;
+
+//모달 안의 버튼 컨테이너
+const ModalContainer = styled.div`
+  display: flex;
+  justify-content: end;
 `;
 
 const LineDiv = styled.div`
@@ -35,14 +42,16 @@ const NaviContainer = styled.div`
 `;
 
 const BloodSugar = () => {
+  const token = null;
+
   const url = 'http://127.0.0.1:80/api/bloodSugar/list';
 
   const options = {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
     body: JSON.stringify({ memberNo: '1' }),
   };
-
+  const [num, setNum] = useState(0);
   const [fullData, setFullData] = useState([]); // 전체 데이터 저장
   const [pagedData, setPagedData] = useState([]); // 페이징된 데이터
   const [filteredData, setFilteredData] = useState([]); // 차트용 필터링 데이터
@@ -67,7 +76,145 @@ const BloodSugar = () => {
         }
       })
       .catch((error) => console.error('데이터 불러오기 실패:', error));
-  }, []);
+  }, [num]);
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////
+  //인풋 안 쪽에 들어가는 데이터 ~~~Vo에 들어있는 이름으로 맞춰주기
+  const initialInputData = {
+    no: '',
+    memberNo: '1',
+    sugar: '',
+    enrollDate: '',
+    note: '',
+  };
+  // 모달 안 쪽 인풋에 데이터 관리
+  const [inputData, setInputData] = useState(initialInputData);
+  // 화면 렌더링
+  // 인풋 데이터 초기화
+  const reset = () => {
+    setInputData(initialInputData);
+  };
+  // 인풋 입력값 받아오기
+  const handleChange = (e) => {
+    setInputData((props) => {
+      return {
+        ...props,
+        [e.target.name]: e.target.value,
+      };
+    });
+  };
+
+  // 인풋 입력값 보내기
+  const handleSubmit = (e) => {
+    Swal.fire({
+      title: '등록하시겠습니까?',
+      icon: 'question',
+      showCancelButton: true, // ❗ 취소 버튼 추가 (없으면 무조건 실행됨)
+      confirmButtonText: '확인',
+      cancelButtonText: '취소',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // ✅ 사용자가 '확인' 버튼을 눌렀을 때만 실행
+        fetch('http://127.0.0.1:80/api/bloodSugar/write', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify(inputData),
+        })
+          .then((resp) => resp.text())
+          .then((data) => {
+            if (data == 1) {
+              setNum((x) => x + 1);
+              Swal.fire({
+                title: '등록되었습니다.',
+                icon: 'success',
+                draggable: true,
+              });
+            } else {
+              Swal.fire({
+                icon: 'error',
+                title: '정확한 수치를 입력해주세요.',
+                text: '다시 입력해주세요',
+              });
+            }
+          });
+
+        // 모달 창 닫기
+        dispatch(close(e.target.title));
+      }
+    });
+  };
+
+  const handleEditSubmit = (e) => {
+    Swal.fire({
+      title: '수정하시겠습니까?',
+      icon: 'question',
+      showCancelButton: true, // ❗ 취소 버튼 추가 (없으면 무조건 실행됨)
+      confirmButtonText: '확인',
+      cancelButtonText: '취소',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // ✅ 사용자가 '확인' 버튼을 눌렀을 때만 실행
+        fetch('http://127.0.0.1:80/api/bloodSugar/edit', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify(inputData),
+        })
+          .then((resp) => resp.text())
+          .then((data) => {
+            if (data == 1) {
+              setNum((x) => x + 1);
+              Swal.fire({
+                title: '수정되었습니다.',
+                icon: 'success',
+                draggable: true,
+              });
+            } else {
+              Swal.fire({
+                icon: 'error',
+                title: '정확한 수치를 입력해주세요.',
+                text: '다시 입력해주세요',
+              });
+            }
+          });
+
+        // 모달 창 닫기
+        dispatch(close(e.target.title));
+      }
+    });
+  };
+  const handleDelSubmit = (e) => {
+    Swal.fire({
+      title: '삭제하시겠습니까?',
+      icon: 'question',
+      showCancelButton: true, // ❗ 취소 버튼 추가 (없으면 무조건 실행됨)
+      confirmButtonText: '확인',
+      cancelButtonText: '취소',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // ✅ 사용자가 '확인' 버튼을 눌렀을 때만 실행
+        fetch('http://127.0.0.1:80/api/bloodSugar/delete', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify(inputData),
+        })
+          .then((resp) => resp.text())
+          .then((data) => {
+            console.log(data);
+            setNum((x) => x - 1);
+            console.log(num);
+            Swal.fire({
+              title: '삭제되었습니다.',
+              icon: 'success',
+              draggable: true,
+            });
+          });
+
+        // 모달 창 닫기
+        dispatch(close(e.target.title));
+      }
+    });
+  };
+  //////////////////////////////////////////////////////////////////////////////
 
   // 테이블 페이징 처리
   useEffect(() => {
@@ -177,11 +324,142 @@ const BloodSugar = () => {
     <>
       <Title>혈당</Title>
       <NaviContainer>
-        <Navi target="bloodSugar" tag={'혈당 기록'}></Navi>
+        <Navi target="bloodsugar" tag={'혈당 기록'}></Navi>
         <Navi target="insulin" tag={'인슐린 기록지'}></Navi>
       </NaviContainer>
 
       <ContentLayout>
+        {/* // title 모달 위 쪽에 들어가는 제목 ,  */}
+        <Modal title="혈당 등록">
+          <InputTag
+            //type 인풋 유형 date , time, text , password ...
+            type="datetime-local"
+            step="60"
+            //vo 이름
+            name="enrollDate"
+            plcaeholder="측정시간"
+            //인풋 상단 이름
+            title="측정시간"
+            //인풋태그 사이즈
+            size={'size3'}
+            // margin bottom , top
+            mb={'10'}
+            mt={'5'}
+            // 위쪽에 만들어둔 useState
+            value={inputData.enrollDate}
+            // 입력값 저장하기
+            f={handleChange}
+          ></InputTag>
+          <InputTag
+            name="sugar"
+            type="number"
+            step="0.1"
+            title="혈당"
+            value={inputData.sugar}
+            size={'size3'}
+            mb={'10'}
+            mt={'5'}
+            f={handleChange}
+          ></InputTag>
+          <InputTag
+            name="note"
+            type="text"
+            title="특이사항"
+            value={inputData.note}
+            size={'size3'}
+            mb={'10'}
+            mt={'5'}
+            f={handleChange}
+          ></InputTag>
+          {/* // 모달 바깥 등록 버튼 */}
+          <ModalContainer>
+            <Btn
+              //모달 title과 맞춰주기
+              title={'혈당 등록'}
+              // 인풋 입력값 보내기
+              f={handleSubmit}
+              //margin top bottom right
+              mt={'10'}
+              mb={'20'}
+              mr={'-10'}
+              // background color
+              c={'#FF7F50'}
+              // font color
+              fc={'white'}
+              // 화면에 노출되는 버튼 안 쪽 내용
+              str={'등록'}
+            ></Btn>
+          </ModalContainer>
+        </Modal>
+
+        <Modal title="혈당 수정">
+          <InputTag
+            //type 인풋 유형 date , time, text , password ...
+            type="datetime-local"
+            step="60"
+            //vo 이름
+            name="enrollDate"
+            plcaeholder="측정시간"
+            //인풋 상단 이름
+            title="측정시간"
+            //인풋태그 사이즈
+            size={'size3'}
+            // margin bottom , top
+            mb={'10'}
+            mt={'5'}
+            // 위쪽에 만들어둔 useState
+            value={inputData.enrollDate}
+            // 입력값 저장하기
+            f={handleChange}
+          ></InputTag>
+          <InputTag
+            name="sugar"
+            type="number"
+            step="0.1"
+            title="혈당"
+            value={inputData.sugar}
+            size={'size3'}
+            mb={'10'}
+            mt={'5'}
+            f={handleChange}
+          ></InputTag>
+          <InputTag
+            name="note"
+            type="text"
+            title="특이사항"
+            value={inputData.note}
+            size={'size3'}
+            mb={'10'}
+            mt={'5'}
+            f={handleChange}
+          ></InputTag>
+
+          {/* //모달 안에 들어가는 버튼 컨테이너 */}
+          <ModalContainer>
+            <Btn
+              f={handleEditSubmit}
+              mt={'10'}
+              mb={'20'}
+              mr={'20'}
+              c={'#7ca96d'}
+              fc={'white'}
+              str={'수정'}
+              title={'혈당 수정'}
+            ></Btn>
+            <Btn
+              f={handleDelSubmit}
+              mt={'10'}
+              mb={'20'}
+              mr={'-20'}
+              c={'lightgray'}
+              fc={'black'}
+              str={'삭제'}
+              title={'혈당 수정'}
+            ></Btn>
+          </ModalContainer>
+        </Modal>
+
+        {/* //모달 열기 버튼 컨테이너 */}
         {/* dateBtn을 호출할때 그래프 타입을 바꿀수있는 setState (onChange) 와 단위기간을 바꿀 수 있는 setState(onSelect) 를 넘겨준다 */}
         <DateBtn dataBtn={dataBtn} onSelect={setSelectedRange} onChange={setSelectChart}></DateBtn>
 
@@ -201,10 +479,14 @@ const BloodSugar = () => {
         <BtnContainer>
           <div
             onClick={() => {
-              dispatch(open({ title: '수면 등록', value: 'block' }));
+              // 모달 안 데이터 초기화
+              reset();
+              //해달 모달 열기
+              // title : 모달 이름
+              dispatch(open({ title: '혈당 등록', value: 'block' }));
             }}
           >
-            <Btn str={'등록'} c={'#FF7F50'} fc={'white'}></Btn>
+            <Btn mt={'50'} mr={'46'} mb={'20'} str={'등록'} c={'#FF7F50'} fc={'white'}></Btn>
           </div>
         </BtnContainer>
 
@@ -231,9 +513,18 @@ const BloodSugar = () => {
               records.map((vo, index) => (
                 <tr
                   key={vo.no}
-                  // onClick={() => {
-                  //   window.location.href = `/board?bno=${vo.no}`;
-                  // }}
+                  onClick={() => {
+                    // 버튼 클릭 시 해당 vo에 들어있는 값으로 useState값 변경
+                    setInputData({
+                      no: vo.no,
+                      memberNo: vo.memberNo,
+                      sugar: vo.sugar,
+                      enrollDate: vo.enrollDate,
+                      note: vo.note,
+                    });
+                    // 모달 열기
+                    dispatch(open({ title: '혈당 수정', value: 'block' }));
+                  }}
                 >
                   {index === 0 && (
                     <td

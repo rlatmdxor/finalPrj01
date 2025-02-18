@@ -12,13 +12,7 @@ import ContentLayout from '../../../util/ContentLayout';
 import Modal from '../../../util/Modal';
 import InputTag from '../../../util/Input';
 import { close, open } from '../../../../redux/modalSlice';
-
-const BtnContainer2 = styled.div`
-  display: flex;
-  margin-top: 30px;
-  margin-left: 1030px;
-  gap: 15px;
-`;
+import Swal from 'sweetalert2';
 
 const LineDiv = styled.div`
   height: 50px;
@@ -38,14 +32,16 @@ const ModalContainer = styled.div`
 `;
 
 const BloodPressure = () => {
+  const token = null;
   const url = 'http://127.0.0.1:80/api/bloodPressure/list';
 
   const options = {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
     body: JSON.stringify({ memberNo: '1' }),
   };
 
+  const [num, setNum] = useState(0);
   const [fullData, setFullData] = useState([]); // 전체 데이터 저장
   const [pagedData, setPagedData] = useState([]); // 페이징된 데이터
   const [filteredData, setFilteredData] = useState([]); // 차트용 필터링 데이터
@@ -60,13 +56,18 @@ const BloodPressure = () => {
 
   ////////////////////////////////////////////////////////////////////////////////////////////////
   //인풋 안 쪽에 들어가는 데이터 ~~~Vo에 들어있는 이름으로 맞춰주기
-  const initialInputData = { memberNo: '1', systole: '', diastole: '', pulse: '', enrollDate: '', note: '' };
+  const initialInputData = {
+    no: '',
+    memberNo: '1',
+    systole: '',
+    diastole: '',
+    pulse: '',
+    enrollDate: '',
+    note: '',
+  };
   // 모달 안 쪽 인풋에 데이터 관리
   const [inputData, setInputData] = useState(initialInputData);
-  // 페이징 쪽에 있는 자료 활용
-  const data = dataVoList.slice(offset, offset + boardLimit);
   // 화면 렌더링
-  const [num, setNum] = useState('');
   // 인풋 데이터 초기화
   const reset = () => {
     setInputData(initialInputData);
@@ -83,19 +84,113 @@ const BloodPressure = () => {
 
   // 인풋 입력값 보내기
   const handleSubmit = (e) => {
-    fetch('http://127.0.0.1:80/api/bloodPressure/write', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify(inputData),
-    })
-      .then((resp) => resp.json())
-      .then((data) => {});
-    //렌
-    setNum(num - 1);
-    // 입력 후 모달 창 닫기
-    dispatch(close(e.target.title));
+    Swal.fire({
+      title: '등록하시겠습니까?',
+      icon: 'question',
+      showCancelButton: true, // ❗ 취소 버튼 추가 (없으면 무조건 실행됨)
+      confirmButtonText: '확인',
+      cancelButtonText: '취소',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // ✅ 사용자가 '확인' 버튼을 눌렀을 때만 실행
+        fetch('http://127.0.0.1:80/api/bloodPressure/write', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify(inputData),
+        })
+          .then((resp) => resp.text())
+          .then((data) => {
+            if (data == 1) {
+              setNum((x) => x + 1);
+              Swal.fire({
+                title: '등록되었습니다.',
+                icon: 'success',
+                draggable: true,
+              });
+            } else {
+              Swal.fire({
+                icon: 'error',
+                title: '정확한 수치를 입력해주세요.',
+                text: '다시 입력해주세요',
+              });
+            }
+          });
+
+        // 모달 창 닫기
+        dispatch(close(e.target.title));
+      }
+    });
+  };
+
+  const handleEditSubmit = (e) => {
+    Swal.fire({
+      title: '수정하시겠습니까?',
+      icon: 'question',
+      showCancelButton: true, // ❗ 취소 버튼 추가 (없으면 무조건 실행됨)
+      confirmButtonText: '확인',
+      cancelButtonText: '취소',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // ✅ 사용자가 '확인' 버튼을 눌렀을 때만 실행
+        fetch('http://127.0.0.1:80/api/bloodPressure/edit', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify(inputData),
+        })
+          .then((resp) => resp.text())
+          .then((data) => {
+            if (data == 1) {
+              setNum((x) => x + 1);
+              Swal.fire({
+                title: '수정되었습니다.',
+                icon: 'success',
+                draggable: true,
+              });
+            } else {
+              Swal.fire({
+                icon: 'error',
+                title: '정확한 수치를 입력해주세요.',
+                text: '다시 입력해주세요',
+              });
+            }
+          });
+
+        // 모달 창 닫기
+        dispatch(close(e.target.title));
+      }
+    });
+  };
+  const handleDelSubmit = (e) => {
+    Swal.fire({
+      title: '삭제하시겠습니까?',
+      icon: 'question',
+      showCancelButton: true, // ❗ 취소 버튼 추가 (없으면 무조건 실행됨)
+      confirmButtonText: '확인',
+      cancelButtonText: '취소',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // ✅ 사용자가 '확인' 버튼을 눌렀을 때만 실행
+        fetch('http://127.0.0.1:80/api/bloodPressure/delete', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify(inputData),
+        })
+          .then((resp) => resp.text())
+          .then((data) => {
+            console.log(data);
+            setNum((x) => x - 1);
+            console.log(num);
+            Swal.fire({
+              title: '삭제되었습니다.',
+              icon: 'success',
+              draggable: true,
+            });
+          });
+
+        // 모달 창 닫기
+        dispatch(close(e.target.title));
+      }
+    });
   };
   //////////////////////////////////////////////////////////////////////////////
 
@@ -113,7 +208,7 @@ const BloodPressure = () => {
         }
       })
       .catch((error) => console.error('데이터 불러오기 실패:', error));
-  }, []);
+  }, [num]);
 
   // 테이블 페이징 처리
   useEffect(() => {
@@ -272,7 +367,7 @@ const BloodPressure = () => {
             mb={'10'}
             mt={'5'}
             // 위쪽에 만들어둔 useState
-            value={inputData.enrollDate}
+            // value={''}
             // 입력값 저장하기
             f={handleChange}
           ></InputTag>
@@ -289,7 +384,7 @@ const BloodPressure = () => {
           <InputTag
             name="diastole"
             type="number"
-            title="수축기 혈압"
+            title="이완기 혈압"
             value={inputData.diastole}
             size={'size3'}
             mb={'10'}
@@ -370,7 +465,7 @@ const BloodPressure = () => {
           <InputTag
             name="diastole"
             type="number"
-            title="수축기 혈압"
+            title="이완기 혈압"
             value={inputData.diastole}
             size={'size3'}
             mb={'10'}
@@ -400,25 +495,30 @@ const BloodPressure = () => {
 
           {/* //모달 안에 들어가는 버튼 컨테이너 */}
           <ModalContainer>
-            <Btn f={handleEditSubmit} mt={'10'} mb={'20'} mr={'20'} c={'#7ca96d'} fc={'white'} str={'수정'}></Btn>
-            <Btn mt={'10'} mb={'20'} mr={'-20'} c={'lightgray'} fc={'black'} str={'삭제'}></Btn>
+            <Btn
+              f={handleEditSubmit}
+              mt={'10'}
+              mb={'20'}
+              mr={'20'}
+              c={'#7ca96d'}
+              fc={'white'}
+              str={'수정'}
+              title={'혈압 수정'}
+            ></Btn>
+            <Btn
+              f={handleDelSubmit}
+              mt={'10'}
+              mb={'20'}
+              mr={'-20'}
+              c={'lightgray'}
+              fc={'black'}
+              str={'삭제'}
+              title={'혈압 수정'}
+            ></Btn>
           </ModalContainer>
         </Modal>
 
         {/* //모달 열기 버튼 컨테이너 */}
-        <BtnContainer>
-          <div
-            onClick={() => {
-              // 모달 안 데이터 초기화
-              reset();
-              //해달 모달 열기
-              // title : 모달 이름
-              dispatch(open({ title: '수면 등록', value: 'block' }));
-            }}
-          >
-            <Btn mt={'50'} mr={'46'} mb={'20'} str={'등록'} c={'#FF7F50'} fc={'white'}></Btn>
-          </div>
-        </BtnContainer>
 
         {/* dateBtn을 호출할때 그래프 타입을 바꿀수있는 setState (onChange) 와 단위기간을 바꿀 수 있는 setState(onSelect) 를 넘겨준다 */}
         <DateBtn dataBtn={dataBtn} onSelect={setSelectedRange} onChange={setSelectChart}></DateBtn>
@@ -431,20 +531,24 @@ const BloodPressure = () => {
           height={450} // 위랑 동일
           xAxisColor="rgba(54, 162, 235, 1)" // 위랑 동일
           yAxisColor="rgba(255, 159, 64, 1)" // 위랑 동일
-          yMax={200} // y축 최댓값 상황에 맏춰서 지정 아무것도 안적으면 자동으로 짜준다.
+          yMax={300} // y축 최댓값 상황에 맏춰서 지정 아무것도 안적으면 자동으로 짜준다.
           yMin={0} // y축 최솟값 지정 아무것도 안적으면 자동으로 짜줌 음수도 입력가능
           xLabelVisible={true} // 추가: X축 라벨 표시 여부 (기본값: true)
         />
 
-        <BtnContainer2>
+        <BtnContainer>
           <div
             onClick={() => {
-              dispatch(open({ title: '수면 등록', value: 'block' }));
+              // 모달 안 데이터 초기화
+              reset();
+              //해달 모달 열기
+              // title : 모달 이름
+              dispatch(open({ title: '혈압 등록', value: 'block' }));
             }}
           >
-            <Btn str={'등록'} c={'#FF7F50'} fc={'white'}></Btn>
+            <Btn mt={'50'} mr={'46'} mb={'20'} str={'등록'} c={'#FF7F50'} fc={'white'}></Btn>
           </div>
-        </BtnContainer2>
+        </BtnContainer>
 
         <RadiusTable width="100%" thBgColor="" radius="0px">
           <thead>
@@ -474,6 +578,7 @@ const BloodPressure = () => {
                   onClick={() => {
                     // 버튼 클릭 시 해당 vo에 들어있는 값으로 useState값 변경
                     setInputData({
+                      no: vo.no,
                       memberNo: vo.memberNo,
                       systole: vo.systole,
                       diastole: vo.diastole,
@@ -482,7 +587,7 @@ const BloodPressure = () => {
                       note: vo.note,
                     });
                     // 모달 열기
-                    dispatch(open({ title: '수면 수정', value: 'block' }));
+                    dispatch(open({ title: '혈압 수정', value: 'block' }));
                   }}
                 >
                   {index === 0 && (
