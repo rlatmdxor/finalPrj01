@@ -49,7 +49,7 @@ const Board = () => {
   const boardLimit = useSelector((state) => state.paging[boardType]?.boardLimit || 12);
   const offset = (currentPage - 1) * boardLimit;
 
-  const url = 'http://127.0.0.1:80/board/honeytip';
+  const url = 'http://127.0.0.1:80/api/board/honeytip';
   const options = {
     method: 'GET',
     headers: {

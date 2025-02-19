@@ -11,6 +11,7 @@ public class DietVo {
     private String dietDay;
     private String mealCode;
     private List<MealVo> foodList;
+    private String sumKcal;
     private String memo;
     private String image;
     private String enrollDate;

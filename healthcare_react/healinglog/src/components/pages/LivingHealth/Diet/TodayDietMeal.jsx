@@ -25,6 +25,11 @@ const Container = styled.div`
   margin-bottom: 15px;
 `;
 
+const SmallTitleDiv = styled.div`
+  color: #4caf50;
+  font-weight: 900;
+`;
+
 const SelectedFoodListArea = styled.div`
   margin-bottom: 25px;
   font-size: 14px;
@@ -58,8 +63,8 @@ const PreviewDiv = styled.div`
 `;
 
 const UploadedImg = styled.img`
-  width: 60%;
-  height: 60%;
+  width: 55%;
+  height: 55%;
   object-fit: contain;
 `;
 
@@ -70,12 +75,13 @@ const DeleteImgBtn = styled.button`
   cursor: pointer;
 `;
 
-const TodayDietMeal = ({ day }) => {
+const TodayDietMeal = ({ day, reRender, setReRender }) => {
   const dispatch = useDispatch();
   const token = localStorage.getItem('token');
 
-  // 끼니별 섭취 칼로리 조회
-  const [mealKcalSummary, setMealKcalSummary] = useState([]);
+  const [foodData, setFoodData] = useState([]); // 음식 목록 데이터
+  const [mealDetailList, setMealDetailList] = useState([]); // 식단 상세 정보
+  const [mealKcalSum, setMealKcalSum] = useState({}); // 끼니별 섭취 칼로리
 
   useEffect(() => {
     fetch('http://127.0.0.1:80/api/diet', {
@@ -85,18 +91,37 @@ const TodayDietMeal = ({ day }) => {
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
-        memberNo: 1,
+        memberNo: '1',
         dietDay: day,
       }),
     })
       .then((resp) => resp.json())
       .then((data) => {
-        setMealKcalSummary(data);
+        setMealDetailList(data);
+        const kcalSummary = {};
+        data.forEach((item) => {
+          kcalSummary[item.mealCode] = item.sumKcal;
+        });
+        setMealKcalSum(kcalSummary);
+      });
+  }, [day, reRender]);
+
+  useEffect(() => {
+    fetch('http://127.0.0.1:80/api/diet/food', {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((resp) => resp.json())
+      .then((data) => {
+        setFoodData(data);
       });
   }, []);
 
   // 식단 등록 폼데이터
   const initialInputData = {
+    no: '',
     memberNo: '1',
     dietDay: day,
     mealCode: '',
@@ -119,7 +144,8 @@ const TodayDietMeal = ({ day }) => {
   // AutoComplete input 초기화를 위한 state
   const [autoCompleteValue, setAutoCompleteValue] = useState('');
 
-  const imgRef = useRef(null);
+  const enrollImgRef = useRef(null);
+  const editImgRef = useRef(null);
 
   const options = [
     { id: '1', label: '아침' },
@@ -128,17 +154,6 @@ const TodayDietMeal = ({ day }) => {
     { id: '4', label: '오후간식' },
     { id: '5', label: '저녁' },
     { id: '6', label: '야식' },
-  ];
-
-  const foodDummyData = [
-    { label: '쌀밥', unit: '1공기', amount: 210, kcal: 336 },
-    { label: '잡곡밥', unit: '1공기', amount: 210, kcal: 306 },
-    { label: '삶은계란', unit: '1개', amount: 45, kcal: 65 },
-    { label: '계란후라이', unit: '1개', amount: 46, kcal: 95 },
-    { label: '배추김치', unit: '1그릇', amount: 40, kcal: 14 },
-    { label: '사과', unit: '1개', amount: 250, kcal: 142 },
-    { label: '바나나', unit: '1개', amount: 150, kcal: 114 },
-    { label: '딸기', unit: '1개', amount: 20, kcal: 6 },
   ];
 
   const handleOpenDietEnrollModal = (mealCode) => {
@@ -226,7 +241,6 @@ const TodayDietMeal = ({ day }) => {
   };
 
   const handleFoodDelete = (index) => {
-    console.log(index);
     setInputData((prev) => {
       return {
         ...prev,
@@ -244,7 +258,7 @@ const TodayDietMeal = ({ day }) => {
     });
   };
 
-  const handleImageChange = () => {
+  const handleImageChange = (imgRef) => {
     const file = imgRef.current.files[0];
 
     if (!file) {
@@ -264,7 +278,7 @@ const TodayDietMeal = ({ day }) => {
     };
   };
 
-  const handleImageDelete = () => {
+  const handleImageDelete = (imgRef) => {
     setInputData((prev) => ({
       ...prev,
       image: '',
@@ -273,6 +287,7 @@ const TodayDietMeal = ({ day }) => {
     imgRef.current.value = '';
   };
 
+  // 식단 등록
   const handleSubmit = () => {
     if (!window.confirm('등록하시겠습니까?')) {
       return;
@@ -295,6 +310,7 @@ const TodayDietMeal = ({ day }) => {
     }).then((resp) => {
       if (resp.status == 200) {
         alert('등록되었습니다.');
+        setReRender(() => reRender + 1);
       } else {
         alert('오류 발생..');
       }
@@ -304,7 +320,74 @@ const TodayDietMeal = ({ day }) => {
 
   // 식단 상세 조회
   const handleOpenDietDetailModal = (mealCode) => {
+    const mealDetail = mealDetailList.find((meal) => meal.mealCode === mealCode);
+    setInputData({
+      no: mealDetail.no,
+      memberNo: '1',
+      dietDay: day,
+      mealCode: mealDetail.mealCode,
+      foodList: mealDetail.foodList || [],
+      memo: mealDetail.memo || '',
+      image: mealDetail.image || '',
+      imagePreview: mealDetail.image || '',
+    });
     dispatch(open({ title: '식단 상세', value: 'block' }));
+  };
+
+  // 식단 수정
+  const handleEdit = () => {
+    if (!window.confirm('저장하시겠습니까?')) {
+      return;
+    }
+    const formData = new FormData();
+    formData.append('no', inputData.no);
+    formData.append('memberNo', inputData.memberNo);
+    formData.append('dietDay', inputData.dietDay);
+    formData.append('mealCode', inputData.mealCode);
+    formData.append('foodListArr', JSON.stringify(inputData.foodList));
+    formData.append('memo', inputData.memo);
+    formData.append('f', inputData.image);
+
+    fetch('http://127.0.0.1:80/api/diet/edit', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    }).then((resp) => {
+      if (resp.status == 200) {
+        alert('저장되었습니다.');
+        setReRender(() => reRender + 1);
+      } else {
+        alert('오류 발생..');
+      }
+      dispatch(close('식단 상세'));
+    });
+  };
+
+  // 식단 삭제
+  const handleDelete = () => {
+    if (!window.confirm('삭제하시겠습니까?')) {
+      return;
+    }
+    fetch('http://127.0.0.1:80/api/diet/delete', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        no: inputData.no,
+      }),
+    }).then((resp) => {
+      if (resp.status == 200) {
+        alert('삭제되었습니다.');
+        setReRender(() => reRender + 1);
+      } else {
+        alert('오류 발생..');
+      }
+      dispatch(close('식단 상세'));
+    });
   };
 
   return (
@@ -314,13 +397,12 @@ const TodayDietMeal = ({ day }) => {
       </TodayDietArea>
       <ContentAreaDiv>
         {options.map((option) => {
-          const mealData = mealKcalSummary.find((meal) => meal.mealCode === option.id);
-          const kcal = mealData ? mealData.summaryKcal : '0';
+          const kcal = mealKcalSum[option.id] || '0';
           return (
             <SmallCard key={option.id}>
               <SmallTextDiv>
                 <div>{option.label}</div>
-                {mealData ? (
+                {mealKcalSum[option.id] ? (
                   <Btn
                     str={'상세'}
                     w={'50'}
@@ -355,11 +437,11 @@ const TodayDietMeal = ({ day }) => {
       </ContentAreaDiv>
 
       <Modal title="식단 등록">
-        <div>{options.find((option) => option.id === inputData.mealCode)?.label || ''} 식단</div>
+        <SmallTitleDiv>{options.find((option) => option.id === inputData.mealCode)?.label || ''}</SmallTitleDiv>
         <Container>
           <Autocomplete
             disablePortal
-            options={foodDummyData}
+            options={foodData}
             getOptionLabel={(option) => option.label || ''}
             value={autoCompleteValue}
             onChange={handleFoodSelect}
@@ -462,13 +544,13 @@ const TodayDietMeal = ({ day }) => {
           f={handleMemoChange}
         />
         <div>사진</div>
-        <FileInput type="file" accept="image/*" onChange={handleImageChange} ref={imgRef} />
+        <FileInput type="file" accept="image/*" onChange={() => handleImageChange(enrollImgRef)} ref={enrollImgRef} />
 
         <PreviewDiv>
           {inputData.image ? (
             <>
               <UploadedImg src={inputData.imagePreview} alt="식단이미지" />
-              <DeleteImgBtn onClick={handleImageDelete}>✖</DeleteImgBtn>
+              <DeleteImgBtn onClick={() => handleImageDelete(enrollImgRef)}>✖</DeleteImgBtn>
             </>
           ) : (
             ''
@@ -489,12 +571,12 @@ const TodayDietMeal = ({ day }) => {
         </ModalContainer>
       </Modal>
 
-      <Modal title="식단 수정">
-        <div>{options.find((option) => option.id === inputData.mealCode)?.label || ''} 식단</div>
+      <Modal title="식단 상세">
+        <SmallTitleDiv>{options.find((option) => option.id === inputData.mealCode)?.label || ''}</SmallTitleDiv>
         <Container>
           <Autocomplete
             disablePortal
-            options={foodDummyData}
+            options={foodData}
             getOptionLabel={(option) => option.label || ''}
             value={autoCompleteValue}
             onChange={handleFoodSelect}
@@ -597,13 +679,13 @@ const TodayDietMeal = ({ day }) => {
           f={handleMemoChange}
         />
         <div>사진</div>
-        <FileInput type="file" accept="image/*" onChange={handleImageChange} ref={imgRef} />
+        <FileInput type="file" accept="image/*" onChange={() => handleImageChange(editImgRef)} ref={editImgRef} />
 
         <PreviewDiv>
           {inputData.image ? (
             <>
               <UploadedImg src={inputData.imagePreview} alt="식단이미지" />
-              <DeleteImgBtn onClick={handleImageDelete}>✖</DeleteImgBtn>
+              <DeleteImgBtn onClick={() => handleImageDelete(editImgRef)}>✖</DeleteImgBtn>
             </>
           ) : (
             ''
@@ -612,15 +694,16 @@ const TodayDietMeal = ({ day }) => {
 
         <ModalContainer>
           <Btn
-            title={'식단 등록'}
-            str={'등록'}
+            title={'식단 상세'}
+            str={'저장'}
             mt={'15'}
             mb={'30'}
-            mr={'0'}
+            mr={'10'}
             c={'#ff8a60'}
             fc={'white'}
-            f={handleSubmit}
+            f={handleEdit}
           ></Btn>
+          <Btn title={'식단 상세'} str={'삭제'} mt={'15'} mb={'30'} mr={'0'} f={handleDelete}></Btn>
         </ModalContainer>
       </Modal>
 

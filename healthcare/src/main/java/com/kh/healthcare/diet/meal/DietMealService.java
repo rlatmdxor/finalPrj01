@@ -21,15 +21,44 @@ public class DietMealService {
         List<MealVo> mealVoList = vo.getFoodList();
 
         for (MealVo mealVo : mealVoList) {
-            System.out.println("mealVo = " + mealVo);
             mapper.mealEnroll(mealVo);
         }
 
     }
 
-    public List<SummaryKcalVo> getMealKcalSummary(DietVo vo) {
+    public List<DietVo> dietMealDetail(DietVo vo) {
 
-        return mapper.getMealKcalSummary(vo);
+        List<DietVo> voList = mapper.getDietDetail(vo);
 
+        for (DietVo dietVo : voList) {
+            String sumKcal = mapper.getSumKcal(dietVo);
+            dietVo.setSumKcal(sumKcal);
+
+            List<MealVo> mealVoList = mapper.getFoodList(dietVo);
+            dietVo.setFoodList(mealVoList);
+        }
+
+        return voList;
+
+    }
+
+    public void dietMealEdit(DietVo vo) {
+        mapper.dietEdit(vo);
+
+        mapper.deleteMealList(vo);
+
+        List<MealVo> mealVoList = vo.getFoodList();
+        for (MealVo mealVo : mealVoList) {
+            mealVo.setDietNo(vo.getNo());
+            mapper.mealEdit(mealVo);
+        }
+    }
+
+    public void dietMealDelete(String no) {
+        mapper.dietMealDelete(no);
+    }
+
+    public List<FoodVo> getFoodData() {
+        return mapper.getFoodData();
     }
 }

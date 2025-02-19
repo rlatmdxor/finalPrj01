@@ -8,7 +8,7 @@ import Input from '../../../util/Input';
 import { close } from '../../../../redux/modalSlice';
 import { useDispatch } from 'react-redux';
 
-const TodayWeight = ({ day }) => {
+const TodayWeight = ({ day, reRender, setReRender }) => {
   const dispatch = useDispatch();
   const token = localStorage.getItem('token');
 
@@ -35,14 +35,13 @@ const TodayWeight = ({ day }) => {
     })
       .then((resp) => resp.text())
       .then((data) => {
-        console.log(data);
         if (data) {
           setAmount(data);
         } else {
           setAmount(0);
         }
       });
-  }, [day]);
+  }, [day, reRender]);
 
   const handleOpenWeightModal = () => {
     setInputData((prev) => ({
@@ -82,8 +81,8 @@ const TodayWeight = ({ day }) => {
     })
       .then((resp) => resp.text())
       .then((data) => {
-        console.log(data);
         setAmount(inputData.amount);
+        setReRender(() => reRender + 1);
         dispatch(close('체중 등록'));
         alert('등록되었습니다.');
         reset();

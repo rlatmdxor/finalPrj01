@@ -35,7 +35,6 @@ const TodayWater = ({ day }) => {
     })
       .then((resp) => resp.text())
       .then((data) => {
-        console.log(data);
         if (data) {
           setAmount(data);
         } else {
@@ -78,7 +77,6 @@ const TodayWater = ({ day }) => {
     })
       .then((resp) => resp.text())
       .then((data) => {
-        console.log(data);
         setAmount(inputData.amount);
         dispatch(close('물 등록'));
         alert('등록되었습니다.');
