@@ -1,22 +1,19 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Navi from './Navi';
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { getPayload } from '../util/JwtUtil';
 
 const ImgLayout = styled.img`
   width: 140px;
   height: 130px;
 `;
 
-const StyledLink = styled(Link)`
+const StyledImg = styled.img`
+  cursor: pointer;
   border-bottom: 1px solid #7ca96d;
   box-sizing: border-box;
   height: 110px;
-`;
-
-const ProfileLink = styled(Link)`
-  text-decoration: none;
-  color: black;
 `;
 
 const ProfileDiv = styled.div`
@@ -42,6 +39,7 @@ const MypageDiv = styled.div`
   align-items: center;
   width: 100px;
   height: 35px;
+  cursor: pointer;
 `;
 
 const LoginDiv = styled.div`
@@ -52,25 +50,26 @@ const LoginDiv = styled.div`
   align-items: center;
   width: 100px;
   height: 35px;
+  cursor: pointer;
 `;
 
 const Header = () => {
+  const token = localStorage.getItem('token');
+  const nick = getPayload(token, 'nick');
+  const navi = useNavigate();
+
   return (
     <>
-      <StyledLink to={'/'}>
-        <ImgLayout src="/img/logo.png"></ImgLayout>
-      </StyledLink>
-      <Navi></Navi>
+      <StyledImg src="/img/logo.png" onClick={() => navi('/')} />
+      <Navi />
       <ProfileDiv>
-        <div>구승용짱</div>
+        <div style={{ fontWeight: 'bold' }}>{nick ? nick + '님' : 'GUEST'}</div>
         <MypageContainer>
-          <MypageDiv>
-            <ProfileLink to={'mypage'}>
-              <div>마이페이지</div>
-            </ProfileLink>
+          <MypageDiv onClick={() => (window.location.href = '/mypage')}>
+            <div>마이페이지</div>
           </MypageDiv>
-          <LoginDiv>
-            <ProfileLink to={'login'}>로그아웃</ProfileLink>
+          <LoginDiv onClick={() => (localStorage.setItem('token', ''), (window.location.href = '/login'))}>
+            <div>{token ? '로그아웃' : '로그인'}</div>
           </LoginDiv>
         </MypageContainer>
       </ProfileDiv>
