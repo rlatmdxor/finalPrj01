@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { BigTextDiv, SmallCard, SmallTextDiv } from './Diet';
+import { useDispatch, useSelector } from 'react-redux';
 
-const TodayKcal = ({ day, reRender }) => {
+const TodayKcal = ({ reRender }) => {
+  const day = useSelector((state) => state.diet.day);
   const token = localStorage.getItem('token');
   const [totalKcal, setTotalKcal] = useState(0); // 총 섭취 칼로리
 

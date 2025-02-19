@@ -6,11 +6,13 @@ import { ModalContainer } from './Diet';
 import Modal from '../../../util/Modal';
 import Input from '../../../util/Input';
 import { close } from '../../../../redux/modalSlice';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
-const TodayWeight = ({ day, reRender, setReRender }) => {
+const TodayWeight = ({ reRender, setReRender }) => {
   const dispatch = useDispatch();
   const token = localStorage.getItem('token');
+
+  const day = useSelector((state) => state.diet.day);
 
   const [amount, setAmount] = useState(0);
 
@@ -46,14 +48,11 @@ const TodayWeight = ({ day, reRender, setReRender }) => {
   const handleOpenWeightModal = () => {
     setInputData((prev) => ({
       ...prev,
+      enrollDate: day,
       amount: amount,
     }));
 
     dispatch(open({ title: '체중 등록', value: 'block' }));
-  };
-
-  const reset = () => {
-    setInputData(initialInputData);
   };
 
   const handleChange = (e) => {
@@ -85,7 +84,6 @@ const TodayWeight = ({ day, reRender, setReRender }) => {
         setReRender(() => reRender + 1);
         dispatch(close('체중 등록'));
         alert('등록되었습니다.');
-        reset();
       });
   };
 
