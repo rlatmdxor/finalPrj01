@@ -95,7 +95,7 @@ public interface MemberMapper {
             WHERE
                 PHONE = #{phone}
             """)
-    int duplicatePhoneCheck(MemberVo vo);
+    int duplicatePhoneCheck(String phone);
 
     @Update("""
             UPDATE
@@ -116,4 +116,75 @@ public interface MemberMapper {
                 ID = #{id}
             """)
     String getProfile(String id);
+
+    @Update("""
+            UPDATE
+                MEMBER
+            SET
+                NICK = #{nick}
+            WHERE
+                ID = #{id}
+            """)
+    void nickChange(String id, String nick);
+
+    @Update("""
+            UPDATE
+                MEMBER
+            SET
+                ADDRESS = #{address}
+            WHERE
+                ID = #{id}
+            """)
+    void addressChange(String id, String address);
+
+    @Update("""
+            UPDATE
+                MEMBER
+            SET
+                PHONE = #{phone}
+            WHERE
+                ID = #{id}
+            """)
+    void phoneChange(String id, String phone);
+
+    @Select("""
+            SELECT
+                PWD
+            FROM
+                MEMBER
+            WHERE
+                ID = #{id}
+            """)
+    String getPwd(String id);
+
+    @Update("""
+            UPDATE
+                MEMBER
+            SET
+                PWD = #{encodedPwd}
+            WHERE
+                ID = #{id}
+            """)
+    void updatePwd(String encodedPwd, String id);
+
+    @Update("""
+            UPDATE
+                MEMBER
+            SET
+                HEIGHT = #{height},
+                WEIGHT = #{weight}
+            WHERE
+                ID = #{id}
+            """)
+    void physicalChange(String id, String height, String weight);
+
+    @Update("""
+            UPDATE
+                MEMBER
+            SET
+                DEL_YN = 'Y'
+            WHERE
+                ID = #{id}
+            """)
+    void withdrawal(String id);
 }
