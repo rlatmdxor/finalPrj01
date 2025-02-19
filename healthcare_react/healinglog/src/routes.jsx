@@ -35,6 +35,7 @@ import ExReport from './components/pages/LivingHealth/Exercise/ExReport';
 import Exercising from './components/pages/LivingHealth/Exercise/Exercising';
 import DietCal from './components/pages/LivingHealth/Diet/DietCal';
 import DietReport from './components/pages/LivingHealth/Diet/DietReport';
+import Bookmark from './components/pages/LivingHealth/Exercise/Bookmark';
 
 export const routes = [
   { path: '/', component: <Main /> },
@@ -74,4 +75,5 @@ export const routes = [
   { path: '/admin/usermanage', component: <AdminUserManage /> },
   { path: '/alc/report', component: <AlcReport /> },
   { path: '/cigarette/report', component: <CigaretteReport /> },
+  { path: '/bookmark', component: <Bookmark /> },
 ];

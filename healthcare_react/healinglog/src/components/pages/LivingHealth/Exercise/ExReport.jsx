@@ -60,6 +60,7 @@ const ExReport = () => {
     <>
       <Title>운동</Title>
       <NaviContainer>
+        <Navi target="bookmark" tag={'즐겨찾기'}></Navi>
         <Navi target="aerobic" tag={'유산소'}></Navi>
         <Navi target="anaerobic" tag={'무산소'}></Navi>
         <Navi target="exhistory" tag={'내역 관리'}></Navi>
@@ -171,10 +172,10 @@ const BlankSpace = styled.div`
 const NaviContainer = styled.div`
   display: grid;
   position: relative;
-  width: 400px;
+  width: 500px;
   top: 20px;
   left: 40px;
-  grid-template-columns: 3fr 3fr 4fr 3fr;
+  grid-template-columns: 4fr 3fr 3fr 4fr 3fr;
 `;
 
 const ChartContainer = styled.div`

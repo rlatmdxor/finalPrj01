@@ -2,8 +2,6 @@ import React, { useEffect, useState } from 'react';
 import Title from '../../../util/Title';
 import Navi from '../../../util/Navi';
 import styled from 'styled-components';
-import FavoriteList from './List/FavoriteList';
-import AerobicList from './List/AerobicList';
 import Modal from '../../../util/Modal';
 import Input from '../../../util/Input';
 import { useDispatch } from 'react-redux';
@@ -36,6 +34,7 @@ const Aerobic = () => {
     <>
       <Title>운동</Title>
       <NaviContainer>
+        <Navi target="bookmark" tag={'즐겨찾기'}></Navi>
         <Navi target="aerobic" tag={'유산소'}></Navi>
         <Navi target="anaerobic" tag={'무산소'}></Navi>
         <Navi target="exhistory" tag={'내역 관리'}></Navi>
@@ -44,7 +43,7 @@ const Aerobic = () => {
 
       <ContentLayout>
         <BlankSpace />
-        <FavoriteList
+        {/* <FavoriteList
           f={(name) => {
             setModalTitle(name);
             dispatch(open({ title: '운동시작', value: 'block' }));
@@ -56,7 +55,7 @@ const Aerobic = () => {
             setModalTitle(name);
             dispatch(open({ title: '운동시작', value: 'block' }));
           }}
-        />
+        /> */}
         <BlankSpace />
       </ContentLayout>
       <Modal title="운동시작" type={'exercise'} f={handleRegister}>
@@ -137,10 +136,10 @@ const BlankSpace = styled.div`
 const NaviContainer = styled.div`
   display: grid;
   position: relative;
-  width: 400px;
+  width: 500px;
   top: 20px;
   left: 40px;
-  grid-template-columns: 3fr 3fr 4fr 3fr;
+  grid-template-columns: 4fr 3fr 3fr 4fr 3fr;
 `;
 
 export default Aerobic;
