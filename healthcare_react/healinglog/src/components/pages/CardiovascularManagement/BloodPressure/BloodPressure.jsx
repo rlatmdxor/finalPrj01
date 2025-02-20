@@ -344,6 +344,17 @@ const BloodPressure = () => {
     },
   ];
 
+  let now = new Date();
+
+  // 날짜를 YYYY-MM-DD 형식으로 변환
+  let year = now.getFullYear();
+  let month = String(now.getMonth() + 1).padStart(2, '0'); // 월은 0부터 시작하므로 +1
+  let day = String(now.getDate()).padStart(2, '0');
+  let hours = String(now.getHours()).padStart(2, '0');
+  let minutes = String(now.getMinutes()).padStart(2, '0');
+
+  let maxDateTime = `${year}-${month}-${day}T00:00`;
+
   return (
     <>
       <Title>혈압</Title>
@@ -369,6 +380,7 @@ const BloodPressure = () => {
             // 위쪽에 만들어둔 useState
             // value={''}
             // 입력값 저장하기
+            max={maxDateTime}
             f={handleChange}
           ></InputTag>
           <InputTag
@@ -447,6 +459,7 @@ const BloodPressure = () => {
             // margin bottom , top
             mb={'10'}
             mt={'5'}
+            max={maxDateTime}
             // 위쪽에 만들어둔 useState
             value={inputData.enrollDate}
             // 입력값 저장하기

@@ -35,6 +35,9 @@ import ExReport from './components/pages/LivingHealth/Exercise/ExReport';
 import Exercising from './components/pages/LivingHealth/Exercise/Exercising';
 import DietCal from './components/pages/LivingHealth/Diet/DietCal';
 import DietReport from './components/pages/LivingHealth/Diet/DietReport';
+import ReportedHoneyBoard from './components/admin/honeyBoard/ReportedHoneyBoard';
+import ReportedHoneyComment from './components/admin/honeyBoard/ReportedHoneyComment';
+import AdminBoard from './components/admin/honeyBoard/AdminBoard';
 
 export const routes = [
   { path: '/', component: <Main /> },
@@ -74,4 +77,7 @@ export const routes = [
   { path: '/admin/usermanage', component: <AdminUserManage /> },
   { path: '/alc/report', component: <AlcReport /> },
   { path: '/cigarette/report', component: <CigaretteReport /> },
+  { path: '/reported/honeytip', component: <ReportedHoneyBoard /> },
+  { path: '/reported/honeytip/comment', component: <ReportedHoneyComment /> },
+  { path: '/admin/board', component: <AdminBoard /> },
 ];
