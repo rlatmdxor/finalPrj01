@@ -10,14 +10,24 @@ import java.util.List;
 public interface AerobicMapper {
 
     @Select("""
-            SELECT *
+            SELECT
+                NO
+                , NAME
+                , BOOKMARK
+                , GUIDE_LINK
+                , CAL_CONSUME
             FROM AEROBIC
             WHERE BOOKMARK = 'N'
             """)
     List<AerobicVo> getData();
 
     @Select("""
-            SELECT *
+            SELECT
+                NO
+                , NAME
+                , BOOKMARK
+                , GUIDE_LINK
+                , CAL_CONSUME
             FROM AEROBIC
             WHERE BOOKMARK = 'Y'
             """)

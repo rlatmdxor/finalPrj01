@@ -25,7 +25,11 @@ public class SleepController {
     public String write(@RequestBody  SleepVo vo){
         LocalTime sleepStart = LocalTime.parse(vo.getSleepStart(), formatter);
         LocalTime sleepEnd = LocalTime.parse(vo.getSleepEnd(), formatter);
-        String sleepMinutes = String.valueOf(ChronoUnit.MINUTES.between(sleepStart, sleepEnd));
+        long betweenTime = ChronoUnit.MINUTES.between(sleepStart, sleepEnd);
+        if(betweenTime < 0 ){
+            betweenTime = betweenTime+1440;
+        }
+        String sleepMinutes = String.valueOf(betweenTime);
         vo.setSleepDuration(sleepMinutes);
         service.write(vo);
         return "write ok~~~";
@@ -43,7 +47,14 @@ public class SleepController {
         System.out.println("vo = " + vo);
         LocalTime sleepStart = LocalTime.parse(vo.getSleepStart(), formatter);
         LocalTime sleepEnd = LocalTime.parse(vo.getSleepEnd(), formatter);
-        String sleepMinutes = String.valueOf(ChronoUnit.MINUTES.between(sleepStart, sleepEnd));
+
+        long betweenTime = ChronoUnit.MINUTES.between(sleepStart, sleepEnd);
+        if(betweenTime < 0 ){
+            betweenTime = betweenTime+1440;
+        }
+        String sleepMinutes = String.valueOf(betweenTime);
+
+
         vo.setSleepDuration(sleepMinutes);
         System.out.println("vo = " + vo);
         service.edit(vo);

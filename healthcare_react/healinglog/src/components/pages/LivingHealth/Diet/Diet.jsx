@@ -1,19 +1,16 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { useDispatch } from 'react-redux';
-import { open } from '../../../../redux/modalSlice';
 import Title from '../../../util/Title';
 import Navi from '../../../util/Navi';
 import ContentLayout from '../../../util/ContentLayout';
-import Btn from '../../../util/Btn';
+import TodayKcal from './TodayKcal';
 import TodayWater from './TodayWater';
 import TodayWeight from './TodayWeight';
-import TodayKcal from './TodayKcal';
 import MyBmi from './MyBmi';
-import WaterEnroll from './WaterEnroll';
-import WeightEnroll from './WeightEnroll';
-import DietEnroll from './DietEnroll';
-import TodayDiet from './TodayDiet';
+import TodayDietMeal from './TodayDietMeal';
+import { useLocation, useParams } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { setDay, updateDay } from '../../../../redux/dietSlice';
 
 const NaviContainer = styled.div`
   display: grid;
@@ -22,15 +19,6 @@ const NaviContainer = styled.div`
   top: 20px;
   left: 40px;
   grid-template-columns: 4fr 3fr 3fr;
-`;
-
-const ContentDiv = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  width: 100%;
-  margin-top: 60px;
-  margin-bottom: 60px;
 `;
 
 const DayDiv = styled.div`
@@ -44,6 +32,7 @@ const DayDiv = styled.div`
   border-radius: 5px;
   color: white;
   font-weight: bold;
+  margin-top: 60px;
   margin-bottom: 30px;
 
   & input {
@@ -101,7 +90,7 @@ export const SmallTextDiv = styled.div`
 export const BigTextDiv = styled.div`
   margin-left: auto;
   margin-right: auto;
-  margin-top: 11px;
+  margin-top: 7px;
   font-size: 38px;
 `;
 
@@ -116,26 +105,27 @@ export const BigCard = styled.div`
   border-radius: 6px;
 `;
 
-export const TodayDietitian = styled.div`
-  display: flex;
-  justify-content: space-between;
-  font-size: 20px;
-  margin-top: 10px;
-  margin-bottom: 20px;
-`;
-
 export const ModalContainer = styled.div`
   display: flex;
   justify-content: end;
 `;
 
 const Diet = () => {
-  console.log('화면 렌더링~~');
-
   const dispatch = useDispatch();
+  const day = useSelector((state) => state.diet.day);
 
-  const handleOpenDietEnrollModal = () => {
-    dispatch(open({ title: '식단 등록', value: 'block' }));
+  const [reRender, setReRender] = useState(0); // 화면 리렌더링용
+
+  const handleChangeDay = (e) => {
+    dispatch(setDay(e.target.value));
+  };
+
+  const handlePrevDay = () => {
+    dispatch(updateDay(-1));
+  };
+
+  const handleNextDay = () => {
+    dispatch(updateDay(+1));
   };
 
   return (
@@ -147,26 +137,23 @@ const Diet = () => {
         <Navi target="dietreport" tag={'리포트'}></Navi>
       </NaviContainer>
       <ContentLayout>
-        <ContentDiv>
-          <DayDiv>
-            <button>◀</button>
-            <input type="date" value={new Date().toISOString().split('T')[0]} />
-            <button>▶</button>
-          </DayDiv>
-          <ContentAreaDiv>
-            <TodayKcal />
-            <TodayWater />
-            <TodayWeight />
-          </ContentAreaDiv>
-          <ContentAreaDiv>
-            <MyBmi />
-          </ContentAreaDiv>
-          <TodayDiet />
-        </ContentDiv>
-        <WaterEnroll />
-        <WeightEnroll />
-        <DietEnroll />
+        <DayDiv>
+          <button onClick={handlePrevDay}>◀</button>
+          <input type="date" name="day" value={day} onChange={handleChangeDay} />
+          <button onClick={handleNextDay}>▶</button>
+        </DayDiv>
+        <ContentAreaDiv>
+          <TodayKcal reRender={reRender} />
+          <TodayWater />
+          <TodayWeight reRender={reRender} setReRender={setReRender} />
+        </ContentAreaDiv>
+        <ContentAreaDiv>
+          <MyBmi reRender={reRender} />
+        </ContentAreaDiv>
+        <TodayDietMeal reRender={reRender} setReRender={setReRender} />
+        <br />
         <h1>여기에 광고를 넣어서 돈을 벌자</h1>
+        <br />
       </ContentLayout>
     </>
   );

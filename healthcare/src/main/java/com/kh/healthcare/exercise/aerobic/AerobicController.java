@@ -1,6 +1,5 @@
 package com.kh.healthcare.exercise.aerobic;
 
-import com.kh.healthcare.cardiovascularManagement.bloodPressure.BloodPressureVo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,7 +14,7 @@ public class AerobicController {
 
     // Aerobic 리스트 데이터 조회
     @GetMapping("list")
-    public List<AerobicVo> getData() {
+    public List<AerobicVo> getData(@RequestHeader("Authorization") String authorization) {
         return service.getData();
     }
     
