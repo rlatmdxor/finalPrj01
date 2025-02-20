@@ -5,6 +5,7 @@
   "dependencies": {
     "@draft-js-plugins/anchor": "^4.2.1",
     "@draft-js-plugins/editor": "^4.1.4",
+    "@draft-js-plugins/image": "^4.1.4",
     "@draft-js-plugins/static-toolbar": "^4.1.4",
     "@draft-js-plugins/text-alignment": "^2.0.1",
     "@emotion/react": "^11.14.0",

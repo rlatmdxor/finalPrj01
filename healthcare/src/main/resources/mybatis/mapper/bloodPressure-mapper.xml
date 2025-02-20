@@ -5,6 +5,27 @@
 
 <mapper namespace="com.kh.healthcare.cardiovascularManagement.bloodPressure.mapper.BloodPressureMapper">
 
-
+    <select id="getSubmitApprovalVoList">
+        SELECT
+        A.NO
+        , A.EMP_NO          AS WRITER_NO
+        , E.NAME            AS WRITER_NAME
+        , A.L_LINE
+        , L.NAME            AS L_LINE_NAME
+        , A.STATUS_NO
+        , S.NAME            AS STATUS_NAME
+        , A.TITLE
+        , TO_CHAR( A.ENROLL_DATE, 'YYYY-MM-DD') AS ENROLL_DATE
+        FROM APPROVAL A
+        JOIN EMPLOYEE E ON ( E.NO = A.EMP_NO )
+        JOIN APPROVAL_STATUS S ON ( S.NO = A.STATUS_NO )
+        JOIN EMPLOYEE L ON ( L.NO = A.L_LINE )
+        WHERE A.EMP_NO = #{no}
+        <if test="statusFilter != null and statusFilter != ''">
+            AND A.STATUS_NO = #{statusFilter}
+        </if>
+        ORDER BY A.ENROLL_DATE DESC
+        OFFSET #{pvo.offset} ROWS FETCH NEXT #{pvo.boardLimit} ROWS ONLY
+    </select>
 
 </mapper>

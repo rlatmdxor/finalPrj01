@@ -4,8 +4,10 @@ import lombok.Data;
 
 @Data
 public class HoneyTipVo {
-    private Long no;
+    private String no;
     private String categoryNo;
+    private String categoryName;
+    private String nick;
     private String memberNo;
     private String title;
     private String content;
