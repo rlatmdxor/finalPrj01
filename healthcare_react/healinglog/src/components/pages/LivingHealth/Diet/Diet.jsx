@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import Title from '../../../util/Title';
 import Navi from '../../../util/Navi';
@@ -8,6 +8,9 @@ import TodayWater from './TodayWater';
 import TodayWeight from './TodayWeight';
 import MyBmi from './MyBmi';
 import TodayDietMeal from './TodayDietMeal';
+import { useLocation, useParams } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { setDay, updateDay } from '../../../../redux/dietSlice';
 
 const NaviContainer = styled.div`
   display: grid;
@@ -108,25 +111,21 @@ export const ModalContainer = styled.div`
 `;
 
 const Diet = () => {
-  const todayDate = new Date().toISOString().split('T')[0];
-  const [day, setDay] = useState(todayDate);
+  const dispatch = useDispatch();
+  const day = useSelector((state) => state.diet.day);
 
   const [reRender, setReRender] = useState(0); // 화면 리렌더링용
 
   const handleChangeDay = (e) => {
-    setDay(e.target.value);
+    dispatch(setDay(e.target.value));
   };
 
   const handlePrevDay = () => {
-    const prevDate = new Date(day);
-    prevDate.setDate(prevDate.getDate() - 1);
-    setDay(prevDate.toISOString().split('T')[0]);
+    dispatch(updateDay(-1));
   };
 
   const handleNextDay = () => {
-    const nextDate = new Date(day);
-    nextDate.setDate(nextDate.getDate() + 1);
-    setDay(nextDate.toISOString().split('T')[0]);
+    dispatch(updateDay(+1));
   };
 
   return (
@@ -144,14 +143,14 @@ const Diet = () => {
           <button onClick={handleNextDay}>▶</button>
         </DayDiv>
         <ContentAreaDiv>
-          <TodayKcal day={day} reRender={reRender} />
-          <TodayWater day={day} />
-          <TodayWeight day={day} reRender={reRender} setReRender={setReRender} />
+          <TodayKcal reRender={reRender} />
+          <TodayWater />
+          <TodayWeight reRender={reRender} setReRender={setReRender} />
         </ContentAreaDiv>
         <ContentAreaDiv>
-          <MyBmi day={day} reRender={reRender} />
+          <MyBmi reRender={reRender} />
         </ContentAreaDiv>
-        <TodayDietMeal day={day} reRender={reRender} setReRender={setReRender} />
+        <TodayDietMeal reRender={reRender} setReRender={setReRender} />
         <br />
         <h1>여기에 광고를 넣어서 돈을 벌자</h1>
         <br />

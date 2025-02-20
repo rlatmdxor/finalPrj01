@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import Modal from '../../../util/Modal';
 import Input from '../../../util/Input';
 import { Autocomplete, TextField } from '@mui/material';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { close, open } from '../../../../redux/modalSlice';
 import { ModalContainer } from './Diet';
 import { ContentAreaDiv, BigTextDiv, SmallCard, SmallTextDiv } from './Diet';
@@ -75,9 +75,10 @@ const DeleteImgBtn = styled.button`
   cursor: pointer;
 `;
 
-const TodayDietMeal = ({ day, reRender, setReRender }) => {
+const TodayDietMeal = ({ reRender, setReRender }) => {
   const dispatch = useDispatch();
   const token = localStorage.getItem('token');
+  const day = useSelector((state) => state.diet.day);
 
   const [foodData, setFoodData] = useState([]); // 음식 목록 데이터
   const [mealDetailList, setMealDetailList] = useState([]); // 식단 상세 정보

@@ -8,6 +8,7 @@ import JoinReducer from './JoinSlice';
 import aerobicReducer from './aerobicSlice';
 import anAerobicReducer from './anAerobicSlice';
 import MemberReducer from './MemberSlice';
+import dietReducer from './dietSlice';
 
 const store = configureStore({
   reducer: {
@@ -20,6 +21,7 @@ const store = configureStore({
     member: MemberReducer,
     aerobic: aerobicReducer,
     anAerobic: anAerobicReducer,
+    diet: dietReducer,
   },
 });
 

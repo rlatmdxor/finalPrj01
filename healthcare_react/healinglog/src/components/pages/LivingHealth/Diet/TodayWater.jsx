@@ -6,11 +6,12 @@ import { ModalContainer } from './Diet';
 import Modal from '../../../util/Modal';
 import Input from '../../../util/Input';
 import { close } from '../../../../redux/modalSlice';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
-const TodayWater = ({ day }) => {
+const TodayWater = () => {
   const dispatch = useDispatch();
   const token = localStorage.getItem('token');
+  const day = useSelector((state) => state.diet.day);
 
   const [amount, setAmount] = useState(0);
 
@@ -46,6 +47,7 @@ const TodayWater = ({ day }) => {
   const handleOpenWaterModal = () => {
     setInputData((prev) => ({
       ...prev,
+      enrollDate: day,
       amount: parseFloat(amount),
     }));
 

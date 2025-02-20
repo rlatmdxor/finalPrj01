@@ -3,6 +3,7 @@ import { BigCard } from './Diet';
 import { IconButton, Tooltip } from '@mui/material';
 import { InfoOutlined } from '@mui/icons-material';
 import styled from 'styled-components';
+import { useSelector } from 'react-redux';
 
 const BigCardInnerDiv = styled.div`
   display: flex;
@@ -25,10 +26,12 @@ const BigCardInnerMidDiv = styled.div`
   margin-right: 12px;
 `;
 
-const MyBmi = ({ day, reRender }) => {
+const MyBmi = ({ reRender }) => {
   const token = localStorage.getItem('token');
 
+  const day = useSelector((state) => state.diet.day);
   const height = 1.62;
+
   const [bmi, setBmi] = useState(0);
   const [standardWeight, setStandardWeight] = useState(0);
   const [recommendedKcal, setRecommendedKcal] = useState(0);
@@ -55,7 +58,7 @@ const MyBmi = ({ day, reRender }) => {
           const calculatedStandardWeight = height * height * 22;
           setStandardWeight(calculatedStandardWeight.toFixed(1));
 
-          const calculatedKcal = weight * 30;
+          const calculatedKcal = weight * 32;
           setRecommendedKcal(calculatedKcal.toFixed(0));
 
           const calculatedWater = weight * 30;
@@ -104,7 +107,7 @@ const MyBmi = ({ day, reRender }) => {
         <BigCardInnerDiv>
           <BigCardInnerTopDiv>
             <div>권장섭취칼로리</div>
-            <Tooltip title={<>보통활동 기준 : 체중(kg) x 30kcal</>}>
+            <Tooltip title={<>보통활동 기준 : 체중(kg) x 32Kcal</>}>
               <IconButton sx={{ paddingTop: '11px' }}>
                 <InfoOutlined sx={{ fontSize: '1.1rem' }} />
               </IconButton>
