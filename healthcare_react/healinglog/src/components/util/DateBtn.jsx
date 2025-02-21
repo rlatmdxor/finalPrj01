@@ -32,19 +32,17 @@ const DateBtn = ({ dataBtn, onSelect, line, onChange }) => {
   return (
     <>
       <DataDiv>
-        {
-          (line = 'Line' ? (
-            <Select onChange={handleSelect}>
-              <option value="Bar">막대</option>
-              <option value="Line">꺽은 선</option>
-            </Select>
-          ) : (
-            <Select onChange={handleSelect}>
-              <option value="Line">꺽은 선</option>
-              <option value="Bar">막대</option>
-            </Select>
-          ))
-        }
+        {line == 'Line' ? (
+          <Select onChange={handleSelect}>
+            <option value="Bar">막대</option>
+            <option value="Line">꺽은 선</option>
+          </Select>
+        ) : (
+          <Select onChange={handleSelect}>
+            <option value="Line">꺽은 선</option>
+            <option value="Bar">막대</option>
+          </Select>
+        )}
 
         {dataBtn.map((label, index) => (
           <StyleBtn

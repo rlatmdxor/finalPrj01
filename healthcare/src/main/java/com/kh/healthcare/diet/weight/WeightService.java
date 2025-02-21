@@ -1,9 +1,12 @@
 package com.kh.healthcare.diet.weight;
 
 import com.kh.healthcare.diet.water.WaterMapper;
+import com.kh.healthcare.diet.water.WaterVo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -36,4 +39,16 @@ public class WeightService {
         }
     }
 
+    public List<WeightVo> getDayWeight(int memberNo, String month) {
+        return mapper.getDayWeight(memberNo, month);
+    }
+
+    public List<WeightVo> getMonthAvgWeight(int memberNo, String year) {
+        return mapper.getMonthAvgWeight(memberNo, year);
+    }
+
+    public List<WeightVo> getYearAvgWeight(int memberNo) {
+        return mapper.getYearAvgWeight(memberNo);
+
+    }
 }
