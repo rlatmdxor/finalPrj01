@@ -8,7 +8,6 @@ import TodayWater from './TodayWater';
 import TodayWeight from './TodayWeight';
 import MyBmi from './MyBmi';
 import TodayDietMeal from './TodayDietMeal';
-import { useLocation, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { setDay, updateDay } from '../../../../redux/dietSlice';
 

@@ -61,4 +61,16 @@ public class DietMealService {
     public List<FoodVo> getFoodData() {
         return mapper.getFoodData();
     }
+
+    public List<TotalKcalVo> getDayKcal(int memberNo, String month) {
+        return mapper.getDayKcal(memberNo, month);
+    }
+
+    public List<TotalKcalVo> getMonthAvgKcal(int memberNo, String year) {
+        return mapper.getMonthAvgKcal(memberNo, year);
+    }
+
+    public List<TotalKcalVo> getYearAvgKcal(int memberNo) {
+        return mapper.getYearAvgKcal(memberNo);
+    }
 }

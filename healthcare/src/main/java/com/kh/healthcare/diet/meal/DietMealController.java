@@ -4,6 +4,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kh.healthcare.Aws.FileUtil;
+import com.kh.healthcare.diet.water.WaterVo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
@@ -98,5 +99,43 @@ public class DietMealController {
             throw new IllegalStateException("[ERROR] FOOD LIST VIEW FAIL..");
         }
     }
+
+    @GetMapping("/report/day")
+    public List<TotalKcalVo> getDayKcal(@RequestParam int memberNo, @RequestParam(required = false) String month, @RequestHeader("Authorization") String authorization){
+        try {
+            List<TotalKcalVo> voList = service.getDayKcal(memberNo, month);
+            return voList;
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            throw new IllegalStateException("[ERROR] GET DAY KCAL FAIL..");
+        }
+    }
+
+    @GetMapping("/report/month")
+    public List<TotalKcalVo> getMonthAvgKcal(@RequestParam int memberNo, @RequestParam(required = false) String year, @RequestHeader("Authorization") String authorization){
+        try {
+            List<TotalKcalVo> voList = service.getMonthAvgKcal(memberNo, year);
+            return voList;
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            throw new IllegalStateException("[ERROR] GET MONTH KCAL FAIL..");
+        }
+    }
+
+    @GetMapping("/report/year")
+    public List<TotalKcalVo> getYearAvgKcal(@RequestParam int memberNo, @RequestHeader("Authorization") String authorization){
+        try {
+            List<TotalKcalVo> voList = service.getYearAvgKcal(memberNo);
+            return voList;
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            throw new IllegalStateException("[ERROR] GET YEAR KCAL FAIL..");
+        }
+    }
+
+
 
 }
