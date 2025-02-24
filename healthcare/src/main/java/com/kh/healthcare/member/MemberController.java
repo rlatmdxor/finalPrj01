@@ -46,14 +46,14 @@ public class MemberController {
     public String duplicateEmailCheck(@RequestBody MemberVo vo){
         String msg = "";
         // 12자~40자 이하 일 때 중복체크 및 유효성 검사
-        if(vo.getEmail().length()>=12 && vo.getEmail().length()<=40 && vo.getEmail().contains(".")){
+        if(vo.getEmail().length()>=12 && vo.getEmail().length()<=40 && vo.getEmail().contains(".com")){
             int isDuplicated = service.duplicateEmailCheck(vo);
             if(isDuplicated<1){
                 msg = "사용 가능한 이메일입니다.";
             } else {
                 msg = "이미 사용중인 이메일입니다. 다른 이메일을 입력해 주세요.";
             }
-        } else if (vo.getEmail().length()>=12 && vo.getEmail().length()<=40 && !vo.getEmail().contains(".")) {
+        } else if (vo.getEmail().length()>=12 && vo.getEmail().length()<=40 && !vo.getEmail().contains(".com")) {
             msg = "잘못된 도메인 값입니다.";
         } else if (vo.getEmail().length()<12) {
             msg = "이메일이 너무 짧습니다.";
