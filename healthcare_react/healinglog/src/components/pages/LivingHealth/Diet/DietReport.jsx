@@ -171,8 +171,8 @@ const DietReport = () => {
       <Title>식단</Title>
       <NaviContainer>
         <Navi target="diet" tag={'식단기록'}></Navi>
-        <Navi target="dietcalendar" tag={'캘린더'}></Navi>
-        <Navi target="dietreport" tag={'리포트'}></Navi>
+        <Navi target="diet/calendar" tag={'캘린더'}></Navi>
+        <Navi target="diet/report" tag={'리포트'}></Navi>
       </NaviContainer>
       <ContentLayout>
         <ChartAreaDiv>
