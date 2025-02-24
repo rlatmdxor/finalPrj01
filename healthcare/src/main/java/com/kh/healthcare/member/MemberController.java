@@ -98,7 +98,7 @@ public class MemberController {
 
     //로그인
     @PostMapping("login")
-    public String login(@RequestBody  MemberVo vo){
+    public String login(@RequestBody MemberVo vo){
         try{
             return service.login(vo);
         }catch (Exception e) {

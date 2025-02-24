@@ -1,121 +1,44 @@
 package com.kh.healthcare.exercise.anAerobic;
 
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
+import com.kh.healthcare.member.MemberVo;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
 @Mapper
 public interface AnAerobicMapper {
 
+    //북마크가 아닌 운동 리스트 조회
     @Select("""
-            SELECT *
+            SELECT NO, NAME, DESCRIPTION, IMAGE_URL, GUIDE, EX_PART
             FROM ANAEROBIC
-            WHERE BOOKMARK = 'Y'
+            WHERE NO NOT IN (
+                SELECT EX_NO FROM ANAEROBIC_BOOKMARK WHERE USER_NO = #{no}
+            )
             """)
-    List<AnAerobicVo> getMarkedData();
+    List<AnAerobicVo> getList(String no);
 
-    @Update("""
-            UPDATE ANAEROBIC
-            SET BOOKMARK = 'N'
-            WHERE no = #{no}
-            """)
-    int unmarkData(String no);
-
+    //북마크 된 리스트 조회
     @Select("""
-            SELECT *
-            FROM ANAEROBIC
-            WHERE BOOKMARK = 'N'
-            AND PART = '팔'
+            SELECT A.NO, A.NAME, A.DESCRIPTION, A.IMAGE_URL, A.GUIDE, A.EX_PART
+            FROM ANAEROBIC A
+            JOIN ANAEROBIC_BOOKMARK B ON A.NO = B.EX_NO
+            WHERE B.USER_NO = #{no}
             """)
-    List<AnAerobicVo> getArmData();
+    List<AnAerobicVo> getBookmarkList(String no);
 
-    @Update("""
-            UPDATE ANAEROBIC
-            SET BOOKMARK = 'Y'
-            WHERE no = #{no}
-            AND PART = '팔'
+    //북마크 해제
+    @Delete("""
+            DELETE FROM ANAEROBIC_BOOKMARK
+            WHERE USER_NO = #{userNo}
+            AND EX_NO = #{no}
             """)
-    int markArmData(String no);
+    void unmark(String userNo, String no);
 
-    @Select("""
-            SELECT *
-            FROM ANAEROBIC
-            WHERE BOOKMARK = 'N'
-            AND PART = '코어'
+    //북마크 등록
+    @Insert("""
+            INSERT INTO ANAEROBIC_BOOKMARK (NO, USER_NO, EX_NO)
+            VALUES (ANAEROBIC_BOOKMARK_SEQ.NEXTVAL, #{userNo}, #{no})
             """)
-    List<AnAerobicVo> getCoreData();
-
-    @Update("""
-            UPDATE ANAEROBIC
-            SET BOOKMARK = 'Y'
-            WHERE no = #{no}
-            AND PART = '코어'
-            """)
-    int markCoreData(String no);
-
-    @Select("""
-            SELECT *
-            FROM ANAEROBIC
-            WHERE BOOKMARK = 'N'
-            AND PART = '다리'
-            """)
-    List<AnAerobicVo> getLegData();
-
-    @Update("""
-            UPDATE ANAEROBIC
-            SET BOOKMARK = 'Y'
-            WHERE no = #{no}
-            AND PART = '다리'
-            """)
-    int markLegData(String no);
-
-    @Select("""
-            SELECT *
-            FROM ANAEROBIC
-            WHERE BOOKMARK = 'N'
-            AND PART = '가슴'
-            """)
-    List<AnAerobicVo> getChestData();
-
-    @Update("""
-            UPDATE ANAEROBIC
-            SET BOOKMARK = 'Y'
-            WHERE no = #{no}
-            AND PART = '가슴'
-            """)
-    int markChestData(String no);
-
-    @Select("""
-            SELECT *
-            FROM ANAEROBIC
-            WHERE BOOKMARK = 'N'
-            AND PART = '어깨'
-            """)
-    List<AnAerobicVo> getShoulderData();
-
-    @Update("""
-            UPDATE ANAEROBIC
-            SET BOOKMARK = 'Y'
-            WHERE no = #{no}
-            AND PART = '어깨'
-            """)
-    int markShoulderData(String no);
-
-    @Select("""
-            SELECT *
-            FROM ANAEROBIC
-            WHERE BOOKMARK = 'N'
-            AND PART = '기타'
-            """)
-    List<AnAerobicVo> getEtcData();
-
-    @Update("""
-            UPDATE ANAEROBIC
-            SET BOOKMARK = 'Y'
-            WHERE no = #{no}
-            AND PART = '기타'
-            """)
-    int markEtcData(String no);
+    void mark(String userNo, String no);
 }

@@ -1,6 +1,8 @@
 package com.kh.healthcare.exercise.anAerobic;
 
+import com.kh.healthcare.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,60 +14,40 @@ import java.util.List;
 public class AnAerobicService {
 
     private final AnAerobicMapper mapper;
+    private final JwtUtil jwtUtil;
 
-    public List<AnAerobicVo> getMarkedData() {
-        return mapper.getMarkedData();
+    //일반 리스트
+    public List<AnAerobicVo> getList(String token) {
+        token = token.replace("Bearer ", "");
+        String no = jwtUtil.getNo(token);
+        return mapper.getList(no);
     }
 
-    public int unmarkData(String no) {
-        return mapper.unmarkData(no);
+    //북마크 리스트
+    public List<AnAerobicVo> getBookmarkList(String token) {
+        token = token.replace("Bearer ", "");
+        String no = jwtUtil.getNo(token);
+        return mapper.getBookmarkList(no);
     }
 
-    public List<AnAerobicVo> getArmData() {
-        return mapper.getArmData();
+    //북마크 해제
+    public void unmark(String token, String no) {
+        token = token.replace("Bearer ", "");
+        String userNo = jwtUtil.getNo(token);
+        mapper.unmark(userNo,no);
     }
 
-    public int markArmData(String no) {
-        return mapper.markArmData(no);
-    }
+    //북마크 등록
+    public String mark(String token, String no) {
+        List<AnAerobicVo> voList = getBookmarkList(token);
+        token = token.replace("Bearer ", "");
+        String userNo = jwtUtil.getNo(token);
 
-    public List<AnAerobicVo> getCoreData() {
-        return mapper.getCoreData();
-    }
-
-    public int markCoreData(String no) {
-        return mapper.markCoreData(no);
-    }
-
-    public List<AnAerobicVo> getLegData() {
-        return mapper.getLegData();
-    }
-
-    public int markLegData(String no) {
-        return mapper.markLegData(no);
-    }
-
-    public List<AnAerobicVo> getChestData() {
-        return mapper.getChestData();
-    }
-
-    public int markChestData(String no) {
-        return mapper.markChestData(no);
-    }
-
-    public List<AnAerobicVo> getShoulderData() {
-        return mapper.getShoulderData();
-    }
-
-    public int markShoulderData(String no) {
-        return mapper.markShoulderData(no);
-    }
-
-    public List<AnAerobicVo> getEtcData() {
-        return mapper.getEtcData();
-    }
-
-    public int markEtcData(String no) {
-        return mapper.markEtcData(no);
+        if(voList.size()<5){
+            mapper.mark(userNo,no);
+            return "성공";
+        }else{
+            return "실패";
+        }
     }
 }

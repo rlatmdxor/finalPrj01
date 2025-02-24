@@ -1,49 +1,43 @@
 package com.kh.healthcare.exercise.aerobic;
 
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
 @Mapper
 public interface AerobicMapper {
 
+    //북마크가 아닌 운동 리스트 조회
     @Select("""
-            SELECT
-                NO
-                , NAME
-                , BOOKMARK
-                , GUIDE_LINK
-                , CAL_CONSUME
+            SELECT NO, NAME, DESCRIPTION, IMAGE_URL, GUIDE
             FROM AEROBIC
-            WHERE BOOKMARK = 'N'
+            WHERE NO NOT IN (
+                SELECT EX_NO FROM AEROBIC_BOOKMARK WHERE USER_NO = #{no}
+            )
             """)
-    List<AerobicVo> getData();
+    List<AerobicVo> getList(String no);
 
+    //북마크 된 리스트 조회
     @Select("""
-            SELECT
-                NO
-                , NAME
-                , BOOKMARK
-                , GUIDE_LINK
-                , CAL_CONSUME
-            FROM AEROBIC
-            WHERE BOOKMARK = 'Y'
+            SELECT A.NO, A.NAME, A.DESCRIPTION, A.IMAGE_URL, A.GUIDE
+            FROM AEROBIC A
+            JOIN AEROBIC_BOOKMARK B ON A.NO = B.EX_NO
+            WHERE B.USER_NO = #{no}
             """)
-    List<AerobicVo> getMarkedData();
+    List<AerobicVo> getBookmarkList(String no);
 
-    @Update("""
-            UPDATE AEROBIC
-            SET BOOKMARK = 'Y'
-            WHERE no = #{no}
+    //북마크 해제
+    @Delete("""
+            DELETE FROM AEROBIC_BOOKMARK
+            WHERE USER_NO = #{userNo}
+            AND EX_NO = #{no}
             """)
-    int markData(String no);
+    void unmark(String userNo, String no);
 
-    @Update("""
-            UPDATE AEROBIC
-            SET BOOKMARK = 'N'
-            WHERE no = #{no}
+    //북마크 등록
+    @Insert("""
+            INSERT INTO AEROBIC_BOOKMARK (NO, USER_NO, EX_NO)
+            VALUES (AEROBIC_BOOKMARK_SEQ.NEXTVAL, #{userNo}, #{no})
             """)
-    int unmarkData(String no);
+    void mark(String userNo, String no);
 }
