@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Title from '../../util/Title';
 import ContentLayout from '../../util/ContentLayout';
 import styled from 'styled-components';
 import Navi from '../../util/Navi';
-import { BigCard, BigTextDiv, SmallCard, SmallTextDiv } from '../LivingHealth/Diet/Diet';
-import { BigCardInnerDiv, BigCardInnerMidDiv, BigCardInnerTopDiv } from '../LivingHealth/Diet/MyBmi';
-import Btn from '../../util/Btn';
+import SmallCard from '../../util/SmallCard';
+import SettingModal from './SettingModal';
+import BigCard from '../../util/BigCard';
+import SettingBtn from './SettingBtn';
+import useWeekRange from '../../hook/useWeekRange';
 
 const NaviContainer = styled.div`
   display: grid;
@@ -14,14 +16,6 @@ const NaviContainer = styled.div`
   top: 20px;
   left: 40px;
   grid-template-columns: 4fr 3fr;
-`;
-
-const SettingBtnDiv = styled.div`
-  display: flex;
-  height: 25px;
-  justify-content: flex-end;
-  margin-top: 30px;
-  margin-bottom: 15px;
 `;
 
 const DateDiv = styled.div`
@@ -70,49 +64,62 @@ const ContentArea = styled.div`
   margin-top: 30px;
   margin-left: auto;
   margin-right: auto;
-  margin-bottom: 60px;
+  margin-bottom: 70px;
+`;
+
+const SmallTextDiv = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 25px;
+  margin-top: 18px;
+  padding: 0px 14px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #3b3b3b;
+`;
+
+const BigTextDiv = styled.div`
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 8px;
+  font-size: 30px;
+`;
+
+const IncDecTextDiv = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 9px;
+  padding: 0px 14px;
+  font-size: 17px;
+  font-weight: 500;
+  color: #3b3b3b;
+`;
+
+const BigCardInnerDiv = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+`;
+
+const BigCardInnerTopDiv = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #5f5f5f;
+`;
+
+const BigCardInnerMidDiv = styled.div`
+  font-size: 26px;
+  color: #000000;
+  margin-top: 3px;
+  margin-bottom: 6px;
 `;
 
 const DashBoard = () => {
-  const getWeekRange = (date) => {
-    const dayOfWeek = date.getDay(); // 0: 일요일, 1: 월요일, ..., 6: 토요일
-    const monday = new Date(date);
-    monday.setDate(date.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1)); // 월요일 찾기
-
-    const sunday = new Date(monday);
-    sunday.setDate(monday.getDate() + 6); // 일요일 찾기
-
-    return {
-      monday: monday.toISOString().split('T')[0],
-      sunday: sunday.toISOString().split('T')[0],
-    };
-  };
-
-  const initialDate = new Date();
-  const initialRange = getWeekRange(initialDate);
-
-  const [currentMonday, setCurrentMonday] = useState(initialRange.monday);
-  const [currentSunday, setCurrentSunday] = useState(initialRange.sunday);
-
-  const handlePrevWeek = () => {
-    let newDate = new Date(currentMonday);
-    newDate.setDate(newDate.getDate() - 7);
-    const newRange = getWeekRange(newDate);
-
-    setCurrentMonday(newRange.monday);
-    setCurrentSunday(newRange.sunday);
-  };
-
-  const handleNextWeek = () => {
-    let newDate = new Date(currentMonday);
-    newDate.setDate(newDate.getDate() + 7);
-    const newRange = getWeekRange(newDate);
-
-    setCurrentMonday(newRange.monday);
-    setCurrentSunday(newRange.sunday);
-  };
-
-  const handleSettingModal = () => {};
+  const { currentMonday, currentSunday, handlePrevWeek, handleNextWeek } = useWeekRange();
 
   return (
     <>
@@ -122,19 +129,7 @@ const DashBoard = () => {
         <Navi target="dashboard/report" tag={'리포트'}></Navi>
       </NaviContainer>
       <ContentLayout>
-        <SettingBtnDiv>
-          <Btn
-            str={'대시보드 설정'}
-            w={'110'}
-            h={'29'}
-            mt={'0'}
-            mb={'0'}
-            ml={'0'}
-            mr={'0'}
-            fs={'13'}
-            f={handleSettingModal}
-          />
-        </SettingBtnDiv>
+        <SettingBtn />
         <DateDiv>
           <button onClick={handlePrevWeek}>◀</button>
           <DateTextDiv>
@@ -143,19 +138,6 @@ const DashBoard = () => {
           <button onClick={handleNextWeek}>▶</button>
         </DateDiv>
         <ContentArea>
-          <SmallCard>
-            <SmallTextDiv>이번주 평균 수면시간</SmallTextDiv>
-            <BigTextDiv>4시간 48분</BigTextDiv>
-            <div>(+ 0시간 20분)</div>
-          </SmallCard>
-          <SmallCard>
-            <SmallTextDiv>이번주 소모 담배량</SmallTextDiv>
-            <BigTextDiv>12.4 갑</BigTextDiv>
-          </SmallCard>
-          <SmallCard>
-            <SmallTextDiv>이번주 음주량</SmallTextDiv>
-            <BigTextDiv>1852cc (300mL)</BigTextDiv>
-          </SmallCard>
           <BigCard>
             <BigCardInnerDiv>
               <BigCardInnerTopDiv>
@@ -184,31 +166,54 @@ const DashBoard = () => {
           </BigCard>
 
           <SmallCard>
+            <SmallTextDiv>이번주 평균 수면시간</SmallTextDiv>
+            <BigTextDiv>4시간 48분</BigTextDiv>
+            <IncDecTextDiv>(+ 0시간 20분)</IncDecTextDiv>
+          </SmallCard>
+          <SmallCard>
+            <SmallTextDiv>이번주 소모 담배량</SmallTextDiv>
+            <BigTextDiv>12.4 갑</BigTextDiv>
+            <IncDecTextDiv>(+ 0시간 20분)</IncDecTextDiv>
+          </SmallCard>
+          <SmallCard>
+            <SmallTextDiv>이번주 음주량</SmallTextDiv>
+            <BigTextDiv>1852cc (300mL)</BigTextDiv>
+            <IncDecTextDiv>(+ 0시간 20분)</IncDecTextDiv>
+          </SmallCard>
+
+          <SmallCard>
             <SmallTextDiv>이번주 평균 체중</SmallTextDiv>
             <BigTextDiv>68.3kg</BigTextDiv>
+            <IncDecTextDiv>(+ 0시간 20분)</IncDecTextDiv>
           </SmallCard>
           <SmallCard>
             <SmallTextDiv>이번주 평균 칼로리 섭취량</SmallTextDiv>
             <BigTextDiv>1834 Kcal</BigTextDiv>
+            <IncDecTextDiv>(+ 0시간 20분)</IncDecTextDiv>
           </SmallCard>
           <SmallCard>
             <SmallTextDiv>이번주 평균 물 섭취량</SmallTextDiv>
             <BigTextDiv>850 ml</BigTextDiv>
+            <IncDecTextDiv>(+ 0시간 20분)</IncDecTextDiv>
           </SmallCard>
 
           <SmallCard>
             <SmallTextDiv>이번주 유산소 운동시간</SmallTextDiv>
             <BigTextDiv>1시간 18분</BigTextDiv>
+            <IncDecTextDiv>(+ 0시간 20분)</IncDecTextDiv>
           </SmallCard>
           <SmallCard>
             <SmallTextDiv>이번주 무산소 운동시간</SmallTextDiv>
             <BigTextDiv>1시간 11분</BigTextDiv>
+            <IncDecTextDiv>(+ 0시간 20분)</IncDecTextDiv>
           </SmallCard>
           <SmallCard>
             <SmallTextDiv>이번주 총 운동시간</SmallTextDiv>
             <BigTextDiv>2시간 29분</BigTextDiv>
+            <IncDecTextDiv>(+ 0시간 20분)</IncDecTextDiv>
           </SmallCard>
         </ContentArea>
+        <SettingModal />
       </ContentLayout>
     </>
   );

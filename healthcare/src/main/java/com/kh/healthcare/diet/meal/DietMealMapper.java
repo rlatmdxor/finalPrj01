@@ -25,7 +25,7 @@ public interface DietMealMapper {
                 , #{mealCode}
                 , #{dietDay}
                 , #{memo}
-                , #{image}
+                , 'https://picsum.photos/200/200'
                 , SYSDATE
             )
             """)
@@ -94,7 +94,7 @@ public interface DietMealMapper {
     @Update("""
             UPDATE DIET
             SET MEMO = #{memo}
-                , IMAGE = #{image}
+                , IMAGE = 'https://picsum.photos/200/200'
             WHERE NO = #{no}
             AND DEL_YN = 'N'
             """)
