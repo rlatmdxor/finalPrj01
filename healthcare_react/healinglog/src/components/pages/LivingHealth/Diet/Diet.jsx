@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import Title from '../../../util/Title';
 import Navi from '../../../util/Navi';
@@ -23,6 +23,7 @@ const NaviContainer = styled.div`
 const DayDiv = styled.div`
   display: flex;
   width: 100%;
+  height: 50px;
   justify-content: space-between;
   align-items: center;
   padding: 12px;
@@ -62,11 +63,11 @@ export const ContentAreaDiv = styled.div`
 `;
 
 export const SmallCard = styled.div`
-  width: 100%;
+  width: 320px;
   height: 150px;
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: 48px auto;
+  grid-template-rows: 48px auto auto;
   border: 1px solid #c5cbd1;
   border-radius: 6px;
   text-align: center;
@@ -132,8 +133,8 @@ const Diet = () => {
       <Title>식단</Title>
       <NaviContainer>
         <Navi target="diet" tag={'식단기록'}></Navi>
-        <Navi target="dietcalendar" tag={'캘린더'}></Navi>
-        <Navi target="dietreport" tag={'리포트'}></Navi>
+        <Navi target="diet/calendar" tag={'캘린더'}></Navi>
+        <Navi target="diet/report" tag={'리포트'}></Navi>
       </NaviContainer>
       <ContentLayout>
         <DayDiv>

@@ -5,21 +5,21 @@ import { InfoOutlined } from '@mui/icons-material';
 import styled from 'styled-components';
 import { useSelector } from 'react-redux';
 
-const BigCardInnerDiv = styled.div`
+export const BigCardInnerDiv = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 `;
 
-const BigCardInnerTopDiv = styled.div`
+export const BigCardInnerTopDiv = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
   color: #5f5f5f;
 `;
 
-const BigCardInnerMidDiv = styled.div`
+export const BigCardInnerMidDiv = styled.div`
   font-size: 22px;
   color: #000000;
   margin-bottom: 6px;

@@ -1,15 +1,16 @@
 import React from 'react';
-import Modal from '../util/Modal';
-import InputTag from '../util/Input';
+import ContentLayout from '../util/ContentLayout';
 
 const Main = () => {
   return (
-    <div>
-      <Modal title="복용약 등록" modalId={'복용약 등록'}>
-        <InputTag type="text" plcaeholder="날짜" title="날짜"></InputTag>
-        <InputTag type="text" plcaeholder="시작 시간" title="수면 시작 시간"></InputTag>
-      </Modal>
-    </div>
+    <>
+      <h1>메인 배너</h1>
+      <ContentLayout>
+        <h1>공지사항</h1>
+        <h1>이번주 꿀팁</h1>
+        <h1>최근 병원 리뷰</h1>
+      </ContentLayout>
+    </>
   );
 };
 
