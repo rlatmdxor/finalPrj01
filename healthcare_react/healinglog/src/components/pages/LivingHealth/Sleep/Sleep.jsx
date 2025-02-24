@@ -239,7 +239,7 @@ const Sleep = () => {
       });
   }, [num]);
   chartVoList.sort((a, b) => new Date(b.day) - new Date(a.day));
-  
+
   const getChartData = () => {
     switch (selectedRange) {
       case '일':

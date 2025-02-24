@@ -41,7 +41,7 @@ const Row = styled.tr`
   }
 `;
 
-const MedisonTable = ({ title, MediSonData }) => {
+const MedisonTable = ({ title, MediSonData, setDrugDel, drugDel }) => {
   return (
     <TableWrapper>
       <Title>{title}</Title>
@@ -61,13 +61,39 @@ const MedisonTable = ({ title, MediSonData }) => {
             <Row key={index}>
               <Td>{index + 1}</Td>
               <Td>
-                <Image src={medicine.image} alt={`약물 ${medicine.name}`} />
+                <Image src={medicine.imageUrl} alt={`약물 ${medicine.name}`} />
               </Td>
               <Td>{medicine.name}</Td>
-              <Td>{medicine.effect}</Td>
-              <Td>{medicine.dosage}</Td>
               <Td>
-                <input type="checkbox" />
+                {medicine.effect.split(/<br\s*\/?>/g).map((line, i) => (
+                  <React.Fragment key={i}>
+                    {line}
+                    <br />
+                  </React.Fragment>
+                ))}
+              </Td>
+              <Td>
+                {medicine.dosage.split(/<br\s*\/?>/g).map((line, i) => (
+                  <React.Fragment key={i}>
+                    {line}
+                    <br />
+                  </React.Fragment>
+                ))}
+              </Td>
+              <Td>
+                <input
+                  type="checkbox"
+                  checked={drugDel.some((item) => item.no === medicine.no && item.isChecked)}
+                  onChange={(e) => {
+                    setDrugDel((prev) => {
+                      if (e.target.checked) {
+                        return [...prev, { no: medicine.no, isChecked: true }];
+                      } else {
+                        return prev.map((item) => (item.no === medicine.no ? { ...item, isChecked: false } : item));
+                      }
+                    });
+                  }}
+                />
               </Td>
             </Row>
           ))}
