@@ -61,5 +61,26 @@
         </choose>
     </select>
 
+    <insert id="insertAttachHoneyBoard">
+        INSERT ALL
+        <foreach collection="list" item="x">
+            INTO BOARD_ATTACHMENT
+            (
+                NO
+                , BOARD_NO
+                , ORIGIN_NAME
+                , PATH
+            )
+            VALUES
+            (
+                (SELECT GET_BOARD_ATTACHMENT_NO FROM DUAL)
+                , SEQ_BOARD.CURRVAL
+                , #{x.originName}
+                , #{x.path}
+            )
+        </foreach>
+        SELECT 1 FROM DUAL
+    </insert>
+
 
 </mapper>

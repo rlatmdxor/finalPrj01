@@ -38,6 +38,7 @@ import DietReport from './components/pages/LivingHealth/Diet/DietReport';
 import ReportedHoneyBoard from './components/admin/honeyBoard/ReportedHoneyBoard';
 import ReportedHoneyComment from './components/admin/honeyBoard/ReportedHoneyComment';
 import AdminBoard from './components/admin/honeyBoard/AdminBoard';
+import BoardDetail from './components/pages/Board/BoardDetail';
 
 export const routes = [
   { path: '/', component: <Main /> },
@@ -80,4 +81,5 @@ export const routes = [
   { path: '/reported/honeytip', component: <ReportedHoneyBoard /> },
   { path: '/reported/honeytip/comment', component: <ReportedHoneyComment /> },
   { path: '/admin/board', component: <AdminBoard /> },
+  { path: '/board/detail', component: <BoardDetail /> },
 ];

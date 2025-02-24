@@ -46,7 +46,7 @@ const BloodPressure = () => {
   const [pagedData, setPagedData] = useState([]); // 페이징된 데이터
   const [filteredData, setFilteredData] = useState([]); // 차트용 필터링 데이터
   const [selectedRange, setSelectedRange] = useState('주'); // 기본값 '일'
-  const [selectChart, setSelectChart] = useState('Line'); // 그래프 모양 정하는 state
+  const [selectChart, setSelectChart] = useState('Bar'); // 그래프 모양 정하는 state
   const dispatch = useDispatch();
 
   const dataBtn = ['주', '월'];
@@ -116,6 +116,7 @@ const BloodPressure = () => {
             }
           });
 
+        setInputData(initialInputData);
         // 모달 창 닫기
         dispatch(close(e.target.title));
       }
@@ -534,7 +535,7 @@ const BloodPressure = () => {
         {/* //모달 열기 버튼 컨테이너 */}
 
         {/* dateBtn을 호출할때 그래프 타입을 바꿀수있는 setState (onChange) 와 단위기간을 바꿀 수 있는 setState(onSelect) 를 넘겨준다 */}
-        <DateBtn dataBtn={dataBtn} onSelect={setSelectedRange} onChange={setSelectChart}></DateBtn>
+        <DateBtn dataBtn={dataBtn} onSelect={setSelectedRange} onChange={setSelectChart} line={'Bar'}></DateBtn>
 
         <Chart
           chartType={selectChart} // 차트 타입지정

@@ -56,7 +56,7 @@ const BloodSugar = () => {
   const [pagedData, setPagedData] = useState([]); // 페이징된 데이터
   const [filteredData, setFilteredData] = useState([]); // 차트용 필터링 데이터
   const [selectedRange, setSelectedRange] = useState('주'); // 기본값 '일'
-  const [selectChart, setSelectChart] = useState('Line'); // 그래프 모양 정하는 state
+  const [selectChart, setSelectChart] = useState('Bar'); // 그래프 모양 정하는 state
 
   const boardType = 'bloodSugar';
   const { currentPage, boardLimit } = useSelector((state) => state.paging[boardType] || {});
@@ -177,6 +177,7 @@ const BloodSugar = () => {
             }
           });
 
+        setInputData(initialInputData);
         // 모달 창 닫기
         dispatch(close(e.target.title));
       }
