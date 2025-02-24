@@ -18,32 +18,14 @@ public class PublicHealthCenterController {
 
     private final PublicHealthCenterService service;
 
+
     @GetMapping("/list")
     public List<PublicHealthCenterVo> list(){
         List<PublicHealthCenterVo> publicHealthCenterVoList =service.list();
         System.out.println("publicHealthCenterVoList = " + publicHealthCenterVoList);
         return publicHealthCenterVoList;
     }
-//
-//    @GetMapping("/list/by-dong")
-//    public ResponseEntity<List<PublicHealthCenterVo>> getPhcByDong(@RequestParam String dong) {
-//        List<PublicHealthCenterVo> list = service.getPublicHealthCentersByDong(dong);
-//        return ResponseEntity.ok(list);
-//    }
 
-//    @GetMapping("/search")
-//    public ResponseEntity<List<PublicHealthCenterVo>> searchPublicHealthCenters(
-//            @RequestParam(required = false) String city,
-//            @RequestParam(required = false) String district,
-//            @RequestParam(required = false) String dong,
-//            @RequestParam(required = false) String searchField,
-//            @RequestParam(required = false) String searchValue
-//    ) {
-//        List<PublicHealthCenterVo> list = service.searchPublicHealthCenters(city , district ,dong, searchField, searchValue);
-//        System.out.println("list = " + list);
-//        System.out.println("searchValue = " + searchValue);
-//        return ResponseEntity.ok(list);
-//    }
 
     @GetMapping("/search")
     public ResponseEntity<List<PublicHealthCenterVo>> searchPublicHealthCenters(
@@ -52,6 +34,7 @@ public class PublicHealthCenterController {
             @RequestParam(required = false) String dong,
             @RequestParam(required = false) String searchField,
             @RequestParam(required = false) String searchValue
+
     )
     {
 
@@ -61,7 +44,9 @@ public class PublicHealthCenterController {
         System.out.println("검색 필드(searchField) = " + searchField);
         System.out.println("검색 값(searchValue) = " + searchValue);
 
+
         List<PublicHealthCenterVo> list = service.searchPublicHealthCenters(city, district, dong, searchField, searchValue);
+
         System.out.println("조회 결과 list = " + list);
 
         return ResponseEntity.ok(list);

@@ -42,18 +42,7 @@ const ContextBox = styled.div`
 
 const Wrapper = styled.div`
   display: flex;
-  /* gap: 20px; */
   flex-wrap: wrap;
-  /* margin-left: 100px;
-  margin-right: 100px;
-  padding: 30px;
-  padding-left: 50px;
-  padding-right: 50px; */
-`;
-
-const Box = styled.div`
-  width: 80%;
-  height: 80%;
 `;
 
 const BtnContainer = styled.div`
@@ -93,7 +82,10 @@ const PulbicHealthCenter = () => {
   const [pagedData, setPagedData] = useState([]); // 페이징된 데이터
 
   const boardType = 'phc';
-  const { currentPage, boardLimit } = useSelector((state) => state.paging[boardType] || {});
+
+  const [dataVoList, setVoList] = useState([]);
+  const currentPage = useSelector((state) => state.paging[boardType]?.currentPage || 1);
+  const boardLimit = useSelector((state) => state.paging[boardType]?.boardLimit || 12);
   const offset = (currentPage - 1) * boardLimit;
 
   const [cities, setCities] = useState([]); // 도시 리스트
@@ -110,38 +102,46 @@ const PulbicHealthCenter = () => {
   const [searchValue, setSearchValue] = useState(null);
 
   const handleSearch = () => {
-    let query = '';
+    let query = `page=${currentPage}&limit=${boardLimit}`;
     if (selectedCity) {
       query += `city=${encodeURIComponent(selectedCity)}`;
     }
     if (selectedDistrict) {
       query += `district=${encodeURIComponent(selectedDistrict)}`;
     }
-    // if (selectedDong) {
-    //   query += `dong=${encodeURIComponent(selectedDong)}`;
-    // }
+    if (selectedDong) {
+      query += `dong=${encodeURIComponent(selectedDong)}`;
+    }
     if (searchField && searchValue) {
       if (query) query += '&';
       query += `${searchField}=${encodeURIComponent(searchValue)}`;
     }
 
     const searchUrl = `http://127.0.0.1:80/api/phc/search?${query}`;
-    console.log('📌 검색 URL:', searchUrl);
 
+    //   fetch(searchUrl)
+    //     .then((res) => res.json())
+    //     .then((data) => {
+    //       setPagedData(data);
+    //     })
+    //     .catch((error) => console.error('1데이터 가져오기 오류:', error));
+    // };
     fetch(searchUrl)
       .then((res) => res.json())
       .then((data) => {
-        console.log('📌 검색 결과 데이터:', data);
-        setPagedData(data);
+        if (data.items) {
+          setPagedData(data.items); // ✅ 서버에서 받은 페이징 데이터만 설정
+          dispatch(setTotalCount({ boardType, totalCount: data.totalCount })); // ✅ Redux에 totalCount 설정
+        } else {
+          setPagedData([]); // 검색 결과가 없을 경우 초기화
+        }
       })
-      .catch((error) => console.error('1데이터 가져오기 오류:', error));
+      .catch((error) => console.error('데이터 가져오기 오류:', error));
   };
 
   // 공통 fetch 함수
   const fetchData = async (url, setData) => {
     try {
-      console.log(`📌 2fetchData() 실행됨: ${url}`);
-
       const response = await fetch(url);
 
       if (!response.ok) {
@@ -149,31 +149,17 @@ const PulbicHealthCenter = () => {
       }
 
       const data = await response.json();
-      console.log(`📌 JSON Response from ${url}:`, data);
 
       setData([...data]); // ✅ 새로운 배열을 생성해서 상태 변경 강제 적용
-      console.log(`📌 2setData() 실행됨!`);
     } catch (error) {
-      console.error(`2데이터 가져오기 오류 (${url}):`, error);
       setData([]); // 오류 발생 시 빈 배열 반환
     }
   };
-  // 테이블 페이징 처리
-  useEffect(() => {
-    setPagedData(fullData.slice(offset, offset + boardLimit));
-  }, [fullData, currentPage, boardLimit]);
-  useEffect(() => {
-    dispatch(resetPaging({ boardType }));
-  }, [boardType, dispatch]);
 
   // 1. CITY 데이터 가져오기
   useEffect(() => {
     fetchData('http://127.0.0.1:80/api/location/cities', setCities);
   }, []);
-
-  useEffect(() => {
-    console.log('📌 cities 데이터 확인:', cities);
-  }, [cities]);
 
   // 2. 선택된 CITY에 따라 DISTRICT 데이터 가져오기
   useEffect(() => {
@@ -195,11 +181,11 @@ const PulbicHealthCenter = () => {
     }
   }, [selectedDistrict]);
 
-  const searchFilter = {
-    city: cities.map((city) => ({ label: city.cityName, value: city.no })), // ✅ 도시 리스트 변환
-    districts: districts.map((district) => ({ label: district.districtName, value: district.no })), // ✅ 군/구 리스트 변환
-    dongs: dongs.map((dong) => ({ label: dong.dongName, value: dong.no })), // ✅ 동 리스트 변환
-  };
+  // const searchFilter = {
+  //   city: cities.map((city) => ({ label: city.cityName, value: city.no })), // ✅ 도시 리스트 변환
+  //   districts: districts.map((district) => ({ label: district.districtName, value: district.no })), // ✅ 군/구 리스트 변환
+  //   dongs: dongs.map((dong) => ({ label: dong.dongName, value: dong.no })), // ✅ 동 리스트 변환
+  // };
 
   //실험
 
@@ -208,27 +194,8 @@ const PulbicHealthCenter = () => {
   }, []);
 
   useEffect(() => {
-    console.log('📌 fullData (전체 데이터):', fullData);
-  }, [fullData]);
-
-  useEffect(() => {
-    console.log('📌 pagedData (페이징된 데이터):', pagedData);
-  }, [pagedData]);
-
-  useEffect(() => {
-    console.log('📌 현재 페이지:', currentPage);
-    console.log('📌 페이지 당 데이터 개수:', boardLimit);
-    console.log('📌 offset 계산 값:', offset);
-    console.log('📌 fullData에서 페이징할 데이터:', fullData.slice(offset, offset + boardLimit));
-  }, [fullData, currentPage, boardLimit]);
-
-  useEffect(() => {
-    console.log('📌 선택된 도시 번호 (selectedCityNo):', selectedCityNo);
-
     if (selectedCityNo) {
       const requestUrl = `http://127.0.0.1:80/api/location/districts/${selectedCityNo}`;
-      console.log('📌 군/구 데이터 요청 URL:', requestUrl);
-
       fetchData(requestUrl, setDistricts);
       setDongs([]); // ✅ 도시 변경 시 동 초기화
     } else {
@@ -240,13 +207,14 @@ const PulbicHealthCenter = () => {
   useEffect(() => {
     if (selectedCity) {
       const searchUrl = `http://127.0.0.1:80/api/phc/search?city=${encodeURIComponent(selectedCity)}`;
-      console.log('📌 보건소 검색 URL:', searchUrl);
 
       fetch(searchUrl)
         .then((res) => res.json())
         .then((data) => {
-          console.log('📌 보건소 데이터:', data);
-          setPagedData(data);
+          dispatch(resetPaging({ boardType }));
+          setPagedData(data.slice(0, 12));
+          // setPagedData(data);
+          console.log('시티시티시티', data);
         })
         .catch((error) => console.error('3데이터 가져오기 오류:', error));
     } else {
@@ -256,20 +224,65 @@ const PulbicHealthCenter = () => {
 
   useEffect(() => {
     if (selectedDistrict) {
-      const searchUrl = `http://127.0.0.1:80/api/phc/search?district=${encodeURIComponent(selectedDistrict)}`;
-      console.log('📌 군/구 보건소 검색 URL:', searchUrl);
-
+      // const searchUrl = `http://127.0.0.1:80/api/phc/search?district=${encodeURIComponent(selectedDistrict)}`;
+      const searchUrl = `http://127.0.0.1:80/api/phc/search?district=${encodeURIComponent(
+        selectedDistrict
+      )}&page=${currentPage}&limit=${boardLimit}`;
       fetch(searchUrl)
         .then((res) => res.json())
         .then((data) => {
-          console.log('📌 군/구 보건소 데이터:', data);
+          // dispatch(resetPaging({ boardType }));
           setPagedData(data);
+          dispatch(setTotalCount({ boardType, totalCount: data.totalCount }));
+          console.log('비둘기비둘기비둘기비둘기', data);
         })
         .catch((error) => console.error('4데이터 가져오기 오류:', error));
     } else {
       setPagedData([]);
     }
-  }, [selectedDistrict]);
+  }, [selectedDistrict, currentPage, boardLimit]);
+
+  useEffect(() => {
+    if (searchField && searchValue) {
+      const searchUrl = `http://127.0.0.1:80/api/phc/search?searchField=${encodeURIComponent(
+        searchField
+      )}&searchValue=${encodeURIComponent(searchValue)}`;
+
+      fetch(searchUrl)
+        .then((res) => res.json())
+        .then((data) => {
+          setPagedData(data);
+        })
+        .catch((error) => console.error('📌 데이터 가져오기 오류:', error));
+    } else {
+      setPagedData([]); // 검색 조건이 없으면 데이터 초기화
+    }
+  }, [searchField, searchValue]); // ✅ `searchField`와 `searchValue`가 변경될 때 실행
+
+  // 테이블 페이징 처리
+  useEffect(() => {
+    setPagedData(fullData.slice(offset, offset + boardLimit));
+  }, [fullData, currentPage, boardLimit]);
+
+  useEffect(() => {
+    dispatch(resetPaging({ boardType }));
+  }, []);
+
+  useEffect(() => {
+    fetch(url)
+      .then((resp) => resp.json())
+      .then((data) => {
+        if (data.length > 0) {
+          dispatch(setTotalCount({ boardType, totalCount: data.length }));
+          const pagedData = data.slice(offset, offset + boardLimit);
+          setVoList(pagedData);
+        } else {
+          dispatch(resetPaging({ boardType }));
+          setVoList([]); // 데이터가 없을 경우 초기화
+        }
+      })
+      .catch((error) => console.error('데이터 불러오기 실패:', error));
+  }, [currentPage, boardLimit]); // currentPage, boardLimit 변경 시 실행
 
   return (
     <>
@@ -286,12 +299,11 @@ const PulbicHealthCenter = () => {
           <ContextBox>
             <SearchDiv>
               <SelectBox
+                width="130px"
                 onChange={(e) => {
                   const selectedCityNo = parseInt(e.target.value, 10); // ✅ 숫자로 변환
                   const selectedCityObj = cities.find((city) => city.no === selectedCityNo);
                   const selectedCityName = selectedCityObj ? selectedCityObj.cityName : '';
-
-                  console.log('📌 선택된 도시:', selectedCityName, '도시 번호:', selectedCityNo);
 
                   setSelectedCity(selectedCityName); // ✅ "서울특별시" 저장
                   setSelectedCityNo(selectedCityNo); // ✅ 11 저장
@@ -317,9 +329,6 @@ const PulbicHealthCenter = () => {
                   const selectedDistrictNo = parseInt(e.target.value, 10);
                   const selectedDistrictObj = districts.find((district) => district.no === selectedDistrictNo);
                   const selectedDistrictName = selectedDistrictObj ? selectedDistrictObj.districtName : '';
-
-                  console.log('📌 선택된 군/구:', selectedDistrictName, '군/구 번호:', selectedDistrictNo);
-
                   setSelectedDistrict(selectedDistrictName);
                   setSelectedDistrictNo(selectedDistrictNo);
                   setSelectedDong(null); // ✅ 군/구 변경 시 동 초기화

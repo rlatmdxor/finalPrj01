@@ -16,13 +16,10 @@ public class PublicHealthCenterService {
     }
 
 
-//
-//    public List<PublicHealthCenterVo> getPublicHealthCentersByDong(String dong) {
-//        return mapper.list();
-//    }
-
-    public List<PublicHealthCenterVo> searchPublicHealthCenters(String city , String district,String dong, String searchField, String searchValue) {
+    public List<PublicHealthCenterVo> searchPublicHealthCenters(String city , String district,String dong, String searchField, String searchValue ) {
         System.out.println("PublicHealthCenterService.searchPublicHealthCenters");
         return mapper.searchPublicHealthCenters(city , district, dong, searchField, searchValue);
     }
+
+
 }
