@@ -43,4 +43,11 @@ public class AnAerobicController {
             return ResponseEntity.ok("북마크 등록 완료");
         }
     }
+
+    //상세정보 가져오기
+    @GetMapping("getDetail")
+    public AnAerobicVo getDetail(@RequestParam String name) {
+        AnAerobicVo exercise = service.findExByName(name);
+        return exercise;
+    }
 }

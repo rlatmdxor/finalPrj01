@@ -1,5 +1,6 @@
 package com.kh.healthcare.exercise.aerobic;
 
+import com.kh.healthcare.exercise.anAerobic.AnAerobicVo;
 import com.kh.healthcare.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -50,4 +51,8 @@ public class AerobicService {
         }
     }
 
+    //운동 상세정보 가져오기
+    public AerobicVo findExByName(String name) {
+        return mapper.findExByName(name);
+    }
 }
