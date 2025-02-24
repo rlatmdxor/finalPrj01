@@ -41,25 +41,11 @@ const SearchInput = styled.input`
   height: ${({ h }) => (h ? `${h}px` : '40px')};
 `;
 
-const SearchBar = ({ onSearch, w, h, mb, mt, ml, mr }) => {
-  const [query, setQuery] = useState('');
-
-  const handleInputChange = (event) => {
-    setQuery(event.target.value);
-  };
-
-  const handleSearchClick = () => {
-    onSearch(query);
-  };
-
-  const handleClearClick = () => {
-    setQuery('');
-  };
-
+const SearchBar = ({ handleClick, handleChange, handleClearClick, w, h, mb, mt, ml, mr }) => {
   return (
     <SearchWrapper mt={mt} mb={mb} ml={ml} mr={mr}>
       <SearchInputWrapper>
-        <SearchIcon onClick={handleSearchClick}>
+        <SearchIcon onClick={handleClick}>
           <svg width="12" height="12" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path
               d="M9.5 9.5L7.325 7.325M8.5 4.5C8.5 6.70914 6.70914 8.5 4.5 8.5C2.29086 8.5 0.5 6.70914 0.5 4.5C0.5 2.29086 2.29086 0.5 4.5 0.5C6.70914 0.5 8.5 2.29086 8.5 4.5Z"
@@ -69,14 +55,7 @@ const SearchBar = ({ onSearch, w, h, mb, mt, ml, mr }) => {
             />
           </svg>
         </SearchIcon>
-        <SearchInput
-          w={w}
-          h={h}
-          type="text"
-          placeholder="검색어를 입력하세요"
-          value={query}
-          onChange={handleInputChange}
-        />
+        <SearchInput w={w} h={h} type="text" placeholder="검색어를 입력하세요" onChange={handleChange} />
         <ClearIcon onClick={handleClearClick}>
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path

@@ -35,7 +35,7 @@ public class MemberService {
 
         if (profile == null || profile.isEmpty()) {
             // 기본 이미지 URL 설정
-            profileUrl = "https://healinglog-bucket.s3.ap-southeast-2.amazonaws.com/default_profile.jpg";
+            profileUrl = "https://healinglog-kh.s3.ap-northeast-2.amazonaws.com/default_profile.jpg";
         } else {
             System.out.println("profile = " + profile.getOriginalFilename());
 
@@ -98,8 +98,8 @@ public class MemberService {
     }
 
     // 전화번호 중복 체크
-    public int duplicatePhoneCheck(MemberVo vo) {
-        return mapper.duplicatePhoneCheck(vo);
+    public int duplicatePhoneCheck(String phone) {
+        return mapper.duplicatePhoneCheck(phone);
     }
 
     //마이페이지 데이터 가져오기
@@ -123,4 +123,55 @@ public class MemberService {
         return mapper.getProfile(id);
     }
 
+    // 비밀번호 변경
+    public boolean pwdChange(String token, String currentPwd, String newPwd){
+        token = token.replace("Bearer ", "");
+        String msg = "";
+        String id =jwtUtil.getId(token);
+        String memberPwd = mapper.getPwd(id);
+        //일치하는지 확인 (평문, 암호문)
+        boolean isMatch = encoder.matches(currentPwd, memberPwd);
+        if(isMatch){
+            String encodedPwd = encoder.encode(newPwd);
+            mapper.updatePwd(encodedPwd, id);
+            return true;
+        } else{
+            return false;
+        }
+    }
+
+    // 닉네임 변경
+    public void nickChange(String token, String nick) {
+        token = token.replace("Bearer ", "");
+        String id = jwtUtil.getId(token);
+        mapper.nickChange(id, nick);
+    }
+
+    // 주소 변경
+    public void addressChange(String token, String address) {
+        token = token.replace("Bearer ", "");
+        String id = jwtUtil.getId(token);
+        mapper.addressChange(id, address);
+    }
+
+    // 전화번호 변경
+    public void changePhone(String token, String phone) {
+        token = token.replace("Bearer ", "");
+        String id = jwtUtil.getId(token);
+        mapper.phoneChange(id, phone);
+    }
+
+    // 신체정보 변경
+    public void changePhysical(String token, String height, String weight) {
+        token = token.replace("Bearer ", "");
+        String id = jwtUtil.getId(token);
+        mapper.physicalChange(id, height, weight);
+    }
+
+    // 회원 탈퇴
+    public void withdrawal(String token) {
+        token = token.replace("Bearer ", "");
+        String id = jwtUtil.getId(token);
+        mapper.withdrawal(id);
+    }
 }

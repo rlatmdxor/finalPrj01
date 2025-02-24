@@ -7,6 +7,7 @@ import { useFormData } from '../../util/useFormData';
 import { useDispatch } from 'react-redux';
 import { getPayload } from '../../util/JwtUtil';
 import { login } from '../../../redux/MemberSlice';
+import { setNick } from '../../../redux/JoinSlice';
 
 const LoginPage = () => {
   const navi = useNavigate();
@@ -40,6 +41,7 @@ const LoginPage = () => {
         const no = getPayload(token, 'no');
         const id = getPayload(token, 'id');
         const nick = getPayload(token, 'nick');
+        dispatch(setNick(nick));
         dispatch(login({ no, id, nick }));
         alert(`환영합니다 ${nick}님`);
         navi('/dashboard');

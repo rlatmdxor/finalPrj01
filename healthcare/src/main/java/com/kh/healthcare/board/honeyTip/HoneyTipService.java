@@ -11,7 +11,11 @@ public class HoneyTipService {
 
     private final HoneyTipMapper mapper;
 
-    public List<HoneyTipVo> list() {
-        return mapper.list();
+    public List<HoneyTipVo> list(SearchFilterVo filterVo) {
+        return mapper.list(filterVo);
+    }
+
+    public int write(HoneyTipVo vo) {
+        return mapper.write(vo);
     }
 }

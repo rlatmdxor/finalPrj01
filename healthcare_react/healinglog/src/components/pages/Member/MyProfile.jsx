@@ -78,7 +78,6 @@ const MyProfile = () => {
 
         <img
           src={profile}
-          // alt="프로필 미리보기"
           onClick={handleImageClick}
           style={{
             width: '150px',
