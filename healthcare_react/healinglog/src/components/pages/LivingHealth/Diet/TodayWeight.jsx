@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BigTextDiv, SmallCard, SmallTextDiv } from './Diet';
+import { BigTextDiv, SmallTextDiv } from './Diet';
 import Btn from '../../../util/Btn';
 import { open } from '../../../../redux/modalSlice';
 import { ModalContainer } from './Diet';
@@ -7,6 +7,7 @@ import Modal from '../../../util/Modal';
 import Input from '../../../util/Input';
 import { close } from '../../../../redux/modalSlice';
 import { useDispatch, useSelector } from 'react-redux';
+import SmallCard from '../../../util/SmallCard';
 
 const TodayWeight = ({ reRender, setReRender }) => {
   const dispatch = useDispatch();

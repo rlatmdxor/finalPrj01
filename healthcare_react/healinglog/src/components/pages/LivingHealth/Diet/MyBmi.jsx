@@ -1,25 +1,25 @@
 import React, { useEffect, useState } from 'react';
-import { BigCard } from './Diet';
 import { IconButton, Tooltip } from '@mui/material';
 import { InfoOutlined } from '@mui/icons-material';
 import styled from 'styled-components';
 import { useSelector } from 'react-redux';
+import BigCard from '../../../util/BigCard';
 
-export const BigCardInnerDiv = styled.div`
+const BigCardInnerDiv = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 `;
 
-export const BigCardInnerTopDiv = styled.div`
+const BigCardInnerTopDiv = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
   color: #5f5f5f;
 `;
 
-export const BigCardInnerMidDiv = styled.div`
+const BigCardInnerMidDiv = styled.div`
   font-size: 22px;
   color: #000000;
   margin-bottom: 6px;

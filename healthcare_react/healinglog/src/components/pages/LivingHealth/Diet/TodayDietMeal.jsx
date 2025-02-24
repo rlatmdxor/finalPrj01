@@ -6,8 +6,9 @@ import { Autocomplete, TextField } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { close, open } from '../../../../redux/modalSlice';
 import { ModalContainer } from './Diet';
-import { ContentAreaDiv, BigTextDiv, SmallCard, SmallTextDiv } from './Diet';
+import { ContentAreaDiv, BigTextDiv, SmallTextDiv } from './Diet';
 import Btn from '../../../util/Btn';
+import SmallCard from '../../../util/SmallCard';
 
 const TodayDietArea = styled.div`
   display: flex;

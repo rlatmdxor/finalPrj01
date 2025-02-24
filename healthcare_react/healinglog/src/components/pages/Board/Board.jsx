@@ -12,8 +12,6 @@ import ContentLayout from '../../util/ContentLayout';
 import HoneytipBoard from './HoneytipBoard';
 
 const Board = () => {
-
-=======
   const boardType = 'honeyTip';
 
   const dispatch = useDispatch();
@@ -57,7 +55,6 @@ const Board = () => {
     category: ['카테고리 전체', '병원', '약국', '생활'],
     searchType: ['제목', '내용', '제목+내용'],
   };
-
 
   return (
     <>
