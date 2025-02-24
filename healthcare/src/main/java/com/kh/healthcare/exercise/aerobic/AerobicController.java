@@ -1,5 +1,6 @@
 package com.kh.healthcare.exercise.aerobic;
 
+import com.kh.healthcare.exercise.anAerobic.AnAerobicVo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -43,4 +44,10 @@ public class AerobicController {
         }
     }
 
+    //상세정보 가져오기
+    @GetMapping("getDetail")
+    public AerobicVo getDetail(@RequestParam String name) {
+        AerobicVo exercise = service.findExByName(name);
+        return exercise;
+    }
 }

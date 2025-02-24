@@ -110,7 +110,7 @@ const Aerobic = () => {
   // };
 
   useEffect(() => {
-    dispatch(close('운동시작'));
+    dispatch(close('운동등록'));
   }, []);
 
   return (
@@ -190,7 +190,7 @@ const Aerobic = () => {
 
         <BlankSpace />
       </ContentLayout>
-      {/* <Modal title="운동시작" type={'exercise'} f={handleRegister}>
+      {/* <Modal title="운동등록" type={'exercise'} f={handleRegister}>
         <Input
           type="text"
           plcaeholder="value"

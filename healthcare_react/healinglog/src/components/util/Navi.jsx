@@ -12,7 +12,7 @@ const Navi = ({ target, tag, selected }) => {
   };
 
   const currentPath = location.pathname;
-  const isSelected = location.pathname === `/${target}`;
+  const isSelected = location.pathname.includes(`/${target}`);
 
   const isSelected2 = selected === 'selected';
   // const isSelected2 = '1';

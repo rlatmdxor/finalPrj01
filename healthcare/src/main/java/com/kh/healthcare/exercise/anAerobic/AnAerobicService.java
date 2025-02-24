@@ -50,4 +50,9 @@ public class AnAerobicService {
             return "실패";
         }
     }
+
+    //운동 상세정보 가져오기
+    public AnAerobicVo findExByName(String name) {
+        return mapper.findExByName(name);
+    }
 }
