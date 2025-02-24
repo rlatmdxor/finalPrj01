@@ -122,7 +122,7 @@ const Join2 = () => {
   //이메일 길이 검사 && 유효성 검사
   const [emailCheckMsg, setEmailCheckMsg] = useState('');
   useEffect(() => {
-    if (email.length < 12) {
+    if (email.length < 12 && email.length > 4) {
       setEmailCheckMsg('이메일이 너무 짧습니다.');
       return;
     }
@@ -205,30 +205,31 @@ const Join2 = () => {
     fd.append('gender', gender);
     fd.append('height', height);
     fd.append('weight', weight);
-    fd.append('profile', profile);
+    fd.append('profileImage', profile);
     fd.append('phone', phone);
-    console.log(fd);
 
-    fetch('http://127.0.0.1:80/api/member/join', {
-      method: 'POST',
-      headers: {
-        // 'Content-Type': 'application/json',
-      },
-      body: fd,
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('네트워크 오류 발생');
-        }
-        return response.json();
+    if (window.confirm('회원 가입 하시겠습니까?')) {
+      fetch('http://127.0.0.1:80/api/member/join', {
+        method: 'POST',
+        headers: {
+          // 'Content-Type': 'application/json',
+        },
+        body: fd,
       })
-      .then((result) => {
-        console.log('성공:', result);
-        navigate('/login');
-      })
-      .catch((error) => {
-        console.error('전송 실패:', error);
-      });
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error('네트워크 오류 발생');
+          }
+          return response.json();
+        })
+        .then((result) => {
+          alert('회원가입 성공!');
+          window.location.href = '/login';
+        })
+        .catch((error) => {
+          console.error('전송 실패:', error);
+        });
+    }
   };
 
   return (

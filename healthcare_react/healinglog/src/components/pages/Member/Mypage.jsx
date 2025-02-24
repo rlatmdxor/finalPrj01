@@ -284,7 +284,8 @@ const Mypage = () => {
                     },
                   })
                     .then((resp) => resp.text())
-                    .then((data) => localStorage.setItem('token', null), navi('/'));
+                    .then((data) => localStorage.removeItem('token'), (window.location.href = '/login'));
+                  alert('탈퇴 처리 되었습니다.');
                 }
               }}
               mt={'0'}
