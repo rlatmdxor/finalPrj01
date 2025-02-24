@@ -1,6 +1,7 @@
 package com.kh.healthcare.exercise.aerobic;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,28 +13,34 @@ public class AerobicController {
 
     private final AerobicService service;
 
-    // Aerobic 리스트 데이터 조회
-    @GetMapping("list")
-    public List<AerobicVo> getData(@RequestHeader("Authorization") String authorization) {
-        return service.getData();
-    }
-    
-    // Aerobic 즐겨찾기 데이터 조회
-    @GetMapping("favlist")
-    public List<AerobicVo> getMarkedData() {
-        return service.getMarkedData();
+    //일반 리스트
+    @GetMapping("getList")
+    public List<AerobicVo> getList(@RequestHeader ("Authorization") String token){
+        return service.getList(token);
     }
 
-    // Aerobic 리스트에서 북마크 처리
-    @PostMapping("mark")
-    public int markData(@RequestBody AerobicVo vo){
-        return service.markData(vo.getNo());
+    //북마크 리스트
+    @GetMapping("getBookmarkList")
+    public List<AerobicVo> getBookmarkList(@RequestHeader ("Authorization") String token){
+        return service.getBookmarkList(token);
     }
-    
-    // Aerobic 즐겨찾기에서 북마크 해제
-    @PostMapping("unmark")
-    public int unmarkData(@RequestBody AerobicVo vo){
-        return service.unmarkData(vo.getNo());
+
+    //북마크 해제
+    @DeleteMapping("unmark")
+    public ResponseEntity<String> unmark(@RequestHeader ("Authorization") String token, @RequestBody String no){
+        service.unmark(token, no);
+        return ResponseEntity.ok("북마크 해제 완료");
+    }
+
+    //북마크 등록
+    @PostMapping("mark")
+    public ResponseEntity<String> mark(@RequestHeader ("Authorization") String token, @RequestBody String no){
+        String msg = service.mark(token, no);
+        if(msg.equals("실패")){
+            return ResponseEntity.ok("즐겨찾기는 3개까지만 등록가능합니다.");
+        } else{
+            return ResponseEntity.ok("북마크 등록 완료");
+        }
     }
 
 }

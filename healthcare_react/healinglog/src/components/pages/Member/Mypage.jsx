@@ -105,8 +105,6 @@ const Mypage = () => {
     })
       .then((resp) => resp.json())
       .then((data) => {
-        console.log('data : ', data);
-
         dispatch(setId(data.id));
         dispatch(setPwd(data.pwd));
         dispatch(setNick(data.nick));
