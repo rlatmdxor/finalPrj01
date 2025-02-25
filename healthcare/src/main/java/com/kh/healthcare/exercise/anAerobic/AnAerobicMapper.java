@@ -1,6 +1,5 @@
 package com.kh.healthcare.exercise.anAerobic;
 
-import com.kh.healthcare.member.MemberVo;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -40,7 +39,7 @@ public interface AnAerobicMapper {
     //북마크 등록
     @Insert("""
             INSERT INTO ANAEROBIC_BOOKMARK (NO, USER_NO, EX_NO)
-            VALUES (ANAEROBIC_BOOKMARK_SEQ.NEXTVAL, #{userNo}, #{no})
+            VALUES (SEQ_ANAEROBIC_BOOKMARK.NEXTVAL, #{userNo}, #{no})
             """)
     void mark(String userNo, String no);
 
@@ -51,4 +50,35 @@ public interface AnAerobicMapper {
             WHERE NAME = #{name}
             """)
     AnAerobicVo findExByName(String name);
+
+    //운동 번호 가져오기
+    @Select("""
+            SELECT NO
+            FROM ANAEROBIC
+            WHERE NAME = #{name}
+            """)
+    AnAerobicVo findExNoByName(String name);
+
+    //운동 내역 겹치는지 확인
+    @Select("""
+            SELECT COUNT(*) FROM ANAEROBIC_HISTORY
+            WHERE USER_NO = #{userNo}
+                AND EX_DATE = TO_DATE(#{vo.exDate}, 'YYYY-MM-DD')
+                AND EX_NO = #{exNo}
+            """)
+    int countOverlappingRecords(String userNo, AnAerobicHistoryVo vo, String exNo);
+
+    //운동 내역 기록
+    @Insert("""
+            INSERT INTO ANAEROBIC_HISTORY
+            (NO, USER_NO, EX_NO, EX_DATE, WEIGHT, REPS)
+            VALUES (
+                SEQ_ANAEROBIC_HISTORY.NEXTVAL,
+                #{userNo}, #{exNo},
+                TO_DATE(#{vo.exDate}, 'YYYY-MM-DD'),
+                #{vo.weight},
+                #{vo.reps}
+            )
+            """)
+    void record(String userNo, String exNo, AnAerobicHistoryVo vo);
 }

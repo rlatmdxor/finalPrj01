@@ -25,7 +25,7 @@ public interface MemberMapper {
             )
             VALUES
             (
-                MEMBER_SEQ.NEXTVAL
+                SEQ_MEMBER.NEXTVAL
                 , #{vo.name}
                 , #{vo.id}
                 , #{vo.pwd}
