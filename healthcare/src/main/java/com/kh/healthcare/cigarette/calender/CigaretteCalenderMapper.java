@@ -14,8 +14,7 @@ public interface CigaretteCalenderMapper {
             "TAR, " +
             "CIGARETTE, " +
             "TO_CHAR(START_DATE, 'YYYY-MM-DD') AS startDate, " +
-            "TO_CHAR(END_DATE, 'YYYY-MM-DD') AS endDate, " +
-            "PACK_DURATION " +
+            "TO_CHAR(END_DATE, 'YYYY-MM-DD') AS endDate " +
             "FROM RECORD_CIGARETTE " +
             "WHERE MEMBER_NO = #{memberNo} " +
             "ORDER BY END_DATE DESC")
