@@ -2,7 +2,6 @@ import React, { useEffect, useState, useRef } from 'react';
 import Title from '../../../util/Title';
 import { setSelection } from '../../../../redux/selectSlice';
 import styled, { ThemeProvider, useTheme } from 'styled-components';
-import Btn from '../../../util/Btn';
 import Navi from '../../../util/Navi';
 import ContentLayout from '../../../util/ContentLayout';
 import Table from '../../../util/Table';
@@ -18,15 +17,6 @@ const NaviContainer = styled.div`
   top: 20px;
   left: 40px;
   grid-template-columns: 2fr 2fr 3fr;
-`;
-
-const BtnContainer = styled.div`
-  display: flex;
-  justify-content: end;
-
-  margin-bottom: 35px;
-  pointer-events: auto; /* ✅ 버튼 클릭을 활성화 */
-  z-index: 10;
 `;
 
 const SearchDiv = styled.div`
@@ -52,197 +42,112 @@ const SelectBox = styled.select`
 `;
 
 const PulbicHealthCenter = () => {
+  const theme = useTheme();
   const dispatch = useDispatch();
-
-  const url = 'http://127.0.0.1/api/phc/list';
-
-  const [fullData, setFullData] = useState([]); // 전체 데이터 저장
-  const [pagedData, setPagedData] = useState([]); // 페이징된 데이터
-
+  const searchFilter = useSelector((state) => state.search); // Redux에서 검색 필터 가져오기
   const boardType = 'phc';
-
-  const [dataVoList, setVoList] = useState([]);
-  const currentPage = useSelector((state) => state.paging[boardType]?.currentPage || 1);
-  const boardLimit = useSelector((state) => state.paging[boardType]?.boardLimit || 12);
-  const offset = (currentPage - 1) * boardLimit;
 
   const [cities, setCities] = useState([]); // 도시 리스트
   const [districts, setDistricts] = useState([]); // 선택된 도시의 구 리스트
   const [dongs, setDongs] = useState([]); // 선택된 구의 동 리스트
-
+  const [searchType, setSearchType] = useState('name');
+  const [keyword, setKeyword] = useState('');
   const [selectedCity, setSelectedCity] = useState(null); // 선택된 도시 ID
-  const [selectedCityNo, setSelectedCityNo] = useState(null); // 도시 번호 (숫자)
   const [selectedDistrict, setSelectedDistrict] = useState(null); // 선택된 구 ID
-  const [selectedDistrictNo, setSelectedDistrictNo] = useState(null); // 선택된 구 ID
   const [selectedDong, setSelectedDong] = useState(null); // 선택된 동 ID
-
-  const [searchField, setSearchField] = useState('');
+  const [phcs, setPhcs] = useState([]);
   const [searchValue, setSearchValue] = useState('');
-  const theme = useTheme();
-  const searchValueRef = useRef(''); // ✅ 최신 검색어 저장용
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(false);
 
-  // 공통 fetch 함수
-  const fetchData = async (url, setData) => {
-    try {
-      const response = await fetch(url);
-
-      if (!response.ok) {
-        throw new Error(`2HTTP 오류 발생! 상태 코드: ${response.status}`);
-      }
-
-      const data = await response.json();
-
-      setData([...data]); // ✅ 새로운 배열을 생성해서 상태 변경 강제 적용
-    } catch (error) {
-      setData([]); // 오류 발생 시 빈 배열 반환
-    }
-  };
-
-  // 1. CITY 데이터 가져오기
+  //시데이터
   useEffect(() => {
-    fetchData('http://127.0.0.1:80/api/location/cities', setCities);
+    fetch('http://127.0.0.1/api/location/cities')
+      .then((res) => res.json())
+      .then((data) => setCities(data))
+      .catch((error) => console.error('시 데이터 로드 실패:', error));
   }, []);
 
-  // 2. 선택된 CITY에 따라 DISTRICT 데이터 가져오기
+  // 군/구 데이터 가져오기
   useEffect(() => {
     if (selectedCity) {
-      fetchData(`http://127.0.0.1:80/api/location/districts/${selectedCity}`, setDistricts);
-      setDongs([]); // 도시 변경 시 동 초기화
+      fetch(`http://127.0.0.1/api/location/districts/${selectedCity}`)
+        .then((res) => res.json())
+        .then((data) => setDistricts(data))
+        .catch((error) => console.error('구 데이터 로드 실패:', error));
     } else {
       setDistricts([]);
-      setDongs([]);
     }
   }, [selectedCity]);
 
-  // 3. 선택된 DISTRICT에 따라 DONG 데이터 가져오기
+  // 📌 동 데이터 가져오기
   useEffect(() => {
     if (selectedDistrict) {
-      fetchData(`http://127.0.0.1:80/api/location/dongs/${selectedDistrict}`, setDongs);
+      fetch(`http://127.0.0.1/api/location/dongs/${selectedDistrict}`)
+        .then((res) => res.json())
+        .then((data) => setDongs(data))
+        .catch((error) => console.error('동 데이터 로드 실패:', error));
     } else {
       setDongs([]);
     }
   }, [selectedDistrict]);
 
-  //실험
-
-  useEffect(() => {
-    fetchData(url, setFullData);
-  }, []);
-
-  useEffect(() => {
-    if (selectedCityNo) {
-      const requestUrl = `http://127.0.0.1:80/api/location/districts/${selectedCityNo}`;
-      fetchData(requestUrl, setDistricts);
-      setDongs([]); // ✅ 도시 변경 시 동 초기화
-    } else {
-      setDistricts([]);
-      setDongs([]);
-    }
-  }, [selectedCityNo]);
-
-  useEffect(() => {
-    if (selectedCity) {
-      const searchUrl = `http://127.0.0.1:80/api/phc/search?city=${encodeURIComponent(selectedCity)}`;
-
-      fetch(searchUrl)
-        .then((res) => res.json())
-        .then((data) => {
-          dispatch(resetPaging({ boardType }));
-          setPagedData(data.slice(0, 12));
-          console.log('시티시티시티', data);
-        })
-        .catch((error) => console.error('3데이터 가져오기 오류:', error));
-    } else {
-      setPagedData([]);
-    }
-  }, [selectedCity]);
-
-  useEffect(() => {
-    if (selectedDistrict) {
-      // const searchUrl = `http://127.0.0.1:80/api/phc/search?district=${encodeURIComponent(selectedDistrict)}`;
-      const searchUrl = `http://127.0.0.1:80/api/phc/search?district=${encodeURIComponent(
-        selectedDistrict
-      )}&page=${currentPage}&limit=${boardLimit}`;
-      fetch(searchUrl)
-        .then((res) => res.json())
-        .then((data) => {
-          setPagedData(data);
-          dispatch(setTotalCount({ boardType, totalCount: data.totalCount }));
-          console.log('비둘기비둘기비둘기비둘기', data);
-        })
-        .catch((error) => console.error('4데이터 가져오기 오류:', error));
-    } else {
-      setPagedData([]);
-    }
-  }, [selectedDistrict, currentPage, boardLimit]);
-
-  useEffect(() => {
-    if (searchField && searchValue) {
-      const searchUrl = `http://127.0.0.1:80/api/phc/search?searchField=${encodeURIComponent(
-        searchField
-      )}&searchValue=${encodeURIComponent(searchValue)}`;
-
-      fetch(searchUrl)
-        .then((res) => res.json())
-        .then((data) => {
-          setPagedData(data);
-        })
-        .catch((error) => console.error('📌 데이터 가져오기 오류:', error));
-    } else {
-      setPagedData([]); // 검색 조건이 없으면 데이터 초기화
-    }
-  }, [searchField, searchValue]); // ✅ `searchField`와 `searchValue`가 변경될 때 실행
-
-  const handleSearch = (query) => {
-    const trimmedValue = query.trim();
-
-    if (!trimmedValue) {
-      console.warn('🚨 검색어를 입력하세요!');
-      return;
-    }
-
-    const searchUrl = `http://127.0.0.1:80/api/phc/search?searchField=${encodeURIComponent(
-      searchField
-    )}&searchValue=${encodeURIComponent(trimmedValue)}`;
-
-    console.log('🔎 최종 검색 URL:', searchUrl);
-
-    fetch(searchUrl)
-      .then((res) => res.json())
-      .then((data) => {
-        console.log('✅ 검색 결과 데이터:', data);
-        setPagedData(data); // ✅ 검색 결과 업데이트
-      })
-      .catch((error) => {
-        console.error('🚨 검색 데이터 가져오기 오류:', error);
-        setPagedData([]);
-      });
+  // 📌 검색어 업데이트 핸들러
+  const handleKeywordChange = (e) => {
+    setKeyword(e.target.value);
   };
 
-  // 테이블 페이징 처리
-  useEffect(() => {
-    setPagedData(fullData.slice(offset, offset + boardLimit));
-  }, [fullData, currentPage, boardLimit]);
+  // 📌 검색 실행 핸들러
+  const handleSearch = async () => {
+    setLoading(true);
+    try {
+      let searchKeyword = keyword.trim();
+      let finalSearchType = searchType;
 
-  useEffect(() => {
-    dispatch(resetPaging({ boardType }));
-  }, []);
+      // 🔹 검색어가 없을 경우 시/구/동을 검색어로 사용
+      if (!searchKeyword) {
+        const cityName = cities.find((c) => c.no === selectedCity)?.cityName || '';
+        const districtName = districts.find((d) => d.no === selectedDistrict)?.districtName || '';
+        const dongName = dongs.find((d) => d.no === selectedDong)?.dongName || '';
 
-  useEffect(() => {
-    fetch(url)
-      .then((resp) => resp.json())
-      .then((data) => {
-        if (data.length > 0) {
-          dispatch(setTotalCount({ boardType, totalCount: data.length }));
-          const pagedData = data.slice(offset, offset + boardLimit);
-          setVoList(pagedData);
-        } else {
-          dispatch(resetPaging({ boardType }));
-          setVoList([]); // 데이터가 없을 경우 초기화
-        }
-      })
-      .catch((error) => console.error('데이터 불러오기 실패:', error));
-  }, [currentPage, boardLimit]); // currentPage, boardLimit 변경 시 실행
+        searchKeyword = dongName || districtName || cityName;
+        finalSearchType = 'address'; // 🔹 기본 검색 타입은 주소로 설정
+      }
+
+      console.log('🔍 최종 검색어:', searchKeyword, '| 검색 타입:', finalSearchType);
+
+      if (!searchKeyword) {
+        console.warn('⚠️ 검색어가 비어 있습니다. 검색을 실행하지 않습니다.');
+        setLoading(false);
+        return;
+      }
+
+      const requestUrl = `http://localhost/api/phc/search?searchType=${finalSearchType}&keyword=${encodeURIComponent(
+        searchKeyword
+      )}&page=${page}&size=12`;
+      console.log('📡 API 요청 URL:', requestUrl);
+
+      const response = await fetch(requestUrl);
+      if (!response.ok) {
+        throw new Error(`API 요청 실패: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('✅ API 응답 데이터:', data);
+
+      setPhcs(data.phcs || []);
+      setTotalPages(data.totalPages || 1);
+    } catch (error) {
+      console.error('❌ 검색 오류:', error);
+    }
+    setLoading(false);
+  };
+
+  // 📌 검색어 초기화 핸들러
+  const handleClearKeyword = () => {
+    setKeyword('');
+  };
 
   return (
     <>
@@ -256,19 +161,12 @@ const PulbicHealthCenter = () => {
       <ContentLayout>
         <SearchDiv>
           <SelectBox
-            width="130px"
             onChange={(e) => {
-              const selectedCityNo = parseInt(e.target.value, 10); // ✅ 숫자로 변환
-              const selectedCityObj = cities.find((city) => city.no === selectedCityNo);
-              const selectedCityName = selectedCityObj ? selectedCityObj.cityName : '';
-
-              setSelectedCity(selectedCityName); // ✅ "서울특별시" 저장
-              setSelectedCityNo(selectedCityNo); // ✅ 11 저장
-              setSelectedDistrict(null); // ✅ 군/구 초기화
-              setSelectedDistrictNo(null);
-              setSelectedDong(null); // ✅ 동 초기화
-              setDongs([]); // ✅ 동 데이터 초기화
-              dispatch(setSelection({ label: 'city', value: selectedCityNo }));
+              const value = parseInt(e.target.value, 10);
+              setSelectedCity(value);
+              setSelectedDistrict('');
+              setSelectedDong('');
+              dispatch(setSelection({ label: 'city', value }));
             }}
           >
             <option value="">도시 선택</option>
@@ -279,59 +177,58 @@ const PulbicHealthCenter = () => {
             ))}
           </SelectBox>
 
+          {/* 군/구 선택 */}
           <SelectBox
-            width="130px"
-            disabled={!selectedCityNo} // ✅ 도시 선택 후 활성화
+            disabled={!selectedCity}
             onChange={(e) => {
-              const selectedDistrictNo = parseInt(e.target.value, 10);
-              const selectedDistrictObj = districts.find((district) => district.no === selectedDistrictNo);
-              const selectedDistrictName = selectedDistrictObj ? selectedDistrictObj.districtName : '';
-              setSelectedDistrict(selectedDistrictName);
-              setSelectedDistrictNo(selectedDistrictNo);
-              setSelectedDong(null); // ✅ 군/구 변경 시 동 초기화
-              dispatch(setSelection({ label: 'district', value: selectedDistrictNo }));
+              const value = parseInt(e.target.value, 10);
+              setSelectedDistrict(value);
+              setSelectedDong('');
+              dispatch(setSelection({ label: 'district', value }));
             }}
           >
             <option value="">군/구 선택</option>
-            {districts.map((district, idx) => (
-              <option key={idx} value={district.no}>
+            {districts.map((district) => (
+              <option key={district.no} value={district.no}>
                 {district.districtName}
               </option>
             ))}
           </SelectBox>
-          <SelectBox onChange={(e) => setSearchField(e.target.value)}>
-            <option value="">검색 조건 선택</option>
-            <option value="name">이름</option>
+
+          {/* 동 선택 */}
+          <SelectBox
+            disabled={!selectedDistrict}
+            onChange={(e) => {
+              const value = parseInt(e.target.value, 10);
+              setSelectedDong(value);
+              dispatch(setSelection({ label: 'dong', value }));
+            }}
+          >
+            <option value="">동 선택</option>
+            {dongs.map((dong) => (
+              <option key={dong.no} value={dong.no}>
+                {dong.dongName}
+              </option>
+            ))}
+          </SelectBox>
+
+          {/* 검색 옵션 */}
+          <SelectBox value={searchType} onChange={(e) => setSearchType(e.target.value)}>
+            <option value="name">보건소명</option>
             <option value="address">주소</option>
             <option value="tellNum">전화번호</option>
             <option value="postNum">우편번호</option>
           </SelectBox>
 
+          {/* SearchBar */}
           <SearchBar
+            handleClick={handleSearch} // ✅ 검색 버튼 클릭 시 handleSearch 실행
+            handleChange={handleKeywordChange} // ✅ 검색어 입력 시 keyword 업데이트
+            handleClearClick={handleClearKeyword} // ✅ 검색어 초기화 버튼
             w={300}
             h={40}
             mb={10}
-            onSearch={(query) => {
-              console.log('🔍 SearchBar에서 검색 실행됨:', query); // ✅ 입력된 검색어 확인
-              setSearchValue(query); // ✅ 상태 업데이트
-              searchValueRef.current = query; // ✅ 최신 검색어 저장
-            }}
           />
-
-          {/* <BtnContainer>
-            <Btn
-              mt={'50'}
-              mr={'50'}
-              mb={'20'}
-              str={'검색'}
-              c={'#FF7F50'}
-              fc={'white'}
-              f={() => {
-                console.log('🔎 버튼 클릭 시 검색어:', searchValue); // ✅ 버튼 클릭 시 최신 검색어 출력
-                handleSearch(searchValueRef.current);
-              }}
-            />
-          </BtnContainer> */}
         </SearchDiv>
 
         <Table>
@@ -344,17 +241,20 @@ const PulbicHealthCenter = () => {
             </tr>
           </thead>
           <tbody>
-            {/* 여기에 API에서 불러온 데이터를 넣어야 함 */}
-            {pagedData.map((vo, index) => {
-              return (
-                <tr key={vo.no || index}>
-                  <td>{vo.name}</td>
-                  <td>{vo.tellNum}</td>
-                  <td>{vo.postNum}</td>
-                  <td>{vo.address}</td>
+            {phcs.length > 0 ? (
+              phcs.map((phc, idx) => (
+                <tr key={idx}>
+                  <td>{phc.name}</td>
+                  <td>{phc.tellNum}</td>
+                  <td>{phc.postNum}</td>
+                  <td>{phc.address}</td>
                 </tr>
-              );
-            })}
+              ))
+            ) : (
+              <tr>
+                <td colSpan="4">검색 결과가 없습니다.</td>
+              </tr>
+            )}
           </tbody>
         </Table>
         <div>

@@ -1,4 +1,4 @@
-package com.kh.healthcare.publicHealthCenter;
+package com.kh.healthcare.pharmacy;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,14 +12,14 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/phc")
+@RequestMapping("api/pharmacy")
 @Slf4j
-public class PublicHealthCenterController {
+public class PharmacyController {
 
-    private final PublicHealthCenterService service;
+    private final PharmacyService service;
 
     @GetMapping("/search")
-    public ResponseEntity<Map<String, Object>> searchPhcs(
+    public ResponseEntity<Map<String, Object>> searchPharmacies(
             @RequestParam(required = false) String city,
             @RequestParam(required = false) String district,
             @RequestParam(required = false) String dong,
@@ -28,12 +28,8 @@ public class PublicHealthCenterController {
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size) {
 
-        Map<String, Object> result = service.searchPhcs(city, district, dong, searchType, keyword, page, size);
+        Map<String, Object> result = service.searchPharmacies(city, district, dong, searchType, keyword, page, size);
         return ResponseEntity.ok(result);
     }
-
-
-
-
 
 }

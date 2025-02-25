@@ -1,4 +1,4 @@
-package com.kh.healthcare.publicHealthCenter;
+package com.kh.healthcare.pharmacy;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -6,15 +6,16 @@ import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
+
 @Mapper
-public interface PublicHealthCenterMapper {
+public interface PharmacyMapper {
 
     @Select("""
         <script>
             SELECT NAME, TELL_NUM, POST_NUM, ADDRESS
             FROM (
                 SELECT PH.*, ROW_NUMBER() OVER (ORDER BY NAME ASC) AS RN
-                FROM PUBLIC_HEALTH_CENTER PH
+                FROM PHARMACY PH
                 WHERE 1=1
                 <if test='city != null and city != ""'>
                     AND CITY = #{city}
@@ -40,7 +41,7 @@ public interface PublicHealthCenterMapper {
             ) WHERE RN BETWEEN #{offset} + 1 AND #{offset} + #{size}
         </script>
     """)
-    List<PublicHealthCenterVo> searchPhcs(
+    List<PharmacyVo> searchPharmacies(
             @Param("city") String city,
             @Param("district") String district,
             @Param("dong") String dong,
@@ -53,7 +54,7 @@ public interface PublicHealthCenterMapper {
     @Select("""
         <script>
             SELECT COUNT(*)
-            FROM PUBLIC_HEALTH_CENTER
+            FROM PHARMACY
             WHERE 1=1
             <if test='city != null and city != ""'>
                 AND CITY = #{city}
@@ -78,12 +79,11 @@ public interface PublicHealthCenterMapper {
             </if>
         </script>
     """)
-    int countPhcs(
+    int countPharmacies(
             @Param("city") String city,
             @Param("district") String district,
             @Param("dong") String dong,
             @Param("searchType") String searchType,
             @Param("keyword") String keyword
     );
-
 }
