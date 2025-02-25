@@ -27,7 +27,7 @@ const Label = styled.label`
   margin-right: 10px;
 `;
 
-const SelectedBar = ({ label, options, reduxAction, index, margin, width, height }) => {
+const SelectedBar = ({ label, options, reduxAction, index, margin, width, height, onChange, disabled }) => {
   const dispatch = useDispatch();
 
   // 상태에서 선택된 값 가져오기
@@ -41,13 +41,15 @@ const SelectedBar = ({ label, options, reduxAction, index, margin, width, height
 
   return (
     <Wrapper margin={margin}>
-      <Select value={selectedValue} onChange={handleChange} width={width} height={height}>
-        {options.map((option, idx) => (
-          <option key={idx} value={option}>
-            {option}
-          </option>
-        ))}
-      </Select>
+      <select onChange={(e) => onChange(e.target.value)} disabled={disabled}>
+        <option value="">선택하세요</option>
+        {Array.isArray(options) &&
+          options.map((opt, idx) => (
+            <option key={idx} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+      </select>
     </Wrapper>
   );
 };
