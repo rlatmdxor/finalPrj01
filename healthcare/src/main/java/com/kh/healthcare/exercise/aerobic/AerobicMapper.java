@@ -51,4 +51,47 @@ public interface AerobicMapper {
             WHERE NAME = #{name}
             """)
     AerobicVo findExByName(String name);
+
+    //운동 번호 가져오기
+    @Select("""
+            SELECT NO
+            FROM AEROBIC
+            WHERE NAME = #{name}
+            """)
+    AerobicVo findExNoByName(String name);
+
+    //운동 내역 겹치는지 확인
+    @Select("""
+    SELECT COUNT(*) FROM AEROBIC_HISTORY
+    WHERE USER_NO = #{userNo}
+      AND EX_DATE = TO_DATE(#{vo.exDate}, 'YYYY-MM-DD')
+      AND (
+           (START_TIME <= TO_TIMESTAMP(#{vo.exDate} || ' ' || #{vo.startTime}, 'YYYY-MM-DD HH24:MI')
+           AND END_TIME > TO_TIMESTAMP(#{vo.exDate} || ' ' || #{vo.startTime}, 'YYYY-MM-DD HH24:MI'))
+           OR
+           (START_TIME < TO_TIMESTAMP(#{vo.exDate} || ' ' || #{vo.endTime}, 'YYYY-MM-DD HH24:MI')
+           AND END_TIME >= TO_TIMESTAMP(#{vo.exDate} || ' ' || #{vo.endTime}, 'YYYY-MM-DD HH24:MI'))
+           OR
+           (START_TIME >= TO_TIMESTAMP(#{vo.exDate} || ' ' || #{vo.startTime}, 'YYYY-MM-DD HH24:MI')
+           AND END_TIME <= TO_TIMESTAMP(#{vo.exDate} || ' ' || #{vo.endTime}, 'YYYY-MM-DD HH24:MI'))
+      )
+    """)
+    int countOverlappingRecords(@Param("userNo") String userNo, @Param("vo") AerobicHistoryVo vo);
+
+    //운동 내역 기록
+    @Insert("""
+        INSERT INTO AEROBIC_HISTORY
+        (NO, USER_NO, EX_NO, EX_DATE, EX_DURATION, START_TIME, END_TIME)
+        VALUES (
+            AEROBIC_HISTORY_SEQ.NEXTVAL,
+            #{userNo}, #{exNo},
+            TO_DATE(#{vo.exDate}, 'YYYY-MM-DD'),
+            #{vo.exDuration},
+            TO_TIMESTAMP(#{vo.exDate} || ' ' || #{vo.startTime}, 'YYYY-MM-DD HH24:MI'),
+            TO_TIMESTAMP(#{vo.exDate} || ' ' || #{vo.endTime}, 'YYYY-MM-DD HH24:MI')
+        )
+        """)
+    void record(String userNo, String exNo, AerobicHistoryVo vo);
+
+
 }
