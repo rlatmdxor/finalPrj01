@@ -50,4 +50,10 @@ public class AerobicController {
         AerobicVo exercise = service.findExByName(name);
         return exercise;
     }
+    
+    //운동 내역 기록
+    @PostMapping("record")
+    public String record(@RequestHeader ("Authorization") String token, @RequestBody AerobicHistoryVo vo){
+        return service.record(token,vo);
+    }
 }
