@@ -101,7 +101,7 @@ const Aerobic = () => {
         setFetchTry(fetchTry + 1);
       })
       .catch((error) => {
-        alert();
+        alert('요청 에러:', error);
         console.error('POST 요청 에러:', error);
       });
   };

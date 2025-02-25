@@ -1,5 +1,6 @@
 package com.kh.healthcare.exercise.anAerobic;
 
+import com.kh.healthcare.exercise.aerobic.AerobicHistoryVo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,7 +39,7 @@ public class AnAerobicController {
     public ResponseEntity<String> mark(@RequestHeader ("Authorization") String token, @RequestBody String no){
         String msg = service.mark(token, no);
         if(msg.equals("실패")){
-            return ResponseEntity.ok("즐겨찾기는 5개까지만 등록가능합니다.");
+            return ResponseEntity.ok("즐겨찾기는 3개까지만 등록가능합니다.");
         } else{
             return ResponseEntity.ok("북마크 등록 완료");
         }
@@ -49,5 +50,11 @@ public class AnAerobicController {
     public AnAerobicVo getDetail(@RequestParam String name) {
         AnAerobicVo exercise = service.findExByName(name);
         return exercise;
+    }
+
+    //운동 내역 기록
+    @PostMapping("record")
+    public String record(@RequestHeader ("Authorization") String token, @RequestBody AnAerobicHistoryVo vo){
+        return service.record(token,vo);
     }
 }
