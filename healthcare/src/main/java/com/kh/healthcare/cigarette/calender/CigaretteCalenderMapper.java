@@ -1,6 +1,5 @@
 package com.kh.healthcare.cigarette.calender;
 
-import com.kh.healthcare.cigarette.report.CigaretteReportVo;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -19,6 +18,7 @@ public interface CigaretteCalenderMapper {
             "WHERE MEMBER_NO = #{memberNo} " +
             "ORDER BY END_DATE DESC")
     List<CigaretteCalenderVo> getCigaretteCalender(Long memberNo);
+
 
     @Insert("""
             INSERT INTO RECORD_CIGARETTE (NO, MEMBER_NO, CIGARETTE, TAR, START_DATE, END_DATE)
