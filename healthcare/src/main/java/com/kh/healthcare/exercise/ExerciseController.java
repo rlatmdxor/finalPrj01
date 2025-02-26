@@ -14,17 +14,24 @@ public class ExerciseController {
 
     private final ExerciseService service;
 
-    @GetMapping("getDuration")
-    public ResponseEntity<List<Map<String, Object>>> getDuration(@RequestHeader("Authorization") String token, @RequestParam String rangeType) {
+    @GetMapping("getCalories")
+    public ResponseEntity<List<Map<String, Object>>> getCalories(
+            @RequestHeader("Authorization") String token
+            , @RequestParam int year
+            , @RequestParam(required = false) Integer month
+            , @RequestParam String rangeType) {
 
-        List<Map<String, Object>> data = service.getDuration(token, rangeType);
+        List<Map<String, Object>> data = service.getCalories(token, rangeType, year, month);
         return ResponseEntity.ok(data);
     }
 
-    @GetMapping("getCalories")
-    public ResponseEntity<List<Map<String, Object>>> getCalories(@RequestHeader("Authorization") String token, @RequestParam String rangeType) {
+    @GetMapping("getDuration")
+    public ResponseEntity<List<Map<String, Object>>> getDuration(@RequestHeader("Authorization") String token
+            , @RequestParam int year
+            , @RequestParam(required = false) Integer month
+            , @RequestParam String rangeType) {
 
-        List<Map<String, Object>> data = service.getCalories(token, rangeType);
+        List<Map<String, Object>> data = service.getDuration(token, rangeType, year, month);
         return ResponseEntity.ok(data);
     }
 
@@ -33,6 +40,27 @@ public class ExerciseController {
 
         List<Map<String, Object>> data = service.getMonthlyMaxWeight(token);
         return ResponseEntity.ok(data);
+    }
+
+    @GetMapping("getTypeCount")
+    public ResponseEntity<List<Map<String, Object>>> getTypeCount(@RequestHeader("Authorization") String token
+            , @RequestParam String rangeType
+            , @RequestParam int year
+            , @RequestParam(required = false) Integer month) {
+
+        List<Map<String, Object>> result = service.getTypeCount(token, rangeType, year, month);
+        return ResponseEntity.ok(result);
+    }
+
+
+    @GetMapping("getCategoryCount")
+    public ResponseEntity<List<Map<String, Object>>> getCategoryCount(@RequestHeader("Authorization") String token
+            , @RequestParam String rangeType
+            , @RequestParam int year
+            , @RequestParam(required = false) Integer month
+    ) {
+        List<Map<String, Object>> result = service.getCategoryCount(token, rangeType, year, month);
+        return ResponseEntity.ok(result);
     }
 
 }

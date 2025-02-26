@@ -10,54 +10,29 @@ import java.util.Map;
 public interface ExerciseMapper {
 
     @Select("""
-        SELECT PERIOD, SUM(TOTAL_AEROBIC_DURATION) AS TOTAL_AEROBIC_DURATION
+        SELECT PERIOD, SUM(TOTAL_AEROBIC_CALORIES) AS TOTAL_AEROBIC_CALORIES, 
+               SUM(TOTAL_ANAEROBIC_CALORIES) AS TOTAL_ANAEROBIC_CALORIES,
+               SUM(TOTAL_AEROBIC_CALORIES + TOTAL_ANAEROBIC_CALORIES) AS TOTAL_CALORIES
         FROM (
             SELECT 
-                AH.USER_NO, 
                 CASE 
-                    WHEN #{rangeType} = '일' THEN TO_CHAR(AH.EX_DATE, 'YYYY-MM-DD')
+                    WHEN #{rangeType} = '일' THEN TO_CHAR(AH.EX_DATE, 'YYYY-MM-DD') 
                     WHEN #{rangeType} = '주' THEN TO_CHAR(AH.EX_DATE, 'IYYY-IW')
-                    ELSE TO_CHAR(AH.EX_DATE, 'YYYY-MM')
-                END AS PERIOD, 
-                SUM(AH.EX_DURATION) AS TOTAL_AEROBIC_DURATION
-            FROM AEROBIC_HISTORY AH
-            WHERE AH.EX_DATE BETWEEN ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -11) AND SYSDATE
-            GROUP BY AH.USER_NO, AH.EX_DATE
-        ) DURATION_DATA
-        WHERE USER_NO = #{userNo}
-        GROUP BY PERIOD
-        ORDER BY PERIOD
-        """)
-    List<Map<String, Object>> getDuration(String userNo, String rangeType);
-
-    @Select("""
-        SELECT
-            PERIOD,
-            SUM(TOTAL_AEROBIC_CALORIES) AS TOTAL_AEROBIC_CALORIES,
-            SUM(TOTAL_ANAEROBIC_CALORIES) AS TOTAL_ANAEROBIC_CALORIES,
-            SUM(TOTAL_AEROBIC_CALORIES + TOTAL_ANAEROBIC_CALORIES) AS TOTAL_CALORIES
-        FROM (
-            -- 유산소 운동 칼로리 소모량
-            SELECT
-                AH.USER_NO,
-                CASE
-                    WHEN #{rangeType} = '일' THEN TO_CHAR(AH.EX_DATE, 'YYYY-MM-DD')
-                    WHEN #{rangeType} = '주' THEN TO_CHAR(AH.EX_DATE, 'IYYY-IW') -- ISO 주차
                     ELSE TO_CHAR(AH.EX_DATE, 'YYYY-MM')
                 END AS PERIOD,
                 (AH.EX_DURATION / 60) * A.CAL_CONSUME AS TOTAL_AEROBIC_CALORIES,
                 0 AS TOTAL_ANAEROBIC_CALORIES
             FROM AEROBIC_HISTORY AH
             JOIN AEROBIC A ON AH.EX_NO = A.NO
-            WHERE AH.EX_DATE BETWEEN TRUNC(SYSDATE, 'MM') - INTERVAL '11' MONTH AND SYSDATE
+            WHERE AH.USER_NO = #{userNo}
+            AND EXTRACT(YEAR FROM AH.EX_DATE) = #{year}
+            AND (#{rangeType} != '일' OR EXTRACT(MONTH FROM AH.EX_DATE) = #{month})
 
             UNION ALL
 
-            -- 무산소 운동 칼로리 소모량
-            SELECT
-                ANH.USER_NO,
-                CASE
-                    WHEN #{rangeType} = '일' THEN TO_CHAR(ANH.EX_DATE, 'YYYY-MM-DD')
+            SELECT 
+                CASE 
+                    WHEN #{rangeType} = '일' THEN TO_CHAR(ANH.EX_DATE, 'YYYY-MM-DD') 
                     WHEN #{rangeType} = '주' THEN TO_CHAR(ANH.EX_DATE, 'IYYY-IW')
                     ELSE TO_CHAR(ANH.EX_DATE, 'YYYY-MM')
                 END AS PERIOD,
@@ -65,13 +40,34 @@ public interface ExerciseMapper {
                 (ANH.REPS * ANAEROBIC.CAL_CONSUME) AS TOTAL_ANAEROBIC_CALORIES
             FROM ANAEROBIC_HISTORY ANH
             JOIN ANAEROBIC ON ANH.EX_NO = ANAEROBIC.NO
-            WHERE ANH.EX_DATE BETWEEN TRUNC(SYSDATE, 'MM') - INTERVAL '11' MONTH AND SYSDATE
+            WHERE ANH.USER_NO = #{userNo}
+            AND EXTRACT(YEAR FROM ANH.EX_DATE) = #{year}
+            AND (#{rangeType} != '일' OR EXTRACT(MONTH FROM ANH.EX_DATE) = #{month})
         ) CALORIE_DATA
-        WHERE USER_NO = #{userNo}
         GROUP BY PERIOD
         ORDER BY PERIOD
-        """)
-    List<Map<String, Object>> getCalories(String userNo, String rangeType);
+    """)
+    List<Map<String, Object>> getCalories(String userNo, String rangeType, int year, Integer month);
+
+    @Select("""
+        SELECT PERIOD, SUM(TOTAL_AEROBIC_DURATION) AS TOTAL_AEROBIC_DURATION
+        FROM (
+            SELECT 
+                CASE 
+                    WHEN #{rangeType} = '일' THEN TO_CHAR(AH.EX_DATE, 'YYYY-MM-DD') 
+                    WHEN #{rangeType} = '주' THEN TO_CHAR(AH.EX_DATE, 'IYYY-IW')
+                    ELSE TO_CHAR(AH.EX_DATE, 'YYYY-MM')
+                END AS PERIOD,
+                AH.EX_DURATION AS TOTAL_AEROBIC_DURATION
+            FROM AEROBIC_HISTORY AH
+            WHERE AH.USER_NO = #{userNo}
+            AND EXTRACT(YEAR FROM AH.EX_DATE) = #{year}
+            AND (#{rangeType} != '일' OR EXTRACT(MONTH FROM AH.EX_DATE) = #{month})
+        ) DURATION_DATA
+        GROUP BY PERIOD
+        ORDER BY PERIOD
+    """)
+    List<Map<String, Object>> getDuration(String userNo, String rangeType, int year, Integer month);
 
     @Select("""
             SELECT
@@ -88,5 +84,63 @@ public interface ExerciseMapper {
             ORDER BY MONTH, EXERCISE_NAME
             """)
     List<Map<String, Object>> getMonthlyMaxWeight(String userNo);
+
+    @Select("""
+            SELECT PERIOD, COUNT(*) AS TOTAL_COUNT
+            FROM (
+                SELECT 
+                    CASE 
+                        WHEN #{rangeType} = '월' THEN TO_CHAR(AH.EX_DATE, 'YYYY-MM') 
+                        ELSE TO_CHAR(AH.EX_DATE, 'YYYY') 
+                    END AS PERIOD
+                FROM AEROBIC_HISTORY AH
+                WHERE AH.USER_NO = #{userNo}
+                AND EXTRACT(YEAR FROM AH.EX_DATE) = #{year}
+                AND (#{month} IS NULL OR EXTRACT(MONTH FROM AH.EX_DATE) = #{month})
+            ) TEMP
+            GROUP BY PERIOD
+            ORDER BY PERIOD
+            """)
+    List<Map<String, Object>> getTypeCountAerobic(String rangeType, int year, Integer month, String userNo);
+
+    @Select("""
+            SELECT PERIOD, COUNT(*) AS TOTAL_COUNT
+            FROM (
+                SELECT 
+                    CASE 
+                        WHEN #{rangeType} = '월' THEN TO_CHAR(ANH.EX_DATE, 'YYYY-MM') 
+                        ELSE TO_CHAR(ANH.EX_DATE, 'YYYY') 
+                    END AS PERIOD
+                FROM ANAEROBIC_HISTORY ANH
+                WHERE ANH.USER_NO = #{userNo}
+                AND EXTRACT(YEAR FROM ANH.EX_DATE) = #{year}
+                AND (#{month} IS NULL OR EXTRACT(MONTH FROM ANH.EX_DATE) = #{month})
+            ) TEMP
+            GROUP BY PERIOD
+            ORDER BY PERIOD
+            """)
+    List<Map<String, Object>> getTypeCountAnAerobic(String rangeType, int year, Integer month, String userNo);
+
+    @Select("""
+            SELECT PERIOD, EX_NO, COUNT(*) AS EXERCISE_COUNT
+            FROM (
+                SELECT
+                    TO_CHAR(ANH.EX_DATE,
+                        CASE
+                            WHEN #{rangeType} = '월' THEN 'YYYY-MM'
+                            ELSE 'YYYY'
+                        END
+                    ) AS PERIOD,
+                    ANH.EX_NO
+                FROM ANAEROBIC_HISTORY ANH
+                WHERE ANH.USER_NO = #{userNo}
+                AND EXTRACT(YEAR FROM ANH.EX_DATE) = #{year}
+                AND (#{month} IS NULL OR EXTRACT(MONTH FROM ANH.EX_DATE) = #{month})
+            ) TEMP
+            GROUP BY PERIOD, EX_NO
+            ORDER BY PERIOD, EX_NO
+            """)
+    List<Map<String, Object>> getCategoryCount(String rangeType, int year, Integer month, String userNo);
+
 
 }
