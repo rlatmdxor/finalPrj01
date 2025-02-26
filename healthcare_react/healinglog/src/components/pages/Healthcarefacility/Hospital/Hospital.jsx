@@ -1,225 +1,287 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Title from '../../../util/Title';
 import { setSelection } from '../../../../redux/selectSlice';
-import SelectedBar from '../../../util/SelectedBar';
-import styled, { ThemeProvider, useTheme } from 'styled-components';
-import Btn from '../../../util/Btn';
+import styled from 'styled-components';
+import Navi from '../../../util/Navi';
+import ContentLayout from '../../../util/ContentLayout';
 import Table from '../../../util/Table';
-// import BoardList from '../../../common/BoardList';
-// import Pagination from '../../../util/Pagination';
+import { useDispatch, useSelector } from 'react-redux';
+import SearchBar from '../../../util/SearchBar';
+import Pagination from '../../../util/Pagination';
+import { resetPaging, setTotalCount } from '../../../../redux/pagingSlice';
 
-const Wrapper = styled.div`
-  display: flex;
-  /* justify-content: center; 중앙 정렬 */
-  gap: 20px; /* 간격 추가 */
-  flex-wrap: wrap; /* 줄 바꿈 허용 */
-  /* margin-top: 20px; */
-  margin-left: 100px;
-  margin-right: 100px;
-  padding: 30px;
-  padding-left: 50px;
-  padding-right: 50px;
-`;
-
-const TitleBox = styled.div`
-  text-align: center;
-  line-height: 55px;
-  font-size: 2em;
-  font-weight: 600;
-  width: 1024px;
-  height: 60px;
-  margin-left: 150px;
-  margin-top: 30px;
-  background-color: rgb(203, 225, 190);
-  /* border: 1px solid black; */
-`;
-
-const ContextBox = styled.div`
-  width: 1024px;
-  height: 500px;
-  margin-left: 150px;
-  background-color: rgb(238, 245, 233);
-  margin-bottom: 100px;
-  position: relative;
-  /* border: 1px solid black; */
-`;
-
-const MiniContainer = styled.div`
+const NaviContainer = styled.div`
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  /* gap: 5px;   */
-  justify-content: center;
-  margin-left: 150px;
-  /* padding: 50px 0; */
-`;
-
-const TitleBoxMini = styled.div`
-  text-align: center;
-  line-height: 55px;
-  font-size: 2em;
-  font-weight: 600;
-  width: 512x;
-  height: 60px;
-  margin-top: 50px;
-  background-color: rgb(203, 225, 190);
-  /* border: 1px solid black; */
-`;
-
-const ContextBoxMini = styled.div`
-  width: 512px;
-  height: 400px;
-  background-color: rgb(238, 245, 233);
   position: relative;
-  /* border: 1px solid black; */
+  width: 400px;
+  top: 20px;
+  left: 40px;
+  grid-template-columns: 2fr 2fr 3fr;
 `;
 
-const PositionedBtn = styled.div`
-  position: absolute;
-  bottom: 40px;
-  right: 40px;
+const SearchDiv = styled.div`
+  display: flex;
+  justify-content: end;
+  gap: 5px;
+  align-items: center;
+  margin-top: 15px;
+  margin-bottom: 5px;
 `;
 
-const MiniBox = styled.div`
-  width: 512px;
-  height: 500px;
-  margin-left: 0px;
-`;
-
-const Box = styled.div`
-  width: 1024px;
-  height: 800px;
-`;
-
-const SubTitle = styled.div`
-  font-size: 35px;
-  font-weight: 600;
-  color: gray;
-  margin-top: 30px;
-  margin-left: 50px;
-`;
-
-const Highlight = styled.span`
-  border-bottom: 6px solid #ff7f50; /* 주황색 밑줄 */
-  padding-bottom: 5px;
-  color: black;
+const SelectBox = styled.select`
+  width: ${(props) => props.width || '100px'};
+  height: 40px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin: 0px 3px;
+  &:focus {
+    border-color: #007bff;
+    outline: none;
+  }
 `;
 
 const Hospital = () => {
-  const theme = useTheme();
-  return (
-    <div>
-      <Title>의료기관 찾기</Title>
-      <SubTitle>
-        <Highlight>병원</Highlight> 약국 보건소
-      </SubTitle>
-      <MiniContainer>
-        <MiniBox>
-          <TitleBoxMini>진료과</TitleBoxMini>
-          <ContextBoxMini>
-            <Wrapper>
-              {/* <Selected> */}
-              <SelectedBar
-                label="city"
-                options={['내과', '외과', '치과', '여긴어디지']}
-                reduxAction={setSelection}
-                index={0}
-              />
-            </Wrapper>
-            <PositionedBtn></PositionedBtn>
-          </ContextBoxMini>
-        </MiniBox>
+  const dispatch = useDispatch();
+  const boardType = 'hospital';
 
-        <MiniBox>
-          <TitleBoxMini>증상</TitleBoxMini>
-          <ContextBoxMini>
-            <Wrapper>
-              {/* <Selected> */}
-              <SelectedBar
-                label="city"
-                options={['해당없음', '머리', '가슴', '배']}
-                reduxAction={setSelection}
-                index={0}
-              />
-              <SelectedBar label="district" options={['머리', '뇌', '눈']} reduxAction={setSelection} index={1} />
-              <SelectedBar
-                label="dong"
-                options={['두통', '눈아파요', '이가아파요', '다아파요']}
-                reduxAction={setSelection}
-                index={2}
-              />
-              {/* </Selected> */}
-            </Wrapper>
-            <PositionedBtn></PositionedBtn>
-          </ContextBoxMini>
-        </MiniBox>
-      </MiniContainer>
-      <Box>
-        <TitleBox>지역</TitleBox>
-        <ContextBox>
-          <Wrapper>
-            {/* <Selected> */}
-            <SelectedBar
-              label="city"
-              options={['서울', '경기', '인천', '어디지']}
-              reduxAction={setSelection}
-              index={0}
-            />
-            <SelectedBar
-              label="district"
-              options={[
-                '동작구',
-                '은평구',
-                '아무구',
-                '저리구',
-                '은평구',
-                '아무구',
-                '저리구',
-                '은평구',
-                '아무구',
-                '저리구',
-                '은평구',
-                '아무구',
-                '저리구',
-                '아무구',
-                '저리구',
-                '은평구',
-                '아무구',
-                '저리구',
-                '은평구',
-                '아무구',
-                '저리구',
-                '은평구',
-                '아무구',
-                '저리구',
-              ]}
-              reduxAction={setSelection}
-              index={1}
-            />
-            <SelectedBar
-              label="dong"
-              options={['동작구', '은평구', '아무구', '저리구']}
-              reduxAction={setSelection}
-              index={2}
-            />
-            {/* </Selected> */}
-          </Wrapper>
-          <PositionedBtn>
-            <Btn
-              // w="60"
-              // h="60"
-              str="검색"
-              c={() => {
-                return `#FF7F50`;
-              }}
-              fs="20"
-              fc="white"
-              type="submit"
-              f={() => {}}
-            ></Btn>
-          </PositionedBtn>
-        </ContextBox>
-      </Box>
-    </div>
+  // 상태값 정의
+  const [cities, setCities] = useState([]);
+  const [districts, setDistricts] = useState([]);
+  const [dongs, setDongs] = useState([]);
+  const [selectedCity, setSelectedCity] = useState(null);
+  const [selectedDistrict, setSelectedDistrict] = useState(null);
+  const [selectedDong, setSelectedDong] = useState(null);
+  const [searchType, setSearchType] = useState('');
+  const [keyword, setKeyword] = useState('');
+  const [hospitals, setHospitals] = useState([]);
+  const [hospitalType, setHospitalType] = useState('');
+  const [selectedHospitalType, setSelectedHostpitalType] = useState([]);
+
+  const [loading, setLoading] = useState(false);
+
+  const currentPage = useSelector((state) => state.paging[boardType]?.currentPage || 1);
+  const boardLimit = useSelector((state) => state.paging[boardType]?.boardLimit || 12);
+
+  // 📌 초기 페이징 상태 리셋
+  useEffect(() => {
+    dispatch(resetPaging({ boardType }));
+  }, []);
+
+  useEffect(() => {
+    handleSearch(); // 초기 로딩 시 검색 실행
+  }, []);
+
+  // 📌 시 데이터 가져오기
+  useEffect(() => {
+    fetch('http://127.0.0.1/api/location/cities')
+      .then((res) => res.json())
+      .then((data) => setCities(data))
+      .catch((error) => console.error('시 데이터 로드 실패:', error));
+  }, []);
+
+  // 📌 군/구 데이터 가져오기
+  useEffect(() => {
+    if (selectedCity) {
+      fetch(`http://127.0.0.1/api/location/districts/${selectedCity}`)
+        .then((res) => res.json())
+        .then((data) => setDistricts(data))
+        .catch((error) => console.error('구 데이터 로드 실패:', error));
+    } else {
+      setDistricts([]);
+    }
+  }, [selectedCity]);
+
+  // 📌 동 데이터 가져오기
+  useEffect(() => {
+    if (selectedDistrict) {
+      fetch(`http://127.0.0.1/api/location/dongs/${selectedDistrict}`)
+        .then((res) => res.json())
+        .then((data) => setDongs(data))
+        .catch((error) => console.error('동 데이터 로드 실패:', error));
+    } else {
+      setDongs([]);
+    }
+  }, [selectedDistrict]);
+
+  useEffect(() => {
+    handleSearch();
+  }, [currentPage]);
+
+  // 📌 검색 실행
+  const handleSearch = async () => {
+    setLoading(true);
+
+    try {
+      let searchKeyword = keyword.trim();
+      let finalHospitalType = hospitalType.trim(); // 공백 제거
+      let finalSearchType = searchType.trim();
+
+      console.log('🔍 검색 실행 - hospitalType:', finalHospitalType); // 디버깅 로그
+
+      if (!searchKeyword) {
+        const cityName = cities.find((c) => c.no === selectedCity)?.cityName || '';
+        const districtName = districts.find((d) => d.no === selectedDistrict)?.districtName || '';
+        const dongName = dongs.find((d) => d.no === selectedDong)?.dongName || '';
+
+        searchKeyword = dongName || districtName || cityName;
+        finalSearchType = 'address';
+      }
+
+      if (!searchKeyword) {
+        searchKeyword = '';
+        finalSearchType = '';
+        finalHospitalType = '';
+      }
+
+      // 📌 API 요청 URL 확인
+      const requestUrl = `http://127.0.0.1/api/hospital/search?hospitalType=${encodeURIComponent(
+        finalHospitalType
+      )}&searchType=${finalSearchType}&keyword=${encodeURIComponent(
+        searchKeyword
+      )}&page=${currentPage}&size=${boardLimit}`;
+
+      console.log('📡 API 요청 URL:', requestUrl); // 디버깅 로그
+
+      const response = await fetch(requestUrl);
+      if (!response.ok) {
+        throw new Error(`API 요청 실패: ${response.status}`);
+      }
+      const data = await response.json();
+
+      dispatch(setTotalCount({ boardType: 'hospital', totalCount: data.totalElements || data.hospitals.length }));
+      setHospitals(data.hospitals || []);
+    } catch (error) {
+      console.error('❌ 검색 오류:', error);
+      setHospitals([]);
+    }
+    setLoading(false);
+  };
+
+  // 📌 검색어 업데이트 핸들러
+  const handleKeywordChange = (e) => {
+    setKeyword(e.target.value);
+  };
+
+  // 📌 검색어 초기화 핸들러
+  const handleClearKeyword = () => {
+    setKeyword('');
+  };
+
+  //시군구 고르면 자동으로 검색
+  useEffect(() => {
+    if (selectedCity || selectedDistrict || selectedDong || hospitalType) {
+      handleSearch();
+    }
+  }, [selectedCity, selectedDistrict, selectedDong, hospitalType]);
+
+  return (
+    <>
+      <Title>의료기관 찾기</Title>
+      <NaviContainer>
+        <Navi target="hospital" tag={'병원'} />
+        <Navi target="pharmacy" tag={'약국'} />
+        <Navi target="publichealthcenter" tag={'보건소'} />
+      </NaviContainer>
+
+      <ContentLayout>
+        <SearchDiv>
+          <SelectBox width="120px" onChange={(e) => setSelectedCity(parseInt(e.target.value, 10))}>
+            <option value="">도시 선택</option>
+            {cities.map((city) => (
+              <option key={city.no} value={city.no}>
+                {city.cityName}
+              </option>
+            ))}
+          </SelectBox>
+
+          <SelectBox disabled={!selectedCity} onChange={(e) => setSelectedDistrict(parseInt(e.target.value, 10))}>
+            <option value="">군/구 선택</option>
+            {districts.map((district) => (
+              <option key={district.no} value={district.no}>
+                {district.districtName}
+              </option>
+            ))}
+          </SelectBox>
+
+          {/* 동 선택 */}
+          <SelectBox
+            disabled={!selectedDistrict}
+            onChange={(e) => {
+              const value = parseInt(e.target.value, 10);
+              setSelectedDong(value);
+              dispatch(setSelection({ label: 'dong', value }));
+            }}
+          >
+            <option value="">동 선택</option>
+            {dongs.map((dong) => (
+              <option key={dong.no} value={dong.no}>
+                {dong.dongName}
+              </option>
+            ))}
+          </SelectBox>
+
+          {/* 수정중임 병원종류 선택 */}
+          <SelectBox value={hospitalType} onChange={(e) => setHospitalType(e.target.value)}>
+            <option value="">과 선택</option>
+            <option value="내과">내과</option>
+            <option value="이비인후과">이비인후과</option>
+            <option value="외과">외과</option>
+            <option value="정형외과">정형외과</option>
+            <option value="신경외과">신경외과</option>
+            <option value="소아청소년과">소아청소년과</option>
+            <option value="정신건강의학과">정신건강의학과</option>
+            <option value="심장혈관흉부외과">심장혈관흉부외과</option>
+            <option value="마취통증의학과">마취통증의학과</option>
+            <option value="산부인과">산부인과</option>
+            <option value="가정의학과">가정의학과</option>
+            <option value="비뇨의학과">비뇨의학과</option>
+          </SelectBox>
+
+          {/* 검색 옵션 */}
+          <SelectBox value={searchType} onChange={(e) => setSearchType(e.target.value)}>
+            <option value="">검색 조건 선택</option>
+            <option value="name">병원명</option>
+            <option value="address">주소</option>
+            <option value="tellNum">전화번호</option>
+            <option value="postNum">우편번호</option>
+          </SelectBox>
+
+          {/* SearchBar */}
+          <SearchBar
+            handleClick={handleSearch} // 검색 버튼 클릭 시 handleSearch 실행
+            handleChange={handleKeywordChange} // 검색어 입력 시 keyword 업데이트
+            handleClearClick={handleClearKeyword} // 검색어 초기화 버튼
+            w={300}
+            h={40}
+          />
+        </SearchDiv>
+        <Table>
+          <thead>
+            <tr>
+              <th>병원명</th>
+              <th>전화번호</th>
+              <th>우편번호</th>
+              <th>주소</th>
+              <th>진단과</th>
+            </tr>
+          </thead>
+          <tbody>
+            {hospitals.map((hospital, idx) => (
+              <tr key={idx}>
+                <td>{hospital.name}</td>
+                <td>{hospital.tellNum}</td>
+                <td>{hospital.postNum}</td>
+                <td>{hospital.address}</td>
+                <td>{hospital.hospitalType}</td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+
+        <Pagination boardType={boardType} />
+      </ContentLayout>
+    </>
   );
 };
 
