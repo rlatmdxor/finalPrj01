@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import ContentLayout from '../util/ContentLayout';
 import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -7,6 +7,9 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import 'swiper/css/scrollbar';
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
+import Avatar from '@mui/material/Avatar';
+import { getNoticeList, getBoardList, getReviewList } from '../services/homeService';
 
 const LayoutDiv = styled.div`
   display: flex;
@@ -26,6 +29,7 @@ const LayoutDiv = styled.div`
 
 const ContentArea = styled.div`
   margin-top: 430px;
+  margin-bottom: 30px;
 `;
 
 const BannerImg = styled.img`
@@ -38,6 +42,11 @@ const TitleTextDiv = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 6px;
+`;
+
+const ViewMore = styled.div`
+  cursor: pointer;
 `;
 
 const CardAreaDiv = styled.div`
@@ -46,27 +55,31 @@ const CardAreaDiv = styled.div`
   grid-template-rows: 1fr;
   justify-content: space-between;
   align-items: center;
-  gap: 51px;
-  margin-bottom: 60px;
+  gap: 42px;
+  margin-bottom: 70px;
 `;
 
 const Card = styled.div`
-  width: 305px;
-  height: 170px;
+  width: 316px;
+  height: auto;
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: 55px 1fr;
-  padding: 17px;
+  grid-template-rows: 54px 84px auto;
+  padding: 22px;
   border-radius: 8px;
   box-sizing: border-box;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
   border: 1px solid lightgray;
+  cursor: pointer;
+
+  &:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  }
 `;
 
 const CardTitleTextDiv = styled.div`
   width: 100%;
-  font-size: 20px;
-  font-weight: 800;
+  font-size: 19px;
+  font-weight: 700;
   overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -76,7 +89,8 @@ const CardTitleTextDiv = styled.div`
 
 const CardContentTextDiv = styled.div`
   width: 100%;
-  margin-top: 12px;
+  margin-top: 10px;
+  margin-bottom: 9px;
   font-size: 14px;
   color: #4e4e4e;
   overflow: hidden;
@@ -87,37 +101,137 @@ const CardContentTextDiv = styled.div`
   max-height: calc(1.4em * 3);
 `;
 
-const SmallCardAreaDiv = styled.div`
+const CardBottomArea = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  color: #696969;
+`;
+
+const ReviewAreDiv = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr;
   grid-template-rows: 1fr;
   justify-content: space-between;
   align-items: center;
-  gap: 37px;
-  margin-bottom: 60px;
+  gap: 30px;
+  margin-bottom: 80px;
 `;
 
-const SmallCard = styled.div`
-  width: 225px;
-  height: 300px;
+const ReviewCard = styled.div`
+  width: 234px;
+  height: 235px;
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: 150px 1fr;
-  padding: 17px;
-  border-radius: 8px;
+  grid-template-rows: 1fr 1fr 1fr 55px 1fr;
+  padding: 20px;
   box-sizing: border-box;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
   border: 1px solid lightgray;
+  cursor: pointer;
+
+  &:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  }
 `;
 
-const CardImg = styled.img`
+const HospitalNameText = styled.div`
+  font-size: 22px;
+  font-weight: 600;
   width: 100%;
-  height: 100%;
+  height: 30px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`;
+
+const RankDiv = styled.div`
+  font-size: 20px;
+  margin-bottom: 15px;
+`;
+
+const ReviewDiv = styled.div`
+  font-size: 15px;
+  color: #424242;
+  width: 100%;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  word-break: break-word;
+  line-height: 1.4em;
+  max-height: calc(1.4em * 2);
+`;
+
+const AreaDiv = styled.div`
+  margin-top: 6px;
+  font-size: 14px;
+  color: #696969;
+  width: 100%;
+  height: 18px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`;
+
+const ProfileAreaDiv = styled.div`
+  display: flex;
+  gap: 7px;
+  align-items: center;
+`;
+
+const AdAreaDiv = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto;
+  justify-content: space-between;
+  align-items: center;
+  gap: 42px;
+  margin-bottom: 70px;
+`;
+
+const AdTitleDiv = styled.div`
+  display: flex;
+  gap: 10px;
+  align-items: center;
+`;
+
+const AdIcon = styled.img`
+  width: 25px;
+  height: 20px;
+`;
+
+const AdImg = styled.img`
+  width: 495px;
+  height: 200px;
   object-fit: cover;
-  border-radius: 5px;
 `;
 
 const Main = () => {
+  const navigate = useNavigate();
+  const token = localStorage.getItem('token');
+
+  const [noticeList, setNoticeList] = useState([]);
+  const [boardList, setBoardList] = useState([]);
+  const [reviewList, setReviewList] = useState([]);
+
+  useEffect(() => {
+    const getFetch = async () => {
+      try {
+        const boardData = await getBoardList(token);
+        const noticeData = await getNoticeList(token);
+        const reviewData = await getReviewList(token);
+        setBoardList(boardData);
+        setNoticeList(noticeData);
+        setReviewList(reviewData);
+      } catch (error) {
+        alert('GET LIST FAIL ...');
+        console.error('[ERROR] GET LIST FAIL', error);
+      }
+    };
+    getFetch();
+  }, []);
+
   return (
     <>
       <LayoutDiv>
@@ -129,8 +243,9 @@ const Main = () => {
           pagination={{ clickable: true }}
           loop={true}
           autoplay={{
-            delay: 3500,
+            delay: 3000,
             disableOnInteraction: false,
+            waitForTransition: false,
           }}
         >
           <SwiperSlide>
@@ -147,101 +262,110 @@ const Main = () => {
       <ContentLayout>
         <ContentArea>
           <TitleTextDiv>
-            <h2>공지사항</h2>
-            <div>{'더보기>'}</div>
+            <h2>📄 공지사항</h2>
+            <ViewMore
+              onClick={() => {
+                navigate('/notice');
+              }}
+            >
+              {'더보기>'}
+            </ViewMore>
           </TitleTextDiv>
           <CardAreaDiv>
-            <Card>
-              <CardTitleTextDiv>미라클 모닝 챌린저에 참여하세요</CardTitleTextDiv>
-              <CardContentTextDiv>
-                안녕하세요 힐링로그 회원 여러분 미라클 모닝 이벤트에 참여하고 상금 300만원 받아가세요!
-              </CardContentTextDiv>
-            </Card>
-            <Card>
-              <CardTitleTextDiv>병원 리뷰 이벤트</CardTitleTextDiv>
-              <CardContentTextDiv>
-                안녕하세요 힐링로그 회원 여러분 병원 리뷰 이벤트에 참여하고 상금 300만원 받아가세요 많관부 많관부~~~
-              </CardContentTextDiv>
-            </Card>
-            <Card>
-              <CardTitleTextDiv>서버 점검 공지</CardTitleTextDiv>
-              <CardContentTextDiv>
-                안녕하세요 힐링로그 회원 여러분 2025년 2월 24일부터 2026년 2월 24일까지 서버 점검을 진행합니다...
-              </CardContentTextDiv>
-            </Card>
+            {noticeList.map((vo) => {
+              return (
+                <Card
+                  key={vo.no}
+                  onClick={() => {
+                    navigate(`/notice?bno=${vo.no}`);
+                  }}
+                >
+                  <CardTitleTextDiv>{vo.title}</CardTitleTextDiv>
+                  <CardContentTextDiv>{vo.content}</CardContentTextDiv>
+                  <CardBottomArea>
+                    <ProfileAreaDiv>{vo.nick}</ProfileAreaDiv>
+                    {vo.enrollDate.slice(0, 10)}
+                  </CardBottomArea>
+                </Card>
+              );
+            })}
           </CardAreaDiv>
           <TitleTextDiv>
-            <h2>이번주 Hot 꿀팁</h2>
-            <div>{'더보기 >'}</div>
+            <h2>🔥 이번주 Hot 꿀팁 </h2>
+            <ViewMore
+              onClick={() => {
+                navigate('/board');
+              }}
+            >
+              {'더보기 >'}
+            </ViewMore>
           </TitleTextDiv>
           <CardAreaDiv>
-            <Card>
-              <CardTitleTextDiv>교통사고 났을 때 보험비 많이 타는 법</CardTitleTextDiv>
-              <CardContentTextDiv>
-                일단 교통사고를 당하면 최대한 아픈 척을 해서 보험비를 많이 받아냅니다. 한방병원가서 한약재도 열심히
-                타먹습니다.
-              </CardContentTextDiv>
-            </Card>
-            <Card>
-              <CardTitleTextDiv>테트리스 잘 하는법</CardTitleTextDiv>
-              <CardContentTextDiv>티스핀을 열심히 연습한다</CardContentTextDiv>
-            </Card>
-            <Card>
-              <CardTitleTextDiv>오늘 점심 메뉴 추천좀</CardTitleTextDiv>
-              <CardContentTextDiv>오늘 점심 메뉴 추전좀 해주세요 오점메 오점메</CardContentTextDiv>
-            </Card>
+            {boardList.slice(0, 3).map((vo) => {
+              return (
+                <Card
+                  key={vo.no}
+                  onClick={() => {
+                    navigate(`/board?bno=${vo.no}`);
+                  }}
+                >
+                  <CardTitleTextDiv>
+                    [{vo.categoryName}] {vo.title}
+                  </CardTitleTextDiv>
+                  <CardContentTextDiv>{vo.content}</CardContentTextDiv>
+                  <CardBottomArea>
+                    <ProfileAreaDiv>
+                      <Avatar src={vo.profile ? vo.profile : '/broken-image.jpg'} sx={{ width: 22, height: 22 }} />
+                      {vo.nick}
+                    </ProfileAreaDiv>
+                    {vo.enrollDate.slice(0, 10)}
+                  </CardBottomArea>
+                </Card>
+              );
+            })}
           </CardAreaDiv>
           <TitleTextDiv>
-            <h2>이번주 Best 병원 리뷰</h2>
-            <div>{'더보기 >'}</div>
+            <h2>👍 이번주 Best 병원 리뷰</h2>
+            <ViewMore
+              onClick={() => {
+                navigate('/hospitalreview');
+              }}
+            >
+              {'더보기 >'}
+            </ViewMore>
           </TitleTextDiv>
-          <SmallCardAreaDiv>
-            <SmallCard>
-              <CardImg src="https://search.idsc.kr/data/item/1609293601/7Jew7IS47IS467iM656A7Iqk67OR7JuQ01.jpg" />
-              <CardTitleTextDiv>연세 세브란스 병원</CardTitleTextDiv>
-              <CardTitleTextDiv>⭐⭐⭐⭐⭐</CardTitleTextDiv>
-              <CardContentTextDiv>역시 대학병원 좋습니다</CardContentTextDiv>
-            </SmallCard>
-            <SmallCard>
-              <CardImg src="https://search.idsc.kr/data/item/1609293601/7Jew7IS47IS467iM656A7Iqk67OR7JuQ01.jpg" />
-              <CardTitleTextDiv>KH 병원</CardTitleTextDiv>
-              <CardTitleTextDiv>⭐⭐⭐⭐⭐</CardTitleTextDiv>
-              <CardContentTextDiv>친절하고 좋습니다</CardContentTextDiv>
-            </SmallCard>
-            <SmallCard>
-              <CardImg src="https://search.idsc.kr/data/item/1609293601/7Jew7IS47IS467iM656A7Iqk67OR7JuQ01.jpg" />
-              <CardTitleTextDiv>연세 세브란스 병원</CardTitleTextDiv>
-              <CardTitleTextDiv>⭐⭐⭐⭐⭐</CardTitleTextDiv>
-              <CardContentTextDiv>친절하고 좋습니다</CardContentTextDiv>
-            </SmallCard>
-            <SmallCard>
-              <CardImg src="https://search.idsc.kr/data/item/1609293601/7Jew7IS47IS467iM656A7Iqk67OR7JuQ01.jpg" />
-              <CardTitleTextDiv>심심투 병원</CardTitleTextDiv>
-              <CardTitleTextDiv>⭐⭐⭐⭐⭐</CardTitleTextDiv>
-              <CardContentTextDiv>친절하고 좋습니다</CardContentTextDiv>
-            </SmallCard>
-          </SmallCardAreaDiv>
+          <ReviewAreDiv>
+            {reviewList.slice(0, 4).map((vo) => {
+              return (
+                <ReviewCard key={vo.no}>
+                  <HospitalNameText>{vo.name}</HospitalNameText>
+                  <AreaDiv>
+                    {vo.city} {vo.district}
+                  </AreaDiv>
+                  <RankDiv>{'⭐'.repeat(vo.rating)}</RankDiv>
+                  <ReviewDiv>{vo.title}</ReviewDiv>
+                  <ProfileAreaDiv>
+                    <CardBottomArea>
+                      <ProfileAreaDiv>
+                        <Avatar src={vo.profile ? vo.profile : '/broken-image.jpg'} sx={{ width: 22, height: 22 }} />
+                        {vo.nick}
+                      </ProfileAreaDiv>
+                    </CardBottomArea>
+                  </ProfileAreaDiv>
+                </ReviewCard>
+              );
+            })}
+          </ReviewAreDiv>
           <TitleTextDiv>
-            <h2>힐링로그 추천 병원</h2>
+            <AdTitleDiv>
+              <AdIcon src="https://static-00.iconduck.com/assets.00/ad-icon-2048x1638-osvwd08x.png" />
+              <h2>힐링로그 추천 병원</h2>
+            </AdTitleDiv>
           </TitleTextDiv>
-          <SmallCardAreaDiv>
-            <SmallCard>
-              <CardTitleTextDiv>광고광고</CardTitleTextDiv>
-              <CardContentTextDiv>광고광고</CardContentTextDiv>
-            </SmallCard>
-            <SmallCard>
-              <CardTitleTextDiv>광고광고</CardTitleTextDiv>
-              <CardContentTextDiv>광고광고</CardContentTextDiv>
-            </SmallCard>
-            <SmallCard>
-              <CardTitleTextDiv>광고광고</CardTitleTextDiv>
-              <CardContentTextDiv>광고광고</CardContentTextDiv>
-            </SmallCard>
-            <SmallCard>
-              <CardTitleTextDiv>광고광고</CardTitleTextDiv>
-              <CardContentTextDiv>광고광고</CardContentTextDiv>
-            </SmallCard>
-          </SmallCardAreaDiv>
+          <AdAreaDiv>
+            <AdImg src="https://lh6.googleusercontent.com/proxy/Xdml5dy74GbBkgtLCNX0ST2-GJOBoOpuCgIW27SiZ4Z2p8q5jxFMXW_-DwoaAu19v5aq62YWN_ExK8EDrt6zBhYtAmtw1XDJiGl5nwdQZrJfhmI9ywhSIeEI6NW1lFPcMrOSajz4A9u6jkGCtard3UeXkj4MHyuA_GxKY0twj7X8nQ1KZsqAy111rgS_URD5eqpjsQIPU-p3pk3wggdRZDwjBd2TVOdC" />
+            <AdImg src="https://lh6.googleusercontent.com/proxy/Xdml5dy74GbBkgtLCNX0ST2-GJOBoOpuCgIW27SiZ4Z2p8q5jxFMXW_-DwoaAu19v5aq62YWN_ExK8EDrt6zBhYtAmtw1XDJiGl5nwdQZrJfhmI9ywhSIeEI6NW1lFPcMrOSajz4A9u6jkGCtard3UeXkj4MHyuA_GxKY0twj7X8nQ1KZsqAy111rgS_URD5eqpjsQIPU-p3pk3wggdRZDwjBd2TVOdC" />
+          </AdAreaDiv>
         </ContentArea>
       </ContentLayout>
     </>
