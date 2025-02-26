@@ -2,10 +2,7 @@ package com.kh.healthcare.exercise;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -17,17 +14,17 @@ public class ExerciseController {
 
     private final ExerciseService service;
 
-    @GetMapping("getMonthlyDuration")
-    public ResponseEntity<List<Map<String, Object>>> getMonthlyDuration(@RequestHeader("Authorization") String token) {
+    @GetMapping("getDuration")
+    public ResponseEntity<List<Map<String, Object>>> getDuration(@RequestHeader("Authorization") String token, @RequestParam String rangeType) {
 
-        List<Map<String, Object>> data = service.getMonthlyDuration(token);
+        List<Map<String, Object>> data = service.getDuration(token, rangeType);
         return ResponseEntity.ok(data);
     }
 
-    @GetMapping("getMonthlyCalories")
-    public ResponseEntity<List<Map<String, Object>>> getMonthlyCalories(@RequestHeader("Authorization") String token) {
+    @GetMapping("getCalories")
+    public ResponseEntity<List<Map<String, Object>>> getCalories(@RequestHeader("Authorization") String token, @RequestParam String rangeType) {
 
-        List<Map<String, Object>> data = service.getMonthlyCalories(token);
+        List<Map<String, Object>> data = service.getCalories(token, rangeType);
         return ResponseEntity.ok(data);
     }
 
