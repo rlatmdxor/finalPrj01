@@ -269,10 +269,10 @@ const ExReport = () => {
 
         <CircleContainer>
           <ChartContainer>
-            <TitleTag2>운동 유형별 운동 시간</TitleTag2>
+            <TitleTag2>운동 유형별 운동 횟수</TitleTag2>
             <ChartPosition>
               <ChartWithHoverEffect
-                chartType="Pie"
+                chartType="Doughnut"
                 labels={labels}
                 dataset={dataset}
                 initialWidth={90}
@@ -283,7 +283,7 @@ const ExReport = () => {
           </ChartContainer>
 
           <ChartContainer>
-            <TitleTag2>운동 종류별 운동 시간</TitleTag2>
+            <TitleTag2>운동 종류별 운동 횟수</TitleTag2>
             <ChartPosition>
               <ChartWithHoverEffect
                 chartType="Doughnut"
