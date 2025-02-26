@@ -28,9 +28,6 @@ public class PharmacyController {
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "200") int size) {
 
-        System.out.println("📡 받은 페이지: " + page);
-        System.out.println("📡 받은 데이터 크기: " + size);
-
 
         Map<String, Object> result = service.searchPharmacies(city, district, dong, searchType, keyword, page, size);
         return ResponseEntity.ok(result);
