@@ -18,16 +18,16 @@ public class ExerciseService {
     private final ExerciseMapper mapper;
     private final JwtUtil jwtUtil;
 
-    public List<Map<String, Object>> getMonthlyDuration(String token) {
+    public List<Map<String, Object>> getDuration(String token, String rangeType) {
         token = token.replace("Bearer ", "");
         String userNo = jwtUtil.getNo(token);
-        return mapper.getMonthlyDuration(userNo);
+        return mapper.getDuration(userNo, rangeType);
     }
 
-    public List<Map<String, Object>> getMonthlyCalories(String token) {
+    public List<Map<String, Object>> getCalories(String token, String rangeType) {
         token = token.replace("Bearer ", "");
         String userNo = jwtUtil.getNo(token);
-        return mapper.getMonthlyCalories(userNo);
+        return mapper.getCalories(userNo, rangeType);
     }
 
     public List<Map<String, Object>> getMonthlyMaxWeight(String token) {

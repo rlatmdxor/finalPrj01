@@ -16,6 +16,7 @@ const StyleBtn = styled.button`
 const DataDiv = styled.div`
   display: flex;
   justify-content: end;
+  height: 30px;
 `;
 
 const Select = styled.select`

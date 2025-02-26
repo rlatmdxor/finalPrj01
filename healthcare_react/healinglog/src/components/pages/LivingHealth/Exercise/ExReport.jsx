@@ -6,37 +6,46 @@ import Chart from '../../../util/Chart';
 import { useDispatch } from 'react-redux';
 import { close } from '../../../../redux/modalSlice';
 import ContentLayout from '../../../util/ContentLayout';
+import DateBtn from '../../../util/DateBtn';
 
 const ExReport = () => {
   const token = localStorage.getItem('token');
+  const dataBtn = ['일', '주', '월'];
   const dispatch = useDispatch();
+  // const [caloriesChartData, setCaloriesChartData] = useState(null);
   const [durationChartData, setDurationChartData] = useState(null);
-  const [caloriesChartData, setCaloriesChartData] = useState(null);
   const [maxWeightChartData, setMaxWeightChartData] = useState(null);
+  const [selectedRange, setSelectedRange] = useState('일');
+  const [selectedChart, setSelectedChart] = useState('Bar');
+  const [caloriesChartData, setCaloriesChartData] = useState({
+    labels: [],
+    datasets: [],
+  });
 
   useEffect(() => {
     //운동시간 fetch
-    const fetchDurationData = async () => {
+    const fetchDurationData = async (range) => {
       try {
-        const response = await fetch('http://127.0.0.1:80/api/exercise/getMonthlyDuration', {
+        const response = await fetch(`http://127.0.0.1:80/api/exercise/getDuration?rangeType=${range}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
           },
         });
+        if (!response.ok) throw new Error('네트워크 응답이 올바르지 않습니다.');
         const data = await response.json();
-        console.log('운동시간 데이터:', data);
+        console.log(data);
 
         // 백엔드 데이터 변환 (Chart.js 형식 맞추기)
-        const labels = data.map((item) => item.MONTH);
-        const durations = data.map((item) => item.TOTAL_DURATION);
+        const labels = data.map((item) => item.PERIOD);
+        const durations = data.map((item) => item.TOTAL_AEROBIC_DURATION);
 
         setDurationChartData({
           labels: labels,
           datasets: [
             {
-              label: '월별 운동시간 (분)',
+              label: '유산소 운동시간 (분)',
               data: durations,
               backgroundColor: [
                 'rgba(255, 99, 132, 0.2)',
@@ -66,9 +75,9 @@ const ExReport = () => {
     };
 
     //월별 칼로리 소모량 fetch
-    const fetchCaloriesData = async () => {
+    const fetchCaloriesData = async (range) => {
       try {
-        const response = await fetch('http://127.0.0.1:80/api/exercise/getMonthlyCalories', {
+        const response = await fetch(`http://127.0.0.1:80/api/exercise/getCalories?rangeType=${range}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -76,10 +85,11 @@ const ExReport = () => {
           },
         });
 
-        const data = await response.json();
-        console.log('칼로리 소모 데이터:', data);
+        if (!response.ok) throw new Error('네트워크 응답이 올바르지 않습니다.');
 
-        const labels = data.map((item) => item.MONTH);
+        const data = await response.json();
+
+        const labels = data.map((item) => item.PERIOD);
         const aerobicCalories = data.map((item) => item.TOTAL_AEROBIC_CALORIES);
         const anaerobicCalories = data.map((item) => item.TOTAL_ANAEROBIC_CALORIES);
         const totalCalories = data.map((item) => item.TOTAL_CALORIES);
@@ -156,10 +166,12 @@ const ExReport = () => {
       }
     };
 
-    fetchDurationData();
-    fetchCaloriesData();
+    fetchCaloriesData(selectedRange);
+    fetchDurationData(selectedRange);
+    // fetchDurationData();
+    // fetchCaloriesData();
     fetchMaxWeightData();
-  }, []);
+  }, [selectedRange]);
 
   const labels = [
     'January',
@@ -217,10 +229,13 @@ const ExReport = () => {
         <BlankSpace />
 
         <ChartContainer>
-          <TitleTag>월별 칼로리 소모량</TitleTag>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', alignItems: 'center' }}>
+            <TitleTag>칼로리 소모량</TitleTag>
+            <DateBtn line={'Line'} dataBtn={dataBtn} onSelect={setSelectedRange} onChange={setSelectedChart} />
+          </div>
           <ChartPosition>
             <Chart
-              chartType="Bar"
+              chartType={selectedChart}
               labels={caloriesChartData?.labels || []}
               dataset={caloriesChartData?.datasets || []}
               width={100}
@@ -232,19 +247,19 @@ const ExReport = () => {
         </ChartContainer>
 
         <ChartContainer>
-          <TitleTag>월별 운동 시간</TitleTag>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', alignItems: 'center' }}>
+            <TitleTag>유산소 운동 시간</TitleTag>
+            <DateBtn line={'Line'} dataBtn={dataBtn} onSelect={setSelectedRange} onChange={setSelectedChart} />
+          </div>
           <ChartPosition>
             <Chart
-              chartType="Bar"
+              chartType={selectedChart}
               labels={durationChartData?.labels || []}
               dataset={durationChartData?.datasets || []}
               width={100}
               height={400}
               xAxisColor="rgba(54, 162, 235, 1)" // x축 색상
               yAxisColor="rgba(255, 159, 64, 1)" // y축 색상
-              // yMin={}     // y축 최소값 음수가 필요한거 아니면 주석 유지하면됨
-              // yMax={''} // y축 최댓값 설정안하면 자동 스케일링됨
-              // yUnit={}       // y축에 표시될 수치의 단위를 입력할 수 있음 안쓰면 자동으로 공백처리
             />
           </ChartPosition>
         </ChartContainer>
