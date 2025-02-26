@@ -26,11 +26,10 @@ public class PublicHealthCenterService {
         // 응답 데이터 구성
         Map<String, Object> response = new HashMap<>();
         response.put("totalElements", totalElements); // 전체 개수
-        response.put("totalPages", (int) Math.ceil((double) totalElements / size)); // 총 페이지 수
+        response.put("totalCount", (int) Math.ceil((double) totalElements / size)); // 총 페이지 수
         response.put("currentPage", page); // 현재 페이지
         response.put("pageSize", size); // 한 페이지당 개수
         response.put("phcs", phcs); // 보건소 리스트
-
         return response;
     }
 }
