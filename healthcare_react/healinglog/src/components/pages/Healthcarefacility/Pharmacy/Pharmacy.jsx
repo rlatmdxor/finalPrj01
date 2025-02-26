@@ -133,8 +133,6 @@ const Pharmacy = () => {
         searchKeyword
       )}&page=${currentPage}&size=${boardLimit}`;
 
-      console.log('📡 API 요청 URL:', requestUrl);
-
       const response = await fetch(requestUrl);
       if (!response.ok) {
         throw new Error(`API 요청 실패: ${response.status}`);
@@ -151,8 +149,6 @@ const Pharmacy = () => {
     }
     setLoading(false);
   };
-
-  console.log('📌 Redux에서 가져온 전체 데이터 개수:', totalCount);
 
   // 📌 검색어 업데이트 핸들러
   const handleKeywordChange = (e) => {
