@@ -121,10 +121,10 @@ const ReviewAreDiv = styled.div`
 
 const ReviewCard = styled.div`
   width: 234px;
-  height: 235px;
+  height: 210px;
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: 1fr 1fr 1fr 55px 1fr;
+  grid-template-rows: 1fr 1fr 1fr 32px 1fr;
   padding: 20px;
   box-sizing: border-box;
   border: 1px solid lightgray;
@@ -155,12 +155,9 @@ const ReviewDiv = styled.div`
   color: #424242;
   width: 100%;
   overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  word-break: break-word;
-  line-height: 1.4em;
-  max-height: calc(1.4em * 2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;
 
 const AreaDiv = styled.div`
@@ -203,7 +200,7 @@ const AdIcon = styled.img`
 
 const AdImg = styled.img`
   width: 495px;
-  height: 200px;
+  height: 170px;
   object-fit: cover;
 `;
 

@@ -2,6 +2,7 @@ package com.kh.healthcare.home;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -15,9 +16,9 @@ public class HomeController {
     private final HomeService service;
 
     @GetMapping("board")
-    public List<HomeBoardVo> getHoneyTipBoardList(){
+    public List<BoardVo> getHoneyTipBoardList(@RequestHeader("Authorization") String authorization){
         try {
-            List<HomeBoardVo> voList = service.getHoneyTipBoardList();
+            List<BoardVo> voList = service.getHoneyTipBoardList();
             return voList;
         }
         catch (Exception e){
@@ -27,9 +28,9 @@ public class HomeController {
     }
 
     @GetMapping("notice")
-    public List<HomeNoticeVo> getNoticeList(){
+    public List<NoticeVo> getNoticeList(@RequestHeader("Authorization") String authorization){
         try {
-            List<HomeNoticeVo> voList = service.getNoticeList();
+            List<NoticeVo> voList = service.getNoticeList();
             return voList;
         }
         catch (Exception e){
@@ -39,9 +40,9 @@ public class HomeController {
     }
 
     @GetMapping("review")
-    public List<HomeReviewVo> getReviewList(){
+    public List<ReviewVo> getReviewList(@RequestHeader("Authorization") String authorization){
         try {
-            List<HomeReviewVo> voList = service.getReviewList();
+            List<ReviewVo> voList = service.getReviewList();
             return voList;
         }
         catch (Exception e){
