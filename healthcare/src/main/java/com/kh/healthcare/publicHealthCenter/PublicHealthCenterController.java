@@ -26,7 +26,10 @@ public class PublicHealthCenterController {
             @RequestParam String searchType,
             @RequestParam String keyword,
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "200") int size) {
+
+
+
 
         Map<String, Object> result = service.searchPhcs(city, district, dong, searchType, keyword, page, size);
         return ResponseEntity.ok(result);
