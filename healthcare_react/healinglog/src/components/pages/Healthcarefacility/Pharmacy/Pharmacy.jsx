@@ -52,22 +52,21 @@ const Pharmacy = () => {
   const [selectedCity, setSelectedCity] = useState(null);
   const [selectedDistrict, setSelectedDistrict] = useState(null);
   const [selectedDong, setSelectedDong] = useState(null);
-  const [searchType, setSearchType] = useState('name');
+  const [searchType, setSearchType] = useState('');
   const [keyword, setKeyword] = useState('');
   const [pharmacies, setPharmacies] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [pagedData, setPagedData] = useState();
 
   const currentPage = useSelector((state) => state.paging[boardType]?.currentPage || 1);
   const boardLimit = useSelector((state) => state.paging[boardType]?.boardLimit || 12);
-  const totalCount = useSelector((state) => state.paging[boardType]?.totalCount || 0);
-  const startPage = useSelector((state) => state.paging[boardType]?.startPage || 1);
-  const endPage = useSelector((state) => state.paging[boardType]?.endPage || 5);
-  const offset = (currentPage - 1) * boardLimit;
 
   // 📌 초기 페이징 상태 리셋
   useEffect(() => {
     dispatch(resetPaging({ boardType }));
+  }, []);
+
+  useEffect(() => {
+    handleSearch(); // 초기 로딩 시 검색 실행
   }, []);
 
   // 📌 시 데이터 가져오기
@@ -124,9 +123,8 @@ const Pharmacy = () => {
       }
 
       if (!searchKeyword) {
-        console.warn('⚠️ 검색어가 비어 있습니다.');
-        setLoading(false);
-        return;
+        searchKeyword = ''; // 전체 데이터 요청을 위한 기본값 설정
+        finalSearchType = ''; // 검색 타입도 비움
       }
 
       const requestUrl = `http://localhost/api/pharmacy/search?searchType=${finalSearchType}&keyword=${encodeURIComponent(
@@ -160,6 +158,13 @@ const Pharmacy = () => {
     setKeyword('');
   };
 
+  //시군구 고르면 자동으로 검색
+  useEffect(() => {
+    if (selectedCity || selectedDistrict || selectedDong) {
+      handleSearch();
+    }
+  }, [selectedCity, selectedDistrict, selectedDong]);
+
   return (
     <>
       <Title>의료기관 찾기</Title>
@@ -171,7 +176,7 @@ const Pharmacy = () => {
 
       <ContentLayout>
         <SearchDiv>
-          <SelectBox onChange={(e) => setSelectedCity(parseInt(e.target.value, 10))}>
+          <SelectBox width="120px" onChange={(e) => setSelectedCity(parseInt(e.target.value, 10))}>
             <option value="">도시 선택</option>
             {cities.map((city) => (
               <option key={city.no} value={city.no}>
@@ -208,6 +213,7 @@ const Pharmacy = () => {
 
           {/* 검색 옵션 */}
           <SelectBox value={searchType} onChange={(e) => setSearchType(e.target.value)}>
+            <option value="">검색 조건 선택</option>
             <option value="name">약국명</option>
             <option value="address">주소</option>
             <option value="tellNum">전화번호</option>
@@ -216,12 +222,11 @@ const Pharmacy = () => {
 
           {/* SearchBar */}
           <SearchBar
-            handleClick={handleSearch} // ✅ 검색 버튼 클릭 시 handleSearch 실행
-            handleChange={handleKeywordChange} // ✅ 검색어 입력 시 keyword 업데이트
-            handleClearClick={handleClearKeyword} // ✅ 검색어 초기화 버튼
+            handleClick={handleSearch} // 검색 버튼 클릭 시 handleSearch 실행
+            handleChange={handleKeywordChange} // 검색어 입력 시 keyword 업데이트
+            handleClearClick={handleClearKeyword} // 검색어 초기화 버튼
             w={300}
             h={40}
-            mb={10}
           />
         </SearchDiv>
         <Table>
