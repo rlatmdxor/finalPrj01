@@ -29,7 +29,9 @@ public class PharmacyService {
         response.put("currentPage", page); // 현재 페이지
         response.put("pageSize", size); // 한 페이지당 개수
         response.put("pharmacies", pharmacies); // 약국 리스트
-
+        System.out.println("📌 Offset 값 확인: " + offset);
         return response;
     }
+
+
 }
