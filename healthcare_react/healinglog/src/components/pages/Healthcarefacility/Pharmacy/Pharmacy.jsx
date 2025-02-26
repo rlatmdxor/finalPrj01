@@ -45,9 +45,6 @@ const Pharmacy = () => {
   const dispatch = useDispatch();
   const boardType = 'pharmacy';
 
-  const { currentPage, boardLimit } = useSelector((state) => state.paging[boardType] || {});
-  const offset = (currentPage - 1) * boardLimit;
-
   // 상태값 정의
   const [cities, setCities] = useState([]);
   const [districts, setDistricts] = useState([]);
@@ -60,6 +57,13 @@ const Pharmacy = () => {
   const [pharmacies, setPharmacies] = useState([]);
   const [loading, setLoading] = useState(false);
   const [pagedData, setPagedData] = useState();
+
+  const currentPage = useSelector((state) => state.paging[boardType]?.currentPage || 1);
+  const boardLimit = useSelector((state) => state.paging[boardType]?.boardLimit || 12);
+  const totalCount = useSelector((state) => state.paging[boardType]?.totalCount || 0);
+  const startPage = useSelector((state) => state.paging[boardType]?.startPage || 1);
+  const endPage = useSelector((state) => state.paging[boardType]?.endPage || 5);
+  const offset = (currentPage - 1) * boardLimit;
 
   // 📌 초기 페이징 상태 리셋
   useEffect(() => {
@@ -98,9 +102,14 @@ const Pharmacy = () => {
     }
   }, [selectedDistrict]);
 
+  useEffect(() => {
+    handleSearch();
+  }, [currentPage]);
+
   // 📌 검색 실행
   const handleSearch = async () => {
     setLoading(true);
+
     try {
       let searchKeyword = keyword.trim();
       let finalSearchType = searchType;
@@ -130,26 +139,19 @@ const Pharmacy = () => {
       if (!response.ok) {
         throw new Error(`API 요청 실패: ${response.status}`);
       }
-
       const data = await response.json();
-      const fetchedData = Array.isArray(data) ? data : data.pharmacies || [];
 
-      //테스트
+      // `data.totalCount`가 존재하면 사용하고, 없으면 가져온 데이터 개수 사용
+      dispatch(setTotalCount({ boardType: 'pharmacy', totalCount: data.totalElements || data.pharmacies.length }));
 
-      if (Array.isArray(fetchedData)) {
-        dispatch(setTotalCount({ boardType, totalCount: fetchedData.length }));
-        const pagedData = fetchedData.slice(offset, offset + boardLimit);
-        setPharmacies(pagedData);
-      } else {
-        setPharmacies([]);
-      }
+      setPharmacies(data.pharmacies || []);
     } catch (error) {
       console.error('❌ 검색 오류:', error);
       setPharmacies([]);
     }
     setLoading(false);
   };
-  const totalCount = useSelector((state) => state.paging[boardType]?.totalCount || 0);
+
   console.log('📌 Redux에서 가져온 전체 데이터 개수:', totalCount);
 
   // 📌 검색어 업데이트 핸들러
