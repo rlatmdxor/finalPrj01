@@ -8,4 +8,5 @@ public class PharmacyVo {
     private String tellNum;
     private String postNum;
     private String address;
+    private int totalCount;
 }
