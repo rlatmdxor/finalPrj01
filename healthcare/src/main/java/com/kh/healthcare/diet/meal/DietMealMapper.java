@@ -16,7 +16,6 @@ public interface DietMealMapper {
                 , DIET_DAY
                 , MEMO
                 , IMAGE
-                , ENROLL_DATE
             )
             VALUES
             (
@@ -26,7 +25,6 @@ public interface DietMealMapper {
                 , #{dietDay}
                 , #{memo}
                 , 'https://picsum.photos/200/200'
-                , SYSDATE
             )
             """)
     void dietEnroll(DietVo vo); // TODO : 픽숨 링크 지우고 #{image} 로 바꾸기
@@ -95,10 +93,11 @@ public interface DietMealMapper {
             UPDATE DIET
             SET MEMO = #{memo}
                 , IMAGE = 'https://picsum.photos/200/200'
+                , MODIFY_DATE = SYSDATE
             WHERE NO = #{no}
             AND DEL_YN = 'N'
             """)
-    void dietEdit(DietVo vo);
+    void dietEdit(DietVo vo); // TODO : 픽숨 링크 지우고 #{image} 로 바꾸기
 
     @Delete("""
             DELETE FROM MEAL_LOG
