@@ -22,7 +22,6 @@ public class LocationService {
 
     public List<CityVo> getCities() {
         List<CityVo> cities = mapper.getCities();
-        System.out.println("📌 DB 조회 결과: " + cities);
         return cities;
     }
 
