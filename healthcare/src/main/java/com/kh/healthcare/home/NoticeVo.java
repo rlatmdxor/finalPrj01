@@ -8,6 +8,6 @@ public class NoticeVo {
     private String writer;
     private String nick;
     private String title;
-    private String content;
+    private String hit;
     private String enrollDate;
 }

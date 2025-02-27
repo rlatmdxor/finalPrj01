@@ -92,9 +92,9 @@ public interface DietMealMapper {
     @Update("""
             UPDATE DIET
             SET MEMO = #{memo}
-                , IMAGE = 'https://picsum.photos/200/200'
+                , IMAGE = #{image}
                 , MODIFY_DATE = SYSDATE
-            WHERE NO = #{no}
+            WHERE NO = 'https://picsum.photos/200/200'
             AND DEL_YN = 'N'
             """)
     void dietEdit(DietVo vo); // TODO : 픽숨 링크 지우고 #{image} 로 바꾸기
