@@ -2,7 +2,7 @@ package com.kh.healthcare.member;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.kh.healthcare.Aws.FileUtil;
+//import com.kh.healthcare.Aws.FileUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -98,7 +98,7 @@ public class MemberController {
 
     //로그인
     @PostMapping("login")
-    public String login(@RequestBody  MemberVo vo){
+    public String login(@RequestBody MemberVo vo){
         try{
             return service.login(vo);
         }catch (Exception e) {

@@ -15,7 +15,7 @@ public class CigaretteCalenderController {
 
     @PostMapping("list")
     public List<CigaretteCalenderVo> CigaretteCalenderVoList(@RequestBody CigaretteCalenderVo vo){
-
+        System.out.println("vo = " + vo);
     return service.list(vo.getMemberNo());
 
     }

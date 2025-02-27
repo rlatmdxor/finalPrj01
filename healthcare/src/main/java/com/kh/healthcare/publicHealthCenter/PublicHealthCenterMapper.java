@@ -1,0 +1,89 @@
+package com.kh.healthcare.publicHealthCenter;
+
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
+
+import java.util.List;
+
+@Mapper
+public interface PublicHealthCenterMapper {
+
+    @Select("""
+        <script>
+            SELECT NAME, TELL_NUM, POST_NUM, ADDRESS
+            FROM (
+                SELECT PH.*, ROW_NUMBER() OVER (ORDER BY NAME ASC) AS RN
+                FROM PUBLIC_HEALTH_CENTER PH
+                WHERE 1=1
+                <if test='city != null and city != ""'>
+                    AND CITY = #{city}
+                </if>
+                <if test='district != null and district != ""'>
+                    AND DISTRICT = #{district}
+                </if>
+                <if test='dong != null and dong != ""'>
+                    AND Dong = #{dong}
+                </if>
+                <if test='searchType == "name"'>
+                    AND NAME LIKE '%' || #{keyword} || '%'
+                </if>
+                <if test='searchType == "address"'>
+                    AND ADDRESS LIKE '%' || #{keyword} || '%'
+                </if>
+                <if test='searchType == "tellNum"'>
+                    AND TELL_NUM LIKE '%' || #{keyword} || '%'
+                </if>
+                <if test='searchType == "postNum"'>
+                    AND POST_NUM LIKE '%' || #{keyword} || '%'
+                </if>
+            ) WHERE RN BETWEEN #{offset} + 1 AND #{offset} + #{size}
+        </script>
+    """)
+    List<PublicHealthCenterVo> searchPhcs(
+            @Param("city") String city,
+            @Param("district") String district,
+            @Param("dong") String dong,
+            @Param("searchType") String searchType,
+            @Param("keyword") String keyword,
+            @Param("size") int size,
+            @Param("offset") int offset
+    );
+
+    @Select("""
+        <script>
+            SELECT COUNT(*)
+            FROM PUBLIC_HEALTH_CENTER
+            WHERE 1=1
+            <if test='city != null and city != ""'>
+                AND CITY = #{city}
+            </if>
+            <if test='district != null and district != ""'>
+                AND DISTRICT = #{district}
+            </if>
+            <if test='dong != null and dong != ""'>
+                AND DONG = #{dong}
+            </if>
+            <if test='searchType == "name"'>
+                AND NAME LIKE '%' || #{keyword} || '%'
+            </if>
+            <if test='searchType == "address"'>
+                AND ADDRESS LIKE '%' || #{keyword} || '%'
+            </if>
+            <if test='searchType == "tellNum"'>
+                AND TELL_NUM LIKE '%' || #{keyword} || '%'
+            </if>
+            <if test='searchType == "postNum"'>
+                AND POST_NUM LIKE '%' || #{keyword} || '%'
+            </if>
+        </script>
+    """)
+    int countPhcs(
+            @Param("city") String city,
+            @Param("district") String district,
+            @Param("dong") String dong,
+            @Param("searchType") String searchType,
+            @Param("keyword") String keyword
+    );
+
+}

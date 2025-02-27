@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { BigTextDiv, SmallCard, SmallTextDiv } from './Diet';
-import { useDispatch, useSelector } from 'react-redux';
+import { BigTextDiv, SmallTextDiv } from './Diet';
+import { useSelector } from 'react-redux';
+import SmallCard from '../../../util/SmallCard';
 
 const TodayKcal = ({ reRender }) => {
   const day = useSelector((state) => state.diet.day);

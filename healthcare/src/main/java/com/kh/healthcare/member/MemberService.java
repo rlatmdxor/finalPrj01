@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -63,8 +64,21 @@ public class MemberService {
     public int memberJoin(MemberVo vo, String profileUrl) {
         String encodedPwd = encoder.encode(vo.getPwd());
         vo.setPwd(encodedPwd);
-        return mapper.memberJoin(vo, profileUrl);
+        int result = mapper.memberJoin(vo, profileUrl);
+
+        List<String> dashboardItems = List.of(
+                "혈압", "혈당", "수면", "흡연", "알코올 섭취량",
+                "체중", "칼로리 섭취량", "물 섭취량", "칼로리 소모량",
+                "유산소 운동시간", "무산소 운동일수"
+        );
+
+        for (String name : dashboardItems) {
+            mapper.createMemberDashboard(name);
+        }
+
+        return result;
     }
+
 
     // 로그인
     public String login(MemberVo vo) {

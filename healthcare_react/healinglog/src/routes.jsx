@@ -33,7 +33,7 @@ import AlcReport from './components/pages/LivingHealth/Alc/AlcReport';
 import CigaretteReport from './components/pages/LivingHealth/Cigarette/CigaretteReport';
 import ExHistory from './components/pages/LivingHealth/Exercise/ExHistory';
 import ExReport from './components/pages/LivingHealth/Exercise/ExReport';
-import Exercising from './components/pages/LivingHealth/Exercise/Exercising';
+// import Exercising from './components/pages/LivingHealth/Exercise/Exercising';
 import DietCal from './components/pages/LivingHealth/Diet/DietCal';
 import DietReport from './components/pages/LivingHealth/Diet/DietReport';
 import Report from './components/pages/DashBoard/Report';
@@ -43,6 +43,8 @@ import AdminBoard from './components/admin/honeyBoard/AdminBoard';
 import Challengers from './components/pages/Board/Challengers';
 import ChallengersBoard from './components/pages/Board/ChallengersBoard';
 import ChallengersList from './components/pages/Board/ChallengersList';
+import BoardDetail from './components/pages/Board/BoardDetail';
+import BoardEdit from './components/pages/Board/BoardEdit';
 
 export const routes = [
   { path: '/', component: <Main /> },
@@ -78,7 +80,7 @@ export const routes = [
   { path: '/anaerobic/:name', component: <AnAerobicDetail /> },
   { path: '/exhistory', component: <ExHistory /> },
   { path: '/exreport', component: <ExReport /> },
-  { path: '/exercising/:name', component: <Exercising /> },
+  // { path: '/exercising/:name', component: <Exercising /> },
   { path: '/board/write', component: <BoardWrite /> },
   { path: '/admin/usermanage', component: <AdminUserManage /> },
   { path: '/alc/report', component: <AlcReport /> },
@@ -89,4 +91,6 @@ export const routes = [
   { path: '/challengers', component: <Challengers /> },
   { path: '/challengersBoard', component: <ChallengersBoard /> },
   { path: '/challengersList', component: <ChallengersList /> },
+  { path: '/board/detail', component: <BoardDetail /> },
+  { path: '/board/edit', component: <BoardEdit /> },
 ];

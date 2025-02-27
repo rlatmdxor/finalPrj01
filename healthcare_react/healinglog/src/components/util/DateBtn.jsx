@@ -4,6 +4,7 @@ import styled from 'styled-components';
 const StyleBtn = styled.button`
   width: 30px;
   height: 30px;
+  font-family: 'goorm-sans-bold';
   font-size: 15px;
   border-radius: 6px;
   background-color: ${(props) => (props.isActive ? '#7ca96d' : 'white')};
@@ -16,6 +17,7 @@ const StyleBtn = styled.button`
 const DataDiv = styled.div`
   display: flex;
   justify-content: end;
+  height: 30px;
 `;
 
 const Select = styled.select`
@@ -25,8 +27,9 @@ const Select = styled.select`
 const DateBtn = ({ dataBtn, onSelect, line, onChange }) => {
   const [activeIndex, setActiveIndex] = useState(0);
 
-  const handleSelect = () => {
-    onChange(document.querySelector('select').value);
+  const handleSelect = (event) => {
+    onChange(event.target.value);
+    // onChange(document.querySelector('select').value);
   };
 
   return (

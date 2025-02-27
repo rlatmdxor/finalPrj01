@@ -15,7 +15,7 @@ import {
   getYearAvgKcal,
   getYearAvgWater,
   getYearAvgWeight,
-} from './dietService';
+} from '../../../services/dietService';
 
 const NaviContainer = styled.div`
   display: grid;
