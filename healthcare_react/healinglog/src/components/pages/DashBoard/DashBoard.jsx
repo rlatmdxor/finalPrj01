@@ -11,6 +11,7 @@ import { getDashboardData, getDashboardSetting, editDashboardSetting } from '../
 import Modal from '../../util/Modal';
 import { useDispatch, useSelector } from 'react-redux';
 import { close, open } from '../../../redux/modalSlice';
+import { useNavigate } from 'react-router-dom';
 
 const NaviContainer = styled.div`
   display: grid;
@@ -166,6 +167,7 @@ const SwitchInputDiv = styled.div`
 const DashBoard = () => {
   const token = localStorage.getItem('token');
   const memberNo = 1;
+  const navigate = useNavigate();
 
   const dispatch = useDispatch();
 
@@ -186,6 +188,11 @@ const DashBoard = () => {
 
   useEffect(() => {
     const getFetch = async () => {
+      // if (!token) {
+      //   alert('로그인 정보가 없습니다.');
+      //   navigate('/');
+      // }
+
       try {
         const fetchData = await getDashboardData(currentMonday, currentSunday, memberNo, token);
         setDashboardData(fetchData);
@@ -220,7 +227,7 @@ const DashBoard = () => {
   };
 
   const handleToggleAll = () => {
-    const newValue = isAllSelected ? 'N' : 'Y'; // 현재 상태에 따라 반전
+    const newValue = isAllSelected ? 'N' : 'Y';
     setInputData((prev) => prev.map((vo) => ({ ...vo, visibleYn: newValue })));
   };
 

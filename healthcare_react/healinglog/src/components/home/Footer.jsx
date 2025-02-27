@@ -3,7 +3,7 @@ import styled from 'styled-components';
 
 const LayoutDiv = styled.div`
   border-top: 1px solid lightgray;
-  height: 230px;
+  height: 240px;
 `;
 
 const FlexDiv = styled.div`
@@ -14,6 +14,7 @@ const FlexDiv = styled.div`
 
 const ContentDiv = styled.div`
   display: grid;
+  grid-template-columns: 1fr;
   grid-auto-rows: 30px;
   width: 25%;
 `;
