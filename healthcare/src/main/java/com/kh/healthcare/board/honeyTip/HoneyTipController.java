@@ -31,25 +31,26 @@ public class HoneyTipController {
     public List<HoneyTipVo> list(@RequestBody SearchFilterVo filterVo) {
 
         List<HoneyTipVo> HoneyTipVoList = service.list(filterVo);
+        System.out.println("HoneyTipVoList = " + HoneyTipVoList);
         return HoneyTipVoList;
 
     }
     @PostMapping("write")
     public int write(
-            @RequestPart("data") HoneyTipVo vo,  // JSON 데이터 받기
-            @RequestHeader("Authorization") String authorization,  // 토큰 받기
-            @RequestPart(value = "f", required = false) List<MultipartFile> f // 파일 리스트 받기
+            @RequestPart("data") HoneyTipVo vo,
+            @RequestHeader("Authorization") String authorization,
+            @RequestPart(value = "f", required = false) List<MultipartFile> f
     ){
 
         List<HoneyTipAttachVo> attachVoList = new ArrayList<>();
 
         try {
-            if (f != null && !f.isEmpty()) { // 파일이 존재할 경우 처리
+            if (f != null && !f.isEmpty()) {
                 List<String> urlList = FileUtil.uploadFileListToAwsS3(f, s3, bucket);
 
                 for (int i = 0; i < f.size(); i++) {
                     String originName = f.get(i).getOriginalFilename();
-                    HoneyTipAttachVo attachVo = new HoneyTipAttachVo(); // 객체 새로 생성
+                    HoneyTipAttachVo attachVo = new HoneyTipAttachVo();
                     attachVo.setPath(urlList.get(i));
                     attachVo.setOriginName(originName);
                     attachVoList.add(attachVo);
@@ -58,20 +59,116 @@ public class HoneyTipController {
 
             return service.write(vo, attachVoList);
         } catch (Exception e) {
-            log.error("[GALLERY-WRITE] FAIL: " + e.getMessage());
-            throw new IllegalStateException("[GALLERY-WRITE] FAIL...");
+            throw new IllegalStateException("CODE [BOARD / WRITE]");
+        }
+    }
+    @PostMapping("edit")
+    public int edit(
+            @RequestPart("data") HoneyTipVo vo,
+            @RequestHeader("Authorization") String authorization,
+            @RequestPart(value = "f", required = false) List<MultipartFile> f
+    ){
+
+        List<HoneyTipAttachVo> attachVoList = new ArrayList<>();
+
+        try {
+            if (f != null && !f.isEmpty()) {
+                List<String> urlList = FileUtil.uploadFileListToAwsS3(f, s3, bucket);
+
+                for (int i = 0; i < f.size(); i++) {
+                    String originName = f.get(i).getOriginalFilename();
+                    HoneyTipAttachVo attachVo = new HoneyTipAttachVo();
+                    attachVo.setPath(urlList.get(i));
+                    attachVo.setOriginName(originName);
+                    attachVoList.add(attachVo);
+                }
+            }
+
+            return service.edit(vo, attachVoList);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
         }
     }
 
     @GetMapping("detail")
-    public Map detail(@RequestParam("bno") String bno){
-        System.out.println("HoneyTipController.detail");
+    public Map detail(@RequestParam("bno") String bno ,@RequestParam("memberNo") String memberNo){
 
-        Map map = service.detail(bno);
-        System.out.println("map = " + map);
+        try {
+            Map map = service.detail(bno , memberNo);
 
-        return map;
+            return map;
+        }catch (Exception e){
+            throw new IllegalStateException("CODE [BOARD / DETAIL]");
+        }
 
     }
+    @PostMapping("recommend")
+    public int recommend(@RequestBody BoardRecommendVo vo){
+
+        System.out.println("vo = " + vo);
+        service.recommend(vo);
+        return '1';
+    }
+    @PostMapping("countLike")
+    public int countLike(@RequestBody String bno){
+        return service.countLike(bno);
+    }
+    @PostMapping("report")
+    public int report(@RequestBody HoneyTipReportVo vo){
+
+        try{
+            return service.reportBoard(vo);
+        }catch (Exception e){
+            e.printStackTrace();
+            return 0;
+        }
+    }
+    @PostMapping("delete")
+    public int deleteHoneyTip(@RequestBody HoneyTipVo vo){
+        try{
+            return service.deleteHoneyTip(vo);
+        } catch (Exception e) {
+            throw new IllegalStateException("CODE [BOARD / DELETE / CONTROLLER");
+        }
+    }
+    @PostMapping("comment/write")
+    public int commentWrite(@RequestBody HoneyTipCommentVo vo){
+        try{
+            return service.commentWrite(vo);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    @PostMapping("comment/delete")
+    public int commentDelete(@RequestBody HoneyTipCommentVo vo){
+        try{
+            return service.commentDelete(vo);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+    @PostMapping("comment/report")
+    public int commentReport(@RequestBody HoneyTipCommentReportVo vo){
+        try{
+            return service.commentReport(vo);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+    @GetMapping("comment/list")
+    public List<HoneyTipCommentVo> commentList(@RequestParam("bno") String bno){
+        try{
+            return service.commentList(bno);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
 
 }

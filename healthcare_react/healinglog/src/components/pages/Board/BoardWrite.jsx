@@ -74,6 +74,7 @@ const ToolboxDiv = styled.div`
 const AttachDiv = styled.div`
   margin-top: 5px;
   height: 40px;
+  width: 95%;
   display: grid;
   grid-template-columns: 180px 1fr;
   & .form-label {
@@ -141,6 +142,13 @@ const EditorDiv = styled.div`
   font-size: 14px;
   border: 1px solid #ccc;
   overflow: auto;
+  padding: 10px;
+`;
+const LayDiv = styled.div`
+  height: 30px;
+`;
+const attachLayDiv = styled.div`
+  width: 95%;
 `;
 
 const staticToolbarPlugin = createToolbarPlugin();
@@ -283,7 +291,7 @@ const BoardWrite = () => {
   return (
     <>
       <Title>꿀팁 작성</Title>
-      <div></div>
+      <LayDiv></LayDiv>
       <ContentDiv>
         <InputDiv>
           <div className="form-label">카테고리</div>
@@ -374,8 +382,8 @@ const BoardWrite = () => {
         </AttachDiv>
       </ContentDiv>
       <ButtonDiv>
-        <Btn str={'등록'} c={'#FF7F50'} fc={'#ffffff'} h={'40'} f={handleEnrollBoard} />
-        <Btn str={'취소'} c={'#D9D9D9'} fc={'#3d4147'} h={'40'} f={() => navigate('/board')} />
+        <Btn str={'등록'} c={'#FF7F50'} fc={'#ffffff'} mr={'10'} h={'40'} f={handleEnrollBoard} />
+        <Btn str={'취소'} c={'#D9D9D9'} fc={'#3d4147'} mr={'65'} h={'40'} f={() => navigate('/board')} />
       </ButtonDiv>
     </>
   );
