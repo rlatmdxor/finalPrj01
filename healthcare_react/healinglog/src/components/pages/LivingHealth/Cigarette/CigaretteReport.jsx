@@ -41,7 +41,7 @@ const CigaretteReport = () => {
   const [fullData, setFullData] = useState([]); // 전체 데이터 저장
   const [pagedData, setPagedData] = useState([]); // 페이징된 데이터
   const [filteredData, setFilteredData] = useState([]); // 차트용 필터링 데이터
-  const [selectedRange, setSelectedRange] = useState('주'); // 기본값 '일'
+  const [selectedRange, setSelectedRange] = useState('주'); // 기본값 '주'
   const [selectChart, setSelectChart] = useState('Line'); // 그래프 모양 정하는 state
   const dispatch = useDispatch();
 
