@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { BigCard } from './Diet';
 import { IconButton, Tooltip } from '@mui/material';
 import { InfoOutlined } from '@mui/icons-material';
 import styled from 'styled-components';
 import { useSelector } from 'react-redux';
+import BigCard from '../../../util/BigCard';
 
 const BigCardInnerDiv = styled.div`
   display: flex;

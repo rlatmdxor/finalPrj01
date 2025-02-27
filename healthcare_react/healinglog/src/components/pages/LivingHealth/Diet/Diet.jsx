@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import Title from '../../../util/Title';
 import Navi from '../../../util/Navi';
@@ -8,7 +8,6 @@ import TodayWater from './TodayWater';
 import TodayWeight from './TodayWeight';
 import MyBmi from './MyBmi';
 import TodayDietMeal from './TodayDietMeal';
-import { useLocation, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { setDay, updateDay } from '../../../../redux/dietSlice';
 
@@ -24,6 +23,7 @@ const NaviContainer = styled.div`
 const DayDiv = styled.div`
   display: flex;
   width: 100%;
+  height: 50px;
   justify-content: space-between;
   align-items: center;
   padding: 12px;
@@ -62,25 +62,12 @@ export const ContentAreaDiv = styled.div`
   margin-bottom: 25px;
 `;
 
-export const SmallCard = styled.div`
-  width: 100%;
-  height: 150px;
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-template-rows: 48px auto;
-  border: 1px solid #c5cbd1;
-  border-radius: 6px;
-  text-align: center;
-
-  &:hover {
-    box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.2);
-  }
-`;
-
 export const SmallTextDiv = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  height: 25px;
+  margin-top: 12px;
   padding: 0px 14px;
   font-size: 16px;
   font-weight: 500;
@@ -90,19 +77,8 @@ export const SmallTextDiv = styled.div`
 export const BigTextDiv = styled.div`
   margin-left: auto;
   margin-right: auto;
-  margin-top: 7px;
+  margin-top: 19px;
   font-size: 38px;
-`;
-
-export const BigCard = styled.div`
-  width: 100%;
-  height: 130px;
-  grid-column: span 3;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  border: 1px solid #c5cbd1;
-  border-radius: 6px;
 `;
 
 export const ModalContainer = styled.div`
@@ -133,8 +109,8 @@ const Diet = () => {
       <Title>식단</Title>
       <NaviContainer>
         <Navi target="diet" tag={'식단기록'}></Navi>
-        <Navi target="dietcalendar" tag={'캘린더'}></Navi>
-        <Navi target="dietreport" tag={'리포트'}></Navi>
+        <Navi target="diet/calendar" tag={'캘린더'}></Navi>
+        <Navi target="diet/report" tag={'리포트'}></Navi>
       </NaviContainer>
       <ContentLayout>
         <DayDiv>
@@ -152,7 +128,7 @@ const Diet = () => {
         </ContentAreaDiv>
         <TodayDietMeal reRender={reRender} setReRender={setReRender} />
         <br />
-        <h1>여기에 광고를 넣어서 돈을 벌자</h1>
+        <br />
         <br />
       </ContentLayout>
     </>

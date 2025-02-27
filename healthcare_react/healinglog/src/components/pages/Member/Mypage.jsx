@@ -105,8 +105,6 @@ const Mypage = () => {
     })
       .then((resp) => resp.json())
       .then((data) => {
-        console.log('data : ', data);
-
         dispatch(setId(data.id));
         dispatch(setPwd(data.pwd));
         dispatch(setNick(data.nick));
@@ -284,7 +282,8 @@ const Mypage = () => {
                     },
                   })
                     .then((resp) => resp.text())
-                    .then((data) => localStorage.setItem('token', null), navi('/'));
+                    .then((data) => localStorage.removeItem('token'), (window.location.href = '/login'));
+                  alert('탈퇴 처리 되었습니다.');
                 }
               }}
               mt={'0'}

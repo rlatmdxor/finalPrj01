@@ -16,9 +16,9 @@ public class CigaretteReportController {
 
     @PostMapping("list")
     public List<CigaretteReportVo> CigaretteReportVoList(@RequestBody CigaretteReportVo vo){
-
-
+        System.out.println("vo = " + vo);
         return service.list(vo.getMemberNo());
+
     }
 
     @PostMapping("write")

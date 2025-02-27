@@ -2,7 +2,7 @@ import AdminLogin from './components/admin/AdminLogin';
 import Main from './components/home/Main';
 import Board from './components/pages/Board/Board';
 import BoardWrite from './components/pages/Board/BoardWrite';
-import DashBoard from './components/pages/Board/DashBoard';
+import DashBoard from './components/pages/DashBoard/DashBoard';
 import HospitalReview from './components/pages/Board/HospitalReview';
 import BloodPressure from './components/pages/CardiovascularManagement/BloodPressure/BloodPressure';
 import BloodSugar from './components/pages/CardiovascularManagement/BloodSugar/BloodSugar';
@@ -32,9 +32,10 @@ import AlcReport from './components/pages/LivingHealth/Alc/AlcReport';
 import CigaretteReport from './components/pages/LivingHealth/Cigarette/CigaretteReport';
 import ExHistory from './components/pages/LivingHealth/Exercise/ExHistory';
 import ExReport from './components/pages/LivingHealth/Exercise/ExReport';
-import Exercising from './components/pages/LivingHealth/Exercise/Exercising';
+// import Exercising from './components/pages/LivingHealth/Exercise/Exercising';
 import DietCal from './components/pages/LivingHealth/Diet/DietCal';
 import DietReport from './components/pages/LivingHealth/Diet/DietReport';
+import Report from './components/pages/DashBoard/Report';
 import ReportedHoneyBoard from './components/admin/honeyBoard/ReportedHoneyBoard';
 import ReportedHoneyComment from './components/admin/honeyBoard/ReportedHoneyComment';
 import AdminBoard from './components/admin/honeyBoard/AdminBoard';
@@ -47,8 +48,8 @@ export const routes = [
   { path: '/login', component: <LoginPage /> },
   { path: '/sleep', component: <Sleep /> },
   { path: '/diet', component: <Diet /> },
-  { path: '/dietcalendar', component: <DietCal /> },
-  { path: '/dietreport', component: <DietReport /> },
+  { path: '/diet/calendar', component: <DietCal /> },
+  { path: '/diet/report', component: <DietReport /> },
   { path: '/aerobic', component: <Aerobic /> },
   { path: '/anaerobic', component: <AnAerobic /> },
   { path: '/alc', component: <Alc /> },
@@ -65,6 +66,7 @@ export const routes = [
   { path: '/hospitalreview', component: <HospitalReview /> },
   { path: '/notice', component: <Notice /> },
   { path: '/dashboard', component: <DashBoard /> },
+  { path: '/dashboard/report', component: <Report /> },
   { path: '/findid', component: <FindIdPage /> },
   { path: '/findpwd', component: <FindPwdPage /> },
   { path: '/join', component: <Join /> },
@@ -74,7 +76,7 @@ export const routes = [
   { path: '/anaerobic/:name', component: <AnAerobicDetail /> },
   { path: '/exhistory', component: <ExHistory /> },
   { path: '/exreport', component: <ExReport /> },
-  { path: '/exercising/:name', component: <Exercising /> },
+  // { path: '/exercising/:name', component: <Exercising /> },
   { path: '/board/write', component: <BoardWrite /> },
   { path: '/admin/usermanage', component: <AdminUserManage /> },
   { path: '/alc/report', component: <AlcReport /> },

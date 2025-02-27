@@ -16,7 +16,6 @@ public interface DietMealMapper {
                 , DIET_DAY
                 , MEMO
                 , IMAGE
-                , ENROLL_DATE
             )
             VALUES
             (
@@ -25,8 +24,7 @@ public interface DietMealMapper {
                 , #{mealCode}
                 , #{dietDay}
                 , #{memo}
-                , 'https://picsum.photos/300/300'
-                , SYSDATE
+                , 'https://picsum.photos/200/200'
             )
             """)
     void dietEnroll(DietVo vo); // TODO : 픽숨 링크 지우고 #{image} 로 바꾸기
@@ -94,11 +92,12 @@ public interface DietMealMapper {
     @Update("""
             UPDATE DIET
             SET MEMO = #{memo}
-                , IMAGE = 'https://picsum.photos/200/200'
-            WHERE NO = #{no}
+                , IMAGE = #{image}
+                , MODIFY_DATE = SYSDATE
+            WHERE NO = 'https://picsum.photos/200/200'
             AND DEL_YN = 'N'
             """)
-    void dietEdit(DietVo vo);
+    void dietEdit(DietVo vo); // TODO : 픽숨 링크 지우고 #{image} 로 바꾸기
 
     @Delete("""
             DELETE FROM MEAL_LOG
@@ -146,4 +145,39 @@ public interface DietMealMapper {
             ORDER BY LABEL 
             """)
     List<FoodVo> getFoodData();
+
+    @Select("""
+            SELECT DIET_DAY, SUM(M.KCAL) AS TOTAL_KCAL
+            FROM DIET D
+            LEFT JOIN MEAL_LOG M ON (D.NO = M.DIET_NO)
+            WHERE D.MEMBER_NO = #{memberNo}
+            AND TO_CHAR(D.DIET_DAY, 'YYYY-MM') = #{month}
+            AND D.DEL_YN = 'N'
+            GROUP BY D.MEMBER_NO, D.DIET_DAY
+            ORDER BY D.DIET_DAY
+            """)
+    List<TotalKcalVo> getDayKcal(int memberNo, String month);
+
+    @Select("""
+            SELECT TO_CHAR(D.DIET_DAY, 'YYYY-MM') AS DIET_DAY, ROUND(SUM(M.KCAL)/COUNT(DISTINCT D.DIET_DAY),0) AS TOTAL_KCAL
+            FROM DIET D
+            LEFT JOIN MEAL_LOG M ON (D.NO = M.DIET_NO)
+            WHERE D.MEMBER_NO = #{memberNo}
+            AND TO_CHAR(D.DIET_DAY, 'YYYY') = #{year}
+            AND D.DEL_YN = 'N'
+            GROUP BY D.MEMBER_NO, TO_CHAR(D.DIET_DAY, 'YYYY-MM')
+            ORDER BY DIET_DAY
+            """)
+    List<TotalKcalVo> getMonthAvgKcal(int memberNo, String year);
+
+    @Select("""
+            SELECT TO_CHAR(D.DIET_DAY, 'YYYY') AS DIET_DAY, ROUND(SUM(M.KCAL)/COUNT(DISTINCT D.DIET_DAY),0) AS TOTAL_KCAL
+            FROM DIET D
+            LEFT JOIN MEAL_LOG M ON (D.NO = M.DIET_NO)
+            WHERE D.MEMBER_NO = #{memberNo}
+            AND D.DEL_YN = 'N'
+            GROUP BY D.MEMBER_NO, TO_CHAR(D.DIET_DAY, 'YYYY')
+            ORDER BY DIET_DAY
+            """)
+    List<TotalKcalVo> getYearAvgKcal(int memberNo);
 }

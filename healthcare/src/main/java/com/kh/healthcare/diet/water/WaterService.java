@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -35,4 +37,15 @@ public class WaterService {
         }
     }
 
+    public List<WaterVo> getDayWater(int memberNo, String month) {
+        return mapper.getDayWater(memberNo, month);
+    }
+
+    public List<WaterVo> getMonthAvgWater(int memberNo, String year) {
+        return mapper.getMonthAvgWater(memberNo, year);
+    }
+
+    public List<WaterVo> getYearAvgWater(int memberNo) {
+        return mapper.getYearAvgWater(memberNo);
+    }
 }

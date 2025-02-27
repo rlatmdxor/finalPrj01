@@ -1,6 +1,8 @@
 package com.kh.healthcare.exercise.anAerobic;
 
+import com.kh.healthcare.exercise.aerobic.AerobicHistoryVo;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,87 +15,58 @@ public class AnAerobicController {
 
     private final AnAerobicService service;
 
-    // AnAerobic 즐겨찾기 데이터 조회
-    @GetMapping("favlist")
-    public List<AnAerobicVo> getMarkedData() {
-        return service.getMarkedData();
+    //일반 리스트
+    @GetMapping("getList")
+    public List<AnAerobicVo> getList(@RequestHeader ("Authorization") String token){
+        return service.getList(token);
     }
 
-    // AnAerobic 즐겨찾기에서 북마크 해제
-    @PostMapping("unmark")
-    public int unmarkData(@RequestBody AnAerobicVo vo){
-        return service.unmarkData(vo.getNo());
+    //북마크 리스트
+    @GetMapping("getBookmarkList")
+    public List<AnAerobicVo> getBookmarkList(@RequestHeader ("Authorization") String token){
+        return service.getBookmarkList(token);
+    }
+    
+    //북마크 해제
+    @DeleteMapping("unmark")
+    public ResponseEntity<String> unmark(@RequestHeader ("Authorization") String token, @RequestBody String no){
+        service.unmark(token, no);
+        return ResponseEntity.ok("북마크 해제 완료");
     }
 
-    // Arm 운동 리스트 데이터 조회
-    @GetMapping("armlist")
-    public List<AnAerobicVo> getArmData(){
-        return service.getArmData();
+    //북마크 등록
+    @PostMapping("mark")
+    public ResponseEntity<String> mark(@RequestHeader ("Authorization") String token, @RequestBody String no){
+        String msg = service.mark(token, no);
+        if(msg.equals("실패")){
+            return ResponseEntity.ok("즐겨찾기는 3개까지만 등록가능합니다.");
+        } else{
+            return ResponseEntity.ok("북마크 등록 완료");
+        }
     }
 
-    // Arm 리스트에서 북마크 처리
-    @PostMapping("markarm")
-    public int markArmData(@RequestBody AnAerobicVo vo){
-        return service.markArmData(vo.getNo());
+    //상세정보 가져오기
+    @GetMapping("getDetail")
+    public AnAerobicVo getDetail(@RequestParam String name) {
+        AnAerobicVo exercise = service.findExByName(name);
+        return exercise;
     }
 
-    // Core 운동 리스트 데이터 조회
-    @GetMapping("corelist")
-    public List<AnAerobicVo> getCoreData(){
-        return service.getCoreData();
+    //운동 내역 기록
+    @PostMapping("record")
+    public String record(@RequestHeader ("Authorization") String token, @RequestBody AnAerobicHistoryVo vo){
+        return service.record(token,vo);
     }
 
-    // Core 리스트에서 북마크 처리
-    @PostMapping("markcore")
-    public int markCoreData(@RequestBody AnAerobicVo vo){
-        return service.markCoreData(vo.getNo());
+    //운동 내역 수정
+    @PostMapping("updateAnAerobic")
+    public String updateAnAerobic(@RequestHeader ("Authorization") String token, @RequestBody AnAerobicHistoryVo vo){
+        return service.updateAnAerobic(token,vo);
     }
 
-    // Leg 운동 리스트 데이터 조회
-    @GetMapping("leglist")
-    public List<AnAerobicVo> getLegData(){
-        return service.getLegData();
-    }
-
-    // Leg 리스트에서 북마크 처리
-    @PostMapping("markleg")
-    public int markLegData(@RequestBody AnAerobicVo vo){
-        return service.markLegData(vo.getNo());
-    }
-
-    // Chest 운동 리스트 데이터 조회
-    @GetMapping("chestlist")
-    public List<AnAerobicVo> getChestData(){
-        return service.getChestData();
-    }
-
-    // Chest 리스트에서 북마크 처리
-    @PostMapping("markchest")
-    public int markChestData(@RequestBody AnAerobicVo vo){
-        return service.markChestData(vo.getNo());
-    }
-
-    // Shoulder 운동 리스트 데이터 조회
-    @GetMapping("shoulderlist")
-    public List<AnAerobicVo> getShoulderData(){
-        return service.getShoulderData();
-    }
-
-    // Shoulder 리스트에서 북마크 처리
-    @PostMapping("markshoulder")
-    public int markShoulderData(@RequestBody AnAerobicVo vo){
-        return service.markShoulderData(vo.getNo());
-    }
-
-    // Etc 운동 리스트 데이터 조회
-    @GetMapping("etclist")
-    public List<AnAerobicVo> getEtcData(){
-        return service.getEtcData();
-    }
-
-    // Etc 리스트에서 북마크 처리
-    @PostMapping("marketc")
-    public int markEtcData(@RequestBody AnAerobicVo vo){
-        return service.markEtcData(vo.getNo());
+    //운동 내역 삭제
+    @DeleteMapping("deleteAnAerobic")
+    public String deleteAnAerobic(@RequestHeader ("Authorization") String token, @RequestBody AnAerobicHistoryVo vo){
+        return service.deleteAnAerobic(token,vo);
     }
 }
