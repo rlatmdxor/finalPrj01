@@ -40,7 +40,7 @@ public class DashboardService {
     }
 
     // 증감값 계산
-    private WeeklyDifferenceVo calculateDifference(WeeklyDataVo current, WeeklyDataVo previous) {
+    public WeeklyDifferenceVo calculateDifference(WeeklyDataVo current, WeeklyDataVo previous) {
         WeeklyDifferenceVo difference = new WeeklyDifferenceVo();
         difference.setMaxBloodPressure(formatDifference(current.getMaxBloodPressure(), previous.getMaxBloodPressure(), "mmHg"));
         difference.setMinBloodPressure(formatDifference(current.getMinBloodPressure(), previous.getMinBloodPressure(), "mmHg"));
@@ -60,7 +60,7 @@ public class DashboardService {
     }
 
     // 숫자 증감값 변환
-    private String formatDifference(double currentValue, double previousValue, String unit) {
+    public String formatDifference(double currentValue, double previousValue, String unit) {
         double diff = currentValue - previousValue;
         if (diff == 0) {
             return "0 " + unit;
@@ -68,8 +68,8 @@ public class DashboardService {
         return String.format("%+.1f %s", diff, unit);
     }
 
-    // 시간 변환
-    private String formatTimeDifference(double currentMinutes, double previousMinutes) {
+    // 시간 증감값 변환
+    public String formatTimeDifference(double currentMinutes, double previousMinutes) {
         if (currentMinutes == 0 && previousMinutes == 0) {
             return "0시간 0분";
         }
@@ -88,7 +88,7 @@ public class DashboardService {
         } else if (minutes == 0) {
             return String.format("%+d시간", hours);
         } else {
-            return String.format("%+d시간 %+02d분", hours, minutes);
+            return String.format("%+d시간 %02d분", hours, minutes);
         }
     }
 
@@ -100,6 +100,5 @@ public class DashboardService {
         for (SettingVo setting : settings) {
             mapper.editDashboardSetting(setting);
         }
-
     }
 }

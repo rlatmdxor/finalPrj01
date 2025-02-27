@@ -291,6 +291,11 @@ const TodayDietMeal = ({ reRender, setReRender }) => {
 
   // 식단 등록
   const handleSubmit = () => {
+    if (!inputData.foodList || inputData.foodList.length === 0) {
+      alert('음식을 입력해주세요.');
+      return;
+    }
+
     if (!window.confirm('등록하시겠습니까?')) {
       return;
     }
@@ -323,7 +328,8 @@ const TodayDietMeal = ({ reRender, setReRender }) => {
   // 식단 상세 조회
   const handleOpenDietDetailModal = (mealCode) => {
     const mealDetail = mealDetailList.find((meal) => meal.mealCode === mealCode);
-    setInputData({
+    setInputData((prev) => ({
+      ...prev,
       no: mealDetail.no,
       memberNo: '1',
       dietDay: day,
@@ -331,13 +337,18 @@ const TodayDietMeal = ({ reRender, setReRender }) => {
       foodList: mealDetail.foodList || [],
       memo: mealDetail.memo || '',
       image: mealDetail.image || '',
-      imagePreview: mealDetail.image || '',
-    });
+      imagePreview: mealDetail.image ? mealDetail.image : prev.imagePreview,
+    }));
     dispatch(open({ title: '식단 상세', value: 'block' }));
   };
 
   // 식단 수정
   const handleEdit = () => {
+    if (!inputData.foodList || inputData.foodList.length === 0) {
+      alert('음식을 입력해주세요.');
+      return;
+    }
+
     if (!window.confirm('저장하시겠습니까?')) {
       return;
     }

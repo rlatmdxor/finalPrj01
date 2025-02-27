@@ -16,7 +16,7 @@ public interface DashboardMapper {
             NVL((SELECT MIN(SYSTOLE) FROM BLOOD_PRESSURE WHERE MEMBER_NO = #{memberNo} AND ENROLL_DATE BETWEEN #{startDate} AND #{endDate}), 0) AS MIN_BLOOD_PRESSURE,  
             NVL((SELECT MAX(SUGAR) FROM BLOOD_SUGAR WHERE MEMBER_NO = #{memberNo} AND ENROLL_DATE BETWEEN #{startDate} AND #{endDate}),0) AS MAX_BLOOD_SUGAR,                                       
             NVL((SELECT MIN(SUGAR) FROM BLOOD_SUGAR WHERE MEMBER_NO = #{memberNo} AND ENROLL_DATE BETWEEN #{startDate} AND #{endDate}), 0) AS MIN_BLOOD_SUGAR,          
-            NVL((SELECT AVG(SLEEP_DURATION) FROM SLEEP WHERE MEMBER_NO = #{memberNo} AND RECORD_DATE BETWEEN #{startDate} AND #{endDate}), 0) AS AVG_SLEEP,            
+            ROUND(NVL((SELECT AVG(SLEEP_DURATION) FROM SLEEP WHERE MEMBER_NO = #{memberNo} AND RECORD_DATE BETWEEN #{startDate} AND #{endDate}), 0)) AS AVG_SLEEP,            
             (SELECT
                 ROUND(SUM(
                     CONSUMPTION_RATIO *
@@ -34,9 +34,9 @@ public interface DashboardMapper {
                 AND (END_DATE >= TO_DATE(#{startDate}, 'YY/MM/DD'))
             )) AS COUNT_CIGARETTE, 
             NVL((SELECT SUM((ABV/100)*CC) FROM RECORD_ALC WHERE MEMBER_NO = #{memberNo} AND ENROLL_DATE BETWEEN #{startDate} AND #{endDate}), 0) AS SUM_ALC,             
-            NVL((SELECT AVG(AMOUNT) FROM WEIGHT_LOG WHERE MEMBER_NO = #{memberNo} AND ENROLL_DATE BETWEEN #{startDate} AND #{endDate}), 0) AS AVG_WEIGHT,               
-            NVL((SELECT AVG(SUM(KCAL)) FROM DIET D JOIN MEAL_LOG M ON (D.NO = M.DIET_NO) WHERE MEMBER_NO = #{memberNo} AND DIET_DAY BETWEEN #{startDate} AND #{endDate} AND DEL_YN = 'N' GROUP BY DIET_DAY), 0) AS AVG_KCAL,
-            NVL((SELECT AVG(AMOUNT) FROM WATER_LOG WHERE MEMBER_NO = #{memberNo} AND ENROLL_DATE BETWEEN #{startDate} AND #{endDate}),0) AS AVG_WATER,                 
+            ROUND(NVL((SELECT AVG(AMOUNT) FROM WEIGHT_LOG WHERE MEMBER_NO = #{memberNo} AND ENROLL_DATE BETWEEN #{startDate} AND #{endDate}), 0),1) AS AVG_WEIGHT,               
+            ROUND(NVL((SELECT AVG(SUM(KCAL)) FROM DIET D JOIN MEAL_LOG M ON (D.NO = M.DIET_NO) WHERE MEMBER_NO = #{memberNo} AND DIET_DAY BETWEEN #{startDate} AND #{endDate} AND DEL_YN = 'N' GROUP BY DIET_DAY), 0),1) AS AVG_KCAL,
+            ROUND(NVL((SELECT AVG(AMOUNT) FROM WATER_LOG WHERE MEMBER_NO = #{memberNo} AND ENROLL_DATE BETWEEN #{startDate} AND #{endDate}),0),1) AS AVG_WATER,                 
             NVL((SELECT SUM(EX_DURATION) FROM AEROBIC_HISTORY WHERE USER_NO = #{memberNo} AND EX_DATE BETWEEN #{startDate} AND #{endDate}),0) AS SUM_AEROBIC,         
             NVL((SELECT COUNT(DISTINCT EX_DATE) FROM ANAEROBIC_HISTORY WHERE USER_NO = #{memberNo} AND EX_DATE BETWEEN #{startDate} AND #{endDate}), 0) AS COUNT_ANAEROBIC,          
             NVL((SELECT SUM((CAL_CONSUME/60)*EX_DURATION)
@@ -59,6 +59,7 @@ public interface DashboardMapper {
             SELECT NO, NAME, VISIBLE_YN
             FROM DASHBOARD
             WHERE MEMBER_NO = #{memberNo}
+            ORDER BY NO
             """)
     List<SettingVo> getDashboardSetting(int memberNo);
 

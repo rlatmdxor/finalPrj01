@@ -26,7 +26,7 @@ SELECT * FROM (
                 JOIN MEMBER M ON (B.MEMBER_NO = M.NO)
                 LEFT JOIN (
                     SELECT BOARD_NO, COUNT(*) AS RECOMMEND_COUNT
-                    FROM RECOMMENDATION
+                    FROM BOARD_RECOMMEND
                     GROUP BY BOARD_NO
                 ) R ON B.NO = R.BOARD_NO
                 WHERE B.DEL_YN = 'N'
@@ -54,7 +54,7 @@ SELECT * FROM (
                 JOIN MEMBER M ON (B.MEMBER_NO = M.NO)
                 LEFT JOIN (
                     SELECT BOARD_NO, COUNT(*) AS RECOMMEND_COUNT
-                    FROM RECOMMENDATION
+                    FROM BOARD_RECOMMEND
                     GROUP BY BOARD_NO
                 ) R ON (B.NO = R.BOARD_NO)
                 WHERE B.DEL_YN = 'N'
@@ -66,7 +66,7 @@ SELECT * FROM (
 
     @Select("""
             SELECT * FROM (
-                SELECT N.NO, N.WRITER, A.NICK, N.TITLE, N.CONTENT, N.ENROLL_DATE
+                SELECT N.NO, N.WRITER, A.NICK, N.TITLE, N.HIT, N.ENROLL_DATE
                 FROM NOTICE N
                 JOIN ADMIN A ON (N.WRITER = A.NO)
                 WHERE DEL_YN = 'N'

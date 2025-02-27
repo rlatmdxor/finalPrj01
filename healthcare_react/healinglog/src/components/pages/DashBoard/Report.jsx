@@ -1,10 +1,16 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Title from '../../util/Title';
 import ContentLayout from '../../util/ContentLayout';
 import styled from 'styled-components';
 import Navi from '../../util/Navi';
 import useWeekRange from '../../hook/useWeekRange';
 import Chart from '../../util/Chart';
+import Btn from '../../util/Btn';
+import { Switch } from '@mui/material';
+import Modal from '../../util/Modal';
+import { useDispatch, useSelector } from 'react-redux';
+import { close, open } from '../../../redux/modalSlice';
+import { getDashboardSetting, editDashboardSetting } from '../../services/dashboardService';
 
 const NaviContainer = styled.div`
   display: grid;
@@ -13,6 +19,14 @@ const NaviContainer = styled.div`
   top: 20px;
   left: 40px;
   grid-template-columns: 4fr 3fr;
+`;
+
+const SettingBtnDiv = styled.div`
+  display: flex;
+  height: 25px;
+  justify-content: flex-end;
+  margin-top: 30px;
+  margin-bottom: 20px;
 `;
 
 const DateDiv = styled.div`
@@ -56,8 +70,87 @@ const ContentArea = styled.div`
   min-height: 400px;
 `;
 
+const ContentDiv = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto;
+  column-gap: 20px;
+  row-gap: 2px;
+  margin-bottom: 10px;
+`;
+
+const ModalContainer = styled.div`
+  display: flex;
+  justify-content: end;
+`;
+
+const SwitchInputDiv = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+`;
+
 const Report = () => {
+  const token = localStorage.getItem('token');
+  const memberNo = 1;
+
+  const dispatch = useDispatch();
+
   const { currentMonday, currentSunday, handlePrevWeek, handleNextWeek } = useWeekRange();
+
+  const [settings, setSettings] = useState([]);
+  const [inputData, setInputData] = useState([]);
+
+  const isModalOpen = useSelector((state) => state.modal.modals['나의 설정'] === 'block');
+
+  const [isAllSelected, setIsAllSelected] = useState(false);
+
+  const handleSettingModal = () => {
+    setInputData([...settings]);
+    dispatch(open({ title: '나의 설정', value: 'block' }));
+  };
+
+  useEffect(() => {
+    const getFetch = async () => {
+      try {
+        const fetchData = await getDashboardSetting(memberNo, token);
+        setSettings(fetchData);
+      } catch (error) {
+        console.error('[ERROR] DASHBOARD SETTING FAIL', error);
+      }
+    };
+    getFetch();
+  }, [isModalOpen]);
+
+  useEffect(() => {
+    const allSelected = inputData.every((item) => item.visibleYn === 'Y');
+    setIsAllSelected(allSelected);
+  }, [inputData]);
+
+  const handleChange = (index) => {
+    setInputData((prev) =>
+      prev.map((vo, i) => (i === index ? { ...vo, visibleYn: vo.visibleYn === 'Y' ? 'N' : 'Y' } : vo))
+    );
+  };
+
+  const handleToggleAll = () => {
+    const newValue = isAllSelected ? 'N' : 'Y'; // 현재 상태에 따라 반전
+    setInputData((prev) => prev.map((vo) => ({ ...vo, visibleYn: newValue })));
+  };
+
+  const handleSave = () => {
+    const getFetch = async () => {
+      try {
+        await editDashboardSetting(inputData, token);
+        setSettings(inputData);
+        alert('저장되었습니다.');
+        dispatch(close('나의 설정'));
+      } catch (error) {
+        console.error('[ERROR] SAVE DASHBOARD SETTING FAIL', error);
+      }
+    };
+    getFetch();
+  };
 
   const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
   const dataset = [
@@ -97,6 +190,9 @@ const Report = () => {
         <Navi target="dashboard/report" tag={'리포트'}></Navi>
       </NaviContainer>
       <ContentLayout>
+        <SettingBtnDiv>
+          <Btn str={'설정'} w={'60'} h={'32'} mt={'0'} mb={'0'} ml={'0'} mr={'0'} fs={'14'} f={handleSettingModal} />
+        </SettingBtnDiv>
         <DateDiv>
           <button onClick={handlePrevWeek}>◀</button>
           <DateTextDiv>
@@ -134,6 +230,35 @@ const Report = () => {
           <h1>Doughnut 차트 예시</h1>
           <Chart chartType="Doughnut" labels={labels} dataset={dataset} width={100} height={500} />
         </ContentArea>
+
+        <Modal title="나의 설정">
+          <ContentDiv>
+            <SwitchInputDiv>
+              <div>전체</div>
+              <Switch checked={isAllSelected} onChange={handleToggleAll} />
+            </SwitchInputDiv>
+            {inputData.map((vo, index) => {
+              return (
+                <SwitchInputDiv key={vo.no}>
+                  <div>{vo.name}</div>
+                  <Switch checked={vo.visibleYn === 'Y'} onChange={() => handleChange(index)} />
+                </SwitchInputDiv>
+              );
+            })}
+          </ContentDiv>
+          <ModalContainer>
+            <Btn
+              title={'나의 설정'}
+              str={'저장'}
+              mt={'17'}
+              mb={'30'}
+              mr={'0'}
+              c={'#ff8a60'}
+              fc={'white'}
+              f={handleSave}
+            ></Btn>
+          </ModalContainer>
+        </Modal>
       </ContentLayout>
     </>
   );

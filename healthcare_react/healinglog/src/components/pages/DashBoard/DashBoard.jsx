@@ -177,11 +177,11 @@ const DashBoard = () => {
 
   const [isAllSelected, setIsAllSelected] = useState(false);
 
-  const isModalOpen = useSelector((state) => state.modal.modals['대시보드 설정'] === 'block');
+  const isModalOpen = useSelector((state) => state.modal.modals['나의 설정'] === 'block');
 
   const handleSettingModal = () => {
     setInputData([...settings]);
-    dispatch(open({ title: '대시보드 설정', value: 'block' }));
+    dispatch(open({ title: '나의 설정', value: 'block' }));
   };
 
   useEffect(() => {
@@ -190,7 +190,6 @@ const DashBoard = () => {
         const fetchData = await getDashboardData(currentMonday, currentSunday, memberNo, token);
         setDashboardData(fetchData);
       } catch (error) {
-        alert('GET DASHBOARD DATA FAIL ...');
         console.error('[ERROR] GET DASHBOARD DATA FAIL', error);
       }
     };
@@ -203,7 +202,6 @@ const DashBoard = () => {
         const fetchData = await getDashboardSetting(memberNo, token);
         setSettings(fetchData);
       } catch (error) {
-        alert('DASHBOARD SETTING FAIL ...');
         console.error('[ERROR] DASHBOARD SETTING FAIL', error);
       }
     };
@@ -222,7 +220,8 @@ const DashBoard = () => {
   };
 
   const handleToggleAll = () => {
-    setInputData((prev) => prev.map((vo) => ({ ...vo, visibleYn: 'Y' })));
+    const newValue = isAllSelected ? 'N' : 'Y'; // 현재 상태에 따라 반전
+    setInputData((prev) => prev.map((vo) => ({ ...vo, visibleYn: newValue })));
   };
 
   const handleSave = () => {
@@ -231,13 +230,24 @@ const DashBoard = () => {
         await editDashboardSetting(inputData, token);
         setSettings(inputData);
         alert('저장되었습니다.');
-        dispatch(close('대시보드 설정'));
+        dispatch(close('나의 설정'));
       } catch (error) {
-        alert('SAVE DASHBOARD SETTING FAIL ...');
         console.error('[ERROR] SAVE DASHBOARD SETTING FAIL', error);
       }
     };
     getFetch();
+  };
+
+  // 시간 변환 (시간, 분)
+  const timeFormat = (minutes) => {
+    if (!minutes || isNaN(minutes)) {
+      return '0시간 00분';
+    }
+
+    const hours = Math.floor(minutes / 60);
+    const remainMinutes = minutes % 60;
+
+    return `${hours}시간 ${remainMinutes.toString().padStart(2, '0')}분`;
   };
 
   return (
@@ -245,7 +255,7 @@ const DashBoard = () => {
       <Title>나의 건강 현황</Title>
       <NaviContainer>
         <Navi target="dashboard" tag={'대시보드'}></Navi>
-        <Navi target="dashboard/report" tag={'리포트'}></Navi>
+        {/* <Navi target="dashboard/report" tag={'리포트'}></Navi> */}
       </NaviContainer>
       <ContentLayout>
         <SettingBtnDiv>
@@ -311,7 +321,7 @@ const DashBoard = () => {
           {settings.find((s) => s.name === '수면' && s.visibleYn === 'Y') && (
             <SmallCard>
               <SmallTextDiv>이번주 평균 수면시간</SmallTextDiv>
-              <BigTextDiv>{dashboardData.currentWeek.avgSleep} 분</BigTextDiv>
+              <BigTextDiv>{timeFormat(dashboardData.currentWeek.avgSleep)}</BigTextDiv>
               <IncDecTextDiv value={dashboardData.difference.avgSleep}>
                 ( {dashboardData.difference.avgSleep} )
               </IncDecTextDiv>
@@ -374,7 +384,7 @@ const DashBoard = () => {
           {settings.find((s) => s.name === '유산소 운동시간' && s.visibleYn === 'Y') && (
             <SmallCard>
               <SmallTextDiv>이번주 유산소 운동시간</SmallTextDiv>
-              <BigTextDiv>{dashboardData.currentWeek.sumAerobic} 분</BigTextDiv>
+              <BigTextDiv>{timeFormat(dashboardData.currentWeek.sumAerobic)}</BigTextDiv>
               <IncDecTextDiv value={dashboardData.difference.sumAerobic}>
                 ( {dashboardData.difference.sumAerobic} )
               </IncDecTextDiv>
@@ -391,7 +401,7 @@ const DashBoard = () => {
           )}
         </ContentArea>
 
-        <Modal title="대시보드 설정">
+        <Modal title="나의 설정">
           <ContentDiv>
             <SwitchInputDiv>
               <div>전체</div>
@@ -408,7 +418,7 @@ const DashBoard = () => {
           </ContentDiv>
           <ModalContainer>
             <Btn
-              title={'표시내용 설정'}
+              title={'나의 설정'}
               str={'저장'}
               mt={'17'}
               mb={'30'}

@@ -64,7 +64,7 @@ const Card = styled.div`
   height: auto;
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: 54px 84px auto;
+  grid-template-rows: 58px auto auto;
   padding: 22px;
   border-radius: 8px;
   box-sizing: border-box;
@@ -90,9 +90,9 @@ const CardTitleTextDiv = styled.div`
 const CardContentTextDiv = styled.div`
   width: 100%;
   margin-top: 10px;
-  margin-bottom: 9px;
+  margin-bottom: 2px;
   font-size: 14px;
-  color: #4e4e4e;
+  color: #696969;
   overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 3;
@@ -101,12 +101,12 @@ const CardContentTextDiv = styled.div`
   max-height: calc(1.4em * 3);
 `;
 
-const CardBottomArea = styled.div`
+const CardMidArea = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
   font-size: 14px;
-  color: #696969;
+  color: #4e4e4e;
 `;
 
 const ReviewAreDiv = styled.div`
@@ -173,6 +173,7 @@ const AreaDiv = styled.div`
 
 const ProfileAreaDiv = styled.div`
   display: flex;
+  margin-top: 15px;
   gap: 7px;
   align-items: center;
 `;
@@ -200,7 +201,7 @@ const AdIcon = styled.img`
 
 const AdImg = styled.img`
   width: 495px;
-  height: 170px;
+  height: 155px;
   object-fit: cover;
 `;
 
@@ -222,7 +223,6 @@ const Main = () => {
         setNoticeList(noticeData);
         setReviewList(reviewData);
       } catch (error) {
-        alert('GET LIST FAIL ...');
         console.error('[ERROR] GET LIST FAIL', error);
       }
     };
@@ -278,11 +278,12 @@ const Main = () => {
                   }}
                 >
                   <CardTitleTextDiv>{vo.title}</CardTitleTextDiv>
-                  <CardContentTextDiv>{vo.content}</CardContentTextDiv>
-                  <CardBottomArea>
+                  <CardMidArea>
                     <ProfileAreaDiv>{vo.nick}</ProfileAreaDiv>
-                    {vo.enrollDate.slice(0, 10)}
-                  </CardBottomArea>
+                  </CardMidArea>
+                  <CardContentTextDiv>
+                    조회수 {vo.hit} · {vo.enrollDate.slice(0, 10)}
+                  </CardContentTextDiv>
                 </Card>
               );
             })}
@@ -309,14 +310,15 @@ const Main = () => {
                   <CardTitleTextDiv>
                     [{vo.categoryName}] {vo.title}
                   </CardTitleTextDiv>
-                  <CardContentTextDiv>{vo.content}</CardContentTextDiv>
-                  <CardBottomArea>
+                  <CardMidArea>
                     <ProfileAreaDiv>
                       <Avatar src={vo.profile ? vo.profile : '/broken-image.jpg'} sx={{ width: 22, height: 22 }} />
                       {vo.nick}
                     </ProfileAreaDiv>
-                    {vo.enrollDate.slice(0, 10)}
-                  </CardBottomArea>
+                  </CardMidArea>
+                  <CardContentTextDiv>
+                    추천수 {vo.recommendCount} · {vo.enrollDate.slice(0, 10)}
+                  </CardContentTextDiv>
                 </Card>
               );
             })}
@@ -334,7 +336,12 @@ const Main = () => {
           <ReviewAreDiv>
             {reviewList.slice(0, 4).map((vo) => {
               return (
-                <ReviewCard key={vo.no}>
+                <ReviewCard
+                  key={vo.no}
+                  onClick={() => {
+                    navigate(`/hospitalreview?bno=${vo.no}`);
+                  }}
+                >
                   <HospitalNameText>{vo.name}</HospitalNameText>
                   <AreaDiv>
                     {vo.city} {vo.district}
@@ -342,12 +349,12 @@ const Main = () => {
                   <RankDiv>{'⭐'.repeat(vo.rating)}</RankDiv>
                   <ReviewDiv>{vo.title}</ReviewDiv>
                   <ProfileAreaDiv>
-                    <CardBottomArea>
+                    <CardMidArea>
                       <ProfileAreaDiv>
                         <Avatar src={vo.profile ? vo.profile : '/broken-image.jpg'} sx={{ width: 22, height: 22 }} />
                         {vo.nick}
                       </ProfileAreaDiv>
-                    </CardBottomArea>
+                    </CardMidArea>
                   </ProfileAreaDiv>
                 </ReviewCard>
               );
