@@ -117,8 +117,6 @@ const Hospital = () => {
       let finalHospitalType = hospitalType.trim(); // 공백 제거
       let finalSearchType = searchType.trim();
 
-      console.log('🔍 검색 실행 - hospitalType:', finalHospitalType); // 디버깅 로그
-
       if (!searchKeyword) {
         const cityName = cities.find((c) => c.no === selectedCity)?.cityName || '';
         const districtName = districts.find((d) => d.no === selectedDistrict)?.districtName || '';
@@ -140,8 +138,6 @@ const Hospital = () => {
       )}&searchType=${finalSearchType}&keyword=${encodeURIComponent(
         searchKeyword
       )}&page=${currentPage}&size=${boardLimit}`;
-
-      console.log('📡 API 요청 URL:', requestUrl); // 디버깅 로그
 
       const response = await fetch(requestUrl);
       if (!response.ok) {
