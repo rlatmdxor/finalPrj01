@@ -187,4 +187,19 @@ public interface MemberMapper {
                 ID = #{id}
             """)
     void withdrawal(String id);
+
+    @Insert("""
+             INSERT INTO DASHBOARD (
+                NO
+                , MEMBER_NO
+                , NAME
+            )
+            VALUES
+            (
+                SEQ_DASHBOARD.NEXTVAL
+                , SEQ_MEMBER.CURRVAL
+                , #{name}
+            )
+            """)
+    void createMemberDashboard(String name);
 }
