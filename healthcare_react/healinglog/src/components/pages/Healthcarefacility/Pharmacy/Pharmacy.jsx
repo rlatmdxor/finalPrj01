@@ -109,6 +109,7 @@ const Pharmacy = () => {
   const handleSearch = async () => {
     setLoading(true);
 
+    //trim 현재 문자열에서 모든 선행 및 후행 공백 문자를 제거
     try {
       let searchKeyword = keyword.trim();
       let finalSearchType = searchType;
