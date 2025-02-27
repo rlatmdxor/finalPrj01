@@ -17,6 +17,7 @@ public class BloodPressureController {
     @PostMapping("write")
     public int bloodPressureWrite(@RequestBody BloodPressureVo vo , @RequestHeader("Authorization") String authorization){
 
+        System.out.println("BloodPressureController.bloodPressureWrite");
         try{
             return service.bloodPressureWrite(vo);
         }catch (Exception e){
