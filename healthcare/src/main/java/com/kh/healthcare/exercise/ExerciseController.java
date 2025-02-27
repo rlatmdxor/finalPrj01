@@ -63,4 +63,11 @@ public class ExerciseController {
         return ResponseEntity.ok(result);
     }
 
+    @GetMapping("getHistory")
+    public ResponseEntity<Map<String, List<List<String>>>> getExerciseHistory(@RequestHeader("Authorization") String token
+            , @RequestParam String type) {
+        Map<String, List<List<String>>> events = service.getExerciseHistory(token, type);
+        return ResponseEntity.ok(events);
+    }
+
 }
