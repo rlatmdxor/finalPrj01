@@ -153,7 +153,13 @@ const Cigarette = () => {
       body: JSON.stringify(inputData),
     })
       .then((resp) => resp.text())
-      .then((data) => {});
+      .then((data) => {
+        alert('등록 완료');
+        window.location.reload();
+      })
+      .catch((error) => {
+        alert('등록 실패');
+      });
     //렌
     setNum(num - 1);
     // 입력 후 모달 창 닫기
@@ -177,10 +183,11 @@ const Cigarette = () => {
         return resp.text(); // 또는 .json() (응답 형식에 따라)
       })
       .then((data) => {
-        console.log('수정 완료:', data);
+        alert('수정 완료');
+        window.location.reload();
       })
       .catch((error) => {
-        console.error('수정 실패:', error);
+        alert('수정 실패');
       });
 
     dispatch(close('흡연 수정'));
@@ -202,10 +209,11 @@ const Cigarette = () => {
         return resp.text(); // 또는 .json() (응답 형식에 따라)
       })
       .then((data) => {
-        console.log('삭제 완료:', data);
+        alert('삭제 완료');
+        window.location.reload();
       })
       .catch((error) => {
-        console.error('삭제 실패:', error);
+        alert('삭제 실패');
       });
     //창닫기
     dispatch(close('흡연 수정'));
