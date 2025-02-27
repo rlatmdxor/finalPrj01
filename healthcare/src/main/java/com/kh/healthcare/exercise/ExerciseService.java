@@ -94,12 +94,13 @@ public class ExerciseService {
 
             //Map에 가져온 유산소 데이터 채워넣기
             for (Map<String, Object> history : historyList) {
+                String historyNo = history.get("NO").toString();
                 String date = history.get("EX_DATE").toString();
                 String duration = history.get("EX_DURATION") != null ? history.get("EX_DURATION").toString() + "분" : "시간 정보 없음";
                 String name = history.get("NAME") != null ? history.get("NAME").toString() : "운동 정보 없음";
 
                 events.putIfAbsent(date, new ArrayList<>()); // 날짜 추가
-                events.get(date).add(Arrays.asList(duration, name)); // 운동 기록 추가
+                events.get(date).add(Arrays.asList(historyNo, duration, name)); // 운동 기록 추가
             }
 
         } else if(type.equals("anaerobic")){
@@ -107,6 +108,7 @@ public class ExerciseService {
 
             //Map에 가져온 무산소 데이터 채워넣기
             for (Map<String, Object> history : historyList) {
+                String historyNo = history.get("NO").toString();
                 String date = history.get("EX_DATE").toString();
                 String weight = history.get("WEIGHT") != null ? history.get("WEIGHT").toString() + "kg" : "";
                 String reps = history.get("REPS") != null ? history.get("REPS").toString() + "회" : "횟수 정보 없음";
@@ -114,7 +116,7 @@ public class ExerciseService {
                 String name = history.get("NAME") != null ? history.get("NAME").toString() : "운동 정보 없음";
 
                 events.putIfAbsent(date, new ArrayList<>()); // 날짜 추가
-                events.get(date).add(Arrays.asList(weightAndReps, name)); // 운동 기록 추가
+                events.get(date).add(Arrays.asList(historyNo, weightAndReps, name)); // 운동 기록 추가
             }
 
         } else { throw new IllegalStateException("Invalid exercise type: " + type); }

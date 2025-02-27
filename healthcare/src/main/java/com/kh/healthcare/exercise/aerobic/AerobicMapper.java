@@ -93,5 +93,25 @@ public interface AerobicMapper {
             """)
     void record(String userNo, String exNo, AerobicHistoryVo vo);
 
+    //운동 내역 업데이트
+    @Update("""
+            UPDATE AEROBIC_HISTORY
+            SET
+                EX_DATE = TO_DATE(#{vo.exDate}, 'YYYY-MM-DD'),
+                EX_DURATION = #{vo.exDuration},
+                START_TIME = TO_TIMESTAMP(#{vo.exDate} || ' ' || #{vo.startTime}, 'YYYY-MM-DD HH24:MI'),
+                END_TIME = TO_TIMESTAMP(#{vo.exDate} || ' ' || #{vo.endTime}, 'YYYY-MM-DD HH24:MI')
+            WHERE
+                USER_NO = #{userNo}
+                AND NO = #{vo.no}
+            """)
+    void updateAerobic(String userNo, AerobicHistoryVo vo);
 
+    //운동 내역 삭제
+    @Delete("""
+            DELETE FROM AEROBIC_HISTORY
+            WHERE USER_NO = #{userNo}
+            AND NO = #{vo.no}
+            """)
+    boolean deleteAerobic(String userNo, AerobicHistoryVo vo);
 }

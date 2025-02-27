@@ -3,12 +3,13 @@ import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import { openCalModal } from '../../redux/modalSlice';
 
-const ExCalendar = ({ modalTitle, vo, events, width, height }) => {
+const ExCalendar = ({ modalTitle, vo, events, width, height, setSelectedDate }) => {
   const [date, setDate] = useState(new Date()); // 현재 날짜 상태
   const dispatch = useDispatch();
 
   // 날짜 클릭 시 모달을 열도록 처리
   const onDayClick = (fullDate) => {
+    setSelectedDate(fullDate);
     dispatch(openCalModal({ title: modalTitle, value: 'block', date: fullDate }));
   };
 
@@ -80,8 +81,11 @@ const ExCalendar = ({ modalTitle, vo, events, width, height }) => {
                 <>
                   {eventData.slice(0, 1).map((item, idx) => (
                     <>
-                      <ExDiv key={idx}>{item[1]}</ExDiv>
-                      <TimeDiv key={idx}>{item[0]}</TimeDiv>
+                      <div key={idx} style={{ display: 'none' }}>
+                        {item[0]}
+                      </div>
+                      <ExDiv key={idx}>{item[2]}</ExDiv>
+                      <TimeDiv key={idx}>{item[1]}</TimeDiv>
                     </>
                   ))}
                   {eventData.length > 1 && (
@@ -102,7 +106,7 @@ export default ExCalendar;
 const CalendarContainer = styled.div`
   width: ${({ width }) => (width ? width : 800)}px;
   margin: 0 auto;
-  font-family: Arial, sans-serif;
+  font-family: 'goorm-sans-bold';
   text-align: center;
 `;
 
@@ -163,7 +167,7 @@ const TimeDiv = styled.div`
   padding-top: 2px;
   padding-bottom: 2px;
   color: darkslategray;
-  font-size: smaller;
+  font-size: 12px;
 `;
 
 const ExDiv = styled.div`
@@ -177,7 +181,7 @@ const ExDiv = styled.div`
   padding-bottom: 2px;
   color: darkslategray;
   font-weight: bold;
-  font-size: small;
+  font-size: 12px;
 `;
 
 const MoreDiv = styled.div`

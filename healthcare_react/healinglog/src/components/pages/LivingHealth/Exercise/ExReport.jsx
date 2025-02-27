@@ -676,6 +676,7 @@ const DayDiv = styled.div`
   font-weight: bold;
   margin-top: 20px;
   margin-bottom: 10px;
+  font-family: Arial, sans-serif;
 
   & h1 {
     margin: 0 20px;
@@ -707,6 +708,7 @@ const DayDiv2 = styled.div`
   font-weight: bold;
   margin-top: 20px;
   margin-bottom: 10px;
+  font-family: Arial, sans-serif;
 
   & h1 {
     margin: 0 20px;
