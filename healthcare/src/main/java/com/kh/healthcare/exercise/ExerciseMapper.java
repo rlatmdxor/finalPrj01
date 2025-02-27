@@ -142,5 +142,20 @@ public interface ExerciseMapper {
             """)
     List<Map<String, Object>> getCategoryCount(String rangeType, int year, Integer month, String userNo);
 
+    @Select("""
+            SELECT TO_CHAR(AH.EX_DATE, 'YYYY-MM-DD') AS EX_DATE, AH.EX_DURATION, A.NAME
+            FROM AEROBIC_HISTORY AH
+            LEFT JOIN AEROBIC A ON AH.EX_NO = A.NO
+            WHERE AH.USER_NO = #{userNo}
+            """)
+    List<Map<String, Object>> getAerobicHistory(String userNo);
+
+    @Select("""
+            SELECT TO_CHAR(AH.EX_DATE, 'YYYY-MM-DD') AS EX_DATE, AH.WEIGHT, AH.REPS, AA.NAME
+            FROM ANAEROBIC_HISTORY AH
+            LEFT JOIN ANAEROBIC AA ON AH.EX_NO = AA.NO
+            WHERE AH.USER_NO = #{userNo}
+            """)
+    List<Map<String, Object>> getAnAerobicHistory(String userNo);
 
 }
