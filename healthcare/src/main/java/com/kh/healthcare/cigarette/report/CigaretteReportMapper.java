@@ -21,7 +21,7 @@ public interface CigaretteReportMapper {
     @Insert("""
             INSERT INTO RECORD_CIGARETTE (NO, MEMBER_NO, CIGARETTE, TAR, START_DATE, END_DATE)
             VALUES
-            (SEQ_RECORD_CIGARETTE.NEXTVAL
+            (SEQ_CIGARETTE.NEXTVAL
             ,'1'
             ,#{cigarette}
             ,#{tar}
