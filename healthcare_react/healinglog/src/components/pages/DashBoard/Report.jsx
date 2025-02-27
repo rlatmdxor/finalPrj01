@@ -3,8 +3,6 @@ import Title from '../../util/Title';
 import ContentLayout from '../../util/ContentLayout';
 import styled from 'styled-components';
 import Navi from '../../util/Navi';
-import SettingModal from './SettingModal';
-import SettingBtn from './SettingBtn';
 import useWeekRange from '../../hook/useWeekRange';
 import Chart from '../../util/Chart';
 
@@ -99,7 +97,6 @@ const Report = () => {
         <Navi target="dashboard/report" tag={'리포트'}></Navi>
       </NaviContainer>
       <ContentLayout>
-        <SettingBtn />
         <DateDiv>
           <button onClick={handlePrevWeek}>◀</button>
           <DateTextDiv>
@@ -137,7 +134,6 @@ const Report = () => {
           <h1>Doughnut 차트 예시</h1>
           <Chart chartType="Doughnut" labels={labels} dataset={dataset} width={100} height={500} />
         </ContentArea>
-        <SettingModal />
       </ContentLayout>
     </>
   );

@@ -3,15 +3,11 @@ package com.kh.healthcare.home;
 import lombok.Data;
 
 @Data
-public class HomeBoardVo {
+public class NoticeVo {
     private String no;
-    private String categoryNo;
-    private String categoryName;
-    private String memberNo;
+    private String writer;
     private String nick;
-    private String profile;
     private String title;
     private String content;
-    private String recommendCount;
     private String enrollDate;
 }

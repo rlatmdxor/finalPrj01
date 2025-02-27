@@ -62,7 +62,7 @@ SELECT * FROM (
             )
             WHERE ROWNUM <= 3
             """)
-    List<HomeBoardVo> getHoneyTipBoardList();
+    List<BoardVo> getHoneyTipBoardList();
 
     @Select("""
             SELECT * FROM (
@@ -74,7 +74,7 @@ SELECT * FROM (
             )
             WHERE ROWNUM <=3
             """)
-    List<HomeNoticeVo> getNoticeList();
+    List<NoticeVo> getNoticeList();
 
     @Select("""
             SELECT * FROM (
@@ -122,5 +122,5 @@ SELECT * FROM (
             )
             WHERE ROWNUM <= 4
             """)
-    List<HomeReviewVo> getReviewList();
+    List<ReviewVo> getReviewList();
 }

@@ -1,13 +1,16 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Title from '../../util/Title';
 import ContentLayout from '../../util/ContentLayout';
 import styled from 'styled-components';
 import Navi from '../../util/Navi';
 import SmallCard from '../../util/SmallCard';
-import SettingModal from './SettingModal';
-import BigCard from '../../util/BigCard';
-import SettingBtn from './SettingBtn';
+import Btn from '../../util/Btn';
 import useWeekRange from '../../hook/useWeekRange';
+import { Switch } from '@mui/material';
+import { getDashboardData, getDashboardSetting, editDashboardSetting } from '../../services/dashboardService';
+import Modal from '../../util/Modal';
+import { useDispatch, useSelector } from 'react-redux';
+import { close, open } from '../../../redux/modalSlice';
 
 const NaviContainer = styled.div`
   display: grid;
@@ -53,6 +56,14 @@ const DateTextDiv = styled.div`
   font-size: 17px;
 `;
 
+const SettingBtnDiv = styled.div`
+  display: flex;
+  height: 25px;
+  justify-content: flex-end;
+  margin-top: 30px;
+  margin-bottom: 20px;
+`;
+
 const ContentArea = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -83,6 +94,7 @@ const BigTextDiv = styled.div`
   margin-left: auto;
   margin-right: auto;
   margin-top: 8px;
+  margin-bottom: 9px;
   font-size: 30px;
 `;
 
@@ -90,11 +102,24 @@ const IncDecTextDiv = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 9px;
   padding: 0px 14px;
   font-size: 17px;
   font-weight: 500;
-  color: #3b3b3b;
+  color: ${({ value }) => {
+    const strValue = value ? String(value).trim() : '0';
+    return strValue.startsWith('+') ? 'red' : strValue.startsWith('-') ? 'blue' : '#3b3b3b';
+  }};
+`;
+
+const BigCard = styled.div`
+  width: 100%;
+  height: 145px;
+  grid-column: span 3;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  border: 1px solid #c5cbd1;
+  border-radius: 6px;
 `;
 
 const BigCardInnerDiv = styled.div`
@@ -112,14 +137,108 @@ const BigCardInnerTopDiv = styled.div`
 `;
 
 const BigCardInnerMidDiv = styled.div`
-  font-size: 26px;
+  font-size: 25px;
   color: #000000;
   margin-top: 3px;
   margin-bottom: 6px;
 `;
 
+const ModalContainer = styled.div`
+  display: flex;
+  justify-content: end;
+`;
+
+const ContentDiv = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto;
+  column-gap: 20px;
+  row-gap: 2px;
+  margin-bottom: 10px;
+`;
+
+const SwitchInputDiv = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+`;
+
 const DashBoard = () => {
+  const token = localStorage.getItem('token');
+  const memberNo = 1;
+
+  const dispatch = useDispatch();
+
   const { currentMonday, currentSunday, handlePrevWeek, handleNextWeek } = useWeekRange();
+  const [dashboardData, setDashboardData] = useState({ currentWeek: {}, previousWeek: {}, difference: {} });
+
+  const [settings, setSettings] = useState([]);
+  const [inputData, setInputData] = useState([]);
+
+  const [isAllSelected, setIsAllSelected] = useState(false);
+
+  const isModalOpen = useSelector((state) => state.modal.modals['대시보드 설정'] === 'block');
+
+  const handleSettingModal = () => {
+    setInputData([...settings]);
+    dispatch(open({ title: '대시보드 설정', value: 'block' }));
+  };
+
+  useEffect(() => {
+    const getFetch = async () => {
+      try {
+        const fetchData = await getDashboardData(currentMonday, currentSunday, memberNo, token);
+        setDashboardData(fetchData);
+      } catch (error) {
+        alert('GET DASHBOARD DATA FAIL ...');
+        console.error('[ERROR] GET DASHBOARD DATA FAIL', error);
+      }
+    };
+    getFetch();
+  }, [currentMonday, currentSunday]);
+
+  useEffect(() => {
+    const getFetch = async () => {
+      try {
+        const fetchData = await getDashboardSetting(memberNo, token);
+        setSettings(fetchData);
+      } catch (error) {
+        alert('DASHBOARD SETTING FAIL ...');
+        console.error('[ERROR] DASHBOARD SETTING FAIL', error);
+      }
+    };
+    getFetch();
+  }, [isModalOpen]);
+
+  useEffect(() => {
+    const allSelected = inputData.every((item) => item.visibleYn === 'Y');
+    setIsAllSelected(allSelected);
+  }, [inputData]);
+
+  const handleChange = (index) => {
+    setInputData((prev) =>
+      prev.map((vo, i) => (i === index ? { ...vo, visibleYn: vo.visibleYn === 'Y' ? 'N' : 'Y' } : vo))
+    );
+  };
+
+  const handleToggleAll = () => {
+    setInputData((prev) => prev.map((vo) => ({ ...vo, visibleYn: 'Y' })));
+  };
+
+  const handleSave = () => {
+    const getFetch = async () => {
+      try {
+        await editDashboardSetting(inputData, token);
+        setSettings(inputData);
+        alert('저장되었습니다.');
+        dispatch(close('대시보드 설정'));
+      } catch (error) {
+        alert('SAVE DASHBOARD SETTING FAIL ...');
+        console.error('[ERROR] SAVE DASHBOARD SETTING FAIL', error);
+      }
+    };
+    getFetch();
+  };
 
   return (
     <>
@@ -129,7 +248,9 @@ const DashBoard = () => {
         <Navi target="dashboard/report" tag={'리포트'}></Navi>
       </NaviContainer>
       <ContentLayout>
-        <SettingBtn />
+        <SettingBtnDiv>
+          <Btn str={'설정'} w={'60'} h={'32'} mt={'0'} mb={'0'} ml={'0'} mr={'0'} fs={'14'} f={handleSettingModal} />
+        </SettingBtnDiv>
         <DateDiv>
           <button onClick={handlePrevWeek}>◀</button>
           <DateTextDiv>
@@ -138,82 +259,166 @@ const DashBoard = () => {
           <button onClick={handleNextWeek}>▶</button>
         </DateDiv>
         <ContentArea>
-          <BigCard>
-            <BigCardInnerDiv>
-              <BigCardInnerTopDiv>
-                <div>이번주 최고 혈압</div>
-              </BigCardInnerTopDiv>
-              <BigCardInnerMidDiv>210 mmHg</BigCardInnerMidDiv>
-            </BigCardInnerDiv>
-            <BigCardInnerDiv>
-              <BigCardInnerTopDiv>
-                <div>이번주 최저 혈압</div>
-              </BigCardInnerTopDiv>
-              <BigCardInnerMidDiv>90 mmHg</BigCardInnerMidDiv>
-            </BigCardInnerDiv>
-            <BigCardInnerDiv>
-              <BigCardInnerTopDiv>
-                <div>이번주 최고 혈당</div>
-              </BigCardInnerTopDiv>
-              <BigCardInnerMidDiv>316 mg/dL</BigCardInnerMidDiv>
-            </BigCardInnerDiv>
-            <BigCardInnerDiv>
-              <BigCardInnerTopDiv>
-                <div>이번주 최저 혈당</div>
-              </BigCardInnerTopDiv>
-              <BigCardInnerMidDiv>85 mg/dL</BigCardInnerMidDiv>
-            </BigCardInnerDiv>
-          </BigCard>
-
-          <SmallCard>
-            <SmallTextDiv>이번주 평균 수면시간</SmallTextDiv>
-            <BigTextDiv>4시간 48분</BigTextDiv>
-            <IncDecTextDiv>(+ 0시간 20분)</IncDecTextDiv>
-          </SmallCard>
-          <SmallCard>
-            <SmallTextDiv>이번주 소모 담배량</SmallTextDiv>
-            <BigTextDiv>12.4 갑</BigTextDiv>
-            <IncDecTextDiv>(+ 0시간 20분)</IncDecTextDiv>
-          </SmallCard>
-          <SmallCard>
-            <SmallTextDiv>이번주 음주량</SmallTextDiv>
-            <BigTextDiv>1852cc (300mL)</BigTextDiv>
-            <IncDecTextDiv>(+ 0시간 20분)</IncDecTextDiv>
-          </SmallCard>
-
-          <SmallCard>
-            <SmallTextDiv>이번주 평균 체중</SmallTextDiv>
-            <BigTextDiv>68.3kg</BigTextDiv>
-            <IncDecTextDiv>(+ 0시간 20분)</IncDecTextDiv>
-          </SmallCard>
-          <SmallCard>
-            <SmallTextDiv>이번주 평균 칼로리 섭취량</SmallTextDiv>
-            <BigTextDiv>1834 Kcal</BigTextDiv>
-            <IncDecTextDiv>(+ 0시간 20분)</IncDecTextDiv>
-          </SmallCard>
-          <SmallCard>
-            <SmallTextDiv>이번주 평균 물 섭취량</SmallTextDiv>
-            <BigTextDiv>850 ml</BigTextDiv>
-            <IncDecTextDiv>(+ 0시간 20분)</IncDecTextDiv>
-          </SmallCard>
-
-          <SmallCard>
-            <SmallTextDiv>이번주 유산소 운동시간</SmallTextDiv>
-            <BigTextDiv>1시간 18분</BigTextDiv>
-            <IncDecTextDiv>(+ 0시간 20분)</IncDecTextDiv>
-          </SmallCard>
-          <SmallCard>
-            <SmallTextDiv>이번주 무산소 운동시간</SmallTextDiv>
-            <BigTextDiv>1시간 11분</BigTextDiv>
-            <IncDecTextDiv>(+ 0시간 20분)</IncDecTextDiv>
-          </SmallCard>
-          <SmallCard>
-            <SmallTextDiv>이번주 총 운동시간</SmallTextDiv>
-            <BigTextDiv>2시간 29분</BigTextDiv>
-            <IncDecTextDiv>(+ 0시간 20분)</IncDecTextDiv>
-          </SmallCard>
+          {(settings.some((s) => s.name === '혈압' && s.visibleYn === 'Y') ||
+            settings.some((s) => s.name === '혈당' && s.visibleYn === 'Y')) && (
+            <BigCard>
+              {settings.find((s) => s.name === '혈압' && s.visibleYn === 'Y') && (
+                <>
+                  <BigCardInnerDiv>
+                    <BigCardInnerTopDiv>
+                      <div>이번주 최고 혈압</div>
+                    </BigCardInnerTopDiv>
+                    <BigCardInnerMidDiv>{dashboardData.currentWeek.maxBloodPressure} mmHg</BigCardInnerMidDiv>
+                    <IncDecTextDiv value={dashboardData.difference.maxBloodPressure}>
+                      ( {dashboardData.difference.maxBloodPressure} )
+                    </IncDecTextDiv>
+                  </BigCardInnerDiv>
+                  <BigCardInnerDiv>
+                    <BigCardInnerTopDiv>
+                      <div>이번주 최저 혈압</div>
+                    </BigCardInnerTopDiv>
+                    <BigCardInnerMidDiv>{dashboardData.currentWeek.minBloodPressure} mmHg</BigCardInnerMidDiv>
+                    <IncDecTextDiv value={dashboardData.difference.minBloodPressure}>
+                      ( {dashboardData.difference.minBloodPressure} )
+                    </IncDecTextDiv>
+                  </BigCardInnerDiv>
+                </>
+              )}
+              {settings.find((s) => s.name === '혈당' && s.visibleYn === 'Y') && (
+                <>
+                  <BigCardInnerDiv>
+                    <BigCardInnerTopDiv>
+                      <div>이번주 최고 혈당</div>
+                    </BigCardInnerTopDiv>
+                    <BigCardInnerMidDiv>{dashboardData.currentWeek.maxBloodSugar} mg/dL</BigCardInnerMidDiv>
+                    <IncDecTextDiv value={dashboardData.difference.maxBloodSugar}>
+                      ( {dashboardData.difference.maxBloodSugar} )
+                    </IncDecTextDiv>
+                  </BigCardInnerDiv>
+                  <BigCardInnerDiv>
+                    <BigCardInnerTopDiv>
+                      <div>이번주 최저 혈당</div>
+                    </BigCardInnerTopDiv>
+                    <BigCardInnerMidDiv>{dashboardData.currentWeek.minBloodSugar} mg/dL</BigCardInnerMidDiv>
+                    <IncDecTextDiv value={dashboardData.difference.minBloodSugar}>
+                      ( {dashboardData.difference.minBloodSugar} )
+                    </IncDecTextDiv>
+                  </BigCardInnerDiv>
+                </>
+              )}
+            </BigCard>
+          )}
+          {settings.find((s) => s.name === '수면' && s.visibleYn === 'Y') && (
+            <SmallCard>
+              <SmallTextDiv>이번주 평균 수면시간</SmallTextDiv>
+              <BigTextDiv>{dashboardData.currentWeek.avgSleep} 분</BigTextDiv>
+              <IncDecTextDiv value={dashboardData.difference.avgSleep}>
+                ( {dashboardData.difference.avgSleep} )
+              </IncDecTextDiv>
+            </SmallCard>
+          )}
+          {settings.find((s) => s.name === '흡연' && s.visibleYn === 'Y') && (
+            <SmallCard>
+              <SmallTextDiv>이번주 소모 담배량</SmallTextDiv>
+              <BigTextDiv>{dashboardData.currentWeek.countCigarette} 갑</BigTextDiv>
+              <IncDecTextDiv value={dashboardData.difference.countCigarette}>
+                ( {dashboardData.difference.countCigarette} )
+              </IncDecTextDiv>
+            </SmallCard>
+          )}
+          {settings.find((s) => s.name === '알코올 섭취량' && s.visibleYn === 'Y') && (
+            <SmallCard>
+              <SmallTextDiv>이번주 알코올 섭취량</SmallTextDiv>
+              <BigTextDiv>{dashboardData.currentWeek.sumAlc} ml</BigTextDiv>
+              <IncDecTextDiv value={dashboardData.difference.sumAlc}>
+                ( {dashboardData.difference.sumAlc} )
+              </IncDecTextDiv>
+            </SmallCard>
+          )}
+          {settings.find((s) => s.name === '체중' && s.visibleYn === 'Y') && (
+            <SmallCard>
+              <SmallTextDiv>이번주 평균 체중</SmallTextDiv>
+              <BigTextDiv>{dashboardData.currentWeek.avgWeight} kg</BigTextDiv>
+              <IncDecTextDiv value={dashboardData.difference.avgWeight}>
+                ( {dashboardData.difference.avgWeight} )
+              </IncDecTextDiv>
+            </SmallCard>
+          )}
+          {settings.find((s) => s.name === '칼로리 섭취량' && s.visibleYn === 'Y') && (
+            <SmallCard>
+              <SmallTextDiv>이번주 평균 칼로리 섭취량</SmallTextDiv>
+              <BigTextDiv>{dashboardData.currentWeek.avgKcal} Kcal</BigTextDiv>
+              <IncDecTextDiv value={dashboardData.difference.avgKcal}>
+                ( {dashboardData.difference.avgKcal} )
+              </IncDecTextDiv>
+            </SmallCard>
+          )}
+          {settings.find((s) => s.name === '물 섭취량' && s.visibleYn === 'Y') && (
+            <SmallCard>
+              <SmallTextDiv>이번주 평균 물 섭취량</SmallTextDiv>
+              <BigTextDiv>{dashboardData.currentWeek.avgWater} ml</BigTextDiv>
+              <IncDecTextDiv value={dashboardData.difference.avgWater}>
+                ( {dashboardData.difference.avgWater} )
+              </IncDecTextDiv>
+            </SmallCard>
+          )}
+          {settings.find((s) => s.name === '칼로리 소모량' && s.visibleYn === 'Y') && (
+            <SmallCard>
+              <SmallTextDiv>이번주 칼로리 소모량</SmallTextDiv>
+              <BigTextDiv>{dashboardData.currentWeek.sumCalConsume} Kcal</BigTextDiv>
+              <IncDecTextDiv value={dashboardData.difference.sumCalConsume}>
+                ( {dashboardData.difference.sumCalConsume} )
+              </IncDecTextDiv>
+            </SmallCard>
+          )}
+          {settings.find((s) => s.name === '유산소 운동시간' && s.visibleYn === 'Y') && (
+            <SmallCard>
+              <SmallTextDiv>이번주 유산소 운동시간</SmallTextDiv>
+              <BigTextDiv>{dashboardData.currentWeek.sumAerobic} 분</BigTextDiv>
+              <IncDecTextDiv value={dashboardData.difference.sumAerobic}>
+                ( {dashboardData.difference.sumAerobic} )
+              </IncDecTextDiv>
+            </SmallCard>
+          )}
+          {settings.find((s) => s.name === '무산소 운동일수' && s.visibleYn === 'Y') && (
+            <SmallCard>
+              <SmallTextDiv>이번주 무산소 운동일수</SmallTextDiv>
+              <BigTextDiv>{dashboardData.currentWeek.countAnaerobic}</BigTextDiv>
+              <IncDecTextDiv value={dashboardData.difference.countAnaerobic}>
+                ( {dashboardData.difference.countAnaerobic} )
+              </IncDecTextDiv>
+            </SmallCard>
+          )}
         </ContentArea>
-        <SettingModal />
+
+        <Modal title="대시보드 설정">
+          <ContentDiv>
+            <SwitchInputDiv>
+              <div>전체</div>
+              <Switch checked={isAllSelected} onChange={handleToggleAll} />
+            </SwitchInputDiv>
+            {inputData.map((vo, index) => {
+              return (
+                <SwitchInputDiv key={vo.no}>
+                  <div>{vo.name}</div>
+                  <Switch checked={vo.visibleYn === 'Y'} onChange={() => handleChange(index)} />
+                </SwitchInputDiv>
+              );
+            })}
+          </ContentDiv>
+          <ModalContainer>
+            <Btn
+              title={'표시내용 설정'}
+              str={'저장'}
+              mt={'17'}
+              mb={'30'}
+              mr={'0'}
+              c={'#ff8a60'}
+              fc={'white'}
+              f={handleSave}
+            ></Btn>
+          </ModalContainer>
+        </Modal>
       </ContentLayout>
     </>
   );

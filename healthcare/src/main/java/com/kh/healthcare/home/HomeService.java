@@ -13,15 +13,15 @@ public class HomeService {
 
     private final HomeMapper mapper;
 
-    public List<HomeBoardVo> getHoneyTipBoardList() {
+    public List<BoardVo> getHoneyTipBoardList() {
         return mapper.getHoneyTipBoardList();
     }
 
-    public List<HomeNoticeVo> getNoticeList() {
+    public List<NoticeVo> getNoticeList() {
         return mapper.getNoticeList();
     }
 
-    public List<HomeReviewVo> getReviewList() {
+    public List<ReviewVo> getReviewList() {
         return mapper.getReviewList();
     }
 }

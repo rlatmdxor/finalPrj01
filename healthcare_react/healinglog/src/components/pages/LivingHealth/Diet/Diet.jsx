@@ -128,7 +128,7 @@ const Diet = () => {
         </ContentAreaDiv>
         <TodayDietMeal reRender={reRender} setReRender={setReRender} />
         <br />
-        <h1>여기에 광고를 넣어서 돈을 벌자</h1>
+        <br />
         <br />
       </ContentLayout>
     </>

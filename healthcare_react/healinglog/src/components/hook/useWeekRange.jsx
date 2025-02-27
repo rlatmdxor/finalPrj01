@@ -1,12 +1,12 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const getWeekRange = (date) => {
   const dayOfWeek = date.getDay(); // 0: 일요일, 1: 월요일, ..., 6: 토요일
   const monday = new Date(date);
-  monday.setDate(date.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1)); // 월요일 찾기
+  monday.setDate(date.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1)); // 이번주 월요일
 
   const sunday = new Date(monday);
-  sunday.setDate(monday.getDate() + 6); // 일요일 찾기
+  sunday.setDate(monday.getDate() + 6); // 이번주 일요일
 
   return {
     monday: monday.toISOString().split('T')[0],

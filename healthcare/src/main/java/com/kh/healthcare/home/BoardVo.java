@@ -3,16 +3,15 @@ package com.kh.healthcare.home;
 import lombok.Data;
 
 @Data
-public class HomeReviewVo {
+public class BoardVo {
     private String no;
+    private String categoryNo;
+    private String categoryName;
     private String memberNo;
-    private String hospitalNo;
-    private String city;
-    private String district;
-    private String name;
     private String nick;
     private String profile;
     private String title;
-    private String rating;
+    private String content;
+    private String recommendCount;
     private String enrollDate;
 }
