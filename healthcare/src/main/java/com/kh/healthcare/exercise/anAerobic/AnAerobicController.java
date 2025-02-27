@@ -57,4 +57,16 @@ public class AnAerobicController {
     public String record(@RequestHeader ("Authorization") String token, @RequestBody AnAerobicHistoryVo vo){
         return service.record(token,vo);
     }
+
+    //운동 내역 수정
+    @PostMapping("updateAnAerobic")
+    public String updateAnAerobic(@RequestHeader ("Authorization") String token, @RequestBody AnAerobicHistoryVo vo){
+        return service.updateAnAerobic(token,vo);
+    }
+
+    //운동 내역 삭제
+    @DeleteMapping("deleteAnAerobic")
+    public String deleteAnAerobic(@RequestHeader ("Authorization") String token, @RequestBody AnAerobicHistoryVo vo){
+        return service.deleteAnAerobic(token,vo);
+    }
 }

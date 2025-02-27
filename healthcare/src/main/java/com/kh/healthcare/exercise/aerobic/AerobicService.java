@@ -80,4 +80,36 @@ public class AerobicService {
         }
 
     }
+
+    //운동 내역 업데이트
+    public String updateAerobic(String token, AerobicHistoryVo vo) {
+        token = token.replace("Bearer ", "");
+        String userNo = jwtUtil.getNo(token);
+
+        // 운동 중복 여부 체크
+        int existingRecords = mapper.countOverlappingRecords(userNo, vo);
+        if (existingRecords > 0) {
+            return "해당 시간에 이미 운동 내역이 존재합니다.";
+        } else{
+            //중복이 없을 경우 기록 저장
+            mapper.updateAerobic(userNo, vo);
+            return "운동 내역이 수정되었습니다.";
+        }
+    }
+
+    //운동 내역 삭제
+    public String deleteAerobic(String token, AerobicHistoryVo vo) {
+        token = token.replace("Bearer ", "");
+        String userNo = jwtUtil.getNo(token);
+
+        if(mapper.deleteAerobic(userNo, vo)){
+            return "운동 내역이 삭제되었습니다.";
+        } else {
+            return "삭제 실패...";
+        }
+
+    }
+
+
+
 }

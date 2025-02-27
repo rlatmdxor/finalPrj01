@@ -1,5 +1,6 @@
 package com.kh.healthcare.exercise.anAerobic;
 
+import com.kh.healthcare.exercise.aerobic.AerobicHistoryVo;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -81,4 +82,36 @@ public interface AnAerobicMapper {
             )
             """)
     void record(String userNo, String exNo, AnAerobicHistoryVo vo);
+
+    //수정하려는 내역의 날짜 가져오기
+    @Select("""
+            SELECT TO_CHAR(EX_DATE, 'YYYY-MM-DD') AS EX_DATE
+            FROM ANAEROBIC_HISTORY
+            WHERE
+                USER_NO = #{userNo}
+                AND NO = #{vo.no}
+            """)
+    String getDate(String userNo, AnAerobicHistoryVo vo);
+
+    //운동 내역 업데이트
+    @Update("""
+            UPDATE ANAEROBIC_HISTORY
+            SET
+                EX_DATE = TO_DATE(#{vo.exDate}, 'YYYY-MM-DD'),
+                WEIGHT = #{vo.weight},
+                REPS = #{vo.reps}
+            WHERE
+                USER_NO = #{userNo}
+                AND NO = #{vo.no}
+            """)
+    void updateAnAerobic(String userNo, AnAerobicHistoryVo vo);
+
+    //운동 내역 삭제
+    @Delete("""
+            DELETE FROM ANAEROBIC_HISTORY
+            WHERE USER_NO = #{userNo}
+            AND NO = #{vo.no}
+            """)
+    boolean deleteAnAerobic(String userNo, AnAerobicHistoryVo vo);
+
 }
