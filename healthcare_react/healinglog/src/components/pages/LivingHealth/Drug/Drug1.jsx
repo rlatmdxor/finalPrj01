@@ -1,14 +1,10 @@
 import React, { useEffect, useState } from 'react';
-
 import Title from '../../../util/Title';
-
 import styled from 'styled-components';
-
 import Navi from '../../../util/Navi';
-import MedisonTable from '../../../util/MedisonTable';
 import ContentLayout from '../../../util/ContentLayout';
+import MedisonTable from '../../../util/MedisonTable';
 import Btn from '../../../util/Btn';
-import { data } from 'react-router-dom';
 
 const TextDiv = styled.div`
   display: flex;

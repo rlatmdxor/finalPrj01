@@ -78,6 +78,7 @@ const DrugSearch = ({ title, MediSonData, onSelect }) => {
                     value={medicine.no}
                     title="no"
                     type="radio"
+                    name="drugSelect"
                     onClick={(e) => {
                       onSelect(() => {
                         return {

@@ -12,6 +12,7 @@ import Pharmacy from './components/pages/Healthcarefacility/Pharmacy/Pharmacy';
 import PulbicHealthCenter from './components/pages/Healthcarefacility/PublicHealthCenter/PulbicHealthCenter';
 import Alc from './components/pages/LivingHealth/Alc/Alc';
 import Cigarette from './components/pages/LivingHealth/Cigarette/Cigarette';
+
 import Diet from './components/pages/LivingHealth/Diet/Diet';
 import Drug from './components/pages/LivingHealth/Drug/Drug';
 import Drug1 from './components/pages/LivingHealth/Drug/Drug1';
@@ -39,6 +40,9 @@ import Report from './components/pages/DashBoard/Report';
 import ReportedHoneyBoard from './components/admin/honeyBoard/ReportedHoneyBoard';
 import ReportedHoneyComment from './components/admin/honeyBoard/ReportedHoneyComment';
 import AdminBoard from './components/admin/honeyBoard/AdminBoard';
+import Challengers from './components/pages/Board/Challengers';
+import ChallengersBoard from './components/pages/Board/ChallengersBoard';
+import ChallengersList from './components/pages/Board/ChallengersList';
 
 export const routes = [
   { path: '/', component: <Main /> },
@@ -82,4 +86,7 @@ export const routes = [
   { path: '/reported/honeytip', component: <ReportedHoneyBoard /> },
   { path: '/reported/honeytip/comment', component: <ReportedHoneyComment /> },
   { path: '/admin/board', component: <AdminBoard /> },
+  { path: '/challengers', component: <Challengers /> },
+  { path: '/challengersBoard', component: <ChallengersBoard /> },
+  { path: '/challengersList', component: <ChallengersList /> },
 ];

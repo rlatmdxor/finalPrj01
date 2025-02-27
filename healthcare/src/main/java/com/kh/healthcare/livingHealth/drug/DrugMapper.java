@@ -9,7 +9,8 @@ public interface DrugMapper {
 
 
     @Select("""
-            SELECT *
+            SELECT
+            *
             FROM USER_MEDICATION U
             JOIN MEDICATION M ON (U.MEDICATION = M.NO)
             WHERE U.MEMBER = 1
