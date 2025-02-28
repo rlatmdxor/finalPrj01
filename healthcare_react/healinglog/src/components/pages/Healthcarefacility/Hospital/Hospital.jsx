@@ -171,6 +171,12 @@ const Hospital = () => {
     }
   }, [selectedCity, selectedDistrict, selectedDong, hospitalType]);
 
+  // useEffect(() => {
+  //   if (hospitalType) {
+  //     handleSearch();
+  //   }
+  // }, [handleSearch]);
+
   return (
     <>
       <Title>의료기관 찾기</Title>
@@ -222,6 +228,7 @@ const Hospital = () => {
             <option value="">과 선택</option>
             <option value="내과">내과</option>
             <option value="이비인후과">이비인후과</option>
+            <option value="치과">치과</option>
             <option value="외과">외과</option>
             <option value="정형외과">정형외과</option>
             <option value="신경외과">신경외과</option>

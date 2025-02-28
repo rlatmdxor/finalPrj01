@@ -16,27 +16,37 @@ public class CigaretteReportController {
 
     @PostMapping("list")
     public List<CigaretteReportVo> CigaretteReportVoList(@RequestBody CigaretteReportVo vo){
-        System.out.println("vo = " + vo);
         return service.list(vo.getMemberNo());
 
     }
 
     @PostMapping("write")
     public String write(@RequestBody CigaretteReportVo vo) {
+        try {
         service.write(vo);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         return "write";
     }
 
     @PostMapping("update")
     public String update(@RequestBody CigaretteReportVo vo){
+        try {
         service.update(vo);
-        System.out.println("vo = " + vo);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         return "update";
     }
 
     @DeleteMapping("delete")
     public String delete(@RequestBody CigaretteReportVo vo){
+        try {
         service.delete(vo);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         return "delete";
     }
 

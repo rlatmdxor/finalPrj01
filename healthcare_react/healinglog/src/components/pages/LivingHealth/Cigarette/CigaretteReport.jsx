@@ -41,7 +41,7 @@ const CigaretteReport = () => {
   const [fullData, setFullData] = useState([]); // 전체 데이터 저장
   const [pagedData, setPagedData] = useState([]); // 페이징된 데이터
   const [filteredData, setFilteredData] = useState([]); // 차트용 필터링 데이터
-  const [selectedRange, setSelectedRange] = useState('주'); // 기본값 '일'
+  const [selectedRange, setSelectedRange] = useState('주'); // 기본값 '주'
   const [selectChart, setSelectChart] = useState('Line'); // 그래프 모양 정하는 state
   const dispatch = useDispatch();
 
@@ -177,19 +177,11 @@ const CigaretteReport = () => {
     cigaretteList.push(vo.endDate);
   }
 
-  // ✅ 선택된 데이터 저장 초기값 빈객체로
-  const [selectedData, setSelectedData] = useState({});
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false); // 수정 모달 상태
-
   const dataset = [
     {
       // 차트에서 그래프가 나타내는 이름 표시 ex)수축기 혈압 , 이완기 혈압
       // Bar , Pie , Doughnut에서는 마우스를 해당 부분에 호버하면 이 label의 이름이 표시된다.
-      // label: 'end_date',
 
-      // data: systoleList, // 위에서 뽑아온 데이터 노션내역
-
-      // data: [data.Cigarette_Duration], // 데이터 값 위의 labels와 같은 갯수 넣어야됨
       label: '일당 소모갑 수',
       data: datasetData,
       backgroundColor: [
@@ -257,7 +249,14 @@ const CigaretteReport = () => {
       body: JSON.stringify(inputData),
     })
       .then((resp) => resp.text())
-      .then((data) => {});
+      .then((data) => {
+        alert('등록 완료');
+        window.location.reload();
+      })
+      .catch((error) => {
+        alert('등록 실패');
+        console.error('등록 실패:', error);
+      });
     //렌
     setNum(num - 1);
     // 입력 후 모달 창 닫기
@@ -281,17 +280,15 @@ const CigaretteReport = () => {
         return resp.text(); // 또는 .json() (응답 형식에 따라)
       })
       .then((data) => {
-        console.log('수정 완료:', data);
+        alert('수정 완료');
+        window.location.reload();
       })
       .catch((error) => {
+        alert('수정 실패');
         console.error('수정 실패:', error);
       });
 
     dispatch(close('흡연 수정'));
-    //렌
-    // setNum(num - 1);
-    // 입력 후 모달 창 닫기
-    // dispatch(close(e.target.title));
   };
 
   const handleDeleteSubmit = (e) => {
@@ -310,9 +307,12 @@ const CigaretteReport = () => {
         return resp.text(); // 또는 .json() (응답 형식에 따라)
       })
       .then((data) => {
+        alert('삭제 완료');
         console.log('삭제 완료:', data);
+        window.location.reload();
       })
       .catch((error) => {
+        alert('삭제 수정');
         console.error('삭제 실패:', error);
       });
     //창닫기

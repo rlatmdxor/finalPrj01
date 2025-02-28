@@ -153,7 +153,13 @@ const Cigarette = () => {
       body: JSON.stringify(inputData),
     })
       .then((resp) => resp.text())
-      .then((data) => {});
+      .then((data) => {
+        alert('등록 완료');
+        window.location.reload();
+      })
+      .catch((error) => {
+        alert('등록 실패');
+      });
     //렌
     setNum(num - 1);
     // 입력 후 모달 창 닫기
@@ -177,10 +183,11 @@ const Cigarette = () => {
         return resp.text(); // 또는 .json() (응답 형식에 따라)
       })
       .then((data) => {
-        console.log('수정 완료:', data);
+        alert('수정 완료');
+        window.location.reload();
       })
       .catch((error) => {
-        console.error('수정 실패:', error);
+        alert('수정 실패');
       });
 
     dispatch(close('흡연 수정'));
@@ -202,10 +209,11 @@ const Cigarette = () => {
         return resp.text(); // 또는 .json() (응답 형식에 따라)
       })
       .then((data) => {
-        console.log('삭제 완료:', data);
+        alert('삭제 완료');
+        window.location.reload();
       })
       .catch((error) => {
-        console.error('삭제 실패:', error);
+        alert('삭제 실패');
       });
     //창닫기
     dispatch(close('흡연 수정'));
@@ -217,10 +225,11 @@ const Cigarette = () => {
     return Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1; // 시작일부터 포함하여 계산
   };
 
-  const CigaretteCalender = () => {
-    const events = {
-      '2025-1-8': ['에쎄 프라임', '2025-1-6', '5'],
-    };
+  const events = {
+    // [endDate]: [cigarette, tar, getDaysConsumed > 0 ? (1 / getDaysConsumed).toFixed(2) : '-'],
+    '2025-2-8': ['1980 Kcal', '5L 물 섭취'],
+    '2025-2-9': ['1451 Kcal', '1시간 운동'],
+    '2025-2-14': ['1000 ml', '6시간 수면'],
   };
 
   return (
@@ -357,10 +366,10 @@ const Cigarette = () => {
 
         <CalContainer>
           <Calendar
-            modalTitle="흡연 수정" // 모달 제목과 맞춰야됨
+            modalTitle="흡연 모달" // 모달 제목과 맞춰야됨
             vo={[]} /* 이벤트 정보 배열 나중을 위해서는 필요하다는데 
         현재 우리는 안쓸 가능성이 높음 복잡하고 다양한 데이터를 넘길때 사용함 */
-            // events={events} // 캘린더에 표시할 데이터 위에 예시대로 데이터 가공해서 사용
+            events={events} // 캘린더에 표시할 데이터 위에 예시대로 데이터 가공해서 사용
             width={800} // 캘린더 넓이
             height={100} // 캘린더 한칸 높이
           />

@@ -15,8 +15,6 @@ public class CigaretteReportService {
 
 
     public List<CigaretteReportVo> list(Long memberNo) {
-        System.out.println("memberNo = " + memberNo);
-
         return mapper.getCigaretteReport(memberNo);
     }
 

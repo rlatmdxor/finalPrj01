@@ -14,8 +14,6 @@ public class CigaretteCalenderService {
     private final CigaretteCalenderMapper mapper;
 
     public List<CigaretteCalenderVo> list(Long memberNo) {
-        System.out.println("memberNo = " + memberNo);
-
         return mapper.getCigaretteCalender(memberNo);
     }
 
