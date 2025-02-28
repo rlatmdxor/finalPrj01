@@ -35,7 +35,7 @@ const LoginPage = () => {
           alert('로그인에 실패했습니다.');
           return;
         }
-        console.log('token ::: ', token);
+        // console.log('token ::: ', token);
         localStorage.setItem('token', token);
 
         const no = getPayload(token, 'no');

@@ -35,7 +35,7 @@ const Mypage = () => {
 
   if (!token) {
     alert('로그인 정보가 없습니다.');
-    window.location.href = '/';
+    window.location.href = '/login';
   }
 
   ///////////////// 주소 관련 데이터////////////////
