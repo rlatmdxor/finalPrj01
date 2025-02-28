@@ -170,7 +170,6 @@ const TodayDietMeal = ({ reRender, setReRender }) => {
 
   const handleOpenFoodEnrollModal = () => {
     setFoodInputData(initialFoodInputData);
-
     dispatch(open({ title: '음식 직접추가', value: 'block' }));
   };
 

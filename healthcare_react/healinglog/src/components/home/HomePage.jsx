@@ -19,10 +19,12 @@ const Layout = styled.div`
 const MainContainer = styled.div`
   display: grid;
   min-height: 835px;
-  grid-template-rows: 100px auto 1fr 230px;
+  grid-template-rows: 100px auto 1fr auto;
 `;
 
 const HomePage = () => {
+  document.body.style.overflow = 'hidden';
+
   return (
     <Layout>
       <BrowserRouter>

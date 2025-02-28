@@ -43,6 +43,7 @@ import AdminBoard from './components/admin/honeyBoard/AdminBoard';
 import Challengers from './components/pages/Board/Challengers';
 import ChallengersBoard from './components/pages/Board/ChallengersBoard';
 import ChallengersList from './components/pages/Board/ChallengersList';
+import AdminBanner from './components/admin/banner/AdminBanner';
 import BoardDetail from './components/pages/Board/BoardDetail';
 import BoardEdit from './components/pages/Board/BoardEdit';
 
@@ -91,6 +92,7 @@ export const routes = [
   { path: '/challengers', component: <Challengers /> },
   { path: '/challengersBoard', component: <ChallengersBoard /> },
   { path: '/challengersList', component: <ChallengersList /> },
+  { path: '/admin/banner', component: <AdminBanner /> },
   { path: '/board/detail', component: <BoardDetail /> },
   { path: '/board/edit', component: <BoardEdit /> },
 ];
