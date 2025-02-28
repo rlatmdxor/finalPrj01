@@ -7,10 +7,10 @@ import { resetPaging, setTotalCount } from '../../../redux/pagingSlice';
 import Pagination from '../../util/Pagination';
 import Btn from '../../util/Btn';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
 import Modal from '../../util/Modal';
 import Input from '../../util/Input';
 import { open, close } from '../../../redux/modalSlice';
+import { getBannerList, enrollBanner, editBanner, deleteBanner } from '../../services/bannerService';
 
 const ButtonAreaDiv = styled.div`
   display: flex;
@@ -99,6 +99,7 @@ const AdminBanner = () => {
 
   const [bannerList, setBannerList] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isAllSelected, setIsAllSelected] = useState(false);
 
   const currentPage = useSelector((state) => state.paging[boardType]?.currentPage || 1);
   const boardLimit = useSelector((state) => state.paging[boardType]?.boardLimit || 12);
@@ -117,49 +118,24 @@ const AdminBanner = () => {
   const enrollImgRef = useRef(null);
   const editImgRef = useRef(null);
 
-  const fetchBannerList = () => {
-    fetch('http://127.0.0.1:80/api/banner', {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((resp) => resp.json())
-      .then((data) => {
-        if (data.length > 0) {
-          dispatch(setTotalCount({ boardType, totalCount: data.length }));
-          const pagedData = data.slice(offset, offset + boardLimit);
-          setBannerList(pagedData);
-        } else {
-          dispatch(resetPaging({ boardType }));
-          setBannerList([]);
-        }
-      });
+  const getFetch = async () => {
+    try {
+      const data = await getBannerList(token);
+      if (data.length > 0) {
+        dispatch(setTotalCount({ boardType, totalCount: data.length }));
+        const pagedData = data.slice(offset, offset + boardLimit);
+        setBannerList(pagedData);
+      } else {
+        dispatch(resetPaging({ boardType }));
+        setBannerList([]);
+      }
+    } catch (error) {
+      console.error('[ERROR] GET DASHBOARD DATA FAIL', error);
+    }
   };
 
   useEffect(() => {
-    dispatch(resetPaging({ boardType }));
-    fetchBannerList();
-  }, []);
-
-  useEffect(() => {
-    fetch('http://127.0.0.1:80/api/banner', {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((resp) => resp.json())
-      .then((data) => {
-        if (data.length > 0) {
-          dispatch(setTotalCount({ boardType, totalCount: data.length }));
-          const pagedData = data.slice(offset, offset + boardLimit);
-          setBannerList(pagedData);
-        } else {
-          dispatch(resetPaging({ boardType }));
-          setBannerList([]);
-        }
-      });
+    getFetch();
   }, [currentPage, boardLimit]);
 
   const handleOpenModal = () => {
@@ -172,7 +148,6 @@ const AdminBanner = () => {
 
   const handleOpenDetailModal = (no) => {
     const vo = bannerList.find((vo) => vo.no === no);
-    //setSelectedBanner(vo);
     setInputData((prev) => ({
       ...prev,
       no: vo.no,
@@ -253,30 +228,32 @@ const AdminBanner = () => {
         formData.append('showYn', inputData.showYn);
         formData.append('f', inputData.imageUrl);
 
-        fetch('http://127.0.0.1:80/api/banner/enroll', {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: formData,
-        }).then((resp) => {
-          if (resp.status == 200) {
-            Swal.fire({
-              title: '등록되었습니다.',
-              confirmButtonText: '확인',
-            });
-          } else {
-            Swal.fire({
-              title: '오류발생...',
-              confirmButtonText: '확인',
-            });
+        const enrollBannerFetch = async () => {
+          try {
+            const result = await enrollBanner(formData, token);
+            if (result == 200) {
+              Swal.fire({
+                title: '등록되었습니다.',
+                confirmButtonText: '확인',
+              });
+            } else {
+              Swal.fire({
+                title: '오류발생...',
+                confirmButtonText: '확인',
+              });
+            }
+          } catch (error) {
+            console.error('[ERROR] ENROLL BANNER FAIL', error);
           }
           dispatch(close('배너 등록'));
-          fetchBannerList();
-        });
+          getFetch();
+        };
+        enrollBannerFetch();
       }
     });
   };
+
+  const handleAllCheckBoxClick = () => {};
 
   const handleEdit = () => {
     if (!inputData.title || inputData.title.length === 0) {
@@ -308,27 +285,27 @@ const AdminBanner = () => {
         formData.append('showYn', inputData.showYn);
         formData.append('f', inputData.imageUrl);
 
-        fetch('http://127.0.0.1:80/api/banner/edit', {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: formData,
-        }).then((resp) => {
-          if (resp.status == 200) {
-            Swal.fire({
-              title: '저장되었습니다.',
-              confirmButtonText: '확인',
-            });
-          } else {
-            Swal.fire({
-              title: '오류발생...',
-              confirmButtonText: '확인',
-            });
+        const editBannerFetch = async () => {
+          try {
+            const result = await editBanner(formData, token);
+            if (result == 200) {
+              Swal.fire({
+                title: '수정되었습니다.',
+                confirmButtonText: '확인',
+              });
+            } else {
+              Swal.fire({
+                title: '오류발생...',
+                confirmButtonText: '확인',
+              });
+            }
+          } catch (error) {
+            console.error('[ERROR] EDIT BANNER FAIL', error);
           }
           dispatch(close('배너 수정'));
-          fetchBannerList();
-        });
+          getFetch();
+        };
+        editBannerFetch();
       }
     });
   };
@@ -342,26 +319,27 @@ const AdminBanner = () => {
       cancelButtonText: '취소',
     }).then((result) => {
       if (result.isConfirmed) {
-        fetch(`http://127.0.0.1:80/api/banner/delete?no=${inputData.no}`, {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }).then((resp) => {
-          if (resp.status == 200) {
-            Swal.fire({
-              title: '삭제되었습니다.',
-              confirmButtonText: '확인',
-            });
-          } else {
-            Swal.fire({
-              title: '오류발생...',
-              confirmButtonText: '확인',
-            });
+        const deleteBannerFetch = async () => {
+          try {
+            const result = await deleteBanner(inputData.no, token);
+            if (result == 200) {
+              Swal.fire({
+                title: '삭제되었습니다.',
+                confirmButtonText: '확인',
+              });
+            } else {
+              Swal.fire({
+                title: '오류발생...',
+                confirmButtonText: '확인',
+              });
+            }
+          } catch (error) {
+            console.error('[ERROR] EDIT BANNER FAIL', error);
           }
           dispatch(close('배너 수정'));
-          fetchBannerList();
-        });
+          getFetch();
+        };
+        deleteBannerFetch();
       }
     });
   };
@@ -380,7 +358,7 @@ const AdminBanner = () => {
                 <th>작성자</th>
                 <th>등록일자</th>
                 <th>
-                  <input type="checkbox" />
+                  <input type="checkbox" onClick={handleAllCheckBoxClick} />
                 </th>
               </tr>
             </thead>
