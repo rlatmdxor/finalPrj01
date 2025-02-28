@@ -2,48 +2,120 @@ import React from 'react';
 import styled from 'styled-components';
 import Input from '../util/Input';
 import Btn from '../util/Btn';
+import ContentLayout from '../util/ContentLayout';
+import { getPayload } from '../util/JwtUtil';
+import { useFormData } from '../util/useFormData';
 
-const StyledMain = styled.div`
-  width: 100%;
-  height: 100%;
-  display: grid;
-  grid-template: 1fr / 1fr 500px 1fr;
-`;
+import { useDispatch } from 'react-redux';
+import Title from '../util/Title';
+import { login } from '../../../src/redux/AdminSlice';
+import { useNavigate } from 'react-router-dom';
+import { setNick } from '../../redux/JoinSlice';
+
 const StyledMiddle = styled.div`
   display: grid;
-  grid-template: 1fr 1fr / 1fr;
+  grid-template: 1fr 1fr / 0.5fr;
 `;
+
 const ImgLayout = styled.img`
-  width: 100%;
+  margin-left: 250px;
+  width: 60%;
   height: 100%;
 `;
-const StyledDiv = styled.div`
-  width: 100%;
-  height: 20px;
-  font-size: 16px;
-  font-weight: bold;
+
+const InputTag = styled.input`
+  width: 580px;
+  height: 60px;
+  margin-bottom: 20px;
+  border-radius: 15px;
+  border: 1px solid gray;
+  padding: 10px;
 `;
 
 const AdminLogin = () => {
+  const navi = useNavigate();
+  const dispatch = useDispatch();
+
+  const initState = {
+    id: '',
+    pwd: '',
+  };
+
+  const submitCallBack = (formData) => {
+    const url = 'http://127.0.0.1:80/api/admin/login';
+    const option = {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify(formData),
+    };
+
+    fetch(url, option)
+      .then((resp) => resp.text())
+      .then((token) => {
+        if (!token) {
+          alert('로그인에 실패했습니다.11111');
+          return;
+        }
+        console.log('token :::', token);
+        localStorage.setItem('token', token);
+
+        const no = getPayload(token, 'no');
+        const id = getPayload(token, 'id');
+        const nick = getPayload(token, 'nick');
+        dispatch(setNick(nick));
+        dispatch(login({ no, id, nick }));
+        alert(`환영합니다 ${nick}님`);
+        navi('../../admin/usermanage');
+      })
+      .catch((error) => console.error(`fetch 에러 발생:`, error));
+  };
+
+  const { formData, handleInputChange, handleSubmit } = useFormData(initState, submitCallBack);
+
   return (
     <>
-      <StyledMain>
-        <div></div>
+      <Title>어드민 로그인</Title>
+      <div></div>
+      <ContentLayout>
         <StyledMiddle>
-          <div>
-            <ImgLayout src="/img/logo.png"></ImgLayout>
-          </div>
-          <div>
-            <StyledDiv>관리자</StyledDiv>
-            <Input type="text" size="size1" mt="50" placeholder="아이디" title="관리자 ㅋㅋㅋ"></Input>
-            <Input type="password" size="size1" mt="25" placeholder="비밀번호"></Input>
-            <Btn></Btn>
-          </div>
+          <ImgLayout src="/img/logo.png"></ImgLayout>
+          <form onSubmit={handleSubmit}>
+            <InputTag
+              onChange={handleInputChange}
+              name="id"
+              type="text"
+              size="size1"
+              ml="220"
+              placeholder="아이디"
+            ></InputTag>
+            <InputTag
+              onChange={handleInputChange}
+              name="pwd"
+              type="password"
+              size="size1"
+              ml="220"
+              mt="25"
+              placeholder="비밀번호"
+            ></InputTag>
+            <Btn
+              w={'500'}
+              h={'55'}
+              mt={'30'}
+              mr={'0'}
+              ml={'220'}
+              mb={'0'}
+              fs={'30'}
+              str={'로그인'}
+              c={'#FF7F50'}
+              fc={'white'}
+              type="submit"
+            />
+          </form>
         </StyledMiddle>
-        <div></div>
-      </StyledMain>
+      </ContentLayout>
     </>
   );
 };
-
 export default AdminLogin;
