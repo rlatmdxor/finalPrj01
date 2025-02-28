@@ -18,6 +18,7 @@ public class DrugController {
     @GetMapping("list")
     public List<DrugVo>  list(){
         List<DrugVo> voList = service.list();
+        System.out.println("voList = " + voList);
         return  voList;
     }
 
@@ -36,6 +37,7 @@ public class DrugController {
 
     @PostMapping("write")
     public int write(@RequestBody DrugVo vo){
+        System.out.println("vo = " + vo);
        int result =  service.write(vo);
         return result;
     }
@@ -54,7 +56,6 @@ public class DrugController {
 
     @PostMapping("del")
     public void del(@RequestBody List<String> vo ){
-
         service.del(vo);
     }
     @PostMapping("removeDrug")
