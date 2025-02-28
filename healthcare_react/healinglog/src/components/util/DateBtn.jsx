@@ -4,6 +4,7 @@ import styled from 'styled-components';
 const StyleBtn = styled.button`
   width: 30px;
   height: 30px;
+  font-family: 'goorm-sans-bold';
   font-size: 15px;
   border-radius: 6px;
   background-color: ${(props) => (props.isActive ? '#7ca96d' : 'white')};

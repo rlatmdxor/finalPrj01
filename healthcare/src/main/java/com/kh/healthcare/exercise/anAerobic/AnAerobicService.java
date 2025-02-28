@@ -73,11 +73,55 @@ public class AnAerobicService {
         // 운동 중복 여부 체크
         int existingRecords = mapper.countOverlappingRecords(userNo, vo, exNo);
         if (existingRecords > 0) {
-            return "해당 일자에 이미 " + vo.getExName() + " 운동 내역이 존재합니다.";
+            return "해당 일자에 이미 운동 내역이 존재합니다.";
         } else{
             // 중복이 없을 경우 기록 저장
             mapper.record(userNo, exNo, vo);
             return "운동 내역이 등록되었습니다.";
         }
     }
+
+    //운동 내역 업데이트
+    public String updateAnAerobic(String token, AnAerobicHistoryVo vo) {
+        token = token.replace("Bearer ", "");
+        String userNo = jwtUtil.getNo(token);
+
+        //이름으로 운동번호 가져오기
+        String exName = vo.getExName();
+        AnAerobicVo anaerobicVo = findExNoByName(exName);
+        String exNo = anaerobicVo.getNo();
+
+        //수정하려는 내역의 날짜 가져오기
+        String historyDate = mapper.getDate(userNo, vo);
+
+        //날짜 동일하면 중복체크 안함
+        if(historyDate.equals(vo.getExDate())){
+            mapper.updateAnAerobic(userNo, vo);
+            return "운동 내역이 수정되었습니다..";
+        } else {
+            // 운동 중복 여부 체크
+            int existingRecords = mapper.countOverlappingRecords(userNo, vo, exNo);
+            if (existingRecords > 0) {
+                return "해당 일자에 이미 운동 내역이 존재합니다.";
+            } else{
+                // 중복이 없을 경우 기록 저장
+                mapper.updateAnAerobic(userNo, vo);
+                return "운동 내역이 수정되었습니다.";
+            }
+        }
+    }
+
+    //운동 내역 삭제
+    public String deleteAnAerobic(String token, AnAerobicHistoryVo vo) {
+        token = token.replace("Bearer ", "");
+        String userNo = jwtUtil.getNo(token);
+
+        if(mapper.deleteAnAerobic(userNo, vo)){
+            return "운동 내역이 삭제되었습니다.";
+        } else {
+            return "삭제 실패...";
+        }
+    }
+
+
 }

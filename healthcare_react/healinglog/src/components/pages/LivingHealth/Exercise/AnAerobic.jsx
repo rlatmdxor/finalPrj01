@@ -155,9 +155,9 @@ const AnAerobic = () => {
   const coreExercises = anaerobic.filter((ex) => ex.exPart === '코어');
   const etcExercises = anaerobic.filter((ex) => ex.exPart === '기타');
 
-  useEffect(() => {
-    dispatch(close('운동시작'));
-  }, []);
+  // useEffect(() => {
+  //   dispatch(close('운동시작'));
+  // }, []);
 
   return (
     <>

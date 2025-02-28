@@ -2,7 +2,7 @@ package com.kh.healthcare.member;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.kh.healthcare.Aws.FileUtil;
+//import com.kh.healthcare.Aws.FileUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
