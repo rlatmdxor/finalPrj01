@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kh.healthcare.banner.BannerMapper">
+
+    <select id="getBannerList">
+        SELECT
+            B.NO
+            , B.WRITER
+            , A.NICK
+            , B.TITLE
+            , B.IMAGE_URL
+            , B.SHOW_YN
+            , B.ENROLL_DATE
+            , B.MODIFY_DATE
+            , B.DEL_YN
+        FROM BANNER B
+        JOIN ADMIN A ON (B.WRITER = A.NO)
+        WHERE B.DEL_YN = 'N'
+
+        <if test="showYn != null and showYn != '' and showYn != '노출여부 전체'">
+            AND B.SHOW_YN = #{showYn}
+        </if>
+
+        <if test="searchValue != null and searchValue != ''">
+            AND B.TITLE LIKE '%${searchValue}%'
+        </if>
+
+        ORDER BY B.NO DESC
+    </select>
+
+    <update id="multiDeleteBanner">
+        UPDATE BANNER
+        SET DEL_YN = 'Y'
+        , MODIFY_DATE = SYSDATE
+        WHERE NO IN
+        <foreach item='no' collection='no' open='(' separator=',' close=')'>
+            #{no}
+        </foreach>
+    </update>
+
+
+</mapper>

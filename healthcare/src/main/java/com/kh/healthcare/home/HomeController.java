@@ -1,5 +1,6 @@
 package com.kh.healthcare.home;
 
+import com.kh.healthcare.banner.BannerVo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -14,6 +15,18 @@ import java.util.List;
 public class HomeController {
 
     private final HomeService service;
+
+    @GetMapping("banner")
+    public List<BannerVo> getBannerList(@RequestHeader("Authorization") String authorization){
+        try {
+            List<BannerVo> voList = service.getBannerList();
+            return voList;
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            throw new IllegalStateException("[ERROR] MAIN - BANNER LIST FAIL..");
+        }
+    }
 
     @GetMapping("board")
     public List<BoardVo> getHoneyTipBoardList(@RequestHeader("Authorization") String authorization){

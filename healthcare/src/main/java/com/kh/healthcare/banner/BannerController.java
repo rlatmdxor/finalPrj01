@@ -41,9 +41,11 @@ public class BannerController {
     }
 
     @GetMapping
-    public List<BannerVo> getBannerList(){
+    public List<BannerVo> getBannerList(@RequestParam String showYn, @RequestParam String searchValue){
+        System.out.println("showYn = " + showYn);
+        System.out.println("searchValue = " + searchValue);
         try {
-            List<BannerVo> voList = service.getBannerList();
+            List<BannerVo> voList = service.getBannerList(showYn, searchValue);
             return voList;
         }
         catch (Exception e){
@@ -76,6 +78,18 @@ public class BannerController {
         catch (Exception e){
             e.printStackTrace();
             throw new IllegalStateException("[ERROR] BANNER DELETE FAIL..");
+        }
+    }
+
+    @PostMapping("delete")
+    public void multiDeleteBanner(@RequestBody List<String> no, @RequestHeader("Authorization") String authorization){
+        System.out.println("noList = " + no);
+        try {
+            service.multiDeleteBanner(no);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            throw new IllegalStateException("[ERROR] BANNER MULTI DELETE FAIL..");
         }
     }
 

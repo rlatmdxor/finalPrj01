@@ -1,5 +1,5 @@
-const getBannerList = async (token) => {
-  const resp = await fetch('http://127.0.0.1:80/api/banner', {
+const getBannerList = async (showYn, searchValue, token) => {
+  const resp = await fetch(`http://127.0.0.1:80/api/banner?showYn=${showYn}&searchValue=${searchValue}`, {
     method: 'GET',
     headers: {
       Authorization: `Bearer ${token}`,
@@ -56,4 +56,20 @@ const deleteBanner = async (no, token) => {
   return result;
 };
 
-export { getBannerList, enrollBanner, editBanner, deleteBanner };
+const multiDeleteBanner = async (noList, token) => {
+  const resp = await fetch(`http://127.0.0.1:80/api/banner/delete`, {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(noList),
+  });
+  if (!resp.ok) {
+    throw new Error(`HTTP ERROR !!! ${resp.status}`);
+  }
+  const result = resp.status;
+  return result;
+};
+
+export { getBannerList, enrollBanner, editBanner, deleteBanner, multiDeleteBanner };
