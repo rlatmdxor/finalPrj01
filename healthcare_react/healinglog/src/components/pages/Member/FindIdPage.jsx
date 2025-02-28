@@ -11,6 +11,7 @@ const FindIdPage = () => {
   const [showResult, setShowResult] = useState(false);
   const [message, setMessage] = useState('');
 
+  // 제출 함수
   const handleSubmit = async () => {
     const requestData = {
       name: userName,

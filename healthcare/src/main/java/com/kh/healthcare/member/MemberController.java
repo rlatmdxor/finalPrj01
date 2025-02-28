@@ -3,6 +3,7 @@ package com.kh.healthcare.member;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 //import com.kh.healthcare.Aws.FileUtil;
+import com.kh.healthcare.member.MailSender.MailSenderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,6 +12,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,6 +22,7 @@ import java.util.List;
 public class MemberController {
 
     private final MemberService service;
+    private final MailSenderService mailSenderService;
 
     //아이디 중복체크
     @PostMapping("checkId")
@@ -219,6 +223,31 @@ public class MemberController {
         String userName = vo.getName();
         String userPhone = vo.getPhone();
         return service.findId(userName, userPhone);
+    }
+    
+    // 비밀번호 초기화
+    @PostMapping("findPwd")
+    public Map<String, String> findPwd(@RequestBody MemberVo vo) {
+        String id = vo.getId();
+        String email = vo.getEmail();
+
+        // 사용자 존재 여부 확인
+        MemberVo memberVo = service.findByEmail(id, email);
+        if (memberVo == null) {
+            return Map.of("message", "등록되지 않은 이메일입니다.");
+        }
+
+        // 임시 비밀번호 생성 및 DB에 저장
+        String tempPassword = mailSenderService.generateTempPassword();
+        service.updatePassword(memberVo, tempPassword);
+
+        // 이메일로 임시 비밀번호 전송
+        // 응답속도가 너무 느려서 추가,,,
+        CompletableFuture.runAsync(() -> {
+            mailSenderService.sendTempPasswordEmail(email, tempPassword);
+        });
+
+        return Map.of("message", "임시 비밀번호가 이메일로 전송되었습니다.");
     }
 
 }
