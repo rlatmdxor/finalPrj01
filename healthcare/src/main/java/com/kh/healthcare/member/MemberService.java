@@ -188,4 +188,16 @@ public class MemberService {
         String id = jwtUtil.getId(token);
         mapper.withdrawal(id);
     }
+
+    // 아이디 찾기
+    public String findId(String userName, String userPhone) {
+        String findedId = mapper.findId(userName, userPhone);
+
+        if(findedId != null){
+            return "회원님의 아이디는 " + findedId + " 입니다.";
+        } else {
+            return "등록된 정보가 없습니다.";
+        }
+
+    }
 }

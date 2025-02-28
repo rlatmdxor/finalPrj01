@@ -212,4 +212,13 @@ public class MemberController {
         // Update DB
         service.withdrawal(token);
     }
+    
+    // 아이디 찾기
+    @PostMapping("findId")
+    public String findId(@RequestBody MemberVo vo){
+        String userName = vo.getName();
+        String userPhone = vo.getPhone();
+        return service.findId(userName, userPhone);
+    }
+
 }
