@@ -87,7 +87,6 @@ public class MemberController {
     @PostMapping("join")
     public int memberJoin(@ModelAttribute MemberVo vo , @RequestParam(value = "profileImage", required = false) MultipartFile profile) throws IOException {
 
-        System.out.println("profile = " + profile);
         // AWS S3에 프로필 업로드, URL 가져오기
         String profileUrl = service.uploadProfile(profile);
 
