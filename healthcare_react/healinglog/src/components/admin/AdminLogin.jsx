@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import Input from '../util/Input';
 import Btn from '../util/Btn';
 import ContentLayout from '../util/ContentLayout';
 import { getPayload } from '../util/JwtUtil';
@@ -24,9 +23,10 @@ const ImgLayout = styled.img`
 `;
 
 const InputTag = styled.input`
-  width: 580px;
-  height: 60px;
+  width: 400px;
+  height: 30px;
   margin-bottom: 20px;
+  margin-left: 220px;
   border-radius: 15px;
   border: 1px solid gray;
   padding: 10px;
@@ -55,10 +55,9 @@ const AdminLogin = () => {
       .then((resp) => resp.text())
       .then((token) => {
         if (!token) {
-          alert('로그인에 실패했습니다.11111');
+          alert('로그인에 실패했습니다.');
           return;
         }
-        console.log('token :::', token);
         localStorage.setItem('token', token);
 
         const no = getPayload(token, 'no');
@@ -82,27 +81,12 @@ const AdminLogin = () => {
         <StyledMiddle>
           <ImgLayout src="/img/logo.png"></ImgLayout>
           <form onSubmit={handleSubmit}>
-            <InputTag
-              onChange={handleInputChange}
-              name="id"
-              type="text"
-              size="size1"
-              ml="220"
-              placeholder="아이디"
-            ></InputTag>
-            <InputTag
-              onChange={handleInputChange}
-              name="pwd"
-              type="password"
-              size="size1"
-              ml="220"
-              mt="25"
-              placeholder="비밀번호"
-            ></InputTag>
+            <InputTag onChange={handleInputChange} name="id" type="text" placeholder="아이디"></InputTag>
+            <InputTag onChange={handleInputChange} name="pwd" type="password" placeholder="비밀번호"></InputTag>
             <Btn
-              w={'500'}
-              h={'55'}
-              mt={'30'}
+              w={'422'}
+              h={'60'}
+              mt={'0'}
               mr={'0'}
               ml={'220'}
               mb={'0'}
