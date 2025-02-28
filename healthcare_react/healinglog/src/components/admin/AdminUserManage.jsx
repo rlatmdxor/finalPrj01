@@ -145,14 +145,13 @@ const AdminUserManage = () => {
       if (!response.ok) {
         throw new Error(result || `삭제 실패: ${response.status}`);
       }
-
       alert(' 유저가 삭제되었습니다.');
       handleSearch(); // 삭제 후 다시 검색
     } catch (error) {
       if (error.message.includes('이미 삭제된 유저')) {
-        alert('⚠️ 이미 삭제된 유저입니다.');
+        alert('이미 삭제된 유저입니다.');
       } else {
-        alert('❌ 삭제 실패');
+        alert('삭제 실패');
       }
     }
   };
@@ -222,7 +221,6 @@ const AdminUserManage = () => {
                     c={'#FF7F50'}
                     fc={'white'}
                     f={() => {
-                      console.log('🟢 삭제 버튼 클릭됨! ID:', vo.id);
                       handleDeleteUser(vo.id);
                     }}
                   />
