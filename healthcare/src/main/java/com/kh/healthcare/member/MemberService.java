@@ -200,4 +200,17 @@ public class MemberService {
         }
 
     }
+
+    // 이메일(+아이디)로 사용자 존재여부 체크
+    public MemberVo findByEmail(String id, String email) {
+        return mapper.findByEmail(id, email);
+    }
+
+    // 임시 패스워드 업데이트
+    public void updatePassword(MemberVo memberVo, String tempPassword) {
+        String encodedPwd = encoder.encode(tempPassword);
+        mapper.updatePwd(encodedPwd, memberVo.getId());
+    }
+
+
 }

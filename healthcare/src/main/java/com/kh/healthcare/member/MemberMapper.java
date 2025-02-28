@@ -211,4 +211,13 @@ public interface MemberMapper {
                 AND PHONE = #{userPhone}
             """)
     String findId(String userName, String userPhone);
+
+    @Select("""
+            SELECT NO, ID
+            FROM MEMBER
+            WHERE
+                ID = #{id}
+                AND EMAIL = #{email}
+            """)
+    MemberVo findByEmail(String id, String email);
 }
