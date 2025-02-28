@@ -39,7 +39,7 @@ public interface DashboardMapper {
             ROUND(NVL((SELECT AVG(AMOUNT) FROM WATER_LOG WHERE MEMBER_NO = #{memberNo} AND ENROLL_DATE BETWEEN #{startDate} AND #{endDate}),0),1) AS AVG_WATER,                 
             NVL((SELECT SUM(EX_DURATION) FROM AEROBIC_HISTORY WHERE USER_NO = #{memberNo} AND EX_DATE BETWEEN #{startDate} AND #{endDate}),0) AS SUM_AEROBIC,         
             NVL((SELECT COUNT(DISTINCT EX_DATE) FROM ANAEROBIC_HISTORY WHERE USER_NO = #{memberNo} AND EX_DATE BETWEEN #{startDate} AND #{endDate}), 0) AS COUNT_ANAEROBIC,          
-            NVL((SELECT SUM((CAL_CONSUME/60)*EX_DURATION)
+            ROUND(NVL((SELECT SUM((CAL_CONSUME/60)*EX_DURATION)
             FROM AEROBIC_HISTORY H
             JOIN AEROBIC A ON (H.EX_NO = A.NO)
             WHERE USER_NO = #{memberNo}
@@ -49,7 +49,7 @@ public interface DashboardMapper {
             FROM ANAEROBIC_HISTORY H
             JOIN ANAEROBIC A ON (H.EX_NO = A.NO)
             WHERE USER_NO = #{memberNo} 
-            AND EX_DATE BETWEEN #{startDate} AND #{endDate}),0)
+            AND EX_DATE BETWEEN #{startDate} AND #{endDate}),0),1)
             AS SUM_CAL_CONSUME 
             FROM DUAL
             """)

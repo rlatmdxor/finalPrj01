@@ -29,25 +29,9 @@ public interface BannerMapper {
                 , #{showYn}
             )
             """)
-    void bannerEnroll(BannerVo vo);
+    void bannerEnroll(BannerVo vo); // TODO : 픽숨 링크 지우고 #{imageUrl} 로 변경하기
 
-    @Select("""
-            SELECT
-                B.NO
-                , B.WRITER
-                , A.NICK
-                , B.TITLE
-                , B.IMAGE_URL
-                , B.SHOW_YN
-                , B.ENROLL_DATE
-                , B.MODIFY_DATE
-                , B.DEL_YN
-            FROM BANNER B
-            JOIN ADMIN A ON (B.WRITER = A.NO)
-            WHERE B.DEL_YN = 'N'
-            ORDER BY B.NO DESC
-            """)
-    List<BannerVo> getBannerList();
+    List<BannerVo> getBannerList(String showYn, String searchValue);
 
     @Update("""
             UPDATE BANNER
@@ -58,7 +42,7 @@ public interface BannerMapper {
             WHERE NO = #{no}
             AND DEL_YN = 'N'
             """)
-    void bannerEdit(BannerVo vo);
+    void bannerEdit(BannerVo vo); // TODO : 픽숨 링크 지우고 #{imageUrl} 로 변경하기
 
     @Update("""
             UPDATE BANNER
@@ -67,4 +51,6 @@ public interface BannerMapper {
             WHERE NO = #{no}
             """)
     void deleteBanner(String no);
+
+    void multiDeleteBanner(List<String> no);
 }
