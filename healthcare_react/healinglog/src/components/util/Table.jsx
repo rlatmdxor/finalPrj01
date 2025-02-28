@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 const LayoutDiv = styled.div`
-  display: flex;
+  display: block;
   margin-bottom: 20px;
 `;
 

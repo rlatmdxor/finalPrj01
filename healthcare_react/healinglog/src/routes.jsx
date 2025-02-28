@@ -39,6 +39,7 @@ import Report from './components/pages/DashBoard/Report';
 import ReportedHoneyBoard from './components/admin/honeyBoard/ReportedHoneyBoard';
 import ReportedHoneyComment from './components/admin/honeyBoard/ReportedHoneyComment';
 import AdminBoard from './components/admin/honeyBoard/AdminBoard';
+import AdminBanner from './components/admin/banner/AdminBanner';
 import BoardDetail from './components/pages/Board/BoardDetail';
 import BoardEdit from './components/pages/Board/BoardEdit';
 
@@ -84,6 +85,7 @@ export const routes = [
   { path: '/reported/honeytip', component: <ReportedHoneyBoard /> },
   { path: '/reported/honeytip/comment', component: <ReportedHoneyComment /> },
   { path: '/admin/board', component: <AdminBoard /> },
+  { path: '/admin/banner', component: <AdminBanner /> },
   { path: '/board/detail', component: <BoardDetail /> },
   { path: '/board/edit', component: <BoardEdit /> },
 ];
