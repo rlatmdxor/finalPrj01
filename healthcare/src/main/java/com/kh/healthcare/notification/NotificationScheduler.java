@@ -1,6 +1,6 @@
 package com.kh.healthcare.notification;
 
-import com.kh.healthcare.Interceptor.StompChannelInterceptor;
+import com.kh.healthcare.interceptor.StompChannelInterceptor;
 import com.kh.healthcare.exercise.ExerciseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
