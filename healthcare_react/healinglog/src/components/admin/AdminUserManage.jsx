@@ -8,6 +8,8 @@ import styled from 'styled-components';
 import SearchBar from '../util/SearchBar';
 import Pagination from '../util/Pagination';
 import Btn from '../util/Btn';
+import { Navigate } from 'react-router-dom';
+import { getPayload } from '../util/JwtUtil';
 
 const NaviContainer = styled.div`
   display: grid;
@@ -53,11 +55,37 @@ const AdminUserManage = () => {
   const currentPage = useSelector((state) => state.paging[boardType]?.currentPage || 1);
   const boardLimit = useSelector((state) => state.paging[boardType]?.boardLimit || 12);
 
+  const token = localStorage.getItem('token');
+
+  if (!token) {
+    alert('로그인 정보가 없습니다.');
+    localStorage.clear();
+    window.location.href = 'login';
+  }
+
+  useEffect(() => {
+    if (!token) {
+      alert('로그인 정보가 없습니다.');
+      console.log('로그인 정보가 없습니다.');
+      localStorage.clear();
+      window.location.href = 'login';
+    }
+
+    // 🔹 토큰에서 role 값 가져오기
+    const role = getPayload(token, 'role');
+
+    if (role !== 'ROLE_ADMIN') {
+      alert('관리자 권한이 없습니다.');
+      console.log('관리자 권한이 없습니다.');
+      window.location.href = 'login';
+    }
+  }, [Navigate, token]);
+
   const url = 'http://127.0.0.1/api/admin/usermanage/search';
 
-  const options = {
+  const option = {
     method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
   };
 
   useEffect(() => {
@@ -106,7 +134,10 @@ const AdminUserManage = () => {
         finalKeyword
       )}&page=${currentPage}&size=${boardLimit}`;
 
-      const response = await fetch(requestUrl, { method: 'GET', headers: { 'Content-Type': 'application/json' } });
+      const response = await fetch(requestUrl, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      });
       if (!response.ok) {
         throw new Error(`API 요청 실패: ${response.status}`);
       }
@@ -136,6 +167,7 @@ const AdminUserManage = () => {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ id: id }),
       });

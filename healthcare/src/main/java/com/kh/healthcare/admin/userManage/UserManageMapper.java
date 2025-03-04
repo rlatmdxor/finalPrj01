@@ -46,7 +46,7 @@ public interface UserManageMapper {
             @Param("keyword") String keyword,
             @Param("searchType") String searchType,
             @Param("delYn") String delYn,
-            @Param("size") int size,
+            String yn, @Param("size") int size,
             @Param("offset") int offset
     );
 
