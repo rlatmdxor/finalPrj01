@@ -1,6 +1,6 @@
 package com.kh.healthcare.conf;
 
-import com.kh.healthcare.Interceptor.StompChannelInterceptor;
+import com.kh.healthcare.interceptor.StompChannelInterceptor;
 import com.kh.healthcare.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;

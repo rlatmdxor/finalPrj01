@@ -1,4 +1,4 @@
-package com.kh.healthcare.Interceptor;
+package com.kh.healthcare.interceptor;
 
 import com.kh.healthcare.jwt.JwtUtil;
 import lombok.Data;
