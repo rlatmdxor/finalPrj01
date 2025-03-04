@@ -158,4 +158,22 @@ public interface ExerciseMapper {
             """)
     List<Map<String, Object>> getAnAerobicHistory(String userNo);
 
+    @Select("""
+            SELECT COUNT(*)
+              FROM (
+                    SELECT AH.NO
+                      FROM AEROBIC_HISTORY AH
+                     WHERE AH.USER_NO = #{userNo}
+                       AND TRUNC(AH.EX_DATE) = TRUNC(SYSDATE)
+        
+                    UNION ALL
+        
+                    SELECT NAH.NO
+                      FROM ANAEROBIC_HISTORY NAH
+                     WHERE NAH.USER_NO = #{userNo}
+                       AND TRUNC(NAH.EX_DATE) = TRUNC(SYSDATE)
+              )
+            """)
+    int checkTodayExercise(String userNo);
+
 }

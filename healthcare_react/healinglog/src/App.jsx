@@ -3,6 +3,7 @@ import './App.css';
 import HomePage from './components/home/HomePage';
 import { ThemeProvider } from 'styled-components';
 import store from './redux/store';
+import NotificationProvider from './components/pages/Notification/NotificationProvider';
 
 function App() {
   const theme = {
@@ -12,9 +13,11 @@ function App() {
   };
   return (
     <Provider store={store}>
-      <ThemeProvider theme={theme}>
-        <HomePage></HomePage>
-      </ThemeProvider>
+      <NotificationProvider>
+        <ThemeProvider theme={theme}>
+          <HomePage></HomePage>
+        </ThemeProvider>
+      </NotificationProvider>
     </Provider>
   );
 }
