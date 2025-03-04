@@ -2,6 +2,7 @@ package com.kh.healthcare.admin.login;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -13,13 +14,12 @@ public class AdminLoginController {
     private final AdminLoginService service;
 
     @PostMapping("login")
-    public String login(@RequestBody AdminLoginVo vo){
+    public ResponseEntity<String> login(@RequestBody AdminLoginVo vo){
         try{
-            return service.login(vo);
+            String token = service.login(vo); // JWT 생성
+            return ResponseEntity.ok(token); // 토큰 반환
         } catch (Exception e) {
-            System.out.println("e = " + e);
-            System.out.println("vo = " + vo);
-            System.out.println("AdminLoginController.login");
+
             throw new IllegalStateException("[ADMIN-LOGIN] LOGIN FAIL ...");
         }
     }
