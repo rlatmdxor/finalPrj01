@@ -131,9 +131,8 @@ const AnAerobic = () => {
         body: JSON.stringify(requestData),
       });
 
-      const message = await response.text();
-
       if (response.ok) {
+        const message = await response.text();
         alert(message);
         reset();
         dispatch(close('운동 기록'));

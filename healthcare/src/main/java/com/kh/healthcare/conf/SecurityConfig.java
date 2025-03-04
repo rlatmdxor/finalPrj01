@@ -24,6 +24,7 @@ public class SecurityConfig {
 //                .requestMatchers("/api/admin/**").hasRole("ADMIN")
 //                .requestMatchers("/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
+
 //                .anyRequest().permitAll()
         );
 
@@ -36,6 +37,7 @@ public class SecurityConfig {
             conf.addAllowedMethod("DELETE");
             conf.addAllowedMethod("PUT");
             conf.addAllowedHeader("*");
+            conf.setAllowCredentials(true); // 웹소켓 때문에 해놈
             return conf;
         } ) );
 

@@ -1,5 +1,7 @@
 package com.kh.healthcare.exercise;
 
+import com.kh.healthcare.exercise.aerobic.AerobicMapper;
+import com.kh.healthcare.exercise.anAerobic.AnAerobicMapper;
 import com.kh.healthcare.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -123,4 +125,18 @@ public class ExerciseService {
 
         return events;
     }
+
+    //오늘 운동내역 체크하고 메시지 반환
+    public String checkTodayExercise(String userNo) {
+        int count = mapper.checkTodayExercise(userNo);
+        if (count == 0) {
+            // 두 테이블 모두 기록이 없으면
+            return "오늘 등록된 운동내역이 없습니다. 운동 내역을 등록해주세요!";
+        } else {
+            // 하나라도 기록이 있으면
+            return "운동 기록이 존재합니다.";
+        }
+
+    }
+
 }
