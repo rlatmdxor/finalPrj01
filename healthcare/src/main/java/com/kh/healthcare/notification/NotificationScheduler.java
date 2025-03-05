@@ -5,7 +5,6 @@ import com.kh.healthcare.board.honeyTip.HoneyTipService;
 import com.kh.healthcare.cardiovascularManagement.bloodPressure.BloodPressureService;
 import com.kh.healthcare.cardiovascularManagement.bloodSugar.BloodSugarService;
 import com.kh.healthcare.cardiovascularManagement.insulin.InsulinService;
-import com.kh.healthcare.diet.meal.DietMealService;
 import com.kh.healthcare.diet.water.WaterService;
 import com.kh.healthcare.interceptor.StompChannelInterceptor;
 import com.kh.healthcare.exercise.ExerciseService;
@@ -24,7 +23,6 @@ public class NotificationScheduler {
     private final InsulinService insulinService;
     private final BloodPressureService bloodPressureService;
     private final BloodSugarService bloodSugarService;
-    private final DietMealService dietService;
     private final WaterService waterService;
     private final SimpMessagingTemplate messagingTemplate;
 
