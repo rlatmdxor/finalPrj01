@@ -71,8 +71,13 @@ const AdminUserManage = () => {
       window.location.href = 'login';
     }
 
-    // 🔹 토큰에서 role 값 가져오기
+    // 토큰에서 role 값 가져오기
     const role = getPayload(token, 'role');
+
+    if (role == 'ROLE_USER') {
+      alert('관리자 권한이 필요!!');
+      window.location.href = 'login';
+    }
 
     if (role !== 'ROLE_ADMIN') {
       alert('관리자 권한이 없습니다.');
@@ -96,10 +101,6 @@ const AdminUserManage = () => {
     handleSearch(); // 초기 로딩 시 검색 실행
   }, []);
 
-  useEffect(() => {
-    handleSearch();
-  }, [currentPage]);
-
   // 📌 검색어 업데이트 핸들러
   const handleKeywordChange = (e) => {
     setKeyword(e.target.value);
@@ -110,12 +111,17 @@ const AdminUserManage = () => {
     setKeyword('');
   };
 
-  //시군구 고르면 자동으로 검색
   useEffect(() => {
-    if (delYn) {
-      handleSearch();
-    }
+    handleSearch();
   }, [delYn]);
+
+  // Enter 키 입력 시 검색 실행
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault(); // 기본 이벤트(폼 제출) 방지
+      handleSearch(); // 검색 실행
+    }
+  };
 
   //검색
   const handleSearch = async () => {
@@ -152,7 +158,7 @@ const AdminUserManage = () => {
         setUsers([]);
       }
     } catch (error) {
-      console.error('❌ 데이터 불러오기 실패:', error);
+      console.error(' 데이터 불러오기 실패:', error);
       setUsers([]);
     }
     setLoading(false);
@@ -214,6 +220,7 @@ const AdminUserManage = () => {
             handleClick={handleSearch} // 검색 버튼 클릭 시 handleSearch 실행
             handleChange={handleKeywordChange} // 검색어 입력 시 keyword 업데이트
             handleClearClick={handleClearKeyword} // 검색어 초기화 버튼
+            handleKeyPress={handleKeyPress}
             w={300}
             h={40}
           />
