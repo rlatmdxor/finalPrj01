@@ -28,14 +28,45 @@ const NaviContainer = styled.div`
   left: 40px;
   grid-template-columns: 3fr 3fr; // 글자수만큼 fr 주면 됩니다. ex) 유산소 3글자니까 3fr
 `;
+const YearDiv = styled.div`
+  display: flex;
+  height: 30px;
+  box-sizing: border-box;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid rgb(118, 118, 118);
+`;
+
+const YearBtn = styled.button`
+  background-color: transparent;
+  border: none;
+  padding: 0px 12px;
+  cursor: pointer;
+  font-size: 16px;
+`;
+
+const SearchArea = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 9px;
+  margin-top: 10px;
+`;
+
+const Input = styled.input`
+  box-sizing: border-box;
+  font-family: '맑은 고딕';
+  height: 30px;
+  padding: 0px 4px;
+`;
 
 const CigaretteReport = () => {
+  const dispatch = useDispatch();
   const [fullData, setFullData] = useState([]); // 전체 데이터 저장
   const [pagedData, setPagedData] = useState([]); // 페이징된 데이터
   const [filteredData, setFilteredData] = useState([]); // 차트용 필터링 데이터
   const [selectedRange, setSelectedRange] = useState('주'); // 기본값 '주'
   const [selectChart, setSelectChart] = useState('Line'); // 그래프 모양 정하는 state
-  const dispatch = useDispatch();
 
   const boardType = 'CigaretteReport';
   const { currentPage, boardLimit } = useSelector((state) => state.paging[boardType] || {});
@@ -95,7 +126,6 @@ const CigaretteReport = () => {
         if (!isAuthorized) {
           return;
         }
-
         if (data.length > 0) {
           dispatch(setTotalCount({ boardType, totalCount: data.length })); // 페이징 처리할때 totalCount 저장
           setFullData(data);
@@ -112,23 +142,11 @@ const CigaretteReport = () => {
     setPagedData(fullData.slice(offset, offset + boardLimit));
   }, [fullData, currentPage, boardLimit]);
 
-  // date버튼의 값에 따라서 그래프에 표시되는 데이터를 설정하는 부분
-  useEffect(() => {
-    if (selectedRange == '주') {
-      setFilteredData(filterData('week'));
-    } else if (selectedRange == '월') {
-      setFilteredData(filterData('month'));
-    } else if (selectedRange == '년') {
-      setFilteredData(filterData('year'));
-    } else {
-      setFilteredData(filterData('all'));
-    }
-  }, [selectedRange]);
-
   // 차트용 필터링 데이터의 마지막 기록 날짜를 기준으로 최근 7일간의 데이터와 해당 날짜가 포함된 달의 데이터를 가져옴
   const filterData = (type) => {
     // const today = new Date(); // 오늘 날짜 가져오기
 
+    //데이터의 최근날짜
     const voList = [];
 
     for (const vo of fullData) {
@@ -177,6 +195,91 @@ const CigaretteReport = () => {
     setFilteredData(filterData('week'));
   }, [fullData]);
 
+  //테스트
+  const currentYear = new Date().getFullYear();
+  const currentMonth = String(new Date().getMonth() + 1).padStart(2, '0');
+  const currentYearMonth = currentYear + '-' + currentMonth;
+  const [year, setYear] = useState(currentYear);
+  const [month, setMonth] = useState(currentYearMonth);
+
+  const handleIncrease = () => {
+    setYear((prev) => prev + 1);
+  };
+
+  const handleDecrease = () => {
+    setYear((prev) => prev - 1);
+  };
+
+  const handleDateChange = (e) => {
+    setMonth(e.target.value);
+  };
+
+  const getYearCigaretteList = async () => {
+    const token = localStorage.getItem('token');
+
+    try {
+      const response = await fetch('http://127.0.0.1/api/cigarette/report/list', {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('데이터 불러오기 실패:', error);
+      return [];
+    }
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const cigaretteList = await getYearCigaretteList(); // 전체 데이터 가져오기
+
+        let filteredData = [];
+
+        if (selectedRange === '주') {
+          // 최근 7일 데이터 필터링
+          const today = new Date();
+          const oneWeekAgo = new Date(today);
+          oneWeekAgo.setDate(today.getDate() - 7);
+
+          filteredData = cigaretteList.filter((item) => {
+            const itemDate = new Date(item.endDate);
+            return itemDate >= oneWeekAgo && itemDate <= today;
+          });
+        } else if (selectedRange === '월') {
+          // 월별 데이터 필터링
+          filteredData = cigaretteList.filter((item) => {
+            const itemDate = new Date(item.endDate);
+            const itemYear = itemDate.getFullYear();
+            const itemMonth = (itemDate.getMonth() + 1).toString().padStart(2, '0');
+            return itemYear === year && itemMonth === month.split('-')[1];
+          });
+        } else if (selectedRange === '년') {
+          // 연도별 데이터 필터링
+          filteredData = cigaretteList.filter((item) => {
+            const itemYear = new Date(item.endDate).getFullYear();
+            return itemYear === year;
+          });
+        }
+
+        setFilteredData(filteredData);
+      } catch (error) {
+        console.error('[ERROR] GET DATA', error);
+      }
+    };
+
+    fetchData();
+  }, [selectedRange, year, month]);
+  //테스트
+
   const dataBtn = ['주', '월', '년'];
 
   // 날짜 기준 오름차순 정렬 (과거 → 현재)
@@ -191,12 +294,12 @@ const CigaretteReport = () => {
     return Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1; // 시작일부터 포함하여 계산
   };
 
-  const datasetData = sortedData.map((vo) => {
+  const cigaretteList = sortedData.map((vo) => {
     const days = getDaysConsumed(vo.startDate, vo.endDate);
     return days > 0 ? parseFloat((1 / days).toFixed(2)) : 0;
   });
 
-  const cigaretteList = [];
+  // const cigaretteList = [];
   // 차트에 들어갈 1번 데이터의 내용
   for (const vo of filteredData) {
     cigaretteList.push(vo.endDate);
@@ -208,7 +311,7 @@ const CigaretteReport = () => {
       // Bar , Pie , Doughnut에서는 마우스를 해당 부분에 호버하면 이 label의 이름이 표시된다.
 
       label: '일당 소모갑 수',
-      data: datasetData,
+      data: cigaretteList,
       backgroundColor: [
         'rgba(255, 99, 132, 0.2)',
         'rgba(54, 162, 235, 0.2)',
@@ -232,7 +335,7 @@ const CigaretteReport = () => {
   ];
 
   // datasetData에서 가장 큰 값 찾기
-  const maxValue = Math.max(...datasetData);
+  const maxValue = Math.max(...cigaretteList);
 
   // yMax 값 설정 (최대값 + 0.5)
   const yMaxValue = maxValue + 0.2;
@@ -330,12 +433,10 @@ const CigaretteReport = () => {
       })
       .then((data) => {
         alert('삭제 완료');
-        console.log('삭제 완료:', data);
         window.location.reload();
       })
       .catch((error) => {
         alert('삭제 수정');
-        console.error('삭제 실패:', error);
       });
     //창닫기
     dispatch(close('흡연 수정'));
@@ -351,11 +452,25 @@ const CigaretteReport = () => {
       <div></div>
 
       <ContentLayout>
-        <DateBtn dataBtn={dataBtn} onSelect={setSelectedRange} onChange={setSelectChart}></DateBtn>
+        <SearchArea>
+          {selectedRange === '월' ? (
+            <Input type="month" name="month" defaultValue={month} onChange={handleDateChange} />
+          ) : selectedRange === '년' ? (
+            <YearDiv>
+              <YearBtn onClick={handleDecrease}>{'<'}</YearBtn>
+              <span>{year}</span>
+              <YearBtn onClick={handleIncrease}>{'>'}</YearBtn>
+            </YearDiv>
+          ) : (
+            ''
+          )}
+          <DateBtn dataBtn={dataBtn} onSelect={setSelectedRange} onChange={setSelectChart}></DateBtn>
+        </SearchArea>
+
         <Chart
           chartType={selectChart} // 차트 타입지정
           labels={labels} // 위랑 동일
-          dataset={dataset} // 위랑 동일
+          dataset={dataset} // 위랑 동일111111111111
           width={100} // 위랑 동일
           height={450} // 위랑 동일
           xAxisColor="rgba(54, 162, 235, 1)" // 위랑 동일

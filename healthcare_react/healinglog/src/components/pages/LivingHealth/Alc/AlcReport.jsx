@@ -79,12 +79,12 @@ const AlcReport = () => {
   const [fullData, setFullData] = useState([]); // 전체 데이터 저장
   const [pagedData, setPagedData] = useState([]); // 페이징된 데이터
   const [filteredData, setFilteredData] = useState([]); // 차트용 필터링 데이터
-  const [selectedRange, setSelectedRange] = useState('주'); // 기본값 '일'
+  const [selectedRange, setSelectedRange] = useState('주'); // 기본값 '주'
   const [selectChart, setSelectChart] = useState('Line'); // 그래프 모양 정하는 state
 
   const boardType = 'AlcReport';
   const { currentPage, boardLimit } = useSelector((state) => state.paging[boardType] || {});
-  const offset = (currentPage - 1) * boardLimit;
+  const offset = Math.max((currentPage - 1) * boardLimit, 0);
 
   const [selectedDrink, setSelectedDrink] = useState(null);
   const [alcoholAmount, setAlcoholAmount] = useState('');
@@ -119,8 +119,6 @@ const AlcReport = () => {
     }
   }, [navi, token]);
 
-  const [memberNo, setMemberNo] = useState(0);
-
   const url = 'http://127.0.0.1/api/alc/report/list';
   const options = {
     method: 'GET',
@@ -145,25 +143,12 @@ const AlcReport = () => {
         }
       })
       .catch((error) => console.error('데이터 불러오기 실패:', error));
-  }, []);
+  }, [isAuthorized, token]);
 
   // 테이블 페이징 처리
   useEffect(() => {
     setPagedData(fullData.slice(offset, offset + boardLimit));
   }, [fullData, currentPage, boardLimit]);
-
-  // date버튼의 값에 따라서 그래프에 표시되는 데이터를 설정하는 부분
-  useEffect(() => {
-    if (selectedRange == '주') {
-      setFilteredData(filterData('week'));
-    } else if (selectedRange == '월') {
-      setFilteredData(filterData('month'));
-    } else if (selectedRange == '년') {
-      setFilteredData(filterData('year'));
-    } else {
-      setFilteredData(filterData('all'));
-    }
-  }, [selectedRange]);
 
   // 차트용 필터링 데이터의 마지막 기록 날짜를 기준으로 최근 7일간의 데이터와 해당 날짜가 포함된 달의 데이터를 가져옴
   const filterData = (type) => {
@@ -410,26 +395,43 @@ const AlcReport = () => {
 
   //수정모달
   const handleEditSubmit = (e) => {
-    fetch('http://127.0.0.1:80/api/alc/report/update', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(inputData),
-    })
-      .then((resp) => {
-        if (!resp.ok) {
-          throw new Error(`HTTP error! Status: ${resp.status}`);
-        }
-        return resp.text(); // 또는 .json() (응답 형식에 따라)
-      })
-      .then((data) => {
-        console.log('수정 완료:', data);
-      })
-      .catch((error) => {
-        console.error('수정 실패:', error);
-      });
+    Swal.fire({
+      title: '수정하시겠습니까?', // 제목
+      icon: 'success', // 아이콘 유형 (warning, success, error 등)
+      showCancelButton: true, // 취소 버튼 표시
+      confirmButtonColor: '#3085d6', // 등록 버튼 색상
+      cancelButtonColor: '#d33', // 취소 버튼 색상
+      confirmButtonText: '수정', // 등록 버튼 텍스트
+      cancelButtonText: '취소', // 취소 버튼 텍스트
+    }).then((result) => {
+      if (result.isConfirmed) {
+        fetch('http://127.0.0.1:80/api/alc/report/update', {
+          method: 'POST',
+          headers: {
+            'content-type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(inputData),
+        })
+          .then((resp) => {
+            if (!resp.ok) {
+              throw new Error(`HTTP error! Status: ${resp.status}`);
+            }
+            return resp.text(); // 또는 .json() (응답 형식에 따라)
+          })
+          .then((data) => {
+            console.log('수정 완료:', data);
+          })
+          .catch((error) => {
+            console.error('수정 실패:', error);
+          });
+      }
+    });
+    Swal.fire({
+      icon: 'success',
+      title: '작성 완료.',
+      confirmButtonText: '확인',
+    });
 
     dispatch(close('음주 수정'));
   };
