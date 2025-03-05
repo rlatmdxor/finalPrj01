@@ -22,21 +22,21 @@ public class PublicHealthCenterController {
     public ResponseEntity<Map<String, Object>> searchPhcs(
             @RequestParam(required = false) String city,
             @RequestParam(required = false) String district,
-            @RequestParam(required = false) String dong,
-            @RequestParam String searchType,
-            @RequestParam String keyword,
+            @RequestParam(required = false) String searchType,
+            @RequestParam(required = false) String keyword,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "200") int size) {
 
+        // ✅ 검색어가 없을 경우, "시/구" 정보를 자동 검색어로 설정
+        if ((searchType == null || searchType.isEmpty()) || (keyword == null || keyword.isEmpty())) {
+            keyword = (district != null && !district.isEmpty()) ? district
+                    : (city != null && !city.isEmpty()) ? city
+                    : null;
+            searchType = "address"; // 기본 검색 타입을 "주소"로 설정
+        }
 
-
-
-        Map<String, Object> result = service.searchPhcs(city, district, dong, searchType, keyword, page, size);
+        Map<String, Object> result = service.searchPhcs(city, district, searchType, keyword, page, size);
         return ResponseEntity.ok(result);
     }
-
-
-
-
 
 }
