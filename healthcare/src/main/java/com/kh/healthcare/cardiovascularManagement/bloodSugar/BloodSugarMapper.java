@@ -41,10 +41,8 @@ public interface BloodSugarMapper {
             WHERE NO = #{no}
             AND MEMBER_NO = #{memberNo}
             """)
-
     int bsDel(BloodSugarVo vo);
 
-    void bsDel(BloodSugarVo vo);
 
     @Select("""
             SELECT COUNT(*)
@@ -54,4 +52,4 @@ public interface BloodSugarMapper {
             """)
     int checkTodayBloodSugar(String userNo);
 
-
+}
