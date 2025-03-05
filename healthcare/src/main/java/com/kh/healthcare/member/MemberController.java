@@ -113,7 +113,6 @@ public class MemberController {
     //마이페이지 정보 불러오기
     @GetMapping("mypage")
     public MemberVo getMyData(@RequestHeader ("Authorization") String token){
-        System.out.println("token = " + token);
         return service.getMyData(token);
     }
 
