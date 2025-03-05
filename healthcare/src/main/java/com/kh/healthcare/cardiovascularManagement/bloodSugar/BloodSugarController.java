@@ -15,17 +15,16 @@ public class BloodSugarController {
 
     private final BloodSugarService service;
 
-    @PostMapping("list")
-    public List<BloodSugarVo> list(@RequestBody BloodSugarVo vo , @RequestHeader("Authorization") String authorization ){
+    @GetMapping("list")
+    public List<BloodSugarVo> list(@RequestHeader("Authorization") String token ){
 
-        return service.list(vo.getMemberNo());
+        return service.list(token);
     }
 
     @PostMapping("write")
-    public int bsWrite(@RequestBody BloodSugarVo vo , @RequestHeader("Authorization") String authorization ){
-
+    public int bsWrite(@RequestBody BloodSugarVo vo , @RequestHeader("Authorization") String token ){
         try{
-            return service.bsWrite(vo);
+            return service.bsWrite(vo , token);
         }catch (Exception e){
             e.printStackTrace();
             return 0;
@@ -34,10 +33,10 @@ public class BloodSugarController {
     }
 
     @PostMapping("edit")
-    public int bsEdit(@RequestBody BloodSugarVo vo , @RequestHeader("Authorization") String authorization ){
+    public int bsEdit(@RequestBody BloodSugarVo vo , @RequestHeader("Authorization") String token ){
 
         try{
-            return service.bsEdit(vo);
+            return service.bsEdit(vo , token);
         }catch (Exception e){
             e.printStackTrace();
             return 0;
@@ -45,8 +44,14 @@ public class BloodSugarController {
 
     }
     @PostMapping("delete")
-    public String bsDel(@RequestBody BloodSugarVo vo, @RequestHeader("Authorization") String authorization ){
-        service.bsDel(vo);
-        return "1";
+    public int bsDel(@RequestBody BloodSugarVo vo, @RequestHeader("Authorization") String token ){
+
+        try{
+            return service.bsDel(vo , token);
+        }catch (Exception e){
+            e.printStackTrace();
+            return 0;
+        }
+
     }
 }

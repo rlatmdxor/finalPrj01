@@ -3,29 +3,37 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.kh.healthcare.cardiovascularManagement.bloodPressure.mapper.BloodPressureMapper">
+<mapper namespace="com.kh.healthcare.cardiovascularManagement.bloodPressure.BloodPressureMapper">
 
-    <select id="getSubmitApprovalVoList">
-        SELECT
-        A.NO
-        , A.EMP_NO          AS WRITER_NO
-        , E.NAME            AS WRITER_NAME
-        , A.L_LINE
-        , L.NAME            AS L_LINE_NAME
-        , A.STATUS_NO
-        , S.NAME            AS STATUS_NAME
-        , A.TITLE
-        , TO_CHAR( A.ENROLL_DATE, 'YYYY-MM-DD') AS ENROLL_DATE
-        FROM APPROVAL A
-        JOIN EMPLOYEE E ON ( E.NO = A.EMP_NO )
-        JOIN APPROVAL_STATUS S ON ( S.NO = A.STATUS_NO )
-        JOIN EMPLOYEE L ON ( L.NO = A.L_LINE )
-        WHERE A.EMP_NO = #{no}
-        <if test="statusFilter != null and statusFilter != ''">
-            AND A.STATUS_NO = #{statusFilter}
-        </if>
-        ORDER BY A.ENROLL_DATE DESC
-        OFFSET #{pvo.offset} ROWS FETCH NEXT #{pvo.boardLimit} ROWS ONLY
-    </select>
+    <insert id="bloodPressureWrite">
+        INSERT INTO BLOOD_PRESSURE
+        (
+            NO
+            , MEMBER_NO
+            <if test="enrollDate != null and enrollDate != ''">
+            , ENROLL_DATE
+            </if>
+            <if test="note != null and note != ''">
+            , NOTE
+            </if>
+            , SYSTOLE
+            , DIASTOLE
+            , PULSE
+        )
+        VALUES
+        (
+            SEQ_BLOOD_PRESSURE.NEXTVAL
+            , #{memberNo}
+            <if test="enrollDate != null and enrollDate != ''">
+            , TO_DATE(REPLACE(#{enrollDate}, 'T', ' '), 'YYYY-MM-DD HH24:MI')
+            </if>
+            <if test="note != null and note != ''">
+            , #{note}
+            </if>
+            , #{systole}
+            , #{diastole}
+            , #{pulse}
+        )
+    </insert>
 
 </mapper>

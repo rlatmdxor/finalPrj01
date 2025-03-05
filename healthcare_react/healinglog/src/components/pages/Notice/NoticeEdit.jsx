@@ -1,9 +1,9 @@
 import Title from '../../util/Title';
 import styled from 'styled-components';
 import Btn from '../../util/Btn';
-import { useNavigate } from 'react-router-dom';
-import React, { useState, useRef } from 'react';
-import { AtomicBlockUtils, convertToRaw, EditorState } from 'draft-js';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import React, { useState, useRef, useEffect } from 'react';
+import { AtomicBlockUtils, convertFromRaw, convertToRaw, EditorState } from 'draft-js';
 import Editor from '@draft-js-plugins/editor';
 import createToolbarPlugin from '@draft-js-plugins/static-toolbar';
 import createTextAlignmentPlugin from '@draft-js-plugins/text-alignment';
@@ -148,7 +148,8 @@ const LayDiv = styled.div`
   height: 30px;
 `;
 const attachLayDiv = styled.div`
-  width: 95%;
+  display: grid;
+  grid-template-columns: auto 1fr;
 `;
 
 const staticToolbarPlugin = createToolbarPlugin();
@@ -180,19 +181,48 @@ const blockRendererFn = (block, contentState) => {
   return null;
 };
 
-const BoardWrite = () => {
+const NoticeEdit = () => {
   const token = localStorage.getItem('token');
-  if (!token) {
-    alert('로그인 정보가 없습니다.');
-    window.location.href = '/login';
-  }
+  const [searchParams] = useSearchParams();
+  const bno = searchParams.get('bno');
   const navigate = useNavigate();
-  const [inputData, setInputData] = useState({ categoryNo: '', title: '', content: '' });
+  const [inputData, setInputData] = useState({});
   const [f, setFiles] = useState([]);
   const [editorState, setEditorState] = useState(() => EditorState.createEmpty());
   const editorRef = useRef(null);
   const [isFocused, setIsFocused] = useState(false);
   const [num, setNum] = useState(1);
+  const [newFiles, setNewFiles] = useState([]);
+  const [deleteFiles, setDeleteFiles] = useState([]);
+
+  useEffect(() => {
+    const fetchPost = async () => {
+      try {
+        const response = await fetch(`http://127.0.0.1:80/api/notice/detail?bno=${bno}`, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        });
+        const data = await response.json();
+        console.log('Fetched isRecommend:', data.isRecommend);
+        const isRec = Number(data.isRecommend);
+
+        setInputData(data.detailVo);
+        if (data.attachVoList && data.attachVoList.length > 0) {
+          setFiles(data.attachVoList);
+        }
+
+        if (data.detailVo.content) {
+          const contentState = convertFromRaw(JSON.parse(data.detailVo.content));
+          setEditorState(EditorState.createWithContent(contentState));
+        }
+      } catch (error) {
+        console.error('데이터 불러오기 오류:', error);
+      }
+    };
+    if (bno) {
+      fetchPost();
+    }
+  }, []);
 
   const focus = () => {
     if (editorRef.current) {
@@ -209,45 +239,43 @@ const BoardWrite = () => {
     setInputData((prev) => ({ ...prev, content: rawContent }));
   };
 
-  const handleEnrollBoard = async () => {
+  const handleEditBoard = async () => {
     const result = await Swal.fire({
-      title: '등록하시겠습니까?',
+      title: '수정하시겠습니까?',
       icon: 'question',
       showCancelButton: true,
       confirmButtonText: '확인',
       cancelButtonText: '취소',
     });
-
     if (result.isConfirmed) {
       try {
         const formData = new FormData();
-
         const jsonBlob = new Blob([JSON.stringify(inputData)], { type: 'application/json' });
         formData.append('data', jsonBlob);
-
-        f.forEach((file) => {
+        newFiles.forEach((file) => {
           formData.append('f', file);
         });
+        const deleteFilesBlob = new Blob([JSON.stringify(deleteFiles)], { type: 'application/json' });
 
-        const response = await fetch('http://127.0.0.1:80/api/board/honeytip/write', {
+        formData.append('deleteFiles', deleteFilesBlob);
+
+        const response = await fetch('http://127.0.0.1:80/api/notice/edit', {
           method: 'POST',
-          headers: { Authorization: `Bearer ${token}` }, // Content-Type 제거 (자동 설정됨)
+          headers: { Authorization: `Bearer ${token}` },
           body: formData,
         });
-
         const data = await response.text();
         if (data !== '0') {
           Swal.fire({
-            title: '등록되었습니다.',
+            title: '수정되었습니다.',
             icon: 'success',
             draggable: true,
           });
-          setInputData({ title: '', memberNo: '', content: '', categoryNo: '' });
-          setFiles([]); // 파일 목록 초기화
-          navigate('/board');
+          setFiles([]);
+          navigate('/notice');
         } else {
           Swal.fire({
-            title: '등록 중 오류가 발생했습니다.',
+            title: '수정 중 오류가 발생했습니다.',
             icon: 'error',
           });
         }
@@ -275,41 +303,36 @@ const BoardWrite = () => {
   };
 
   const handleFileChange = (e) => {
-    const file = e.target.files;
-    for (let index = 0; index < file.length; index++) {
-      const files = e.target.files[index];
-      f.push(files);
-    }
-    setFiles(() => f);
-    handleCounter();
-  };
-  const handleCounter = () => {
-    setNum((prev) => prev + 1);
+    const fileList = Array.from(e.target.files);
+    setNewFiles((prev) => [...prev, ...fileList]);
   };
 
   const removeFile = (index) => {
+    setDeleteFiles((prev) => [...prev, f[index]]);
     setFiles((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const removeNewFile = (index) => {
+    setNewFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
   return (
     <>
-      <Title>꿀팁 작성</Title>
+      <Title>공지 수정</Title>
       <LayDiv></LayDiv>
       <ContentDiv>
         <InputDiv>
           <div className="form-label">카테고리</div>
-          <div className="form-input">
-            <select onChange={handleChangeInput} name="categoryNo">
-              <option value="0">-- 카테고리 선택 --</option>
-              <option value="1">병원</option>
-              <option value="2">약국</option>
-              <option value="3">생활</option>
-              <option value="4">보험</option>
-            </select>
-          </div>
+          <div className="form-input">공지</div>
           <div className="form-label">제목</div>
           <div className="form-input">
-            <input type="text" name="title" onChange={handleChangeInput} placeholder="제목을 입력하세요." />
+            <input
+              type="text"
+              name="title"
+              onChange={handleChangeInput}
+              placeholder="제목을 입력하세요."
+              value={inputData.title}
+            />
           </div>
         </InputDiv>
         <ToolboxDiv className="toolbar">
@@ -338,6 +361,7 @@ const BoardWrite = () => {
             ref={editorRef}
             placeholder={isFocused ? '' : '내용을 입력해주세요.'}
             blockRendererFn={(block) => blockRendererFn(block, editorState.getCurrentContent())}
+            value={inputData.content}
           />
         </EditorDiv>
         <AttachDiv>
@@ -350,12 +374,21 @@ const BoardWrite = () => {
               </label>
             </div>
             <div>
-              {f?.map((file, index) => (
-                <>
-                  <span key={index}>{file.name}</span>
-                  <button onClick={() => removeFile(index)}>삭제</button>
-                </>
-              ))}
+              <div>
+                {f?.map((file, index) => (
+                  <>
+                    <span key={index}>{file.originName}</span>
+                    <button onClick={() => removeFile(index)}>삭제</button>
+                  </>
+                ))}
+
+                {newFiles?.map((file, index) => (
+                  <>
+                    <span key={index}>{file.name}</span>
+                    <button onClick={() => removeNewFile(index)}>삭제</button>
+                  </>
+                ))}
+              </div>
             </div>
           </div>
         </AttachDiv>
@@ -374,21 +407,15 @@ const BoardWrite = () => {
                 파일 추가
               </label>
             </div>
-            <div>
-              {/* {f?.map((file, index) => (
-                <span key={index} onClick={() => removeFile(index)}>
-                  {file.name} 삭제
-                </span>
-              ))} */}
-            </div>
+            <div></div>
           </div>
         </AttachDiv>
       </ContentDiv>
       <ButtonDiv>
-        <Btn str={'등록'} c={'#FF7F50'} fc={'#ffffff'} mr={'10'} h={'40'} f={handleEnrollBoard} />
-        <Btn str={'취소'} c={'#D9D9D9'} fc={'#3d4147'} mr={'65'} h={'40'} f={() => navigate('/board')} />
+        <Btn str={'수정'} c={'#FF7F50'} fc={'#ffffff'} mr={'10'} h={'40'} f={handleEditBoard} />
+        <Btn str={'취소'} c={'#D9D9D9'} fc={'#3d4147'} mr={'65'} h={'40'} f={() => navigate(`notice?bno=${bno}`)} />
       </ButtonDiv>
     </>
   );
 };
-export default BoardWrite;
+export default NoticeEdit;

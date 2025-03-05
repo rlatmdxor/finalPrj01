@@ -1,6 +1,6 @@
-import Title from '../../util/Title';
+import Title from '../../../util/Title';
 import styled from 'styled-components';
-import Btn from '../../util/Btn';
+import Btn from '../../../util/Btn';
 import { data, Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import React, { useState, useRef, useEffect } from 'react';
 import { AtomicBlockUtils, convertFromRaw, convertToRaw, EditorState } from 'draft-js';
@@ -13,11 +13,10 @@ import '@draft-js-plugins/static-toolbar/lib/plugin.css';
 import '@draft-js-plugins/text-alignment/lib/plugin.css';
 import Swal from 'sweetalert2';
 import { FaThumbsUp, FaStar } from 'react-icons/fa';
-import Modal from '../../util/Modal';
+import Modal from '../../../util/Modal';
 import { useDispatch } from 'react-redux';
-import { close, open } from '../../../redux/modalSlice';
+import { close, open } from '../../../../redux/modalSlice';
 
-//모달 안의 버튼 컨테이너
 const ModalContainer = styled.div`
   display: flex;
   justify-content: end;
@@ -35,7 +34,41 @@ const InputDiv = styled.div`
   width: 95%;
   height: 40px;
   display: grid;
-  grid-template-columns: 130px 150px 130px 1fr;
+  grid-template-columns: 130px 170px 130px 150px 130px 1fr 80px;
+
+  & .form-label {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #d3ebcf;
+    color: #32383f;
+    font-weight: 600;
+    font-size: 14px;
+    padding: 2px 0px;
+    text-align: center;
+    height: 35px;
+  }
+  & .form-input {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  & select,
+  input {
+    box-sizing: border-box;
+    width: 100%;
+    height: 40px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    padding: 0px 8px;
+  }
+`;
+
+const InputDiv2 = styled.div`
+  width: 95%;
+  height: 40px;
+  display: grid;
+  grid-template-columns: 130px 170px 130px 1fr;
   margin-top: 5px;
 
   & .form-label {
@@ -135,10 +168,19 @@ const EditorDiv = styled.div`
   padding: 10px;
   margin-top: 8px;
 `;
+const attachLayDiv = styled.div`
+  width: 95%;
+`;
+
+const BottomDiv = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
 const MinDiv = styled.div`
   width: 95%;
   display: grid;
-  grid-template-columns: repeat(8, 1fr);
+  grid-template-columns: 130px 170px 130px 150px 130px 1fr 100px 100px;
   border-collapse: collapse;
   box-sizing: border-box;
 
@@ -264,19 +306,17 @@ const blockRendererFn = (block, contentState) => {
   return null;
 };
 
-const BoardDetail = () => {
+const ReviewDetail = () => {
   const token = localStorage.getItem('token');
-  const [searchParams] = useSearchParams(); // 쿼리스트링 값 가져오기
-  const bno = searchParams.get('bno'); // 'bno' 키의 값 가져오기
+  const [searchParams] = useSearchParams();
+  const bno = searchParams.get('bno');
   const navigate = useNavigate();
   const [boardVo, setBoardVo] = useState({});
   const [f, setFiles] = useState([]);
   const [editorState, setEditorState] = useState(() => EditorState.createEmpty());
   const [num, setNum] = useState(0);
-  const [liked, setLiked] = useState(false);
-  const [sendData, setSendData] = useState({ isLike: false, bno });
-  const [sendReport, setSendReport] = useState({ boardNo: bno, reportType: '', commentNo: '' });
-  const [sendComment, setSendComment] = useState({ boardNo: bno, content: '', no: '' });
+  const [sendReport, setSendReport] = useState({ reviewNo: bno, reportType: '', commentNo: '' });
+  const [sendComment, setSendComment] = useState({ reviewNo: bno, content: '', no: '' });
   const [commentList, setCommentList] = useState([]);
   const [radio, setRadio] = useState();
   const [userNo, setUserNo] = useState('');
@@ -286,19 +326,13 @@ const BoardDetail = () => {
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const response = await fetch(`http://127.0.0.1:80/api/board/honeytip/detail?bno=${bno}`, {
+        const response = await fetch(`http://127.0.0.1:80/api/review/detail?bno=${bno}`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         });
         const data = await response.json();
-        console.log('Fetched isRecommend:', data.isRecommend);
-        const isRec = Number(data.isRecommend);
 
         setUserNo(() => data.userNo);
-
-        if (isRec === 1) {
-          setLiked(true);
-        }
 
         setBoardVo(data.detailVo);
         if (data.attachVoList && data.attachVoList.length > 0) {
@@ -322,59 +356,13 @@ const BoardDetail = () => {
   const handleDownload = (url, fileName) => {
     const a = document.createElement('a');
     a.href = url;
-    a.download = fileName || 'downloaded-file'; // 🔹 파일 이름 지정 가능
+    a.download = fileName || 'downloaded-file';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
   };
 
-  const handleLike = () => {
-    const newLiked = !liked;
-    setLiked(newLiked);
-    setSendData((prev) => {
-      const ssd = { ...prev, isLike: newLiked };
-      countLike(ssd);
-      return ssd;
-    });
-  };
-
-  const countLike = (ssd) => [
-    fetch('http://127.0.0.1:80/api/board/honeytip/recommend', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(ssd),
-    })
-      .then((resp) => resp.text())
-      .then((data) => handleCountLike())
-      .catch((err) => console.error(err)),
-  ];
-
-  const handleCountLike = () => {
-    fetch('http://127.0.0.1:80/api/board/honeytip/countLike', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: bno,
-    })
-      .then((resp) => resp.text())
-      .then((data) => {
-        setBoardVo((prev) => {
-          return {
-            ...prev,
-            recommendCount: data,
-          };
-        });
-      });
-  };
-
   const handleChange = (e) => {
-    const rrr = e.target.value;
-
     setRadio(e.target.value);
   };
 
@@ -386,7 +374,7 @@ const BoardDetail = () => {
       };
     });
     reset();
-    dispatch(open({ title: '꿀팁댓글 신고', value: 'block' }));
+    dispatch(open({ title: '리뷰댓글 신고', value: 'block' }));
   };
 
   const handleBoardReport = () => {
@@ -406,7 +394,7 @@ const BoardDetail = () => {
       cancelButtonText: '취소',
     }).then((result) => {
       if (result.isConfirmed) {
-        fetch('http://127.0.0.1:80/api/board/honeytip/report', {
+        fetch('http://127.0.0.1:80/api/review/report', {
           method: 'POST',
           headers: {
             'content-type': 'application/json',
@@ -431,20 +419,20 @@ const BoardDetail = () => {
               });
             }
           });
-        dispatch(close('게시글 신고'));
+        dispatch(close('병원 리뷰 신고'));
       }
     });
   };
 
   const handleNaviEditPage = () => {
-    navigate(`/board/edit?bno=${bno}`);
+    navigate(`/review/edit?bno=${bno}`);
   };
   const reset = () => {
-    setSendReport({ memberNo: '', boardNo: bno, reportType: '', commentNo: '' });
+    setSendReport({ memberNo: '', reviewNo: bno, reportType: '', commentNo: '' });
     setRadio('1');
   };
   const handleNaviList = () => {
-    navigate('/board');
+    navigate('/review');
   };
 
   const handleDeleteHoneyTip = () => {
@@ -456,7 +444,7 @@ const BoardDetail = () => {
       cancelButtonText: '취소',
     }).then((result) => {
       if (result.isConfirmed) {
-        fetch('http://127.0.0.1:80/api/board/honeytip/delete', {
+        fetch('http://127.0.0.1:80/api/review/delete', {
           method: 'POST',
           headers: {
             'content-type': 'application/json',
@@ -472,7 +460,7 @@ const BoardDetail = () => {
                 icon: 'success',
                 draggable: true,
               });
-              navigate('/board');
+              navigate('/review');
             } else {
               Swal.fire({
                 icon: 'error',
@@ -494,7 +482,7 @@ const BoardDetail = () => {
       cancelButtonText: '취소',
     }).then((result) => {
       if (result.isConfirmed) {
-        fetch('http://127.0.0.1:80/api/board/honeytip/comment/write', {
+        fetch('http://127.0.0.1:80/api/review/comment/write', {
           method: 'POST',
           headers: {
             'content-type': 'application/json',
@@ -554,7 +542,7 @@ const BoardDetail = () => {
       cancelButtonText: '취소',
     }).then((result) => {
       if (result.isConfirmed) {
-        fetch('http://127.0.0.1:80/api/board/honeytip/comment/delete', {
+        fetch('http://127.0.0.1:80/api/review/comment/delete', {
           method: 'POST',
           headers: {
             'content-type': 'application/json',
@@ -606,7 +594,7 @@ const BoardDetail = () => {
       cancelButtonText: '취소',
     }).then((result) => {
       if (result.isConfirmed) {
-        fetch('http://127.0.0.1:80/api/board/honeytip/comment/report', {
+        fetch('http://127.0.0.1:80/api/review/comment/report', {
           method: 'POST',
           headers: {
             'content-type': 'application/json',
@@ -631,13 +619,13 @@ const BoardDetail = () => {
               });
             }
           });
-        dispatch(close('꿀팁댓글 신고'));
+        dispatch(close('리뷰댓글 신고'));
       }
     });
   };
 
   useEffect(() => {
-    fetch(`http://127.0.0.1:80/api/board/honeytip/comment/list?bno=${bno}`, {
+    fetch(`http://127.0.0.1:80/api/review/comment/list?bno=${bno}`, {
       method: 'GET',
       headers: {
         'content-type': 'application/json',
@@ -658,10 +646,10 @@ const BoardDetail = () => {
   };
   return (
     <>
-      <Title>꿀팁 상세</Title>
+      <Title>리뷰 상세</Title>
       <LayDiv></LayDiv>
       <ContentDiv>
-        <Modal title="게시글 신고">
+        <Modal title="병원 리뷰 신고">
           <ModalDiv>
             {[
               { id: 'reason1', value: '1', label: '성적인 콘텐츠' },
@@ -691,7 +679,7 @@ const BoardDetail = () => {
 
           <ModalContainer>
             <Btn
-              title={'게시글 신고'}
+              title={'병원 리뷰 신고'}
               f={handleBoardReport}
               mt={'10'}
               mb={'20'}
@@ -702,7 +690,7 @@ const BoardDetail = () => {
             ></Btn>
           </ModalContainer>
         </Modal>
-        <Modal title="꿀팁댓글 신고">
+        <Modal title="리뷰댓글 신고">
           <ModalDiv>
             {[
               { id: 'reason11', value: '1', label: '성적인 콘텐츠' },
@@ -731,7 +719,7 @@ const BoardDetail = () => {
           </ModalDiv>
           <ModalContainer>
             <Btn
-              title={'꿀팁댓글 신고'}
+              title={'리뷰댓글 신고'}
               f={handleCommentReport}
               mt={'10'}
               mb={'20'}
@@ -743,21 +731,34 @@ const BoardDetail = () => {
           </ModalContainer>
         </Modal>
         <MinDiv>
-          <div className="form-label">추천수</div>
-          <div className="form-input">{boardVo.recommendCount}</div>
-          <div className="form-label">조회수</div>
-          <div className="form-input">{boardVo.hit}</div>
+          <div className="form-label">방문시간</div>
+          <div className="form-input">{boardVo.visitDate}</div>
+          <div className="form-label">진료과</div>
+          <div className="form-input">{boardVo.department}</div>
+          <div className="form-label">병원명</div>
+          <div className="form-input">{boardVo.name}</div>
           <div className="form-label">작성자</div>
           <div className="form-input">{boardVo.nick}</div>
-          <div className="form-label">등록일</div>
-          <div className="form-input">{boardVo.enrollDate}</div>
         </MinDiv>
-        <InputDiv>
-          <div className="form-label">카테고리</div>
-          <div className="form-input">{boardVo.categoryName}</div>
+        <InputDiv2>
+          <div className="form-label">별점</div>
+          <div className="form-input">
+            {' '}
+            {[1, 2, 3, 4, 5].map((value) => (
+              <FaStar
+                key={value}
+                style={{
+                  color: boardVo.rating >= value ? 'gold' : 'grey',
+                  cursor: 'pointer',
+                  fontSize: '24px',
+                  marginRight: '4px',
+                }}
+              />
+            ))}
+          </div>
           <div className="form-label">제목</div>
           <div className="form-input">{boardVo.title}</div>
-        </InputDiv>
+        </InputDiv2>
 
         <EditorDiv>
           <Editor
@@ -793,22 +794,13 @@ const BoardDetail = () => {
             onClick={() => {
               console.log(sendReport);
               reset();
-              dispatch(open({ title: '게시글 신고', value: 'block' }));
+              dispatch(open({ title: '병원 리뷰 신고', value: 'block' }));
             }}
           >
             신고하기
           </ReportDiv>
         )}
-        <ThumbsupDiv>
-          <FaThumbsUp
-            onClick={handleLike}
-            style={{
-              color: liked ? 'blue' : 'grey',
-              cursor: 'pointer',
-              fontSize: '48px',
-            }}
-          />
-        </ThumbsupDiv>
+        <ThumbsupDiv></ThumbsupDiv>
         <ButtonDiv>
           <Btn str={'목록으로'} c={'lightgray'} fc={'black'} h={'40'} w={'120'} f={handleNaviList} />
         </ButtonDiv>
@@ -857,4 +849,4 @@ const BoardDetail = () => {
   );
 };
 
-export default BoardDetail;
+export default ReviewDetail;

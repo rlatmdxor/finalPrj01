@@ -15,18 +15,23 @@ public class InsulinController {
 
     private final InsulinService service;
 
-    @PostMapping("list")
-    public HashMap insulinList(@RequestBody InsulinVo vo , @RequestHeader("Authorization") String authorization){
-        HashMap map = service.insulinList(vo);
-        System.out.println("map = " + map);
-        return map;
+    @GetMapping("list")
+    public HashMap insulinList(@RequestHeader("Authorization") String token){
+        try{
+            HashMap map = service.insulinList(token);
+            return map;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+
     }
 
     @PostMapping("write")
-    public int insulinInsert(@RequestBody InsulinVo vo , @RequestHeader("Authorization") String authorization){
+    public int insulinInsert(@RequestBody InsulinVo vo , @RequestHeader("Authorization") String token){
 
         try{
-            return service.insulinInsert(vo);
+            return service.insulinInsert(vo , token);
         }catch (Exception e){
             e.printStackTrace();
             return 0;
@@ -34,10 +39,10 @@ public class InsulinController {
     }
 
     @PostMapping("delete")
-    public int insulinDel(@RequestBody String[] numList , @RequestHeader("Authorization") String authorization){
+    public int insulinDel(@RequestBody String[] numList , @RequestHeader("Authorization") String token){
 
         try{
-            int result = service.insulinDel(numList);
+            int result = service.insulinDel(numList , token);
             return result;
         } catch (Exception e) {
             e.printStackTrace();

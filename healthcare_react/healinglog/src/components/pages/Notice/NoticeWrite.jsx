@@ -180,14 +180,14 @@ const blockRendererFn = (block, contentState) => {
   return null;
 };
 
-const BoardWrite = () => {
+const NoticeWrite = () => {
   const token = localStorage.getItem('token');
   if (!token) {
     alert('로그인 정보가 없습니다.');
     window.location.href = '/login';
   }
   const navigate = useNavigate();
-  const [inputData, setInputData] = useState({ categoryNo: '', title: '', content: '' });
+  const [inputData, setInputData] = useState({});
   const [f, setFiles] = useState([]);
   const [editorState, setEditorState] = useState(() => EditorState.createEmpty());
   const editorRef = useRef(null);
@@ -211,7 +211,7 @@ const BoardWrite = () => {
 
   const handleEnrollBoard = async () => {
     const result = await Swal.fire({
-      title: '등록하시겠습니까?',
+      title: '작성하시겠습니까?',
       icon: 'question',
       showCancelButton: true,
       confirmButtonText: '확인',
@@ -229,9 +229,9 @@ const BoardWrite = () => {
           formData.append('f', file);
         });
 
-        const response = await fetch('http://127.0.0.1:80/api/board/honeytip/write', {
+        const response = await fetch('http://127.0.0.1:80/api/notice/write', {
           method: 'POST',
-          headers: { Authorization: `Bearer ${token}` }, // Content-Type 제거 (자동 설정됨)
+          headers: { Authorization: `Bearer ${token}` },
           body: formData,
         });
 
@@ -242,9 +242,9 @@ const BoardWrite = () => {
             icon: 'success',
             draggable: true,
           });
-          setInputData({ title: '', memberNo: '', content: '', categoryNo: '' });
-          setFiles([]); // 파일 목록 초기화
-          navigate('/board');
+          setInputData({ title: '', writer: '', content: '' });
+          setFiles([]);
+          navigate('/notice');
         } else {
           Swal.fire({
             title: '등록 중 오류가 발생했습니다.',
@@ -293,20 +293,12 @@ const BoardWrite = () => {
 
   return (
     <>
-      <Title>꿀팁 작성</Title>
+      <Title>공지사항 작성</Title>
       <LayDiv></LayDiv>
       <ContentDiv>
         <InputDiv>
           <div className="form-label">카테고리</div>
-          <div className="form-input">
-            <select onChange={handleChangeInput} name="categoryNo">
-              <option value="0">-- 카테고리 선택 --</option>
-              <option value="1">병원</option>
-              <option value="2">약국</option>
-              <option value="3">생활</option>
-              <option value="4">보험</option>
-            </select>
-          </div>
+          <div className="form-input">공지</div>
           <div className="form-label">제목</div>
           <div className="form-input">
             <input type="text" name="title" onChange={handleChangeInput} placeholder="제목을 입력하세요." />
@@ -386,9 +378,9 @@ const BoardWrite = () => {
       </ContentDiv>
       <ButtonDiv>
         <Btn str={'등록'} c={'#FF7F50'} fc={'#ffffff'} mr={'10'} h={'40'} f={handleEnrollBoard} />
-        <Btn str={'취소'} c={'#D9D9D9'} fc={'#3d4147'} mr={'65'} h={'40'} f={() => navigate('/board')} />
+        <Btn str={'취소'} c={'#D9D9D9'} fc={'#3d4147'} mr={'65'} h={'40'} f={() => navigate('/notice')} />
       </ButtonDiv>
     </>
   );
 };
-export default BoardWrite;
+export default NoticeWrite;

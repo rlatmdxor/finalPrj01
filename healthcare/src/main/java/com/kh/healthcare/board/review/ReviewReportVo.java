@@ -1,12 +1,12 @@
-package com.kh.healthcare.board.honeyTip;
+package com.kh.healthcare.board.review;
 
 import lombok.Data;
 
 @Data
-public class HoneyTipReportVo {
+public class ReviewReportVo {
     private String no;
     private String reportType;
-    private String boardNo;
+    private String reviewNo;
     private String memberNo;
     private String enrollDate;
     private String nick;

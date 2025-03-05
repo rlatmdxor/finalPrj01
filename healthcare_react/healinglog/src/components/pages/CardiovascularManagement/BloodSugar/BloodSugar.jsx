@@ -42,21 +42,24 @@ const NaviContainer = styled.div`
 `;
 
 const BloodSugar = () => {
-  const token = null;
+  const token = localStorage.getItem('token');
+  if (!token) {
+    alert('로그인 정보가 없습니다.');
+    window.location.href = '/login';
+  }
 
   const url = 'http://127.0.0.1:80/api/bloodSugar/list';
 
   const options = {
-    method: 'POST',
+    method: 'GET',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-    body: JSON.stringify({ memberNo: '1' }),
   };
   const [num, setNum] = useState(0);
   const [fullData, setFullData] = useState([]); // 전체 데이터 저장
   const [pagedData, setPagedData] = useState([]); // 페이징된 데이터
   const [filteredData, setFilteredData] = useState([]); // 차트용 필터링 데이터
   const [selectedRange, setSelectedRange] = useState('주'); // 기본값 '일'
-  const [selectChart, setSelectChart] = useState('Bar'); // 그래프 모양 정하는 state
+  const [selectChart, setSelectChart] = useState('Line'); // 그래프 모양 정하는 state
 
   const boardType = 'bloodSugar';
   const { currentPage, boardLimit } = useSelector((state) => state.paging[boardType] || {});
@@ -70,6 +73,12 @@ const BloodSugar = () => {
         if (data.length > 0) {
           dispatch(setTotalCount({ boardType, totalCount: data.length })); // 페이징 처리할때 totalCount 저장
           setFullData(data);
+        } else if (data == null) {
+          Swal.fire({
+            title: '다시 로그인해주세요.',
+            icon: 'success',
+            draggable: true,
+          }).then(() => (window.location.href = '/login'));
         } else {
           dispatch(resetPaging({ boardType }));
           setFullData([]);
@@ -78,8 +87,6 @@ const BloodSugar = () => {
       .catch((error) => console.error('데이터 불러오기 실패:', error));
   }, [num]);
 
-  ////////////////////////////////////////////////////////////////////////////////////////////////
-  //인풋 안 쪽에 들어가는 데이터 ~~~Vo에 들어있는 이름으로 맞춰주기
   const initialInputData = {
     no: '',
     memberNo: '1',
@@ -87,14 +94,10 @@ const BloodSugar = () => {
     enrollDate: '',
     note: '',
   };
-  // 모달 안 쪽 인풋에 데이터 관리
   const [inputData, setInputData] = useState(initialInputData);
-  // 화면 렌더링
-  // 인풋 데이터 초기화
   const reset = () => {
     setInputData(initialInputData);
   };
-  // 인풋 입력값 받아오기
   const handleChange = (e) => {
     setInputData((props) => {
       return {
@@ -104,12 +107,11 @@ const BloodSugar = () => {
     });
   };
 
-  // 인풋 입력값 보내기
   const handleSubmit = (e) => {
     Swal.fire({
       title: '등록하시겠습니까?',
       icon: 'question',
-      showCancelButton: true, // ❗ 취소 버튼 추가 (없으면 무조건 실행됨)
+      showCancelButton: true,
       confirmButtonText: '확인',
       cancelButtonText: '취소',
     }).then((result) => {
@@ -556,7 +558,6 @@ const BloodSugar = () => {
             )}
           </tbody>
         </RadiusTable>
-        <LineDiv />
         <LineDiv />
         <Pagination boardType={boardType}></Pagination>
         <LineDiv />
