@@ -12,7 +12,7 @@ import Modal from '../../util/Modal';
 import { useDispatch } from 'react-redux';
 import { close, open } from '../../../redux/modalSlice';
 import { useNavigate } from 'react-router-dom';
-// import { isTokenExpired, getRoleFromToken } from '../../util/JwtUtil';
+import { getRoleFromToken, isTokenExpired } from '../../util/JwtUtil';
 
 const NaviContainer = styled.div`
   display: grid;
@@ -182,8 +182,8 @@ const DashBoard = () => {
   const [isAllSelected, setIsAllSelected] = useState(false);
 
   useEffect(() => {
-    //if (!token || isTokenExpired(token)) {
-    if (!token) {
+    if (!token || isTokenExpired(token) || getRoleFromToken(token) == 'ROLE_ADMIN') {
+      window.localStorage.removeItem('token'); // 토큰 삭제
       navi('/login'); // 로그인 페이지로 이동
       Swal.fire({
         icon: 'warning',

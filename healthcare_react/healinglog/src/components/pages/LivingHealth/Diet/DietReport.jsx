@@ -7,7 +7,7 @@ import Chart from '../../../util/Chart';
 import DateBtn from '../../../util/DateBtn';
 import { getDayData, getMonthData, getYearData } from '../../../services/dietService';
 import { useNavigate } from 'react-router-dom';
-// import { isTokenExpired, getRoleFromToken } from '../../util/JwtUtil';
+import { getRoleFromToken, isTokenExpired } from '../../../util/JwtUtil';
 
 const NaviContainer = styled.div`
   display: grid;
@@ -63,8 +63,8 @@ const DietReport = () => {
   const [isAuthorized, setIsAuthorized] = useState(false); // 로그인 여부 체크
 
   useEffect(() => {
-    //if (!token || isTokenExpired(token)) {
-    if (!token) {
+    if (!token || isTokenExpired(token) || getRoleFromToken(token) == 'ROLE_ADMIN') {
+      window.localStorage.removeItem('token'); // 토큰 삭제
       navi('/login'); // 로그인 페이지로 이동
       Swal.fire({
         icon: 'warning',

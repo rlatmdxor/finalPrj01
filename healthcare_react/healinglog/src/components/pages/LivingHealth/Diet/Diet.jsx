@@ -19,7 +19,7 @@ import {
 } from '../../../../redux/dietSlice';
 import { useNavigate } from 'react-router-dom';
 import { getMealData, getMemberHeight, getTodayWater, getTodayWeight } from '../../../services/dietService';
-// import { isTokenExpired, getRoleFromToken } from '../../util/JwtUtil';
+import { getRoleFromToken, isTokenExpired } from '../../../util/JwtUtil';
 
 const NaviContainer = styled.div`
   display: grid;
@@ -107,8 +107,8 @@ const Diet = () => {
   const day = useSelector((state) => state.diet.day);
 
   useEffect(() => {
-    //if (!token || isTokenExpired(token)) {
-    if (!token) {
+    if (!token || isTokenExpired(token) || getRoleFromToken(token) == 'ROLE_ADMIN') {
+      window.localStorage.removeItem('token'); // 토큰 삭제
       navi('/login'); // 로그인 페이지로 이동
       Swal.fire({
         icon: 'warning',

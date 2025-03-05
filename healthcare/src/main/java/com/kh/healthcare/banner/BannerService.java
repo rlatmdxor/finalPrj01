@@ -47,11 +47,13 @@ public class BannerService {
         return mapper.getBannerList(showYn, searchValue);
     }
 
-    public void bannerEdit(BannerVo vo, MultipartFile f, String token) {
+    public void bannerEdit(BannerVo vo, MultipartFile f, String imageUrl, String token) {
         try {
-            if (f != null) {
+            if (f == null && imageUrl != null) {
+                vo.setImageUrl(imageUrl); // 기존 이미지 유지
+            } else if (f != null) {
                 String url = FileUtil.uploadFileToAwsS3(f, s3, bucket);
-                vo.setImageUrl(url);
+                vo.setImageUrl(url); // 새 이미지 url 저장
             }
 
             token = token.replace("Bearer ", "");

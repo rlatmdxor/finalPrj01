@@ -10,6 +10,7 @@ import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import Avatar from '@mui/material/Avatar';
 import { getBannerList, getNoticeList, getBoardList, getReviewList } from '../services/mainService';
+import { getRoleFromToken } from '../util/JwtUtil';
 
 const LayoutDiv = styled.div`
   display: flex;
@@ -206,13 +207,20 @@ const AdImg = styled.img`
 `;
 
 const Main = () => {
-  const navigate = useNavigate();
+  const navi = useNavigate();
   const token = localStorage.getItem('token');
 
   const [bannerList, setBannerList] = useState([]);
   const [noticeList, setNoticeList] = useState([]);
   const [boardList, setBoardList] = useState([]);
   const [reviewList, setReviewList] = useState([]);
+
+  useEffect(() => {
+    if (getRoleFromToken(token) == 'ROLE_ADMIN') {
+      window.localStorage.removeItem('token'); // 토큰 삭제
+      navi('/');
+    }
+  }, [navi, token]);
 
   useEffect(() => {
     const getFetch = async () => {
@@ -263,7 +271,7 @@ const Main = () => {
             <h2>📄 공지사항</h2>
             <ViewMore
               onClick={() => {
-                navigate('/notice');
+                navi('/notice');
               }}
             >
               {'더보기>'}
@@ -275,7 +283,7 @@ const Main = () => {
                 <Card
                   key={vo.no}
                   onClick={() => {
-                    navigate(`/notice?bno=${vo.no}`);
+                    navi(`/notice?bno=${vo.no}`);
                   }}
                 >
                   <CardTitleTextDiv>{vo.title}</CardTitleTextDiv>
@@ -293,7 +301,7 @@ const Main = () => {
             <h2>🔥 이번주 Hot 꿀팁 </h2>
             <ViewMore
               onClick={() => {
-                navigate('/board');
+                navi('/board');
               }}
             >
               {'더보기 >'}
@@ -305,7 +313,7 @@ const Main = () => {
                 <Card
                   key={vo.no}
                   onClick={() => {
-                    navigate(`/board?bno=${vo.no}`);
+                    navi(`/board?bno=${vo.no}`);
                   }}
                 >
                   <CardTitleTextDiv>
@@ -328,7 +336,7 @@ const Main = () => {
             <h2>👍 이번주 Best 병원 리뷰</h2>
             <ViewMore
               onClick={() => {
-                navigate('/hospitalreview');
+                navi('/hospitalreview');
               }}
             >
               {'더보기 >'}
@@ -340,7 +348,7 @@ const Main = () => {
                 <ReviewCard
                   key={vo.no}
                   onClick={() => {
-                    navigate(`/hospitalreview?bno=${vo.no}`);
+                    navi(`/hospitalreview?bno=${vo.no}`);
                   }}
                 >
                   <HospitalNameText>{vo.name}</HospitalNameText>

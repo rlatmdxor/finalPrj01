@@ -135,6 +135,16 @@ public interface MealMapper {
     void dietMealDelete(String no);
 
     @Select("""
+            SELECT COUNT(*)
+            FROM NOTIFICATION_SETTINGS
+            WHERE
+                MEMBER_NO = #{userNo}
+                AND ALL_PUSH = 'Y'
+                AND DIET_PUSH = 'Y'
+            """)
+    int isDietPushEnabled(String userNo);
+
+    @Select("""
             SELECT 
                 NO
                 , NAME AS LABEL

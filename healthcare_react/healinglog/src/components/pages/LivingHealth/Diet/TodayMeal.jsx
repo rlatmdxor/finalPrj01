@@ -441,7 +441,12 @@ const TodayMeal = ({ token }) => {
         formData.append('mealCode', inputData.mealCode);
         formData.append('foodListArr', JSON.stringify(inputData.foodList));
         formData.append('memo', inputData.memo);
-        formData.append('f', inputData.image);
+
+        if (typeof inputData.image === 'string') {
+          formData.append('imageUrl', inputData.image); // 기존 이미지 URL 유지
+        } else if (inputData.image) {
+          formData.append('f', inputData.image); // 새 이미지 업로드
+        }
 
         fetch('http://127.0.0.1:80/api/diet/edit', {
           method: 'POST',
