@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import Title from '../../../util/Title';
 import Navi from '../../../util/Navi';
@@ -7,9 +7,20 @@ import TodayKcal from './TodayKcal';
 import TodayWater from './TodayWater';
 import TodayWeight from './TodayWeight';
 import MyBmi from './MyBmi';
-import TodayDietMeal from './TodayDietMeal';
+import TodayMeal from './TodayMeal';
 import { useDispatch, useSelector } from 'react-redux';
-import { setDay, updateDay } from '../../../../redux/dietSlice';
+import {
+  setDay,
+  updateDay,
+  setWaterAmount,
+  setWeightAmount,
+  setTotalKcal,
+  setHeight,
+  setMemberNo,
+} from '../../../../redux/dietSlice';
+import { jwtDecode } from 'jwt-decode';
+import { useNavigate } from 'react-router-dom';
+import { getMealData, getMemberHeight, getTodayWater, getTodayWeight } from '../../../services/dietService';
 
 const NaviContainer = styled.div`
   display: grid;
@@ -88,9 +99,97 @@ export const ModalContainer = styled.div`
 
 const Diet = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const token = localStorage.getItem('token');
+
+  const memberNo = useSelector((state) => state.diet.memberNo);
   const day = useSelector((state) => state.diet.day);
 
-  const [reRender, setReRender] = useState(0); // 화면 리렌더링용
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (!token) {
+      alert('로그인 정보가 없습니다.');
+      navigate('/login');
+    }
+  }, []);
+
+  useEffect(() => {
+    if (token) {
+      try {
+        const decodedToken = jwtDecode(token);
+        dispatch(setMemberNo(decodedToken.no));
+        setIsLoading(false);
+      } catch {
+        navigate('/login');
+      }
+    }
+  }, [token, dispatch]);
+
+  useEffect(() => {
+    if (memberNo > 0) {
+      const fetchMemberHeight = async () => {
+        try {
+          const fetchData = await getMemberHeight(token);
+          if (fetchData) {
+            dispatch(setHeight(fetchData.height));
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      };
+      fetchMemberHeight();
+    }
+  }, [memberNo, dispatch]);
+
+  useEffect(() => {
+    if (memberNo > 0) {
+      const fetchTotalKcal = async () => {
+        try {
+          const fetchData = await getMealData(memberNo, day, token);
+          let total = 0;
+          if (fetchData) {
+            for (let i = 0; i < fetchData.length; i++) {
+              total += Number(fetchData[i].sumKcal);
+            }
+          }
+          dispatch(setTotalKcal(total || 0));
+        } catch {
+          dispatch(setTotalKcal(0));
+        }
+      };
+      fetchTotalKcal();
+    }
+  }, [day, memberNo, dispatch]);
+
+  useEffect(() => {
+    if (memberNo > 0) {
+      const fetchWaterAmount = async () => {
+        try {
+          const fetchData = await getTodayWater(memberNo, day, token);
+          dispatch(setWaterAmount(fetchData.amount || 0));
+        } catch {
+          dispatch(setWaterAmount(0));
+        }
+      };
+      fetchWaterAmount();
+    }
+  }, [day, memberNo, dispatch]);
+
+  useEffect(() => {
+    if (memberNo > 0) {
+      const fetchWeightAmount = async () => {
+        try {
+          const fetchData = await getTodayWeight(memberNo, day, token);
+          dispatch(setWeightAmount(fetchData.amount || 0));
+        } catch {
+          dispatch(setWeightAmount(0));
+        }
+      };
+      fetchWeightAmount();
+    }
+  }, [day, memberNo, dispatch]);
 
   const handleChangeDay = (e) => {
     dispatch(setDay(e.target.value));
@@ -103,6 +202,10 @@ const Diet = () => {
   const handleNextDay = () => {
     dispatch(updateDay(+1));
   };
+
+  if (isLoading) {
+    return;
+  }
 
   return (
     <>
@@ -119,14 +222,14 @@ const Diet = () => {
           <button onClick={handleNextDay}>▶</button>
         </DayDiv>
         <ContentAreaDiv>
-          <TodayKcal reRender={reRender} />
-          <TodayWater />
-          <TodayWeight reRender={reRender} setReRender={setReRender} />
+          <TodayKcal />
+          <TodayWater token={token} />
+          <TodayWeight token={token} />
         </ContentAreaDiv>
         <ContentAreaDiv>
-          <MyBmi reRender={reRender} />
+          <MyBmi />
         </ContentAreaDiv>
-        <TodayDietMeal reRender={reRender} setReRender={setReRender} />
+        <TodayMeal token={token} />
         <br />
         <br />
         <br />

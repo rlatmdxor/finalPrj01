@@ -29,10 +29,6 @@ const ModalContainer = styled.div`
   justify-content: end;
 `;
 
-const bodyContatiner = styled.div`
-  margin-top: 20px;
-`;
-
 const NaviContainer = styled.div`
   display: grid;
   position: relative;
@@ -41,19 +37,9 @@ const NaviContainer = styled.div`
   left: 40px;
   grid-template-columns: 3fr 3fr; // 글자수만큼 fr 주면 됩니다. ex) 유산소 3글자니까 3fr
 `;
+//토큰관련코드
 
 const AlcReport = () => {
-  const url = 'http://127.0.0.1/api/alc/report/list';
-
-  const options = {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      // Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({ memberNo: '1' }),
-  };
-
   const dispatch = useDispatch();
 
   const [fullData, setFullData] = useState([]); // 전체 데이터 저장
@@ -79,7 +65,20 @@ const AlcReport = () => {
     { name: '와인', alc: 12, cc: 150 },
     { name: '칵테일', alc: 10, cc: 60 },
   ];
+  const token = localStorage.getItem('token');
 
+  if (!token) {
+    alert('로그인 정보가 없습니다.');
+    window.location.href = '/login';
+  }
+
+  const url = 'http://127.0.0.1/api/alc/report/list';
+  const options = {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
   //fetch 실행
   useEffect(() => {
     fetch(url, options)
@@ -241,9 +240,6 @@ const AlcReport = () => {
   // 화면 렌더링
   const [num, setNum] = useState('');
 
-  //토큰관련코드
-  const token = localStorage.getItem('token');
-
   // 인풋 데이터 초기화
   const reset = () => {
     setInputData(initialInputData);
@@ -273,6 +269,7 @@ const AlcReport = () => {
     setNum(num - 1);
     // 입력 후 모달 창 닫기
     dispatch(close(e.target.title));
+    alert('등록완료');
   };
 
   //수정모달
@@ -299,9 +296,6 @@ const AlcReport = () => {
       });
 
     dispatch(close('음주 수정'));
-    // setNum(num - 1);
-    // 입력 후 모달 창 닫기
-    // dispatch(close(e.target.title));
   };
   //삭제모달
   const handleDeleteSubmit = (e) => {
@@ -338,10 +332,11 @@ const AlcReport = () => {
     <>
       <Title>음주관리</Title>
 
-      <NaviContainer>
+      <div></div>
+      {/* <NaviContainer>
         <Navi target="alc" tag={'캘린더'}></Navi>
         <Navi target="alc/report" tag={'리포트'}></Navi>
-      </NaviContainer>
+      </NaviContainer> */}
 
       <ContentLayout>
         <DateBtn dataBtn={dataBtn} onSelect={setSelectedRange} onChange={setSelectChart}></DateBtn>

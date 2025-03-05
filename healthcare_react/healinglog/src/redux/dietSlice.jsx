@@ -1,13 +1,29 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-const todayDate = new Date().toISOString().split('T')[0];
+const today = new Date();
+const todayDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(
+  today.getDate()
+).padStart(2, '0')}`;
 
 const dietSlice = createSlice({
   name: 'diet',
   initialState: {
+    memberNo: 0,
+    height: 0,
     day: todayDate,
+    water: 0,
+    weight: 0,
+    totalKcal: 0,
+    mealDetailList: [],
+    mealKcalSum: {},
   },
   reducers: {
+    setMemberNo: (state, action) => {
+      state.memberNo = action.payload;
+    },
+    setHeight: (state, action) => {
+      state.height = action.payload;
+    },
     setDay: (state, action) => {
       state.day = action.payload;
     },
@@ -16,8 +32,33 @@ const dietSlice = createSlice({
       newDate.setDate(newDate.getDate() + action.payload); // +1 or -1 값으로 업데이트
       state.day = newDate.toISOString().split('T')[0];
     },
+    setWaterAmount: (state, action) => {
+      state.water = action.payload;
+    },
+    setWeightAmount: (state, action) => {
+      state.weight = action.payload;
+    },
+    setTotalKcal: (state, action) => {
+      state.totalKcal = action.payload;
+    },
+    setMealDetailList: (state, action) => {
+      state.mealDetailList = action.payload;
+    },
+    setMealKcalSum: (state, action) => {
+      state.mealKcalSum = action.payload;
+    },
   },
 });
 
 export default dietSlice.reducer;
-export const { setDay, updateDay } = dietSlice.actions;
+export const {
+  setDay,
+  updateDay,
+  setWaterAmount,
+  setWeightAmount,
+  setTotalKcal,
+  setHeight,
+  setMemberNo,
+  setMealDetailList,
+  setMealKcalSum,
+} = dietSlice.actions;

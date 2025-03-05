@@ -8,49 +8,53 @@ import java.util.List;
 @Mapper
 public interface HospitalMapper {
 
+
+
+
     @Select("""
         <script>
             SELECT NAME, TELL_NUM, POST_NUM, ADDRESS, HOSPITAL_TYPE
             FROM (
-                SELECT H.NAME, H.TELL_NUM, H.POST_NUM, H.ADDRESS, H.HOSPITAL_TYPE,
-                       ROW_NUMBER() OVER (ORDER BY H.NAME ASC) AS RN
+                SELECT H.*, ROW_NUMBER() OVER (ORDER BY NAME ASC) AS RN
                 FROM HOSPITAL H
                 WHERE 1=1
-                
-                <!-- 시/구/동 검색 -->
+
+                <!-- ✅ 지역 필터 유지 -->
                 <if test='city != null and city != ""'>
-                    AND H.CITY = #{city}
+                    AND CITY = #{city}
                 </if>
                 <if test='district != null and district != ""'>
-                    AND H.DISTRICT = #{district}
+                    AND DISTRICT = #{district}
                 </if>
                 <if test='dong != null and dong != ""'>
-                    AND H.DONG = #{dong}
+                    AND DONG = #{dong}
                 </if>
 
-                <!-- 병원과 검색 -->
+                <!-- ✅ 병원 유형 필터링 (과가 선택되지 않으면 필터링 X) -->
                 <if test='hospitalType != null and hospitalType != ""'>
-                    AND H.HOSPITAL_TYPE = #{hospitalType}
+                    AND HOSPITAL_TYPE = #{hospitalType}
                 </if>
 
-                <!-- 검색 조건 추가 -->
+                <!-- ✅ 검색 조건 적용 -->
                 <if test='searchType != null and searchType != "" and keyword != null and keyword != ""'>
-                    <choose>
-                        <when test='searchType == "name"'>
-                            AND H.NAME LIKE '%' || #{keyword} || '%'
-                        </when>
-                        <when test='searchType == "address"'>
-                            AND H.ADDRESS LIKE '%' || #{keyword} || '%'
-                        </when>
-                        <when test='searchType == "tellNum"'>
-                            AND H.TELL_NUM LIKE '%' || #{keyword} || '%'
-                        </when>
-                        <when test='searchType == "postNum"'>
-                            AND H.POST_NUM LIKE '%' || #{keyword} || '%'
-                        </when>
-                    </choose>
+                    AND (
+                        <choose>
+                            <when test='searchType == "name"'>
+                                NAME LIKE '%' || #{keyword} || '%'
+                            </when>
+                            <when test='searchType == "address"'>
+                                ADDRESS LIKE '%' || #{keyword} || '%'
+                            </when>
+                            <when test='searchType == "tellNum"'>
+                                TELL_NUM LIKE '%' || #{keyword} || '%'
+                            </when>
+                            <when test='searchType == "postNum"'>
+                                POST_NUM LIKE '%' || #{keyword} || '%'
+                            </when>
+                        </choose>
+                    )
                 </if>
-            )
+            ) 
             WHERE RN BETWEEN #{offset} + 1 AND #{offset} + #{size}
         </script>
     """)
@@ -66,46 +70,48 @@ public interface HospitalMapper {
     );
 
     @Select("""
-        <script>
-            SELECT COUNT(*)
-            FROM HOSPITAL H
-            WHERE 1=1
+    <script>
+        SELECT COUNT(*)
+        FROM HOSPITAL H
+        WHERE 1=1
 
-            <!-- 시/구/동 검색 -->
-            <if test='city != null and city != ""'>
-                AND H.CITY = #{city}
-            </if>
-            <if test='district != null and district != ""'>
-                AND H.DISTRICT = #{district}
-            </if>
-            <if test='dong != null and dong != ""'>
-                AND H.DONG = #{dong}
-            </if>
+        <!-- ✅ 지역 필터 유지 -->
+        <if test='city != null and city != ""'>
+            AND H.CITY = #{city}
+        </if>
+        <if test='district != null and district != ""'>
+            AND H.DISTRICT = #{district}
+        </if>
+        <if test='dong != null and dong != ""'>
+            AND H.DONG = #{dong}
+        </if>
 
-            <!-- 병원과 검색 -->
-            <if test='hospitalType != null and hospitalType != ""'>
-                AND H.HOSPITAL_TYPE = #{hospitalType}
-            </if>
+        <!-- ✅ 병원 유형 필터링 (과가 선택되지 않으면 필터링 X) -->
+        <if test='hospitalType != null and hospitalType != ""'>
+            AND H.HOSPITAL_TYPE = #{hospitalType}
+        </if>
 
-            <!-- 검색 조건 추가 -->
-            <if test='searchType != null and searchType != "" and keyword != null and keyword != ""'>
+        <!-- ✅ 검색 조건 적용 -->
+        <if test='searchType != null and searchType != "" and keyword != null and keyword != ""'>
+            AND (
                 <choose>
                     <when test='searchType == "name"'>
-                        AND H.NAME LIKE '%' || #{keyword} || '%'
+                        H.NAME LIKE '%' || #{keyword} || '%'
                     </when>
                     <when test='searchType == "address"'>
-                        AND H.ADDRESS LIKE '%' || #{keyword} || '%'
+                        H.ADDRESS LIKE '%' || #{keyword} || '%'
                     </when>
                     <when test='searchType == "tellNum"'>
-                        AND H.TELL_NUM LIKE '%' || #{keyword} || '%'
+                        H.TELL_NUM LIKE '%' || #{keyword} || '%'
                     </when>
                     <when test='searchType == "postNum"'>
-                        AND H.POST_NUM LIKE '%' || #{keyword} || '%'
+                        H.POST_NUM LIKE '%' || #{keyword} || '%'
                     </when>
                 </choose>
-            </if>
-        </script>
-    """)
+            )
+        </if>
+    </script>
+""")
     int countHospitals(
             @Param("city") String city,
             @Param("district") String district,
@@ -114,4 +120,5 @@ public interface HospitalMapper {
             @Param("searchType") String searchType,
             @Param("keyword") String keyword
     );
+
 }

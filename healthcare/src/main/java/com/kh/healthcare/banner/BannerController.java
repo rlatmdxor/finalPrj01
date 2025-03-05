@@ -3,8 +3,6 @@ package com.kh.healthcare.banner;
 import com.amazonaws.services.s3.AmazonS3;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kh.healthcare.Aws.FileUtil;
-import com.kh.healthcare.dashboard.SettingVo;
-import com.kh.healthcare.diet.meal.DietVo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
@@ -29,7 +27,6 @@ public class BannerController {
         try {
             if (f != null) {
                 String url = FileUtil.uploadFileToAwsS3(f , s3 , bucket);
-                System.out.println("url = " + url);
                 vo.setImageUrl(url);
             }
             service.bannerEnroll(vo);
@@ -42,8 +39,6 @@ public class BannerController {
 
     @GetMapping
     public List<BannerVo> getBannerList(@RequestParam String showYn, @RequestParam String searchValue){
-        System.out.println("showYn = " + showYn);
-        System.out.println("searchValue = " + searchValue);
         try {
             List<BannerVo> voList = service.getBannerList(showYn, searchValue);
             return voList;
@@ -59,7 +54,6 @@ public class BannerController {
         try {
             if (f != null) {
                 String url = FileUtil.uploadFileToAwsS3(f , s3 , bucket);
-                System.out.println("url = " + url);
                 vo.setImageUrl(url);
             }
             service.bannerEdit(vo);
@@ -83,7 +77,6 @@ public class BannerController {
 
     @PostMapping("delete")
     public void multiDeleteBanner(@RequestBody List<String> no, @RequestHeader("Authorization") String authorization){
-        System.out.println("noList = " + no);
         try {
             service.multiDeleteBanner(no);
         }

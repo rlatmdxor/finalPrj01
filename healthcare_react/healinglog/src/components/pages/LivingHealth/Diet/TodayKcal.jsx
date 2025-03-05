@@ -1,38 +1,9 @@
-import React, { useEffect, useState } from 'react';
 import { BigTextDiv, SmallTextDiv } from './Diet';
-import { useSelector } from 'react-redux';
 import SmallCard from '../../../util/SmallCard';
+import { useSelector } from 'react-redux';
 
-const TodayKcal = ({ reRender }) => {
-  const day = useSelector((state) => state.diet.day);
-  const token = localStorage.getItem('token');
-  const [totalKcal, setTotalKcal] = useState(0); // 총 섭취 칼로리
-
-  useEffect(() => {
-    fetch('http://127.0.0.1:80/api/diet', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        memberNo: '1',
-        dietDay: day,
-      }),
-    })
-      .then((resp) => resp.json())
-      .then((data) => {
-        if (data) {
-          let total = 0;
-          for (let i = 0; i < data.length; i++) {
-            total += Number(data[i].sumKcal);
-          }
-          setTotalKcal(total);
-        } else {
-          setTotalKcal(0);
-        }
-      });
-  }, [day, reRender]);
+const TodayKcal = () => {
+  const totalKcal = useSelector((state) => state.diet.totalKcal);
 
   return (
     <>

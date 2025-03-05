@@ -25,11 +25,11 @@ public interface BannerMapper {
                 SEQ_BANNER.NEXTVAL
                 , #{writer}
                 , #{title}
-                , 'https://picsum.photos/1380/500'
+                , #{imageUrl}
                 , #{showYn}
             )
             """)
-    void bannerEnroll(BannerVo vo); // TODO : 픽숨 링크 지우고 #{imageUrl} 로 변경하기
+    void bannerEnroll(BannerVo vo);
 
     List<BannerVo> getBannerList(String showYn, String searchValue);
 
@@ -37,12 +37,12 @@ public interface BannerMapper {
             UPDATE BANNER
             SET TITLE = #{title}
                 , SHOW_YN = #{showYn}
-                , IMAGE_URL = 'https://picsum.photos/1380/500'
+                , IMAGE_URL = #{imageUrl}
                 , MODIFY_DATE = SYSDATE
             WHERE NO = #{no}
             AND DEL_YN = 'N'
             """)
-    void bannerEdit(BannerVo vo); // TODO : 픽숨 링크 지우고 #{imageUrl} 로 변경하기
+    void bannerEdit(BannerVo vo);
 
     @Update("""
             UPDATE BANNER

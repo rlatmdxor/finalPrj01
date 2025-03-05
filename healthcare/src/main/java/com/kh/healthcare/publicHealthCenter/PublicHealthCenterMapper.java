@@ -10,78 +10,112 @@ import java.util.List;
 public interface PublicHealthCenterMapper {
 
     @Select("""
-        <script>
-            SELECT NAME, TELL_NUM, POST_NUM, ADDRESS
-            FROM (
-                SELECT PH.*, ROW_NUMBER() OVER (ORDER BY NAME ASC) AS RN
-                FROM PUBLIC_HEALTH_CENTER PH
-                WHERE 1=1
-                <if test='city != null and city != ""'>
-                    AND CITY = #{city}
-                </if>
-                <if test='district != null and district != ""'>
-                    AND DISTRICT = #{district}
-                </if>
-                <if test='dong != null and dong != ""'>
-                    AND Dong = #{dong}
-                </if>
-                <if test='searchType == "name"'>
-                    AND NAME LIKE '%' || #{keyword} || '%'
-                </if>
-                <if test='searchType == "address"'>
-                    AND ADDRESS LIKE '%' || #{keyword} || '%'
-                </if>
-                <if test='searchType == "tellNum"'>
-                    AND TELL_NUM LIKE '%' || #{keyword} || '%'
-                </if>
-                <if test='searchType == "postNum"'>
-                    AND POST_NUM LIKE '%' || #{keyword} || '%'
-                </if>
-            ) WHERE RN BETWEEN #{offset} + 1 AND #{offset} + #{size}
-        </script>
-    """)
-    List<PublicHealthCenterVo> searchPhcs(
-            @Param("city") String city,
-            @Param("district") String district,
-            @Param("dong") String dong,
-            @Param("searchType") String searchType,
-            @Param("keyword") String keyword,
-            @Param("size") int size,
-            @Param("offset") int offset
-    );
-
-    @Select("""
-        <script>
-            SELECT COUNT(*)
-            FROM PUBLIC_HEALTH_CENTER
+    <script>
+        SELECT NAME, TELL_NUM, POST_NUM, ADDRESS
+        FROM (
+            SELECT PH.*, ROW_NUMBER() OVER (ORDER BY NAME ASC) AS RN
+            FROM PUBLIC_HEALTH_CENTER PH
             WHERE 1=1
+            
+            <!-- ✅ 시/구 검색 (필수가 아님) -->
             <if test='city != null and city != ""'>
                 AND CITY = #{city}
             </if>
             <if test='district != null and district != ""'>
                 AND DISTRICT = #{district}
             </if>
-            <if test='dong != null and dong != ""'>
-                AND DONG = #{dong}
+
+            <!-- ✅ 검색어가 없을 경우, 시/구 정보를 자동 검색어로 설정 -->
+            <if test='(searchType == null or searchType == "") and (keyword == null or keyword == "")'>
+                <choose>
+                    <when test='district != null and district != ""'>
+                        AND ADDRESS LIKE '%' || #{district} || '%'
+                    </when>
+                    <when test='city != null and city != ""'>
+                        AND ADDRESS LIKE '%' || #{city} || '%'
+                    </when>
+                </choose>
             </if>
-            <if test='searchType == "name"'>
-                AND NAME LIKE '%' || #{keyword} || '%'
+
+            <!-- ✅ 검색 조건 적용 -->
+            <if test='searchType != null and searchType != "" and keyword != null and keyword != ""'>
+                <choose>
+                    <when test='searchType == "name"'>
+                        AND NAME LIKE '%' || #{keyword} || '%'
+                    </when>
+                    <when test='searchType == "address"'>
+                        AND ADDRESS LIKE '%' || #{keyword} || '%'
+                    </when>
+                    <when test='searchType == "tellNum"'>
+                        AND TELL_NUM LIKE '%' || #{keyword} || '%'
+                    </when>
+                    <when test='searchType == "postNum"'>
+                        AND POST_NUM LIKE '%' || #{keyword} || '%'
+                    </when>
+                </choose>
             </if>
-            <if test='searchType == "address"'>
-                AND ADDRESS LIKE '%' || #{keyword} || '%'
-            </if>
-            <if test='searchType == "tellNum"'>
-                AND TELL_NUM LIKE '%' || #{keyword} || '%'
-            </if>
-            <if test='searchType == "postNum"'>
-                AND POST_NUM LIKE '%' || #{keyword} || '%'
-            </if>
-        </script>
-    """)
+        ) 
+        WHERE RN BETWEEN #{offset} + 1 AND #{offset} + #{size}
+    </script>
+""")
+    List<PublicHealthCenterVo> searchPhcs(
+            @Param("city") String city,
+            @Param("district") String district,
+            @Param("searchType") String searchType,
+            @Param("keyword") String keyword,
+            @Param("size") int size,
+            @Param("offset") int offset
+    );
+
+
+    @Select("""
+    <script>
+        SELECT COUNT(*)
+        FROM PUBLIC_HEALTH_CENTER
+        WHERE 1=1
+        
+        <!-- ✅ 시/구 검색 (필수가 아님) -->
+        <if test='city != null and city != ""'>
+            AND CITY = #{city}
+        </if>
+        <if test='district != null and district != ""'>
+            AND DISTRICT = #{district}
+        </if>
+
+        <!-- ✅ 검색어가 없을 경우, 시/구 정보를 자동 검색어로 설정 -->
+        <if test='(searchType == null or searchType == "") and (keyword == null or keyword == "")'>
+            <choose>
+                <when test='district != null and district != ""'>
+                    AND ADDRESS LIKE '%' || #{district} || '%'
+                </when>
+                <when test='city != null and city != ""'>
+                    AND ADDRESS LIKE '%' || #{city} || '%'
+                </when>
+            </choose>
+        </if>
+
+        <!-- ✅ 검색 조건 적용 -->
+        <if test='searchType != null and searchType != "" and keyword != null and keyword != ""'>
+            <choose>
+                <when test='searchType == "name"'>
+                    AND NAME LIKE '%' || #{keyword} || '%'
+                </when>
+                <when test='searchType == "address"'>
+                    AND ADDRESS LIKE '%' || #{keyword} || '%'
+                </when>
+                <when test='searchType == "tellNum"'>
+                    AND TELL_NUM LIKE '%' || #{keyword} || '%'
+                </when>
+                <when test='searchType == "postNum"'>
+                    AND POST_NUM LIKE '%' || #{keyword} || '%'
+                </when>
+            </choose>
+        </if>
+    </script>
+""")
     int countPhcs(
             @Param("city") String city,
             @Param("district") String district,
-            @Param("dong") String dong,
             @Param("searchType") String searchType,
             @Param("keyword") String keyword
     );

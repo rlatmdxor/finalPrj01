@@ -13,22 +13,34 @@ public class HospitalService {
 
     private final HospitalMapper mapper;
 
+
     public Map<String, Object> searchHospitals(String city, String district, String dong, String hospitalType, String searchType, String keyword, int page, int size) {
         int offset = (page - 1) * size; // OFFSET 계산
 
-        // 병원 목록 조회
+        // ✅ 검색어가 없을 경우, "동 → 구 → 시"를 자동 검색어로 설정
+        if ((keyword == null || keyword.isEmpty())) {
+            if (searchType == null || searchType.isEmpty()) {
+                searchType = "address"; // 기본 검색 유형
+            }
+            keyword = (dong != null && !dong.isEmpty()) ? dong
+                    : (district != null && !district.isEmpty()) ? district
+                    : (city != null && !city.isEmpty()) ? city
+                    : "";
+        }
+
+        // ✅ 병원 목록 조회 (과 선택이 없어도 지역 필터 유지)
         List<HospitalVo> hospitals = mapper.searchHospitals(city, district, dong, hospitalType, searchType, keyword, size, offset);
 
-        // 전체 데이터 개수 조회
+        // ✅ 전체 데이터 개수 조회
         int totalElements = mapper.countHospitals(city, district, dong, hospitalType, searchType, keyword);
 
-        // 응답 데이터 구성
+        // ✅ 응답 데이터 구성
         Map<String, Object> response = new HashMap<>();
-        response.put("totalElements", totalElements); // 전체 개수
-        response.put("totalCount", (int) Math.ceil((double) totalElements / size)); // 총 페이지 수
-        response.put("currentPage", page); // 현재 페이지
-        response.put("pageSize", size); // 한 페이지당 개수
-        response.put("hospitals", hospitals); // 병원 리스트
+        response.put("totalElements", totalElements);
+        response.put("totalCount", (int) Math.ceil((double) totalElements / size));
+        response.put("currentPage", page);
+        response.put("pageSize", size);
+        response.put("hospitals", hospitals);
         return response;
     }
 }

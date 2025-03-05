@@ -1,5 +1,7 @@
-const getBannerData = async (token) => {
-  const resp = await fetch(`http://127.0.0.1:80/api/main/banner`, {
+import { BASE_URL } from './config';
+
+const getBannerList = async (token) => {
+  const resp = await fetch(`${BASE_URL}/api/main/banner`, {
     method: 'GET',
     headers: {
       Authorization: `Bearer ${token}`,
@@ -54,4 +56,4 @@ const getReviewList = async (token) => {
   return boardList;
 };
 
-export { getNoticeList, getBoardList, getReviewList, getBannerData };
+export { getNoticeList, getBoardList, getReviewList, getBannerList };

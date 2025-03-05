@@ -15,7 +15,6 @@ public class DietCalController {
 
     @PostMapping
     public List<DietCalVo> getDietCalData(@RequestBody DietCalVo vo, @RequestHeader("Authorization") String authorization){
-        System.out.println("memberNo = " + vo);
         try {
             List<DietCalVo> voList = service.getDietCalData(vo.getMemberNo());
             return voList;

@@ -241,9 +241,9 @@ const Pharmacy = () => {
           <tbody>
             {pharmacies.map((pharmacy, idx) => (
               <tr key={idx}>
-                <td>{pharmacy.name}</td>
-                <td>{pharmacy.tellNum}</td>
-                <td>{pharmacy.postNum}</td>
+                <td width="150px">{pharmacy.name}</td>
+                <td width="110px">{pharmacy.tellNum}</td>
+                <td width="60px">{pharmacy.postNum}</td>
                 <td>{pharmacy.address}</td>
               </tr>
             ))}

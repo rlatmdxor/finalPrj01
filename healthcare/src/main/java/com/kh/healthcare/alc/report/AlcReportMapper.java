@@ -6,7 +6,6 @@ import java.util.List;
 
 @Mapper
 public interface AlcReportMapper {
-
     @Select("""
             SELECT NO
             , MEMBER_NO
@@ -18,43 +17,31 @@ public interface AlcReportMapper {
             WHERE MEMBER_NO = #{memberNo}
             ORDER BY ENROLL_DATE DESC
             """)
-    List<AlcReportVo> getAlcReport(Long memberNo);
+    List<AlcReportVo> list(String memberNo);
 
     @Insert("""
-            INSERT INTO RECORD_ALC
-            (NO
-             ,MEMBER_NO
-             ,ALC_TYPE
-             ,ABV
-             ,CC
-             ,ENROLL_DATE)
-            VALUES
-            (
-            SEQ_RECORD_ALC.NEXTVAL
-            ,'1'
-            ,#{alcType}
-            ,#{abv}
-            ,#{cc}
-            ,#{enrollDate}
-            )
-           """)
-    void write(AlcReportVo vo);
+        INSERT INTO RECORD_ALC (NO, MEMBER_NO, ALC_TYPE, ABV, CC, ENROLL_DATE)
+        VALUES (SEQ_RECORD_ALC.NEXTVAL, #{memberNo}, #{vo.alcType}, #{vo.abv}, #{vo.cc}, #{vo.enrollDate})
+    """)
+    void write(@Param("memberNo") String memberNo, @Param("vo") AlcReportVo vo);
 
 
     @Update("""
-            UPDATE RECORD_ALC
-            SET
-                ALC_TYPE = #{alcType},
-                ABV= #{abv},
-                CC=#{cc},
-                ENROLL_DATE =#{enrollDate}
-            WHERE NO = #{no}
-            """)
-    void update(AlcReportVo vo);
+        UPDATE RECORD_ALC
+        SET
+            ALC_TYPE = #{vo.alcType},
+            ABV = #{vo.abv},
+            CC = #{vo.cc},
+            ENROLL_DATE = #{vo.enrollDate}
+        WHERE NO = #{vo.no} AND MEMBER_NO = #{memberNo}
+    """)
+    void update(@Param("memberNo") String memberNo, @Param("vo") AlcReportVo vo);
 
     @Delete("""
-            DELETE RECORD_ALC
-            WHERE NO = #{no}
-            """)
-    void delete(AlcReportVo vo);
+        DELETE FROM RECORD_ALC
+        WHERE NO = #{no} AND MEMBER_NO = #{memberNo}
+    """)
+    void delete(@Param("memberNo") String memberNo, @Param("no") String no);
+
+
 }

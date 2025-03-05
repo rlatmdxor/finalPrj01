@@ -9,6 +9,8 @@ import { ModalContainer } from './Diet';
 import { ContentAreaDiv, BigTextDiv, SmallTextDiv } from './Diet';
 import Btn from '../../../util/Btn';
 import SmallCard from '../../../util/SmallCard';
+import { setMealDetailList, setMealKcalSum, setTotalKcal } from '../../../../redux/dietSlice';
+import { getMealData } from '../../../services/dietService';
 
 const TodayDietArea = styled.div`
   display: flex;
@@ -76,37 +78,38 @@ const DeleteImgBtn = styled.button`
   cursor: pointer;
 `;
 
-const TodayDietMeal = ({ reRender, setReRender }) => {
+const TodayMeal = ({ token }) => {
   const dispatch = useDispatch();
-  const token = localStorage.getItem('token');
+  const Swal = require('sweetalert2');
+
+  const memberNo = useSelector((state) => state.diet.memberNo);
   const day = useSelector((state) => state.diet.day);
+  const mealDetailList = useSelector((state) => state.diet.mealDetailList);
+  const mealKcalSum = useSelector((state) => state.diet.mealKcalSum);
 
   const [foodData, setFoodData] = useState([]); // 음식 목록 데이터
-  const [mealDetailList, setMealDetailList] = useState([]); // 식단 상세 정보
-  const [mealKcalSum, setMealKcalSum] = useState({}); // 끼니별 섭취 칼로리
+
+  const fetchMealData = async () => {
+    try {
+      const data = await getMealData(memberNo, day, token);
+      dispatch(setMealDetailList(data));
+      let totalKcal = 0;
+      const kcalSummary = {};
+      data.forEach((item) => {
+        const kcal = Number(item.sumKcal);
+        kcalSummary[item.mealCode] = kcal;
+        totalKcal += kcal;
+      });
+      dispatch(setMealKcalSum(kcalSummary));
+      dispatch(setTotalKcal(totalKcal));
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   useEffect(() => {
-    fetch('http://127.0.0.1:80/api/diet', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        memberNo: '1',
-        dietDay: day,
-      }),
-    })
-      .then((resp) => resp.json())
-      .then((data) => {
-        setMealDetailList(data);
-        const kcalSummary = {};
-        data.forEach((item) => {
-          kcalSummary[item.mealCode] = item.sumKcal;
-        });
-        setMealKcalSum(kcalSummary);
-      });
-  }, [day, reRender]);
+    fetchMealData();
+  }, [day, memberNo]);
 
   useEffect(() => {
     fetch('http://127.0.0.1:80/api/diet/food', {
@@ -124,7 +127,7 @@ const TodayDietMeal = ({ reRender, setReRender }) => {
   // 식단 등록 폼데이터
   const initialInputData = {
     no: '',
-    memberNo: '1',
+    memberNo: memberNo,
     dietDay: day,
     mealCode: '',
     foodList: [],
@@ -215,6 +218,38 @@ const TodayDietMeal = ({ reRender, setReRender }) => {
   };
 
   const handleAddFood = (e) => {
+    if (!foodInputData.label.trim()) {
+      Swal.fire({
+        title: '음식명을 입력해주세요.',
+        confirmButtonText: '확인',
+      });
+      return;
+    }
+
+    if (!foodInputData.unit.trim()) {
+      Swal.fire({
+        title: '단위을 입력해주세요.',
+        confirmButtonText: '확인',
+      });
+      return;
+    }
+
+    if (!foodInputData.amount || foodInputData.amount < 0) {
+      Swal.fire({
+        title: '음식양을 0 이상 입력해주세요.',
+        confirmButtonText: '확인',
+      });
+      return;
+    }
+
+    if (!foodInputData.kcal || foodInputData.kcal < 0) {
+      Swal.fire({
+        title: '칼로리를을 0 이상 입력해주세요.',
+        confirmButtonText: '확인',
+      });
+      return;
+    }
+
     setInputData((prev) => {
       return {
         ...prev,
@@ -225,7 +260,40 @@ const TodayDietMeal = ({ reRender, setReRender }) => {
   };
 
   const handleEditFood = (e) => {
+    if (!foodInputData.label.trim()) {
+      Swal.fire({
+        title: '음식명을 입력해주세요.',
+        confirmButtonText: '확인',
+      });
+      return;
+    }
+
+    if (!foodInputData.unit.trim()) {
+      Swal.fire({
+        title: '단위을 입력해주세요.',
+        confirmButtonText: '확인',
+      });
+      return;
+    }
+
+    if (!foodInputData.amount || foodInputData.amount < 0) {
+      Swal.fire({
+        title: '음식양을 0 이상 입력해주세요.',
+        confirmButtonText: '확인',
+      });
+      return;
+    }
+
+    if (!foodInputData.kcal || foodInputData.kcal < 0) {
+      Swal.fire({
+        title: '칼로리를을 0 이상 입력해주세요.',
+        confirmButtonText: '확인',
+      });
+      return;
+    }
+
     e.preventDefault();
+
     const updatedFoodList = [];
     for (let i = 0; i < inputData.foodList.length; i++) {
       if (i === foodInputData.index) {
@@ -291,36 +359,50 @@ const TodayDietMeal = ({ reRender, setReRender }) => {
   // 식단 등록
   const handleSubmit = () => {
     if (!inputData.foodList || inputData.foodList.length === 0) {
-      alert('음식을 입력해주세요.');
+      Swal.fire({
+        title: '음식을 입력해주세요.',
+        confirmButtonText: '확인',
+      });
       return;
     }
 
-    if (!window.confirm('등록하시겠습니까?')) {
-      return;
-    }
+    Swal.fire({
+      title: '등록하시겠습니까?',
+      showCancelButton: true,
+      confirmButtonText: '확인',
+      cancelButtonText: '취소',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const formData = new FormData();
+        formData.append('memberNo', inputData.memberNo);
+        formData.append('dietDay', inputData.dietDay);
+        formData.append('mealCode', inputData.mealCode);
+        formData.append('foodListArr', JSON.stringify(inputData.foodList));
+        formData.append('memo', inputData.memo);
+        formData.append('f', inputData.image);
 
-    const formData = new FormData();
-    formData.append('memberNo', inputData.memberNo);
-    formData.append('dietDay', inputData.dietDay);
-    formData.append('mealCode', inputData.mealCode);
-    formData.append('foodListArr', JSON.stringify(inputData.foodList));
-    formData.append('memo', inputData.memo);
-    formData.append('f', inputData.image);
-
-    fetch('http://127.0.0.1:80/api/diet/enroll', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      body: formData,
-    }).then((resp) => {
-      if (resp.status == 200) {
-        alert('등록되었습니다.');
-        setReRender(() => reRender + 1);
-      } else {
-        alert('오류 발생..');
+        fetch('http://127.0.0.1:80/api/diet/enroll', {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        }).then((resp) => {
+          if (resp.status == 200) {
+            Swal.fire({
+              title: '등록되었습니다.',
+              confirmButtonText: '확인',
+            });
+            fetchMealData();
+          } else {
+            Swal.fire({
+              title: '오류발생...',
+              confirmButtonText: '확인',
+            });
+          }
+          dispatch(close('식단 등록'));
+        });
       }
-      dispatch(close('식단 등록'));
     });
   };
 
@@ -330,7 +412,7 @@ const TodayDietMeal = ({ reRender, setReRender }) => {
     setInputData((prev) => ({
       ...prev,
       no: mealDetail.no,
-      memberNo: '1',
+      memberNo: memberNo,
       dietDay: day,
       mealCode: mealDetail.mealCode,
       foodList: mealDetail.foodList || [],
@@ -344,61 +426,87 @@ const TodayDietMeal = ({ reRender, setReRender }) => {
   // 식단 수정
   const handleEdit = () => {
     if (!inputData.foodList || inputData.foodList.length === 0) {
-      alert('음식을 입력해주세요.');
+      Swal.fire({
+        title: '음식을 입력해주세요.',
+        confirmButtonText: '확인',
+      });
       return;
     }
+    Swal.fire({
+      title: '저장하시겠습니까?',
+      showCancelButton: true,
+      confirmButtonText: '확인',
+      cancelButtonText: '취소',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const formData = new FormData();
+        formData.append('no', inputData.no);
+        formData.append('memberNo', inputData.memberNo);
+        formData.append('dietDay', inputData.dietDay);
+        formData.append('mealCode', inputData.mealCode);
+        formData.append('foodListArr', JSON.stringify(inputData.foodList));
+        formData.append('memo', inputData.memo);
+        formData.append('f', inputData.image);
 
-    if (!window.confirm('저장하시겠습니까?')) {
-      return;
-    }
-    const formData = new FormData();
-    formData.append('no', inputData.no);
-    formData.append('memberNo', inputData.memberNo);
-    formData.append('dietDay', inputData.dietDay);
-    formData.append('mealCode', inputData.mealCode);
-    formData.append('foodListArr', JSON.stringify(inputData.foodList));
-    formData.append('memo', inputData.memo);
-    formData.append('f', inputData.image);
-
-    fetch('http://127.0.0.1:80/api/diet/edit', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      body: formData,
-    }).then((resp) => {
-      if (resp.status == 200) {
-        alert('저장되었습니다.');
-        setReRender(() => reRender + 1);
-      } else {
-        alert('오류 발생..');
+        fetch('http://127.0.0.1:80/api/diet/edit', {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        }).then((resp) => {
+          if (resp.status == 200) {
+            Swal.fire({
+              title: '저장되었습니다.',
+              confirmButtonText: '확인',
+            });
+            fetchMealData();
+          } else {
+            Swal.fire({
+              title: '오류발생...',
+              confirmButtonText: '확인',
+            });
+          }
+          dispatch(close('식단 상세'));
+        });
       }
-      dispatch(close('식단 상세'));
     });
   };
 
   // 식단 삭제
   const handleDelete = () => {
-    if (!window.confirm('삭제하시겠습니까?')) {
-      return;
-    }
-    fetch('http://127.0.0.1:80/api/diet/delete', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        no: inputData.no,
-      }),
-    }).then((resp) => {
-      if (resp.status == 200) {
-        alert('삭제되었습니다.');
-        setReRender(() => reRender + 1);
-      } else {
-        alert('오류 발생..');
+    Swal.fire({
+      title: '삭제하시겠습니까?',
+      showCancelButton: true,
+      confirmButtonText: '확인',
+      cancelButtonText: '취소',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        fetch('http://127.0.0.1:80/api/diet/delete', {
+          method: 'POST',
+          headers: {
+            'content-type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            no: inputData.no,
+          }),
+        }).then((resp) => {
+          if (resp.status == 200) {
+            Swal.fire({
+              title: '삭제되었습니다.',
+              confirmButtonText: '확인',
+            });
+            fetchMealData();
+          } else {
+            Swal.fire({
+              title: '오류발생...',
+              confirmButtonText: '확인',
+            });
+          }
+          dispatch(close('식단 상세'));
+        });
       }
-      dispatch(close('식단 상세'));
     });
   };
 
@@ -840,4 +948,4 @@ const TodayDietMeal = ({ reRender, setReRender }) => {
   );
 };
 
-export default TodayDietMeal;
+export default TodayMeal;

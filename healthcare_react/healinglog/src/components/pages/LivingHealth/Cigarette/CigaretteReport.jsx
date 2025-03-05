@@ -27,17 +27,6 @@ const NaviContainer = styled.div`
 `;
 
 const CigaretteReport = () => {
-  const url = 'http://127.0.0.1/api/cigarette/report/list';
-
-  const options = {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      // Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({ memberNo: '1' }),
-  };
-
   const [fullData, setFullData] = useState([]); // 전체 데이터 저장
   const [pagedData, setPagedData] = useState([]); // 페이징된 데이터
   const [filteredData, setFilteredData] = useState([]); // 차트용 필터링 데이터
@@ -65,6 +54,22 @@ const CigaretteReport = () => {
   useEffect(() => {
     dispatch(resetPaging({ boardType }));
   }, [boardType, dispatch]);
+
+  //토큰관련코드
+  const token = localStorage.getItem('token');
+
+  if (!token) {
+    alert('로그인 정보가 없습니다.');
+    window.location.href = '/login';
+  }
+
+  const url = 'http://127.0.0.1/api/cigarette/report/list';
+  const options = {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
 
   // fetch실행
   useEffect(() => {
@@ -221,9 +226,6 @@ const CigaretteReport = () => {
   // 화면 렌더링
   const [num, setNum] = useState('');
 
-  //토큰관련코드
-  const token = localStorage.getItem('token');
-
   // 인풋 데이터 초기화
   const reset = () => {
     setInputData(initialInputData);
@@ -322,10 +324,11 @@ const CigaretteReport = () => {
   return (
     <>
       <Title>흡연관리</Title>
-      <NaviContainer>
+      {/* <NaviContainer>
         <Navi target="cigarette" tag={'캘린더'}></Navi>
         <Navi target="cigarette/report" tag={'리포트'}></Navi>
-      </NaviContainer>
+      </NaviContainer> */}
+      <div></div>
 
       <ContentLayout>
         <DateBtn dataBtn={dataBtn} onSelect={setSelectedRange} onChange={setSelectChart}></DateBtn>
