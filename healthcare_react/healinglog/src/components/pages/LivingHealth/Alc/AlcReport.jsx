@@ -16,6 +16,9 @@ import { open, close } from '../../../../redux/modalSlice';
 import ContentLayout from '../../../util/ContentLayout';
 import DateBtn from '../../../util/DateBtn';
 
+import Swal from 'sweetalert2';
+import { useNavigate } from 'react-router-dom';
+
 //모달 밖의 버튼 컨테이너
 const BtnContainer = styled.div`
   display: flex;
@@ -37,7 +40,38 @@ const NaviContainer = styled.div`
   left: 40px;
   grid-template-columns: 3fr 3fr; // 글자수만큼 fr 주면 됩니다. ex) 유산소 3글자니까 3fr
 `;
-//토큰관련코드
+
+const YearDiv = styled.div`
+  display: flex;
+  height: 30px;
+  box-sizing: border-box;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid rgb(118, 118, 118);
+`;
+
+const YearBtn = styled.button`
+  background-color: transparent;
+  border: none;
+  padding: 0px 12px;
+  cursor: pointer;
+  font-size: 16px;
+`;
+
+const SearchArea = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 9px;
+  margin-top: 10px;
+`;
+
+const Input = styled.input`
+  box-sizing: border-box;
+  font-family: '맑은 고딕';
+  height: 30px;
+  padding: 0px 4px;
+`;
 
 const AlcReport = () => {
   const dispatch = useDispatch();
@@ -65,12 +99,27 @@ const AlcReport = () => {
     { name: '와인', alc: 12, cc: 150 },
     { name: '칵테일', alc: 10, cc: 60 },
   ];
-  const token = localStorage.getItem('token');
 
-  if (!token) {
-    alert('로그인 정보가 없습니다.');
-    window.location.href = '/login';
-  }
+  const token = localStorage.getItem('token');
+  const navi = useNavigate();
+  const [isAuthorized, setIsAuthorized] = useState(false); // 로그인 여부 체크
+
+  useEffect(() => {
+    if (!token) {
+      Swal.fire({
+        icon: 'warning',
+        title: '로그인이 필요합니다',
+        text: '로그인 후 이용해주세요',
+        confirmButtonText: '확인',
+      }).then(() => {
+        navi('/login'); // 로그인 페이지로 이동
+      });
+    } else {
+      setIsAuthorized(true); // 로그인 성공 시 데이터 요청 가능
+    }
+  }, [navi, token]);
+
+  const [memberNo, setMemberNo] = useState(0);
 
   const url = 'http://127.0.0.1/api/alc/report/list';
   const options = {
@@ -84,6 +133,9 @@ const AlcReport = () => {
     fetch(url, options)
       .then((resp) => resp.json())
       .then((data) => {
+        if (!isAuthorized) {
+          return;
+        }
         if (data.length > 0) {
           dispatch(setTotalCount({ boardType, totalCount: data.length })); // 페이징 처리할때 totalCount 저장
           setFullData(data);
@@ -167,6 +219,91 @@ const AlcReport = () => {
   }, [fullData]);
 
   const dataBtn = ['주', '월', '년'];
+  //테스트
+  const currentYear = new Date().getFullYear();
+  const currentMonth = String(new Date().getMonth() + 1).padStart(2, '0');
+  const currentYearMonth = currentYear + '-' + currentMonth;
+  const [year, setYear] = useState(currentYear);
+  const [month, setMonth] = useState(currentYearMonth);
+
+  const handleIncrease = () => {
+    setYear((prev) => prev + 1);
+  };
+
+  const handleDecrease = () => {
+    setYear((prev) => prev - 1);
+  };
+
+  const handleDateChange = (e) => {
+    setMonth(e.target.value);
+  };
+
+  const getYearalcList = async () => {
+    const token = localStorage.getItem('token');
+
+    try {
+      const response = await fetch('http://127.0.0.1/api/alc/report/list', {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('데이터 불러오기 실패:', error);
+      return [];
+    }
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const alcList = await getYearalcList(); // 전체 데이터 가져오기
+
+        let filteredData = [];
+
+        if (selectedRange === '주') {
+          // 최근 7일 데이터 필터링
+          const today = new Date();
+          const oneWeekAgo = new Date(today);
+          oneWeekAgo.setDate(today.getDate() - 7);
+
+          filteredData = alcList.filter((item) => {
+            const itemDate = new Date(item.enrollDate);
+            return itemDate >= oneWeekAgo && itemDate <= today;
+          });
+        } else if (selectedRange === '월') {
+          // 월별 데이터 필터링
+          filteredData = alcList.filter((item) => {
+            const itemDate = new Date(item.enrollDate);
+            const itemYear = itemDate.getFullYear();
+            const itemMonth = (itemDate.getMonth() + 1).toString().padStart(2, '0');
+            return itemYear === year && itemMonth === month.split('-')[1];
+          });
+        } else if (selectedRange === '년') {
+          // 연도별 데이터 필터링
+          filteredData = alcList.filter((item) => {
+            const itemYear = new Date(item.enrollDate).getFullYear();
+            return itemYear === year;
+          });
+        }
+
+        setFilteredData(filteredData);
+      } catch (error) {
+        console.error('[ERROR] GET DATA', error);
+      }
+    };
+
+    fetchData();
+  }, [selectedRange, year, month]);
+  //테스트
 
   const labels = [];
 
@@ -179,7 +316,6 @@ const AlcReport = () => {
 
   for (const vo of filteredData) {
     alcList.unshift(((vo.abv / 100) * vo.cc).toFixed(2));
-    // alcList.unshift(alcAmount);
   }
 
   const dataset = [
@@ -339,7 +475,22 @@ const AlcReport = () => {
       </NaviContainer> */}
 
       <ContentLayout>
-        <DateBtn dataBtn={dataBtn} onSelect={setSelectedRange} onChange={setSelectChart}></DateBtn>
+        {/* <DateBtn dataBtn={dataBtn} onSelect={setSelectedRange} onChange={setSelectChart}></DateBtn> */}
+
+        <SearchArea>
+          {selectedRange === '월' ? (
+            <Input type="month" name="month" defaultValue={month} onChange={handleDateChange} />
+          ) : selectedRange === '년' ? (
+            <YearDiv>
+              <YearBtn onClick={handleDecrease}>{'<'}</YearBtn>
+              <span>{year}</span>
+              <YearBtn onClick={handleIncrease}>{'>'}</YearBtn>
+            </YearDiv>
+          ) : (
+            ''
+          )}
+          <DateBtn dataBtn={dataBtn} onSelect={setSelectedRange} onChange={setSelectChart}></DateBtn>
+        </SearchArea>
         <Chart
           chartType={selectChart} // 차트 타입지정
           labels={labels} // 위랑 동일
