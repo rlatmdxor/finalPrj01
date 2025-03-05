@@ -19,7 +19,6 @@ function isTokenExpired(token) {
     // 현재 시간(초 단위)
     const currentTime = Date.now() / 1000;
 
-    // 토큰의 만료 시간 확인 (exp는 JWT에서 초 단위로 제공)
     if (decodedToken.exp < currentTime) {
       return true; // 토큰이 만료됨
     } else {
@@ -31,4 +30,16 @@ function isTokenExpired(token) {
   }
 }
 
-export { getPayload, isTokenExpired };
+function getRoleFromToken(token) {
+  try {
+    // JWT 디코딩
+    const decodedToken = jwtDecode(token);
+
+    return decodedToken.role;
+  } catch (error) {
+    console.error('JWT 디코딩 실패:', error);
+    return null; // 디코딩 실패 시 null 반환
+  }
+}
+
+export { getPayload, isTokenExpired, getRoleFromToken };
