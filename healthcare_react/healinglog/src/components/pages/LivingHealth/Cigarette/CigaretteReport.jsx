@@ -454,7 +454,7 @@ const CigaretteReport = () => {
               // 모달 닫기
               dispatch(close('흡연 수정'));
               // 필요 시 페이지 새로고침
-              // window.location.reload();
+              window.location.reload();
             });
           })
           .catch((error) => {
