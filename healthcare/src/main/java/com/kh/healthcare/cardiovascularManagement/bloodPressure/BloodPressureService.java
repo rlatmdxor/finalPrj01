@@ -71,4 +71,14 @@ public class BloodPressureService {
     public void bloodPressureDelete(BloodPressureVo vo) {
         dao.bloodPressureDelete(vo);
     }
+
+    // 오늘 혈압 체크했는지
+    public String checkTodayBloodPressure(String userNo) {
+        int count = dao.checkTodayBloodPressure(userNo);
+        if (count == 0) {
+            return "오늘 혈압 측정 내역이 없습니다. 혈압 측정 내역을 기록해주세요!";
+        } else {
+            return "측정 내역 있음";
+        }
+    }
 }

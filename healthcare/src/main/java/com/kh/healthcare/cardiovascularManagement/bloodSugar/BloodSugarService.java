@@ -49,4 +49,14 @@ public class BloodSugarService {
     public void bsDel(BloodSugarVo vo) {
         mapper.bsDel(vo);
     }
+
+    //혈당 체크했는지
+    public String checkTodayBloodSugar(String userNo) {
+        int count = mapper.checkTodayBloodSugar(userNo);
+        if (count == 0) {
+            return "오늘 혈당 측정 내역이 없습니다. 혈당 측정 내역을 기록해주세요!";
+        } else {
+            return "측정 내역 있음";
+        }
+    }
 }

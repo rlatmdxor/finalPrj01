@@ -57,4 +57,17 @@ public class InsulinService {
     }
 
 
+    //오늘 인슐린 투약 내역 체크하고 메시지 반환
+    public String checkTodayInsulin(String userNo) {
+        int count = mapper.checkTodayInsulin(userNo);
+        if (count == 0) {
+            return "오늘 등록된 투약 내역이 없습니다. 인슐린 투약 내역을 등록해주세요!";
+        } else if(count < 3){
+            return "오늘 투약할 인슐린이 남아 있습니다. 인슐린 투약 내역을 등록해주세요!";
+        } else {
+            return "투약 완료";
+        }
+
+    }
+    
 }

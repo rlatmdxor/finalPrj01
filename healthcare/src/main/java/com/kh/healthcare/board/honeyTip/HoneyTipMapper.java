@@ -196,6 +196,19 @@ public interface HoneyTipMapper {
             AND B.DEL_YN = 'N'
             """)
     List<HoneyTipCommentVo> commentList(String bno);
+
+    @Select("""
+            SELECT COUNT(*)
+            FROM BOARD_COMMENT
+            WHERE BOARD_NO IN (
+                SELECT NO
+                FROM BOARD
+                WHERE MEMBER_NO = #{userNo}
+            )
+            AND ENROLL_DATE > SYSDATE - INTERVAL '1' MINUTE
+            AND DEL_YN = 'N'
+            """)
+    int checkNewComment(String userNo);
 }
 
 
