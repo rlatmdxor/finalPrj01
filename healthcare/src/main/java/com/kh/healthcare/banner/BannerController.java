@@ -41,10 +41,9 @@ public class BannerController {
     }
 
     @PostMapping("edit")
-    public void editBanner(BannerVo vo, MultipartFile f, @RequestHeader("Authorization") String token){
+    public void editBanner(BannerVo vo, @RequestParam(required = false) MultipartFile f, @RequestParam(required = false) String imageUrl, @RequestHeader("Authorization") String token){
         try {
-
-            service.bannerEdit(vo, f, token);
+            service.bannerEdit(vo, f, imageUrl, token);
         }
         catch (Exception e){
             e.printStackTrace();

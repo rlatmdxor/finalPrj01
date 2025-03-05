@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { close } from '../../../../redux/modalSlice';
 import { useNavigate } from 'react-router-dom';
 import { setDay } from '../../../../redux/dietSlice';
-// import { isTokenExpired, getRoleFromToken } from '../../util/JwtUtil';
+import { getRoleFromToken, isTokenExpired } from '../../../util/JwtUtil';
 
 const NaviContainer = styled.div`
   display: grid;
@@ -38,8 +38,8 @@ const DietCal = () => {
   const [isAuthorized, setIsAuthorized] = useState(false); // 로그인 여부 체크
 
   useEffect(() => {
-    //if (!token || isTokenExpired(token)) {
-    if (!token) {
+    if (!token || isTokenExpired(token) || getRoleFromToken(token) == 'ROLE_ADMIN') {
+      window.localStorage.removeItem('token'); // 토큰 삭제
       navi('/login'); // 로그인 페이지로 이동
       Swal.fire({
         icon: 'warning',

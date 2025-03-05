@@ -13,7 +13,7 @@ import { open, close } from '../../../redux/modalSlice';
 import { getBannerList, enrollBanner, editBanner, deleteBanner, multiDeleteBanner } from '../../services/bannerService';
 import SearchBar from '../../util/SearchBar';
 import { useNavigate } from 'react-router-dom';
-import { jwtDecode } from 'jwt-decode';
+import { getRoleFromToken, isTokenExpired } from '../../util/JwtUtil';
 
 const SearchDiv = styled.div`
   display: flex;
@@ -119,11 +119,8 @@ const AdminBanner = () => {
   const token = localStorage.getItem('token');
   const [isAuthorized, setIsAuthorized] = useState(false); // 로그인 여부 체크
 
-  const [adminNo, setAdminNo] = useState(0);
-
   useEffect(() => {
-    // if (!token || isTokenExpired(token) || getRoleFromToken(token) !== 'ROLE_ADMIN') {
-    if (!token) {
+    if (!token || isTokenExpired(token) || getRoleFromToken(token) !== 'ROLE_ADMIN') {
       navi('/admin/login'); // 로그인 페이지로 이동
       Swal.fire({
         icon: 'warning',
@@ -332,7 +329,12 @@ const AdminBanner = () => {
         formData.append('no', inputData.no);
         formData.append('title', inputData.title);
         formData.append('showYn', inputData.showYn);
-        formData.append('f', inputData.imageUrl);
+
+        if (typeof inputData.imageUrl === 'string') {
+          formData.append('imageUrl', inputData.imageUrl); // 기존 이미지 URL 유지
+        } else if (inputData.imageUrl) {
+          formData.append('f', inputData.imageUrl); // 새 이미지 업로드
+        }
 
         const editBannerFetch = async () => {
           try {

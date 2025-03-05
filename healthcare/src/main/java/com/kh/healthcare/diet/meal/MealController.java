@@ -37,9 +37,9 @@ public class MealController {
     }
 
     @PostMapping("edit")
-    public void dietMealEdit(DietVo vo, String foodListArr, MultipartFile f, @RequestHeader("Authorization") String token){
+    public void dietMealEdit(DietVo vo, String foodListArr, @RequestParam(required = false) MultipartFile f, @RequestParam(required = false) String imageUrl, @RequestHeader("Authorization") String token){
         try {
-            service.dietMealEdit(vo, foodListArr, f, token);
+            service.dietMealEdit(vo, foodListArr, f, imageUrl, token);
         }
         catch (Exception e){
             e.printStackTrace();

@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom';
 import { getPayload } from '../util/JwtUtil';
 import AdminNavi from './AdminNavi';
 
@@ -9,7 +8,6 @@ const LogoAreaDiv = styled.div`
 `;
 
 const StyledImg = styled.img`
-  cursor: pointer;
   box-sizing: border-box;
   margin-left: 8px;
   height: 115px;
@@ -47,12 +45,11 @@ const LoginDiv = styled.div`
 const AdminHeader = () => {
   const token = localStorage.getItem('token');
   const nick = getPayload(token, 'nick');
-  const navi = useNavigate();
 
   return (
     <>
       <LogoAreaDiv>
-        <StyledImg src="/img/logo.png" onClick={() => navi('/admin/usermanage')} />
+        <StyledImg src="/img/logo.png" />
       </LogoAreaDiv>
       <AdminNavi />
       <ProfileDiv>
