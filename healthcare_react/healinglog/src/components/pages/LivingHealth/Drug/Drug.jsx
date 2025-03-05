@@ -12,7 +12,7 @@ import ContentLayout from '../../../util/ContentLayout';
 import DrugSearch from './DrugSearch';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
-import { isTokenExpired, getRoleFromToken } from '../../util/JwtUtil';
+import { isTokenExpired, getRoleFromToken } from '../../../util/JwtUtil';
 
 const BottomDiv = styled.div`
   margin-top: 25px;
