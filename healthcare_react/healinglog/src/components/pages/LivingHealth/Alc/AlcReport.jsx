@@ -18,6 +18,7 @@ import DateBtn from '../../../util/DateBtn';
 
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
+import { getRoleFromToken, isTokenExpired } from '../../../util/JwtUtil';
 
 //모달 밖의 버튼 컨테이너
 const BtnContainer = styled.div`
@@ -105,14 +106,14 @@ const AlcReport = () => {
   const [isAuthorized, setIsAuthorized] = useState(false); // 로그인 여부 체크
 
   useEffect(() => {
-    if (!token) {
+    if (!token || isTokenExpired(token) || getRoleFromToken(token) == 'ROLE_ADMIN') {
+      window.localStorage.removeItem('token'); // 토큰 삭제
+      navi('/login'); // 로그인 페이지로 이동
       Swal.fire({
         icon: 'warning',
         title: '로그인이 필요합니다',
         text: '로그인 후 이용해주세요',
         confirmButtonText: '확인',
-      }).then(() => {
-        navi('/login'); // 로그인 페이지로 이동
       });
     } else {
       setIsAuthorized(true); // 로그인 성공 시 데이터 요청 가능
