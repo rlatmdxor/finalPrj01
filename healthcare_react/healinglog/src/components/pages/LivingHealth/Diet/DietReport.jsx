@@ -16,6 +16,8 @@ import {
   getYearAvgWater,
   getYearAvgWeight,
 } from '../../../services/dietService';
+import { jwtDecode } from 'jwt-decode';
+import { useNavigate } from 'react-router-dom';
 
 const NaviContainer = styled.div`
   display: grid;
@@ -64,8 +66,28 @@ const YearBtn = styled.button`
 `;
 
 const DietReport = () => {
+  const navigate = useNavigate();
+
   const token = localStorage.getItem('token');
-  const memberNo = 1;
+  const [memberNo, setMemberNo] = useState(0);
+
+  useEffect(() => {
+    if (!token) {
+      alert('로그인 정보가 없습니다.');
+      navigate('/login');
+    }
+  }, []);
+
+  useEffect(() => {
+    if (token) {
+      try {
+        const decodedToken = jwtDecode(token);
+        setMemberNo(decodedToken.no);
+      } catch {
+        navigate('/login');
+      }
+    }
+  }, [token]);
 
   const [kcalLabel, setkcalLabel] = useState([]);
   const [kcalData, setKcalData] = useState([]);
@@ -98,45 +120,47 @@ const DietReport = () => {
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        let kcalData;
-        let waterData;
-        let weightData;
+    if (memberNo > 0) {
+      const fetchData = async () => {
+        try {
+          let kcalData;
+          let waterData;
+          let weightData;
 
-        switch (selectedRange) {
-          case '일':
-            kcalData = await getDayKcal(memberNo, month, token);
-            waterData = await getDayWater(memberNo, month, token);
-            weightData = await getDayWeight(memberNo, month, token);
-            break;
-          case '월':
-            kcalData = await getMonthAvgKcal(memberNo, year, token);
-            waterData = await getMonthAvgWater(memberNo, year, token);
-            weightData = await getMonthAvgWeight(memberNo, year, token);
-            break;
-          case '년':
-            kcalData = await getYearAvgKcal(memberNo, token);
-            waterData = await getYearAvgWater(memberNo, token);
-            weightData = await getYearAvgWeight(memberNo, token);
-            break;
-          default:
-            return;
+          switch (selectedRange) {
+            case '일':
+              kcalData = await getDayKcal(memberNo, month, token);
+              waterData = await getDayWater(memberNo, month, token);
+              weightData = await getDayWeight(memberNo, month, token);
+              break;
+            case '월':
+              kcalData = await getMonthAvgKcal(memberNo, year, token);
+              waterData = await getMonthAvgWater(memberNo, year, token);
+              weightData = await getMonthAvgWeight(memberNo, year, token);
+              break;
+            case '년':
+              kcalData = await getYearAvgKcal(memberNo, token);
+              waterData = await getYearAvgWater(memberNo, token);
+              weightData = await getYearAvgWeight(memberNo, token);
+              break;
+            default:
+              return;
+          }
+
+          setkcalLabel(kcalData.map((item) => item.dietDay.split(' ')[0]));
+          setKcalData(kcalData.map((item) => item.totalKcal));
+          setWaterLabel(waterData.map((item) => item.enrollDate.split(' ')[0]));
+          setWaterData(waterData.map((item) => item.amount));
+          setWeightLabel(weightData.map((item) => item.enrollDate.split(' ')[0]));
+          setWeightData(weightData.map((item) => item.amount));
+        } catch (error) {
+          alert('GET KCAL DATA FAIL ...');
+          console.error('[ERROR] GET DATA', error);
         }
-
-        setkcalLabel(kcalData.map((item) => item.dietDay.split(' ')[0]));
-        setKcalData(kcalData.map((item) => item.totalKcal));
-        setWaterLabel(waterData.map((item) => item.enrollDate.split(' ')[0]));
-        setWaterData(waterData.map((item) => item.amount));
-        setWeightLabel(weightData.map((item) => item.enrollDate.split(' ')[0]));
-        setWeightData(weightData.map((item) => item.amount));
-      } catch (error) {
-        alert('GET KCAL DATA FAIL ...');
-        console.error('[ERROR] GET DATA', error);
-      }
-    };
-    fetchData();
-  }, [selectedRange, year, month]);
+      };
+      fetchData();
+    }
+  }, [selectedRange, year, month, memberNo]);
 
   const kcalDataset = [
     {

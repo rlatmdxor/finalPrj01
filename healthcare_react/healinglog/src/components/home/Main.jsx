@@ -9,7 +9,7 @@ import 'swiper/css/scrollbar';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import Avatar from '@mui/material/Avatar';
-import { getBannerData, getNoticeList, getBoardList, getReviewList } from '../services/homeService';
+import { getBannerList, getNoticeList, getBoardList, getReviewList } from '../services/mainService';
 
 const LayoutDiv = styled.div`
   display: flex;
@@ -28,7 +28,7 @@ const LayoutDiv = styled.div`
 `;
 
 const ContentArea = styled.div`
-  margin-top: 450px;
+  margin-top: 445px;
   margin-bottom: 30px;
 `;
 
@@ -217,7 +217,7 @@ const Main = () => {
   useEffect(() => {
     const getFetch = async () => {
       try {
-        const bannerData = await getBannerData(token);
+        const bannerData = await getBannerList(token);
         const boardData = await getBoardList(token);
         const noticeData = await getNoticeList(token);
         const reviewData = await getReviewList(token);

@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { close } from '../../../../redux/modalSlice';
 import { useNavigate } from 'react-router-dom';
 import { setDay } from '../../../../redux/dietSlice';
+import { jwtDecode } from 'jwt-decode';
 
 const NaviContainer = styled.div`
   display: grid;
@@ -33,6 +34,25 @@ const DietCal = () => {
   const dispatch = useDispatch();
 
   const token = localStorage.getItem('token');
+  const [memberNo, setMemberNo] = useState(0);
+
+  useEffect(() => {
+    if (!token) {
+      alert('로그인 정보가 없습니다.');
+      navigate('/login');
+    }
+  }, []);
+
+  useEffect(() => {
+    if (token) {
+      try {
+        const decodedToken = jwtDecode(token);
+        setMemberNo(decodedToken.no);
+      } catch {
+        navigate('/login');
+      }
+    }
+  }, [token]);
 
   const [events, setEvents] = useState({});
 
@@ -53,22 +73,24 @@ const DietCal = () => {
   };
 
   useEffect(() => {
-    fetch('http://127.0.0.1:80/api/dietcal', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        memberNo: '1',
-      }),
-    })
-      .then((resp) => resp.json())
-      .then((data) => {
-        const formattedData = formatData(data);
-        setEvents(formattedData);
-      });
-  }, []);
+    if (memberNo > 0) {
+      fetch('http://127.0.0.1:80/api/dietcal', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          memberNo: memberNo,
+        }),
+      })
+        .then((resp) => resp.json())
+        .then((data) => {
+          const formattedData = formatData(data);
+          setEvents(formattedData);
+        });
+    }
+  }, [memberNo]);
 
   const modalState = useSelector((state) => state.modal.modals['캘린더 모달']);
   const selectedDate = useSelector((state) => state.modal.selectedDate);

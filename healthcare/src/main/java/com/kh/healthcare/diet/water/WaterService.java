@@ -13,24 +13,24 @@ public class WaterService {
 
     private final WaterMapper mapper;
 
-    public void waterIntakeEnroll(WaterVo vo) {
-        String amount = getWaterIntakeByDate(vo);
+    public void waterEnroll(WaterVo vo) {
+        WaterVo waterVo = getWaterByDate(vo);
 
-        if(amount == null) {
-            mapper.waterIntakeEnroll(vo);
+        if(waterVo == null) {
+            mapper.waterEnroll(vo);
         }
         else {
-            mapper.waterIntakeUpdate(vo);
+            mapper.waterUpdate(vo);
         }
     }
 
-    public String getWaterIntakeByDate(WaterVo vo) {
+    public WaterVo getWaterByDate(WaterVo vo) {
         try {
-            String amount = mapper.getWaterIntakeByDate(vo);
-            if (amount == null) {
+            WaterVo waterVo = mapper.getWaterByDate(vo);
+            if (waterVo == null) {
                 return null;
             }
-            return amount;
+            return waterVo;
         } catch (Exception e) {
             e.getMessage();
             return null;

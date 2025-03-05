@@ -26,7 +26,7 @@ public interface WaterMapper {
                  , #{amount}
             )
             """)
-    void waterIntakeEnroll(WaterVo vo);
+    void waterEnroll(WaterVo vo);
 
     @Update("""
             UPDATE WATER_LOG
@@ -34,7 +34,7 @@ public interface WaterMapper {
             WHERE MEMBER_NO = #{memberNo}
             AND TRUNC(ENROLL_DATE) = #{enrollDate}
             """)
-    void waterIntakeUpdate(WaterVo vo);
+    void waterUpdate(WaterVo vo);
 
     @Select("""
             SELECT AMOUNT
@@ -42,7 +42,7 @@ public interface WaterMapper {
             WHERE MEMBER_NO = #{memberNo}
             AND TRUNC(ENROLL_DATE) = #{enrollDate}
             """)
-    String getWaterIntakeByDate(WaterVo vo);
+    WaterVo getWaterByDate(WaterVo vo);
 
     @Select("""
             SELECT ENROLL_DATE, AMOUNT

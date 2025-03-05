@@ -9,9 +9,10 @@ import useWeekRange from '../../hook/useWeekRange';
 import { Switch } from '@mui/material';
 import { getDashboardData, getDashboardSetting, editDashboardSetting } from '../../services/dashboardService';
 import Modal from '../../util/Modal';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { close, open } from '../../../redux/modalSlice';
 import { useNavigate } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
 
 const NaviContainer = styled.div`
   display: grid;
@@ -165,11 +166,13 @@ const SwitchInputDiv = styled.div`
 `;
 
 const DashBoard = () => {
-  const token = localStorage.getItem('token');
-  const memberNo = 1;
   const navigate = useNavigate();
-
   const dispatch = useDispatch();
+
+  const token = localStorage.getItem('token');
+  const [memberVo, setMemberVo] = useState({
+    memberNo: 0,
+  });
 
   const { currentMonday, currentSunday, handlePrevWeek, handleNextWeek } = useWeekRange();
   const [dashboardData, setDashboardData] = useState({ currentWeek: {}, previousWeek: {}, difference: {} });
@@ -178,47 +181,68 @@ const DashBoard = () => {
   const [inputData, setInputData] = useState([]);
 
   const [isAllSelected, setIsAllSelected] = useState(false);
-
-  const isModalOpen = useSelector((state) => state.modal.modals['나의 설정'] === 'block');
-
-  const handleSettingModal = () => {
-    setInputData([...settings]);
-    dispatch(open({ title: '나의 설정', value: 'block' }));
-  };
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const getFetch = async () => {
-      // if (!token) {
-      //   alert('로그인 정보가 없습니다.');
-      //   navigate('/');
-      // }
+    if (!token) {
+      alert('로그인 정보가 없습니다.');
+      navigate('/login');
+    }
+  }, []);
 
+  useEffect(() => {
+    if (token) {
       try {
-        const fetchData = await getDashboardData(currentMonday, currentSunday, memberNo, token);
+        const decodedToken = jwtDecode(token);
+        setMemberVo({
+          memberNo: decodedToken.no,
+        });
+      } catch {
+        navigate('/login');
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!memberVo.memberNo || memberVo.memberNo === '') {
+      return;
+    }
+
+    const fetchDashboardData = async () => {
+      try {
+        const fetchData = await getDashboardData(currentMonday, currentSunday, memberVo.memberNo, token);
         setDashboardData(fetchData);
       } catch (error) {
         console.error('[ERROR] GET DASHBOARD DATA FAIL', error);
       }
     };
-    getFetch();
-  }, [currentMonday, currentSunday]);
 
-  useEffect(() => {
-    const getFetch = async () => {
+    const fetchDashboardSettings = async () => {
       try {
-        const fetchData = await getDashboardSetting(memberNo, token);
+        const fetchData = await getDashboardSetting(memberVo.memberNo, token);
         setSettings(fetchData);
       } catch (error) {
-        console.error('[ERROR] DASHBOARD SETTING FAIL', error);
+        console.error('[ERROR] GET DASHBOARD SETTING FAIL', error);
       }
     };
-    getFetch();
-  }, [isModalOpen]);
+
+    const fetchData = async () => {
+      await fetchDashboardData();
+      await fetchDashboardSettings();
+      setIsLoading(false);
+    };
+    fetchData();
+  }, [currentMonday, currentSunday, memberVo.memberNo]);
 
   useEffect(() => {
     const allSelected = inputData.every((item) => item.visibleYn === 'Y');
     setIsAllSelected(allSelected);
   }, [inputData]);
+
+  const handleSettingModal = () => {
+    setInputData([...settings]);
+    dispatch(open({ title: '대시보드 설정', value: 'block' }));
+  };
 
   const handleChange = (index) => {
     setInputData((prev) =>
@@ -237,9 +261,9 @@ const DashBoard = () => {
         await editDashboardSetting(inputData, token);
         setSettings(inputData);
         alert('저장되었습니다.');
-        dispatch(close('나의 설정'));
+        dispatch(close('대시보드 설정'));
       } catch (error) {
-        console.error('[ERROR] SAVE DASHBOARD SETTING FAIL', error);
+        console.error('[ERROR] EDIT DASHBOARD SETTING FAIL', error);
       }
     };
     getFetch();
@@ -256,6 +280,10 @@ const DashBoard = () => {
 
     return `${hours}시간 ${remainMinutes.toString().padStart(2, '0')}분`;
   };
+
+  if (isLoading) {
+    return;
+  }
 
   return (
     <>
@@ -408,7 +436,7 @@ const DashBoard = () => {
           )}
         </ContentArea>
 
-        <Modal title="나의 설정">
+        <Modal title="대시보드 설정">
           <ContentDiv>
             <SwitchInputDiv>
               <div>전체</div>
@@ -425,7 +453,7 @@ const DashBoard = () => {
           </ContentDiv>
           <ModalContainer>
             <Btn
-              title={'나의 설정'}
+              title={'대시보드 설정'}
               str={'저장'}
               mt={'17'}
               mb={'30'}

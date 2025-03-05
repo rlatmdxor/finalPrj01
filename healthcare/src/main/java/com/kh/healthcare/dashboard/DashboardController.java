@@ -21,7 +21,7 @@ public class DashboardController {
         }
         catch (Exception e){
             e.printStackTrace();
-            throw new IllegalStateException("[ERROR] DASHBOARD - GET DATA FAIL..");
+            throw new IllegalStateException("[ERROR] DASHBOARD - GET DASHBOARD DATA FAIL..");
         }
     }
 
@@ -33,7 +33,7 @@ public class DashboardController {
         }
         catch (Exception e){
             e.printStackTrace();
-            throw new IllegalStateException("[ERROR] DASHBOARD - GET SETTING DATA FAIL..");
+            throw new IllegalStateException("[ERROR] DASHBOARD - GET DASHBOARD SETTING FAIL..");
         }
     }
 
@@ -45,7 +45,7 @@ public class DashboardController {
         }
         catch (Exception e){
             e.printStackTrace();
-            throw new IllegalStateException("[ERROR] DASHBOARD - EDIT SETTING FAIL..");
+            throw new IllegalStateException("[ERROR] DASHBOARD - EDIT DASHBOARD SETTING FAIL..");
         }
     }
 }

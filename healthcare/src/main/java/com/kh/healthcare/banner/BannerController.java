@@ -3,8 +3,6 @@ package com.kh.healthcare.banner;
 import com.amazonaws.services.s3.AmazonS3;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kh.healthcare.Aws.FileUtil;
-import com.kh.healthcare.dashboard.SettingVo;
-import com.kh.healthcare.diet.meal.DietVo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;

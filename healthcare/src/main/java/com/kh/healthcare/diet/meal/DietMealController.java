@@ -49,6 +49,7 @@ public class DietMealController {
     public List<DietVo> dietMealDetail(@RequestBody DietVo vo, @RequestHeader("Authorization") String authorization){
         try {
             List<DietVo> detailVoList = service.dietMealDetail(vo);
+            System.out.println("detailVoList = " + detailVoList);
             return detailVoList;
         }
         catch (Exception e){
