@@ -7,6 +7,8 @@ import { setTotalCount, resetPaging } from '../../../redux/pagingSlice';
 import SearchBar from '../../util/SearchBar';
 import Table from '../../util/Table';
 import { useNavigate } from 'react-router-dom';
+import Title from '../../util/Title';
+import ContentLayout from '../../util/ContentLayout';
 
 const SearchDiv = styled.div`
   display: flex;
@@ -36,13 +38,12 @@ const BottomDiv = styled.div`
   align-items: center;
 `;
 
-const HoneytipBoard = () => {
+const NoticeList = () => {
   const token = localStorage.getItem('token');
 
-  const boardType = 'honeyTip';
+  const boardType = 'notice';
   const initstate = {
     order: '',
-    category: '',
     searchType: '',
     searchValue: '',
   };
@@ -53,13 +54,14 @@ const HoneytipBoard = () => {
   const [dataVoList, setVoList] = useState([]);
   const [pagedData, setPagedData] = useState([]);
   const [searchInput, setSearchInput] = useState(initstate);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const currentPage = useSelector((state) => state.paging[boardType]?.currentPage || 1);
   const boardLimit = useSelector((state) => state.paging[boardType]?.boardLimit || 12);
   const [num, setNum] = useState(0);
   const offset = (currentPage - 1) * boardLimit;
 
-  const url = `http://127.0.0.1:80/api/board/honeytip/list`;
+  const url = `http://127.0.0.1:80/api/notice/list`;
   const options = {
     method: 'POST',
     headers: {
@@ -81,21 +83,20 @@ const HoneytipBoard = () => {
     fetch(url, options)
       .then((resp) => resp.json())
       .then((data) => {
-        if (data.length > 0) {
+        if (data.list.length > 0) {
           dispatch(setTotalCount({ boardType, totalCount: data.length }));
-          // const pagedData = data.slice(offset, offset + boardLimit);
-          setVoList(data);
+          setVoList(data.list);
         } else {
           dispatch(resetPaging({ boardType }));
           setVoList([]);
         }
+        setIsAdmin(data.isAdmin);
       })
       .catch((error) => console.error('데이터 불러오기 실패:', error));
   }, [num]);
 
   const searchFilter = {
-    order: ['최신순', '오래된순', '조회순', '추천순'],
-    category: ['카테고리 전체', '병원', '약국', '생활'],
+    order: ['최신순', '오래된순', '조회순'],
     searchType: ['제목', '내용', '제목+내용', '작성자'],
   };
 
@@ -104,17 +105,6 @@ const HoneytipBoard = () => {
       return {
         ...prev,
         order: e.target.value,
-      };
-    });
-    setNum((prev) => prev + 1);
-  };
-  const handleCategory = (e) => {
-    console.log(e.target.value);
-
-    setSearchInput((prev) => {
-      return {
-        ...prev,
-        category: e.target.value,
       };
     });
     setNum((prev) => prev + 1);
@@ -152,71 +142,68 @@ const HoneytipBoard = () => {
 
   return (
     <>
-      <SearchDiv>
-        <SelectBox onChange={handleOrder}>
-          {searchFilter.order.map((option, idx) => (
-            <option key={idx} value={idx} name={option}>
-              {option}
-            </option>
-          ))}
-        </SelectBox>
-        <SelectBox width="130px" onChange={handleCategory}>
-          {searchFilter.category.map((option, idx) => (
-            <option key={idx} value={idx} name={option}>
-              {option}
-            </option>
-          ))}
-        </SelectBox>
-        <SelectBox onChange={handleSearchType}>
-          {searchFilter.searchType.map((option, idx) => (
-            <option key={idx} value={idx} name={option}>
-              {option}
-            </option>
-          ))}
-        </SelectBox>
-        <SearchBar handleClick={handleClick} handleChange={handleChange} handleClearClick={handleClearClick} />
-      </SearchDiv>
-      <Table>
-        <thead>
-          <tr>
-            <th>번호</th>
-            <th>카테고리</th>
-            <th>제목</th>
-            <th>추천수</th>
-            <th>조회수</th>
-            <th>작성자</th>
-            <th>등록일자</th>
-          </tr>
-        </thead>
-        <tbody>
-          {pagedData.map((vo) => {
-            return (
-              <tr key={vo.no} onClick={() => navigate(`/board/detail?bno=${vo.no}`)}>
-                <td>{vo.no}</td>
-                <td>{vo.categoryName}</td>
-                <td>
-                  {vo.title}({vo.commentCount})
-                </td>
-                <td>{vo.recommendCount}</td>
-                <td>{vo.hit}</td>
-                <td>{vo.nick}</td>
-                <td>{vo.enrollDate}</td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </Table>
-      <BottomDiv>
-        <div></div>
-        <div>
-          <Pagination boardType={boardType} />
-        </div>
-        <div>
-          <Btn str={'등록'} c={'#FF7F50'} fc={'#ffffff'} h={'40'} f={() => navigate('/board/write')} />
-        </div>
-      </BottomDiv>
+      <Title>공지사항</Title>
+      <div></div>
+      <ContentLayout>
+        <SearchDiv>
+          <SelectBox onChange={handleOrder}>
+            {searchFilter.order.map((option, idx) => (
+              <option key={idx} value={idx} name={option}>
+                {option}
+              </option>
+            ))}
+          </SelectBox>
+          <SelectBox onChange={handleSearchType}>
+            {searchFilter.searchType.map((option, idx) => (
+              <option key={idx} value={idx} name={option}>
+                {option}
+              </option>
+            ))}
+          </SelectBox>
+          <SearchBar handleClick={handleClick} handleChange={handleChange} handleClearClick={handleClearClick} />
+        </SearchDiv>
+        <Table>
+          <thead>
+            <tr>
+              <th>번호</th>
+              <th>카테고리</th>
+              <th>제목</th>
+              <th>조회수</th>
+              <th>작성자</th>
+              <th>등록일자</th>
+            </tr>
+          </thead>
+          <tbody>
+            {pagedData.map((vo) => {
+              return (
+                <tr key={vo.no} onClick={() => navigate(`/notice/detail?bno=${vo.no}`)}>
+                  <td>{vo.no}</td>
+                  <td>공지</td>
+                  <td>{vo.title}</td>
+                  <td>{vo.hit}</td>
+                  <td>{vo.nick}</td>
+                  <td>{vo.enrollDate}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </Table>
+        <BottomDiv>
+          <div></div>
+          <div>
+            <Pagination boardType={boardType} />
+          </div>
+          {isAdmin ? (
+            <div>
+              <Btn str={'등록'} c={'#FF7F50'} fc={'#ffffff'} h={'40'} f={() => navigate('/notice/write')} />
+            </div>
+          ) : (
+            <div></div>
+          )}
+        </BottomDiv>
+      </ContentLayout>
     </>
   );
 };
 
-export default HoneytipBoard;
+export default NoticeList;

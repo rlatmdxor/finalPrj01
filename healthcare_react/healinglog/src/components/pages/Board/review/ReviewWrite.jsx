@@ -1,8 +1,8 @@
-import Title from '../../util/Title';
+import Title from '../../../util/Title';
 import styled from 'styled-components';
-import Btn from '../../util/Btn';
+import Btn from '../../../util/Btn';
 import { useNavigate } from 'react-router-dom';
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { AtomicBlockUtils, convertToRaw, EditorState } from 'draft-js';
 import Editor from '@draft-js-plugins/editor';
 import createToolbarPlugin from '@draft-js-plugins/static-toolbar';
@@ -22,6 +22,14 @@ import {
   OrderedListButton,
 } from '@draft-js-plugins/buttons';
 import Swal from 'sweetalert2';
+import { useDispatch, useSelector } from 'react-redux';
+import { resetPaging, setTotalCount } from '../../../../redux/pagingSlice';
+import { close, open } from '../../../../redux/modalSlice';
+import Modal from '../../../util/Modal';
+import SearchBar from '../../../util/SearchBar';
+import Table from '../../../util/Table';
+import Pagination from '../../../util/Pagination';
+import { FaStar } from 'react-icons/fa';
 
 const ContentDiv = styled.div`
   margin: 0;
@@ -29,14 +37,14 @@ const ContentDiv = styled.div`
   width: 95%;
   min-height: 2000px;
   display: grid;
-  grid-template-rows: 40px 40px 1fr 40px 40px;
+  grid-template-rows: 40px 40px 40px 1fr 40px 40px;
   /* border: 1px solid #ccc; */
 `;
 const InputDiv = styled.div`
   width: 95%;
   height: 40px;
   display: grid;
-  grid-template-columns: 130px 150px 130px 1fr;
+  grid-template-columns: 130px 170px 130px 150px 130px 1fr 80px;
 
   & .form-label {
     display: flex;
@@ -52,7 +60,7 @@ const InputDiv = styled.div`
   }
   & .form-input {
     display: flex;
-    justify-content: start;
+    justify-content: center;
     align-items: center;
   }
   & select,
@@ -65,6 +73,41 @@ const InputDiv = styled.div`
     padding: 0px 8px;
   }
 `;
+
+const InputDiv2 = styled.div`
+  width: 95%;
+  height: 40px;
+  display: grid;
+  grid-template-columns: 130px 170px 130px 1fr;
+
+  & .form-label {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #d3ebcf;
+    color: #32383f;
+    font-weight: 600;
+    font-size: 14px;
+    padding: 2px 0px;
+    text-align: center;
+    height: 35px;
+  }
+  & .form-input {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  & select,
+  input {
+    box-sizing: border-box;
+    width: 100%;
+    height: 40px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    padding: 0px 8px;
+  }
+`;
+
 const ToolboxDiv = styled.div`
   height: 40px;
   width: 95%;
@@ -151,6 +194,16 @@ const attachLayDiv = styled.div`
   width: 95%;
 `;
 
+const ModalContainer = styled.div`
+  display: flex;
+  justify-content: end;
+`;
+const BottomDiv = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
 const staticToolbarPlugin = createToolbarPlugin();
 const textAlignmentPlugin = createTextAlignmentPlugin();
 const linkPlugin = createLinkPlugin();
@@ -180,19 +233,36 @@ const blockRendererFn = (block, contentState) => {
   return null;
 };
 
-const BoardWrite = () => {
+const ReviewWrite = () => {
   const token = localStorage.getItem('token');
   if (!token) {
     alert('로그인 정보가 없습니다.');
     window.location.href = '/login';
   }
   const navigate = useNavigate();
-  const [inputData, setInputData] = useState({ categoryNo: '', title: '', content: '' });
+  const [inputData, setInputData] = useState({});
   const [f, setFiles] = useState([]);
   const [editorState, setEditorState] = useState(() => EditorState.createEmpty());
   const editorRef = useRef(null);
   const [isFocused, setIsFocused] = useState(false);
-  const [num, setNum] = useState(1);
+  const [searchInput, setSearchInput] = useState({});
+  const [dataVoList, setVoList] = useState([]);
+  const [pagedData, setPagedData] = useState([]);
+  const dispatch = useDispatch();
+
+  const boardType = 'reviewHospital';
+  const currentPage = useSelector((state) => state.paging[boardType]?.currentPage || 1);
+  const boardLimit = useSelector((state) => state.paging[boardType]?.boardLimit || 12);
+  const [num, setNum] = useState(0);
+  const offset = (currentPage - 1) * boardLimit;
+
+  useEffect(() => {
+    dispatch(resetPaging({ boardType }));
+  }, []);
+
+  useEffect(() => {
+    setPagedData(dataVoList.slice(offset, offset + boardLimit));
+  }, [dataVoList, currentPage, boardLimit]);
 
   const focus = () => {
     if (editorRef.current) {
@@ -229,9 +299,9 @@ const BoardWrite = () => {
           formData.append('f', file);
         });
 
-        const response = await fetch('http://127.0.0.1:80/api/board/honeytip/write', {
+        const response = await fetch('http://127.0.0.1:80/api/review/write', {
           method: 'POST',
-          headers: { Authorization: `Bearer ${token}` }, // Content-Type 제거 (자동 설정됨)
+          headers: { Authorization: `Bearer ${token}` },
           body: formData,
         });
 
@@ -242,9 +312,9 @@ const BoardWrite = () => {
             icon: 'success',
             draggable: true,
           });
-          setInputData({ title: '', memberNo: '', content: '', categoryNo: '' });
+          setInputData({});
           setFiles([]); // 파일 목록 초기화
-          navigate('/board');
+          navigate('/review');
         } else {
           Swal.fire({
             title: '등록 중 오류가 발생했습니다.',
@@ -291,27 +361,190 @@ const BoardWrite = () => {
     setFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
+  const handleOpenModal = (e) => {
+    setSearchInput(() => {});
+    dispatch(open({ title: '병원 리뷰 병원검색', value: 'block' }));
+  };
+  const handleClick = () => {
+    setNum((prev) => prev + 1);
+  };
+
+  const handleChange = (e) => {
+    setSearchInput((prev) => {
+      const ssr = { ...prev, searchValue: e.target.value };
+      return ssr;
+    });
+    setNum((prev) => prev + 1);
+  };
+
+  const handleClearClick = () => {
+    setSearchInput((prev) => {
+      return {
+        ...prev,
+        searchValue: '',
+      };
+    });
+  };
+
+  const selectHospital = (e) => {
+    const tr = e.target.closest('tr');
+
+    const hospitalName = tr.getAttribute('name');
+    const hospitalNo = tr.getAttribute('value');
+
+    Swal.fire({
+      title: '병원을 등록하시겠습니까?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: '확인',
+      cancelButtonText: '취소',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        setInputData((prev) => ({
+          ...prev,
+          name: hospitalName,
+          hospitalNo: hospitalNo,
+        }));
+        dispatch(close('병원 리뷰 병원검색'));
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'ERROR',
+          text: '잠시후 다시 시도해주세요',
+        });
+      }
+    });
+  };
+
+  useEffect(() => {
+    fetch(`http://127.0.0.1:80/api/review/hospital/list`, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(searchInput),
+    })
+      .then((resp) => resp.json())
+      .then((data) => {
+        if (data.length > 0) {
+          dispatch(setTotalCount({ boardType, totalCount: data.length }));
+          setVoList(data);
+        } else {
+          dispatch(resetPaging({ boardType }));
+          setVoList([]);
+        }
+      })
+      .catch((error) => console.error('데이터 불러오기 실패:', error));
+  }, [num]);
+
+  const handleRating = (value) => {
+    setInputData((prev) => ({
+      ...prev,
+      rating: value,
+    }));
+  };
+  const handleVisitDate = (e) => {
+    setInputData((prev) => ({
+      ...prev,
+      visitDate: e.target.value,
+    }));
+  };
+
   return (
     <>
-      <Title>꿀팁 작성</Title>
+      <Title>병원 리뷰 작성</Title>
       <LayDiv></LayDiv>
       <ContentDiv>
+        <Modal title="병원 리뷰 병원검색">
+          <div>
+            <SearchBar handleClick={handleClick} handleChange={handleChange} handleClearClick={handleClearClick} />
+            <Table>
+              <thead>
+                <tr>
+                  <th>지역</th>
+                  <th>병원명</th>
+                  <th>진료과</th>
+                </tr>
+              </thead>
+              <tbody>
+                {pagedData.map((vo) => {
+                  return (
+                    <tr key={vo.no} name={vo.name} value={vo.no} onClick={selectHospital}>
+                      <td>{vo.district}</td>
+                      <td>{vo.name}</td>
+                      <td>{vo.hospitalType}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </Table>
+            <BottomDiv>
+              <div></div>
+              <div>
+                <Pagination boardType={boardType} />
+              </div>
+              <div></div>
+            </BottomDiv>
+          </div>
+        </Modal>
         <InputDiv>
-          <div className="form-label">카테고리</div>
+          <div className="form-label">방문시간</div>
           <div className="form-input">
-            <select onChange={handleChangeInput} name="categoryNo">
-              <option value="0">-- 카테고리 선택 --</option>
-              <option value="1">병원</option>
-              <option value="2">약국</option>
-              <option value="3">생활</option>
-              <option value="4">보험</option>
-            </select>
+            <input type="datetime-local" onChange={handleVisitDate} />
+          </div>
+          <div className="form-label">진료과</div>
+          <div className="form-input">
+            <input type="text" name="department" onChange={handleChangeInput} placeholder="진료과를 입력하세요." />
+          </div>
+          <div className="form-label">병원명</div>
+          <div className="form-input">
+            <input
+              type="text"
+              name="hospitalName"
+              onChange={handleChangeInput}
+              placeholder="병원을 검색해주세요."
+              value={inputData.name}
+              readOnly
+            />
+          </div>
+          <div>
+            <Btn
+              str={'검색'}
+              c={'lightgray'}
+              fc={'#ffffff'}
+              h={'40'}
+              w={'80'}
+              mr={'0'}
+              ml={'0'}
+              mt={'0'}
+              mb={'0'}
+              br={'0'}
+              f={handleOpenModal}
+            />
+          </div>
+        </InputDiv>
+        <InputDiv2>
+          <div className="form-label">별점</div>
+          <div className="form-input">
+            {[1, 2, 3, 4, 5].map((value) => (
+              <FaStar
+                key={value}
+                onClick={() => handleRating(value)}
+                style={{
+                  color: inputData.rating >= value ? 'gold' : 'grey',
+                  cursor: 'pointer',
+                  fontSize: '24px',
+                  marginRight: '4px',
+                }}
+              />
+            ))}
           </div>
           <div className="form-label">제목</div>
           <div className="form-input">
             <input type="text" name="title" onChange={handleChangeInput} placeholder="제목을 입력하세요." />
           </div>
-        </InputDiv>
+        </InputDiv2>
         <ToolboxDiv className="toolbar">
           <Toolbar className="toolbar">
             {(externalProps) => (
@@ -386,9 +619,9 @@ const BoardWrite = () => {
       </ContentDiv>
       <ButtonDiv>
         <Btn str={'등록'} c={'#FF7F50'} fc={'#ffffff'} mr={'10'} h={'40'} f={handleEnrollBoard} />
-        <Btn str={'취소'} c={'#D9D9D9'} fc={'#3d4147'} mr={'65'} h={'40'} f={() => navigate('/board')} />
+        <Btn str={'취소'} c={'#D9D9D9'} fc={'#3d4147'} mr={'65'} h={'40'} f={() => navigate('/review')} />
       </ButtonDiv>
     </>
   );
 };
-export default BoardWrite;
+export default ReviewWrite;

@@ -28,7 +28,7 @@ public class BloodPressureDao {
         return mapper.bloodPressureEdit(vo);
     }
 
-    public void bloodPressureDelete(BloodPressureVo vo) {
-        mapper.bloodPressureDelete(vo);
+    public int bloodPressureDelete(BloodPressureVo vo) {
+        return mapper.bloodPressureDelete(vo);
     }
 }

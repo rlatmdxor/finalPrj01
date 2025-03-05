@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import Btn from '../../util/Btn';
-import Pagination from '../../util/Pagination';
+import Btn from '../../../util/Btn';
+import Pagination from '../../../util/Pagination';
 import { useSelector, useDispatch } from 'react-redux';
-import { setTotalCount, resetPaging } from '../../../redux/pagingSlice';
-import SearchBar from '../../util/SearchBar';
-import Table from '../../util/Table';
+import { setTotalCount, resetPaging } from '../../../../redux/pagingSlice';
+import SearchBar from '../../../util/SearchBar';
+import Table from '../../../util/Table';
 import { useNavigate } from 'react-router-dom';
+import { FaStar } from 'react-icons/fa';
 
 const SearchDiv = styled.div`
   display: flex;
@@ -36,10 +37,10 @@ const BottomDiv = styled.div`
   align-items: center;
 `;
 
-const HoneytipBoard = () => {
+const HospitalReview = () => {
   const token = localStorage.getItem('token');
 
-  const boardType = 'honeyTip';
+  const boardType = 'review';
   const initstate = {
     order: '',
     category: '',
@@ -59,7 +60,7 @@ const HoneytipBoard = () => {
   const [num, setNum] = useState(0);
   const offset = (currentPage - 1) * boardLimit;
 
-  const url = `http://127.0.0.1:80/api/board/honeytip/list`;
+  const url = `http://127.0.0.1:80/api/review/list`;
   const options = {
     method: 'POST',
     headers: {
@@ -83,7 +84,6 @@ const HoneytipBoard = () => {
       .then((data) => {
         if (data.length > 0) {
           dispatch(setTotalCount({ boardType, totalCount: data.length }));
-          // const pagedData = data.slice(offset, offset + boardLimit);
           setVoList(data);
         } else {
           dispatch(resetPaging({ boardType }));
@@ -94,9 +94,8 @@ const HoneytipBoard = () => {
   }, [num]);
 
   const searchFilter = {
-    order: ['최신순', '오래된순', '조회순', '추천순'],
-    category: ['카테고리 전체', '병원', '약국', '생활'],
-    searchType: ['제목', '내용', '제목+내용', '작성자'],
+    order: ['최신순', '오래된순', '별점높은순', '별점낮은순'],
+    searchType: ['제목', '내용', '제목+내용', '작성자', '병원이름'],
   };
 
   const handleOrder = (e) => {
@@ -104,17 +103,6 @@ const HoneytipBoard = () => {
       return {
         ...prev,
         order: e.target.value,
-      };
-    });
-    setNum((prev) => prev + 1);
-  };
-  const handleCategory = (e) => {
-    console.log(e.target.value);
-
-    setSearchInput((prev) => {
-      return {
-        ...prev,
-        category: e.target.value,
       };
     });
     setNum((prev) => prev + 1);
@@ -160,13 +148,6 @@ const HoneytipBoard = () => {
             </option>
           ))}
         </SelectBox>
-        <SelectBox width="130px" onChange={handleCategory}>
-          {searchFilter.category.map((option, idx) => (
-            <option key={idx} value={idx} name={option}>
-              {option}
-            </option>
-          ))}
-        </SelectBox>
         <SelectBox onChange={handleSearchType}>
           {searchFilter.searchType.map((option, idx) => (
             <option key={idx} value={idx} name={option}>
@@ -179,11 +160,9 @@ const HoneytipBoard = () => {
       <Table>
         <thead>
           <tr>
-            <th>번호</th>
-            <th>카테고리</th>
+            <th>병원명</th>
             <th>제목</th>
-            <th>추천수</th>
-            <th>조회수</th>
+            <th>별점</th>
             <th>작성자</th>
             <th>등록일자</th>
           </tr>
@@ -191,14 +170,25 @@ const HoneytipBoard = () => {
         <tbody>
           {pagedData.map((vo) => {
             return (
-              <tr key={vo.no} onClick={() => navigate(`/board/detail?bno=${vo.no}`)}>
-                <td>{vo.no}</td>
-                <td>{vo.categoryName}</td>
+              <tr key={vo.no} onClick={() => navigate(`/review/detail?bno=${vo.no}`)}>
+                <td>{vo.name}</td>
                 <td>
                   {vo.title}({vo.commentCount})
                 </td>
-                <td>{vo.recommendCount}</td>
-                <td>{vo.hit}</td>
+
+                <td>
+                  {[1, 2, 3, 4, 5].map((value) => (
+                    <FaStar
+                      key={value}
+                      style={{
+                        color: vo.rating >= value ? 'gold' : 'grey',
+                        cursor: 'pointer',
+                        fontSize: '24px',
+                        marginRight: '4px',
+                      }}
+                    />
+                  ))}
+                </td>
                 <td>{vo.nick}</td>
                 <td>{vo.enrollDate}</td>
               </tr>
@@ -212,11 +202,11 @@ const HoneytipBoard = () => {
           <Pagination boardType={boardType} />
         </div>
         <div>
-          <Btn str={'등록'} c={'#FF7F50'} fc={'#ffffff'} h={'40'} f={() => navigate('/board/write')} />
+          <Btn str={'등록'} c={'#FF7F50'} fc={'#ffffff'} h={'40'} f={() => navigate('/review/write')} />
         </div>
       </BottomDiv>
     </>
   );
 };
 
-export default HoneytipBoard;
+export default HospitalReview;

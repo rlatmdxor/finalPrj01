@@ -113,7 +113,7 @@ const Navi = () => {
           </MenuLayoutDiv3>
           <MenuLayoutDiv4>
             <LinkTag to={'board'}>꿀팁게시판</LinkTag>
-            <LinkTag to={'hospitalreview'}>병원리뷰</LinkTag>
+            <LinkTag to={'review'}>병원리뷰</LinkTag>
             <LinkTag to={'challengers'}>챌린저스</LinkTag>
           </MenuLayoutDiv4>
         </MenuDiv>

@@ -21,7 +21,7 @@ public interface InsulinMapper {
             WHERE MEMBER_NO = #{memberNo}
             ORDER BY ENROLL_DATE DESC
             """)
-    List<InsulinVo> insulinList(InsulinVo vo);
+    List<InsulinVo> insulinList(String vo);
 
 
     @Insert("""
@@ -49,8 +49,9 @@ public interface InsulinMapper {
     @Delete("""
             DELETE INSULIN
             WHERE NO = #{no}
+            AND MEMBER_NO = #{memberNo}
             """)
-    void insulinDel(String no);
+    void insulinDel(String no, String memberNo);
 
     @Select("""
             SELECT *
@@ -68,7 +69,7 @@ public interface InsulinMapper {
             WHERE MEMBER_NO = #{memberNo}
             AND TRUNC(ABLE_DATE) > TRUNC(CURRENT_DATE)
             """)
-    String[] findDisablePointList(InsulinVo vo);
+    String[] findDisablePointList(String vo);
 
 //    @Update("""
 //            UPDATE INSULIN

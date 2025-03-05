@@ -1,7 +1,10 @@
 package com.kh.healthcare.board.honeyTip;
 
+import com.kh.healthcare.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
@@ -9,25 +12,33 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
+@Slf4j
 public class HoneyTipService {
 
     private final HoneyTipMapper mapper;
+    private final JwtUtil jwtUtil;
 
     public List<HoneyTipVo> list(SearchFilterVo filterVo) {
-        return mapper.list(filterVo);
+        return  mapper.list(filterVo);
     }
 
 
-    public int write(HoneyTipVo vo, List<HoneyTipAttachVo> attachVoList) {
+    public int write(HoneyTipVo vo, List<HoneyTipAttachVo> attachVoList, String token) {
+
+        token = token.replace("Bearer ", "");
+        String memberNo = jwtUtil.getNo(token);
+        vo.setMemberNo(memberNo);
+
         int result1 = 0;
         int result2 = 1;
-        if(vo.getTitle().length() < 1){
+
+        if(vo.getTitle() == null || vo.getTitle().equals("")){
             throw new IllegalStateException("CODE [ BOARD / WRITE / DISABLE TITLE");
         }
-        if(vo.getContent().length() < 1){
+        if(vo.getContent() == null || vo.getContent().equals("")){
             throw new IllegalStateException("CODE [ BOARD / WRITE / DISABLE CONTENT");
         }
-//        if(vo.getCategoryNo())
 
         result1 = mapper.write(vo);
         if(attachVoList.size()>0){
@@ -35,11 +46,42 @@ public class HoneyTipService {
         }
         return result1*result2;
     }
-    public int edit(HoneyTipVo vo, List<HoneyTipAttachVo> attachVoList) {
-        return 0;
+    public int edit(HoneyTipVo vo, List<HoneyTipAttachVo> attachVoList, List<HoneyTipAttachVo> deleteFiles) {
+
+        int result1 = 0;
+        int result2 = 1;
+
+        String bno = vo.getNo();
+
+        if(vo.getTitle() == null || vo.getTitle().equals("")){
+            throw new IllegalStateException("CODE [ BOARD / EDIT / DISABLE TITLE");
+        }
+        if(vo.getContent() == null || vo.getContent().equals("")){
+            throw new IllegalStateException("CODE [ BOARD / EDIT / DISABLE CONTENT");
+        }
+        if(deleteFiles.size()>0){
+            for (HoneyTipAttachVo deleteFile : deleteFiles) {
+                mapper.deleteAttach(deleteFile);
+            }
+        }
+
+        result1 = mapper.edit(vo);
+        if(attachVoList.size()>0){
+            for (HoneyTipAttachVo attachVo : attachVoList) {
+                result2 = mapper.editAttachHoneyBoard(attachVo, bno);
+            }
+        }
+        return result1*result2;
+
+
+
     }
 
-    public Map detail(String bno , String memberNo) {
+    public Map detail(String bno , String token) {
+
+        token = token.replace("Bearer ", "");
+        String memberNo = jwtUtil.getNo(token);
+
         Map map = new HashMap<>();
         mapper.increaseHit(bno);
         HoneyTipVo detailVo = mapper.detailVo(bno);
@@ -48,13 +90,16 @@ public class HoneyTipService {
             map.put("attachVoList" , attachVoList);
         }
         int isRecommend = mapper.isRecommend(bno , memberNo);
-
+        map.put("userNo" , memberNo);
         map.put("detailVo" , detailVo);
         map.put("isRecommend" , isRecommend);
         return map;
     }
 
-    public void recommend(BoardRecommendVo vo) {
+    public void recommend(BoardRecommendVo vo, String token) {
+        token = token.replace("Bearer ", "");
+        String memberNo = jwtUtil.getNo(token);
+        vo.setMemberNo(memberNo);
 
         int isRecommend = mapper.isRecommend(vo.getBno() , vo.getMemberNo());
 
@@ -69,15 +114,23 @@ public class HoneyTipService {
         return mapper.getCountLike(bno);
     }
 
-    public int reportBoard(HoneyTipReportVo vo) {
+    public int reportBoard(HoneyTipReportVo vo, String token) {
+        token = token.replace("Bearer ", "");
+        String memberNo = jwtUtil.getNo(token);
+        vo.setMemberNo(memberNo);
+
         int type = Integer.parseInt(vo.getReportType());
         if (type < 1 || type > 9) {
-            throw new IllegalStateException("CODE [ BOARD / COMMENT / REPORT ]");
+            throw new IllegalStateException("CODE [ BOARD / HONEY_TIP / REPORT ]");
         }
         return mapper.reportBoard(vo);
     }
 
-    public int deleteHoneyTip(HoneyTipVo vo) {
+    public int deleteHoneyTip(HoneyTipVo vo, String token) {
+
+        token = token.replace("Bearer ", "");
+        String memberNo = jwtUtil.getNo(token);
+        vo.setMemberNo(memberNo);
 
         int result = mapper.deleteHoneyTip(vo);
         if (result != 1){
@@ -86,7 +139,10 @@ public class HoneyTipService {
         return result;
     }
 
-    public int commentWrite(HoneyTipCommentVo vo) {
+    public int commentWrite(HoneyTipCommentVo vo, String token) {
+        token = token.replace("Bearer ", "");
+        String memberNo = jwtUtil.getNo(token);
+        vo.setMemberNo(memberNo);
 
         if(vo.getContent() == null || vo.getContent().equals("")){
             throw new IllegalStateException("CODE [ BOARD / COMMENT / WRITE ]");
@@ -97,7 +153,10 @@ public class HoneyTipService {
 
 
 
-    public int commentDelete(HoneyTipCommentVo vo) {
+    public int commentDelete(HoneyTipCommentVo vo, String token) {
+        token = token.replace("Bearer ", "");
+        String memberNo = jwtUtil.getNo(token);
+        vo.setMemberNo(memberNo);
         int result = mapper.commentDelete(vo);
         if(result != 1){
             throw new IllegalStateException("CODE [ BOARD / COMMENT / DELETE ]");
@@ -105,7 +164,10 @@ public class HoneyTipService {
         return result;
     }
 
-    public int commentReport(HoneyTipCommentReportVo vo) {
+    public int commentReport(HoneyTipCommentReportVo vo, String token) {
+        token = token.replace("Bearer ", "");
+        String memberNo = jwtUtil.getNo(token);
+        vo.setMemberNo(memberNo);
         int type = Integer.parseInt(vo.getReportType());
         if (type < 1 || type > 9) {
             throw new IllegalStateException("CODE [ BOARD / COMMENT / REPORT ]");
@@ -113,7 +175,9 @@ public class HoneyTipService {
         return mapper.commentReport(vo);
     }
 
-    public List<HoneyTipCommentVo> commentList(String bno) {
+    public List<HoneyTipCommentVo> commentList(String bno, String token) {
+        token = token.replace("Bearer ", "");
+        String memberNo = jwtUtil.getNo(token);
 
         if(bno == null || bno.equals("")){
             throw new IllegalStateException("CODE [ BOARD / COMMENT / LIST / BNO ERROR ]");
@@ -121,6 +185,7 @@ public class HoneyTipService {
 
         return mapper.commentList(bno);
     }
+
 
 }
 

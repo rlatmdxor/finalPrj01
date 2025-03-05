@@ -1,48 +1,64 @@
-package com.kh.healthcare.board.honeyTip;
+package com.kh.healthcare.board.review;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.kh.healthcare.Aws.FileUtil;
+import com.kh.healthcare.board.honeyTip.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("api/board/honeytip")
+@RequestMapping("api/review")
 @RequiredArgsConstructor
 @Slf4j
 @CrossOrigin
-public class HoneyTipController {
+public class ReviewController {
 
-    private final HoneyTipService service;
+    private final ReviewService service;
     private final AmazonS3 s3;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
     @PostMapping("list")
-    public List<HoneyTipVo> list(@RequestBody SearchFilterVo filterVo) {
-        try{
-            List<HoneyTipVo> HoneyTipVoList = service.list(filterVo);
-            return HoneyTipVoList;
+    public List<ReviewVo> list(@RequestBody SearchFilterVo filterVo) {
+
+
+        try {
+            List<ReviewVo> ReviewVoList = service.list(filterVo);
+            return ReviewVoList;
         } catch (Exception e) {
-            throw new IllegalStateException("CODE [ BOARD / LIST ]");
+            throw new IllegalStateException("CODE [ REVIEW / LIST ]");
         }
 
     }
+    @PostMapping("hospital/list")
+    public List<ReviewHospitalVo> searchHospital(@RequestBody SearchFilterVo filterVo){
+        System.out.println("ReviewController.searchHospital");
+        try {
+            List<ReviewHospitalVo> ReviewHospitalVoList = service.searchHospital(filterVo);
+            return ReviewHospitalVoList;
+        } catch (Exception e) {
+            throw new IllegalStateException("CODE [ REVIEW / HOSPITAL / LIST ]");
+        }
+    }
+
     @PostMapping("write")
     public int write(
-            @RequestPart("data") HoneyTipVo vo,
+            @RequestPart("data") ReviewVo vo,
             @RequestHeader("Authorization") String token,
             @RequestPart(value = "f", required = false) List<MultipartFile> f
-    ){
+    ) throws IOException {
 
-        List<HoneyTipAttachVo> attachVoList = new ArrayList<>();
+        List<ReviewAttachVo> attachVoList = new ArrayList<>();
+
 
         try {
             if (f != null && !f.isEmpty()) {
@@ -50,7 +66,7 @@ public class HoneyTipController {
 
                 for (int i = 0; i < f.size(); i++) {
                     String originName = f.get(i).getOriginalFilename();
-                    HoneyTipAttachVo attachVo = new HoneyTipAttachVo();
+                    ReviewAttachVo attachVo = new ReviewAttachVo();
                     attachVo.setPath(urlList.get(i));
                     attachVo.setOriginName(originName);
                     attachVoList.add(attachVo);
@@ -59,19 +75,20 @@ public class HoneyTipController {
 
             return service.write(vo, attachVoList , token);
         } catch (Exception e) {
-            throw new IllegalStateException("CODE [BOARD / WRITE]");
+            throw new IllegalStateException("CODE [REVIEW / WRITE]");
         }
     }
+
     @PostMapping("edit")
     public int edit(
-            @RequestPart("data") HoneyTipVo vo,
-            @RequestPart("deleteFiles") List<HoneyTipAttachVo> deleteFiles,
+            @RequestPart("data") ReviewVo vo,
+            @RequestPart("deleteFiles") List<ReviewAttachVo> deleteFiles,
             @RequestHeader("Authorization") String token,
             @RequestPart(value = "f", required = false) List<MultipartFile> f
 
     ){
 
-        List<HoneyTipAttachVo> attachVoList = new ArrayList<>();
+        List<ReviewAttachVo> attachVoList = new ArrayList<>();
 
         try {
             if (f != null && !f.isEmpty()) {
@@ -79,7 +96,7 @@ public class HoneyTipController {
 
                 for (int i = 0; i < f.size(); i++) {
                     String originName = f.get(i).getOriginalFilename();
-                    HoneyTipAttachVo attachVo = new HoneyTipAttachVo();
+                    ReviewAttachVo attachVo = new ReviewAttachVo();
                     attachVo.setPath(urlList.get(i));
                     attachVo.setOriginName(originName);
                     attachVoList.add(attachVo);
@@ -92,32 +109,20 @@ public class HoneyTipController {
             return 0;
         }
     }
-
-
     @GetMapping("detail")
-    public Map detail(@RequestParam("bno") String bno ,@RequestHeader("Authorization") String token){
+    public Map detail(@RequestParam("bno") String bno , @RequestHeader("Authorization") String token){
 
         try {
             Map map = service.detail(bno , token);
 
             return map;
         }catch (Exception e){
-            throw new IllegalStateException("CODE [BOARD / DETAIL]");
+            throw new IllegalStateException("CODE [REVIEW / DETAIL]");
         }
 
     }
-    @PostMapping("recommend")
-    public int recommend(@RequestBody BoardRecommendVo vo , @RequestHeader("Authorization") String token){
-
-        service.recommend(vo , token);
-        return '1';
-    }
-    @PostMapping("countLike")
-    public int countLike(@RequestBody String bno){
-        return service.countLike(bno);
-    }
     @PostMapping("report")
-    public int report(@RequestBody HoneyTipReportVo vo ,@RequestHeader("Authorization") String token){
+    public int report(@RequestBody ReviewReportVo vo , @RequestHeader("Authorization") String token){
 
         try{
             return service.reportBoard(vo , token);
@@ -127,7 +132,7 @@ public class HoneyTipController {
         }
     }
     @PostMapping("delete")
-    public int deleteHoneyTip(@RequestBody HoneyTipVo vo , @RequestHeader("Authorization") String token){
+    public int deleteHoneyTip(@RequestBody ReviewVo vo , @RequestHeader("Authorization") String token){
         try{
             return service.deleteHoneyTip(vo , token);
         } catch (Exception e) {
@@ -135,7 +140,7 @@ public class HoneyTipController {
         }
     }
     @PostMapping("comment/write")
-    public int commentWrite(@RequestBody HoneyTipCommentVo vo ,@RequestHeader("Authorization") String token){
+    public int commentWrite(@RequestBody ReviewCommentVo vo , @RequestHeader("Authorization") String token){
         try{
             return service.commentWrite(vo , token);
         } catch (Exception e) {
@@ -143,9 +148,8 @@ public class HoneyTipController {
             return 0;
         }
     }
-
     @PostMapping("comment/delete")
-    public int commentDelete(@RequestBody HoneyTipCommentVo vo , @RequestHeader("Authorization") String token){
+    public int commentDelete(@RequestBody ReviewCommentVo vo , @RequestHeader("Authorization") String token){
         try{
             return service.commentDelete(vo , token);
         } catch (Exception e) {
@@ -153,17 +157,8 @@ public class HoneyTipController {
             return 0;
         }
     }
-    @PostMapping("comment/report")
-    public int commentReport(@RequestBody HoneyTipCommentReportVo vo , @RequestHeader("Authorization") String token){
-        try{
-            return service.commentReport(vo , token);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return 0;
-        }
-    }
     @GetMapping("comment/list")
-    public List<HoneyTipCommentVo> commentList(@RequestParam("bno") String bno ,  @RequestHeader("Authorization") String token){
+    public List<ReviewCommentVo> commentList(@RequestParam("bno") String bno ,  @RequestHeader("Authorization") String token){
         try{
             return service.commentList(bno , token);
         } catch (Exception e) {
@@ -171,5 +166,4 @@ public class HoneyTipController {
             return null;
         }
     }
-
 }
