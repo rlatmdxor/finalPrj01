@@ -183,29 +183,10 @@ public interface DietMealMapper {
 
     @Select("""
             SELECT COUNT(*)
-            FROM NOTIFICATION_SETTINGS
-            WHERE
-                MEMBER_NO = #{userNo}
-                AND ALL_PUSH = 'Y'
-                AND DIET_PUSH = 'Y'
-            """)
-    int isDietPushEnabled(String userNo);
-
-    @Select("""
-            SELECT COUNT(*)
             FROM DIET
             WHERE MEMBER_NO = #{userNo}
             AND TRUNC(DIET_DAY) = TRUNC(SYSDATE)
             AND DEL_YN = 'N'
-            AND EXISTS (
-                    SELECT 1
-                    FROM NOTIFICATION_SETTINGS NS
-                    WHERE NS.MEMBER_NO = #{userNo}
-                        AND NS.ALL_PUSH = 'Y'
-                        AND NS.DIET_PUSH = 'Y'
-                )
             """)
     int checkTodayDiet(String userNo);
-
-
 }
