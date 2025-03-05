@@ -15,7 +15,7 @@ import Pagination from '../../../util/Pagination';
 import { addDays, addMonths, endOfMonth, startOfDay, startOfMonth, startOfYear, subYears } from 'date-fns';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
-import { isTokenExpired, getRoleFromToken } from '../../util/JwtUtil';
+import { isTokenExpired, getRoleFromToken } from '../../../util/JwtUtil';
 
 const BottomDiv = styled.div`
   margin-top: 25px;
