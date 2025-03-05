@@ -29,7 +29,6 @@ public class DietMealController {
         try {
             if (f != null) {
                 String url = FileUtil.uploadFileToAwsS3(f , s3 , bucket);
-                System.out.println("url = " + url);
                 vo.setImage(url);
             }
 
@@ -49,7 +48,6 @@ public class DietMealController {
     public List<DietVo> dietMealDetail(@RequestBody DietVo vo, @RequestHeader("Authorization") String authorization){
         try {
             List<DietVo> detailVoList = service.dietMealDetail(vo);
-            System.out.println("detailVoList = " + detailVoList);
             return detailVoList;
         }
         catch (Exception e){
@@ -63,7 +61,6 @@ public class DietMealController {
         try {
             if (f != null) {
                 String url = FileUtil.uploadFileToAwsS3(f , s3 , bucket);
-                System.out.println("url = " + url);
                 vo.setImage(url);
             }
 
@@ -80,7 +77,6 @@ public class DietMealController {
 
     @PostMapping("delete")
     public void dietMealDelete(@RequestBody DietVo vo, @RequestHeader("Authorization") String authorization){
-        System.out.println("vo.getNo() = " + vo.getNo());
         try {
             service.dietMealDelete(vo.getNo());
         }

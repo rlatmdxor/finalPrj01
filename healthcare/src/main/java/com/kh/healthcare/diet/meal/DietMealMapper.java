@@ -180,4 +180,13 @@ public interface DietMealMapper {
             ORDER BY DIET_DAY
             """)
     List<TotalKcalVo> getYearAvgKcal(int memberNo);
+
+    @Select("""
+            SELECT COUNT(*)
+            FROM DIET
+            WHERE MEMBER_NO = #{userNo}
+            AND TRUNC(DIET_DAY) = TRUNC(SYSDATE)
+            AND DEL_YN = 'N'
+            """)
+    int checkTodayDiet(String userNo);
 }
