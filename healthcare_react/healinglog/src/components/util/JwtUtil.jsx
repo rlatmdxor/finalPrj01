@@ -14,7 +14,7 @@ const getPayload = (token, key) => {
 function isTokenExpired(token) {
   try {
     // JWT 디코딩
-    const decodedToken = jwt_decode(token);
+    const decodedToken = jwtDecode(token);
 
     // 현재 시간(초 단위)
     const currentTime = Date.now() / 1000;
