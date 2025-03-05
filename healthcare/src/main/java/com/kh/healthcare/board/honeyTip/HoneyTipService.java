@@ -192,12 +192,19 @@ public class HoneyTipService {
 
     // 신규 댓글 확인
     public String checkNewComment(String userNo) {
-        int count = mapper.checkNewComment(userNo);
-        if (count == 0) {
-            return "신규 댓글 없음";
+        int isEnabled = mapper.isCommentPushEnabled(userNo);
+
+        if(isEnabled>=1){
+            int count = mapper.checkNewComment(userNo);
+            if (count == 0) {
+                return "신규 댓글 없음";
+            } else {
+                return "회원님의 게시글에 새로운 댓글이 있습니다.";
+            }
         } else {
-            return "회원님의 게시글에 새로운 댓글이 있습니다.";
+            return  "푸시 설정 OFF";
         }
+
     }
 
 }

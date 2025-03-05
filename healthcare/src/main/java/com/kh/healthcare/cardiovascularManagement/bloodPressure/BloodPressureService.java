@@ -102,11 +102,18 @@ public class BloodPressureService {
 
     // 오늘 혈압 체크했는지
     public String checkTodayBloodPressure(String userNo) {
-        int count = dao.checkTodayBloodPressure(userNo);
-        if (count == 0) {
-            return "오늘 혈압 측정 내역이 없습니다. 혈압 측정 내역을 기록해주세요!";
+        int isEnabled = dao.isBloodPressurePushEnabled(userNo);
+
+        if(isEnabled>=1){
+            int count = dao.checkTodayBloodPressure(userNo);
+            if (count == 0) {
+                return "오늘 혈압 측정 내역이 없습니다. 혈압 측정 내역을 기록해주세요!";
+            } else {
+                return "측정 내역 있음";
+            }
         } else {
-            return "측정 내역 있음";
+            return "푸시 설정 OFF";
         }
+
     }
 }

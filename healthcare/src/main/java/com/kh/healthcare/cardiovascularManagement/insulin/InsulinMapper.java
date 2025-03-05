@@ -73,11 +73,30 @@ public interface InsulinMapper {
 
     @Select("""
             SELECT COUNT(*)
+            FROM NOTIFICATION_SETTINGS
+            WHERE
+                MEMBER_NO = #{userNo}
+                AND ALL_PUSH = 'Y'
+                AND INSULIN_PUSH = 'Y'
+            """)
+    int isInsulinPushEnabled(String userNo);
+
+    @Select("""
+            SELECT COUNT(*)
             FROM INSULIN
             WHERE MEMBER_NO = #{userNo}
             AND TRUNC(ENROLL_DATE) = TRUNC(SYSDATE)
+            AND EXISTS (
+                    SELECT 1
+                    FROM NOTIFICATION_SETTINGS NS
+                    WHERE NS.MEMBER_NO = #{userNo}
+                        AND NS.ALL_PUSH = 'Y'
+                        AND NS.INSULIN_PUSH = 'Y'
+                )
             """)
     int checkTodayInsulin(String userNo);
+
+
 
 //    @Update("""
 //            UPDATE INSULIN

@@ -240,6 +240,16 @@ public interface HoneyTipMapper {
 
     @Select("""
             SELECT COUNT(*)
+            FROM NOTIFICATION_SETTINGS
+            WHERE
+                MEMBER_NO = #{userNo}
+                AND ALL_PUSH = 'Y'
+                AND COMMENT_PUSH = 'Y'
+            """)
+    int isCommentPushEnabled(String userNo);
+
+    @Select("""
+            SELECT COUNT(*)
             FROM BOARD_COMMENT
             WHERE BOARD_NO IN (
                 SELECT NO

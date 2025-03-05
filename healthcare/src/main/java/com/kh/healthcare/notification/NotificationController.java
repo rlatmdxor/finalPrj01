@@ -1,0 +1,22 @@
+package com.kh.healthcare.notification;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("api/notification")
+@RequiredArgsConstructor
+public class NotificationController {
+
+    private final NotificationService service;
+
+    @GetMapping("getPushSettings")
+    public NotificationVo getPushSettings(@RequestHeader("Authorization") String token){
+        return service.getPushSettings(token);
+    }
+
+    @PostMapping("setPushSettings")
+    public void setPushSettings(@RequestHeader("Authorization") String token, @RequestBody NotificationVo vo){
+        service.setPushSettings(token, vo);
+    }
+}
