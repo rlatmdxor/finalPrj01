@@ -76,13 +76,20 @@ public class DietMealService {
 
     //오늘 식단내역 체크하고 메시지 반환
     public String checkTodayDiet(String userNo) {
-        int count = mapper.checkTodayDiet(userNo);
-        if (count == 0) {
-            // 기록이 없으면
-            return "오늘 등록된 식단내역이 없습니다. 식단 내역을 등록해주세요!";
+        int isEnabled = mapper.isDietPushEnabled(userNo);
+
+        if(isEnabled>=1){
+            int count = mapper.checkTodayDiet(userNo);
+            if (count == 0) {
+                // 기록이 없으면
+                return "오늘 등록된 식단내역이 없습니다. 식단 내역을 등록해주세요!";
+            } else {
+                // 하나라도 기록이 있으면
+                return "식단 기록이 존재합니다.";
+            }
         } else {
-            // 하나라도 기록이 있으면
-            return "식단 기록이 존재합니다.";
+            return "푸시 설정 OFF";
         }
+
     }
 }

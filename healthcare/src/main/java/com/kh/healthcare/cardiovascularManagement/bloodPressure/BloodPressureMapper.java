@@ -74,4 +74,14 @@ public interface BloodPressureMapper {
             AND TRUNC(ENROLL_DATE) = TRUNC(SYSDATE)
             """)
     int checkTodayBloodPressure(String userNo);
+
+    @Select("""
+            SELECT COUNT(*)
+            FROM NOTIFICATION_SETTINGS
+            WHERE
+                MEMBER_NO = #{userNo}
+                AND ALL_PUSH = 'Y'
+                AND BLOOD_PRESSURE_PUSH = 'Y'
+            """)
+    int isBloodPressurePushEnabled(String userNo);
 }

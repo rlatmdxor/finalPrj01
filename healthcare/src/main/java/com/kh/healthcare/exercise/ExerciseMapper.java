@@ -160,6 +160,16 @@ public interface ExerciseMapper {
 
     @Select("""
             SELECT COUNT(*)
+            FROM NOTIFICATION_SETTINGS
+            WHERE
+                MEMBER_NO = #{userNo}
+                AND ALL_PUSH = 'Y'
+                AND EXERCISE_PUSH = 'Y'
+            """)
+    int isExercisePushEnabled(String userNo);
+
+    @Select("""
+            SELECT COUNT(*)
               FROM (
                     SELECT AH.NO
                       FROM AEROBIC_HISTORY AH
@@ -172,8 +182,9 @@ public interface ExerciseMapper {
                       FROM ANAEROBIC_HISTORY NAH
                      WHERE NAH.USER_NO = #{userNo}
                        AND TRUNC(NAH.EX_DATE) = TRUNC(SYSDATE)
-              )
+                    )
             """)
     int checkTodayExercise(String userNo);
+
 
 }

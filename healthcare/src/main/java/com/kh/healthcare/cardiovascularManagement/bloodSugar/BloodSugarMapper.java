@@ -65,6 +65,23 @@ public interface BloodSugarMapper {
             FROM BLOOD_SUGAR
             WHERE MEMBER_NO = #{userNo}
             AND TRUNC(ENROLL_DATE) = TRUNC(SYSDATE)
+            AND EXISTS (
+                    SELECT 1
+                    FROM NOTIFICATION_SETTINGS NS
+                    WHERE NS.MEMBER_NO = #{userNo}
+                        AND NS.ALL_PUSH = 'Y'
+                        AND NS.BLOOD_SUGAR_PUSH = 'Y'
+                )
             """)
     int checkTodayBloodSugar(String userNo);
+
+    @Select("""
+            SELECT COUNT(*)
+            FROM NOTIFICATION_SETTINGS
+            WHERE
+                MEMBER_NO = #{userNo}
+                AND ALL_PUSH = 'Y'
+                AND BLOOD_SUGAR_PUSH = 'Y'
+            """)
+    int isBloodSugarPushEnabled(String userNo);
 }

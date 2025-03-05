@@ -24,25 +24,45 @@ import Postcode from '../../util/PostCode';
 import { useNavigate } from 'react-router-dom';
 import { Switch } from '@mui/material';
 import Modal2 from '../../util/Modal2';
+import { isTokenExpired, getRoleFromToken } from '../../util/JwtUtil';
+import Swal from 'sweetalert2';
 
 const Mypage = () => {
   const theme = useTheme();
   const dispatch = useDispatch();
-  const navi = useNavigate();
   const { id, pwd, nick, name, address, email, phone, height, weight, profile } = useSelector((state) => state.join);
   const [newNick, setNewNick] = useState('');
   const heightOptions = Array.from({ length: 71 }, (_, i) => i + 140); // 140 ~ 210 cm
   const weightOptions = Array.from({ length: 81 }, (_, i) => i + 40); // 40 ~ 120 kg
   const [settings, setSettings] = useState({
-    전체푸시: true,
-    식단푸시: false,
-    물섭취푸시: true,
-    운동푸시: true,
-    댓글푸시: false,
-    혈압푸시: true,
-    혈당푸시: false,
-    인슐린투약푸시: false,
+    allPush: true,
+    dietPush: true,
+    waterPush: true,
+    exercisePush: true,
+    commentPush: true,
+    bloodPressurePush: true,
+    bloodSugarPush: true,
+    insulinPush: true,
   });
+
+  const token = localStorage.getItem('token');
+  const navi = useNavigate();
+  const [isAuthorized, setIsAuthorized] = useState(false); // 로그인 여부 체크
+
+  useEffect(() => {
+    if (!token || isTokenExpired(token)) {
+      Swal.fire({
+        icon: 'warning',
+        title: '로그인이 필요합니다',
+        text: '로그인 후 이용해주세요',
+        confirmButtonText: '확인',
+      }).then(() => {
+        navi('/login'); // 로그인 페이지로 이동
+      });
+    } else {
+      setIsAuthorized(true); // 로그인 성공 시 데이터 요청 가능
+    }
+  }, [navi, token]);
 
   const handleToggle = (setting) => {
     setSettings({
@@ -50,12 +70,6 @@ const Mypage = () => {
       [setting]: !settings[setting],
     });
   };
-  const token = localStorage.getItem('token');
-
-  if (!token) {
-    alert('로그인 정보가 없습니다.');
-    window.location.href = '/login';
-  }
 
   ///////////////// 주소 관련 데이터////////////////
   const [zoneAddress, setZoneAddress] = useState('');
@@ -278,8 +292,29 @@ const Mypage = () => {
               str="푸시알람 설정"
               fc={'white'}
               fs={'18'}
-              f={() => {
+              f={async () => {
                 reset();
+                const response = await fetch('http://127.0.0.1:80/api/notification/getPushSettings', {
+                  method: 'GET',
+                  headers: { Authorization: `Bearer ${token}` },
+                });
+                if (!response.ok) {
+                  throw new Error('서버 응답 오류');
+                }
+                const data = await response.json();
+                //가져온 데이터로 푸시알림설정 세팅
+                setSettings((prevSettings) => ({
+                  ...prevSettings,
+                  allPush: data.allPush === 'Y' ? true : false,
+                  dietPush: data.dietPush === 'Y' ? true : false,
+                  waterPush: data.waterPush === 'Y' ? true : false,
+                  exercisePush: data.exercisePush === 'Y' ? true : false,
+                  commentPush: data.commentPush === 'Y' ? true : false,
+                  bloodPressurePush: data.bloodPressurePush === 'Y' ? true : false,
+                  bloodSugarPush: data.bloodSugarPush === 'Y' ? true : false,
+                  insulinPush: data.insulinPush === 'Y' ? true : false,
+                }));
+
                 dispatch(open({ title: '푸시알람 설정', value: 'block' }));
               }}
               mt={'0'}
@@ -582,9 +617,9 @@ const Mypage = () => {
             <PushLabel>전체 푸시</PushLabel>
             <SwitchContainer>
               <Switch
-                checked={settings['전체푸시']}
-                onChange={() => handleToggle('전체푸시')}
-                name={'전체푸시'}
+                checked={settings['allPush']}
+                onChange={() => handleToggle('allPush')}
+                name={'allPush'}
                 color="primary"
               />
             </SwitchContainer>
@@ -595,9 +630,9 @@ const Mypage = () => {
             <PushLabel>식단 푸시</PushLabel>
             <SwitchContainer>
               <Switch
-                checked={settings['식단푸시']}
-                onChange={() => handleToggle('식단푸시')}
-                name={'식단푸시'}
+                checked={settings['dietPush']}
+                onChange={() => handleToggle('dietPush')}
+                name={'dietPush'}
                 color="primary"
               />
             </SwitchContainer>
@@ -606,9 +641,9 @@ const Mypage = () => {
             <PushLabel>물 섭취 푸시</PushLabel>
             <SwitchContainer>
               <Switch
-                checked={settings['물섭취푸시']}
-                onChange={() => handleToggle('물섭취푸시')}
-                name={'물섭취푸시'}
+                checked={settings['waterPush']}
+                onChange={() => handleToggle('waterPush')}
+                name={'waterPush'}
                 color="primary"
               />
             </SwitchContainer>
@@ -617,9 +652,9 @@ const Mypage = () => {
             <PushLabel>운동 푸시</PushLabel>
             <SwitchContainer>
               <Switch
-                checked={settings['운동푸시']}
-                onChange={() => handleToggle('운동푸시')}
-                name={'운동푸시'}
+                checked={settings['exercisePush']}
+                onChange={() => handleToggle('exercisePush')}
+                name={'exercisePush'}
                 color="primary"
               />
             </SwitchContainer>
@@ -628,9 +663,9 @@ const Mypage = () => {
             <PushLabel>댓글 푸시</PushLabel>
             <SwitchContainer>
               <Switch
-                checked={settings['댓글푸시']}
-                onChange={() => handleToggle('댓글푸시')}
-                name={'댓글푸시'}
+                checked={settings['commentPush']}
+                onChange={() => handleToggle('commentPush')}
+                name={'commentPush'}
                 color="primary"
               />
             </SwitchContainer>
@@ -639,9 +674,9 @@ const Mypage = () => {
             <PushLabel>혈압 푸시</PushLabel>
             <SwitchContainer>
               <Switch
-                checked={settings['혈압푸시']}
-                onChange={() => handleToggle('혈압푸시')}
-                name={'혈압푸시'}
+                checked={settings['bloodPressurePush']}
+                onChange={() => handleToggle('bloodPressurePush')}
+                name={'bloodPressurePush'}
                 color="primary"
               />
             </SwitchContainer>
@@ -650,9 +685,9 @@ const Mypage = () => {
             <PushLabel>혈당 푸시</PushLabel>
             <SwitchContainer>
               <Switch
-                checked={settings['혈당푸시']}
-                onChange={() => handleToggle('혈당푸시')}
-                name={'혈당푸시'}
+                checked={settings['bloodSugarPush']}
+                onChange={() => handleToggle('bloodSugarPush')}
+                name={'bloodSugarPush'}
                 color="primary"
               />
             </SwitchContainer>
@@ -661,9 +696,9 @@ const Mypage = () => {
             <PushLabel>인슐린 투약 푸시</PushLabel>
             <SwitchContainer>
               <Switch
-                checked={settings['인슐린투약푸시']}
-                onChange={() => handleToggle('인슐린투약푸시')}
-                name={'인슐린투약푸시'}
+                checked={settings['insulinPush']}
+                onChange={() => handleToggle('insulinPush')}
+                name={'insulinPush'}
                 color="primary"
               />
             </SwitchContainer>
@@ -678,27 +713,36 @@ const Mypage = () => {
               c={theme.green}
               fc={'white'}
               str={'저장'}
-              f={(e) => {
+              f={async (e) => {
                 if (window.confirm('변경하시겠습니까?')) {
-                  const formData = new FormData();
-                  formData.append('height', newHeight);
-                  formData.append('weight', newWeight);
+                  const settingData = {
+                    allPush: settings.allPush ? 'Y' : 'N',
+                    dietPush: settings.dietPush ? 'Y' : 'N',
+                    waterPush: settings.waterPush ? 'Y' : 'N',
+                    exercisePush: settings.exercisePush ? 'Y' : 'N',
+                    commentPush: settings.commentPush ? 'Y' : 'N',
+                    bloodPressurePush: settings.bloodPressurePush ? 'Y' : 'N',
+                    bloodSugarPush: settings.bloodSugarPush ? 'Y' : 'N',
+                    insulinPush: settings.insulinPush ? 'Y' : 'N',
+                  };
 
-                  fetch('http://127.0.0.1:80/api/notification/setNotification', {
+                  const response = await fetch('http://127.0.0.1:80/api/notification/setPushSettings', {
                     method: 'POST',
                     headers: {
+                      'Content-Type': 'application/json',
                       Authorization: `Bearer ${token}`,
                     },
-                    body: formData,
-                  })
-                    .then((resp) => {
-                      resp.text();
-                    })
-                    .then((data) => {
-                      dispatch(setHeight(newHeight));
-                      dispatch(setWeight(newWeight));
-                      alert('신체정보 수정 완료!');
-                    });
+                    body: JSON.stringify(settingData),
+                  });
+                  if (!response.ok) {
+                    throw new Error('서버 응답 오류');
+                  }
+                  Swal.fire({
+                    title: '알림',
+                    text: '변경 완료!',
+                    icon: 'success',
+                    confirmButtonText: '확인',
+                  });
                   dispatch(close(e.target.title));
                 }
               }}
@@ -710,7 +754,6 @@ const Mypage = () => {
               ml={'20'}
               mr={'10'}
               c={theme.gray}
-              fc={'black'}
               str={'취소'}
               f={(e) => {
                 dispatch(close(e.target.title));
