@@ -222,9 +222,9 @@ const PublicHealthCenter = () => {
           <tbody>
             {phcs.map((phc, idx) => (
               <tr key={idx}>
-                <td>{phc.name}</td>
-                <td>{phc.tellNum}</td>
-                <td>{phc.postNum}</td>
+                <td width="160px">{phc.name}</td>
+                <td width="110px">{phc.tellNum}</td>
+                <td width="60px">{phc.postNum}</td>
                 <td>{phc.address}</td>
               </tr>
             ))}
