@@ -15,17 +15,15 @@ public class DrugController {
 
     private final DrugService service;
 
-    @GetMapping("list")
-    public List<DrugVo>  list(){
-        List<DrugVo> voList = service.list();
-        System.out.println("voList = " + voList);
+    @PostMapping("list")
+    public List<DrugVo>  list(@RequestHeader ("Authorization") String token){
+        List<DrugVo> voList = service.list(token);
         return  voList;
     }
 
-    @GetMapping("delList")
-    public List<DrugVo>  delList(){
-        System.out.println("DrugController.delList");
-        List<DrugVo> voList = service.delList();
+    @PostMapping("delList")
+    public List<DrugVo>  delList(@RequestHeader ("Authorization") String token){
+        List<DrugVo> voList = service.delList(token);
         return  voList;
     }
 
@@ -36,9 +34,8 @@ public class DrugController {
     }
 
     @PostMapping("write")
-    public int write(@RequestBody DrugVo vo){
-        System.out.println("vo = " + vo);
-       int result =  service.write(vo);
+    public int write(@RequestHeader ("Authorization") String token, @RequestBody DrugVo vo){
+       int result =  service.write(token,vo);
         return result;
     }
 
@@ -55,13 +52,12 @@ public class DrugController {
     }
 
     @PostMapping("del")
-    public void del(@RequestBody List<String> vo ){
-        service.del(vo);
+    public void del(@RequestHeader ("Authorization") String token, @RequestBody List<String> vo ){
+        service.del(token,vo);
     }
     @PostMapping("removeDrug")
-    public void removeDrug(@RequestBody List<String> vo ){
-        System.out.println("vo = " + vo);
-        service.removeDrug(vo);
+    public void removeDrug(@RequestHeader ("Authorization") String token, @RequestBody List<String> vo ){
+        service.removeDrug(token, vo);
     }
 
 }

@@ -21,15 +21,15 @@ public interface SleepMapper {
              VALUES
              (
              SEQ_SLEEP.NEXTVAL
-             , '1'
-             , TO_DATE((TO_DATE(#{recordDate}) || #{sleepStart} ), 'YYYY-MM-DD HH24:MI')
-             , TO_DATE((TO_DATE(#{recordDate}) || #{sleepEnd} ), 'YYYY-MM-DD HH24:MI')
-             , #{sleepDuration}
-             , TO_DATE(#{recordDate})
+             ,#{userNo}
+             , TO_DATE((TO_DATE(#{vo.recordDate}) || #{vo.sleepStart} ), 'YYYY-MM-DD HH24:MI')
+             , TO_DATE((TO_DATE(#{vo.recordDate}) || #{vo.sleepEnd} ), 'YYYY-MM-DD HH24:MI')
+             , #{vo.sleepDuration}
+             , TO_DATE(#{vo.recordDate})
              )
             
             """)
-    void write(SleepVo vo);
+    void write(String userNo, SleepVo vo);
 
     @Select("""
             SELECT NO
@@ -39,19 +39,20 @@ public interface SleepMapper {
             , SLEEP_DURATION
             , TO_CHAR(RECORD_DATE , 'YYYY-MM-DD') AS DAY
             FROM SLEEP
+            WHERE MEMBER_NO = #{userNo}
             ORDER BY SLEEP_START DESC
             """)
-    List<SleepVo> list();
+    List<SleepVo> list(String userNo);
 
     @Update("""
             UPDATE SLEEP
                 SET
-                    SLEEP_START = TO_DATE((TO_DATE(#{recordDate}) || #{sleepStart} ), 'YYYY-MM-DD HH24:MI'),
-                    SLEEP_END =TO_DATE((TO_DATE(#{recordDate}) || #{sleepEnd} ), 'YYYY-MM-DD HH24:MI'),
-                    SLEEP_DURATION =#{sleepDuration},
-                    RECORD_DATE = TO_DATE(#{recordDate})
-            WHERE MEMBER_NO = '1'
-            AND NO =#{no}
+                    SLEEP_START = TO_DATE((TO_DATE(#{vo.recordDate}) || #{vo.sleepStart} ), 'YYYY-MM-DD HH24:MI'),
+                    SLEEP_END =TO_DATE((TO_DATE(#{vo.recordDate}) || #{vo.sleepEnd} ), 'YYYY-MM-DD HH24:MI'),
+                    SLEEP_DURATION =#{vo.sleepDuration},
+                    RECORD_DATE = TO_DATE(#{vo.recordDate})
+            WHERE MEMBER_NO = #{userNo}
+            AND NO =#{vo.no}
             """)
-    void edit(SleepVo vo);
+    void edit(String userNo, SleepVo vo);
 }

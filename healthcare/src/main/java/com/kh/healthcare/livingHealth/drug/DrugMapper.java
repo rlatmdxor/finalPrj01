@@ -13,20 +13,20 @@ public interface DrugMapper {
             *
             FROM USER_MEDICATION U
             JOIN MEDICATION M ON (U.MEDICATION = M.NO)
-            WHERE U.MEMBER = 1
+            WHERE U.MEMBER = #{userNo}
             AND DEL_YN ='N'
             """)
-    List<DrugVo> list();
+    List<DrugVo> list(String userNo);
 
     @Select("""
             SELECT *
             FROM USER_MEDICATION U
             JOIN MEDICATION M ON (U.MEDICATION = M.NO)
-            WHERE U.MEMBER = 1
+            WHERE U.MEMBER = #{userNo}
             AND DEL_YN = 'Y'
             ORDER BY DEL_TIME DESC
             """)
-    List<DrugVo> delList();
+    List<DrugVo> delList(String userNo);
 
 
     List<DrugVo> find(DrugVo vo);
@@ -42,12 +42,12 @@ public interface DrugMapper {
             VALUES
             (
             SEQ_USER_MEDICATION.NEXTVAL
-            , #{no}
-            , 1
+            , #{vo.no}
+            , #{userNo}
             ,'zz'
             )
             """)
-    int write(DrugVo vo);
+    int write(String userNo, DrugVo vo);
 
     @Select("""
             SELECT * FROM DRUG_COLOR
@@ -60,9 +60,9 @@ public interface DrugMapper {
     List<DrugFormCategoryVo> form();
 
 
-    void del(List<String> vo);
+    void del(String userNo, List<String> vo);
 
-    void removeDrug(List<String> vo);
+    void removeDrug(String userNo, List<String> vo);
 
 
 }

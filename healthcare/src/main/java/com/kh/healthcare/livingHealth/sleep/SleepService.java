@@ -1,6 +1,7 @@
 package com.kh.healthcare.livingHealth.sleep;
 
 
+import com.kh.healthcare.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,18 +16,24 @@ import java.util.List;
 public class SleepService {
 
     private final SleepMapper mapper;
+    private final JwtUtil jwtUtil;
 
-    public void write(SleepVo vo) {
-        System.out.println("vo = " + vo);
-        mapper.write(vo);
+    public void write(String token, SleepVo vo) {
+        token = token.replace("Bearer ", "");
+        String userNo = jwtUtil.getNo(token);
+        mapper.write(userNo, vo);
 
     }
 
-    public List<SleepVo> list() {
-        return mapper.list();
+    public List<SleepVo> list(String token) {
+        token = token.replace("Bearer ", "");
+        String userNo = jwtUtil.getNo(token);
+        return mapper.list(userNo);
     }
 
-    public void edit(SleepVo vo) {
-        mapper.edit(vo);
+    public void edit(String token, SleepVo vo) {
+        token = token.replace("Bearer ", "");
+        String userNo = jwtUtil.getNo(token);
+        mapper.edit(userNo, vo);
     }
 }
