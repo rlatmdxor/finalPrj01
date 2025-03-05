@@ -8,7 +8,6 @@ const todayDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStar
 const dietSlice = createSlice({
   name: 'diet',
   initialState: {
-    memberNo: 0,
     height: 0,
     day: todayDate,
     water: 0,
@@ -18,9 +17,6 @@ const dietSlice = createSlice({
     mealKcalSum: {},
   },
   reducers: {
-    setMemberNo: (state, action) => {
-      state.memberNo = action.payload;
-    },
     setHeight: (state, action) => {
       state.height = action.payload;
     },

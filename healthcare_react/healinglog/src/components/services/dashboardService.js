@@ -1,6 +1,6 @@
-const getDashboardData = async (currentMonday, currentSunday, memberNo, token) => {
+const getDashboardData = async (currentMonday, currentSunday, token) => {
   const resp = await fetch(
-    `http://127.0.0.1:80/api/dashboard?currentMonday=${currentMonday}&currentSunday=${currentSunday}&memberNo=${memberNo}`,
+    `http://127.0.0.1:80/api/dashboard?currentMonday=${currentMonday}&currentSunday=${currentSunday}`,
     {
       method: 'GET',
       headers: {
@@ -15,8 +15,8 @@ const getDashboardData = async (currentMonday, currentSunday, memberNo, token) =
   return dashboardData;
 };
 
-const getDashboardSetting = async (memberNo, token) => {
-  const resp = await fetch(`http://127.0.0.1:80/api/dashboard/setting?memberNo=${memberNo}`, {
+const getDashboardSetting = async (token) => {
+  const resp = await fetch(`http://127.0.0.1:80/api/dashboard/setting`, {
     method: 'GET',
     headers: {
       Authorization: `Bearer ${token}`,
@@ -41,7 +41,7 @@ const editDashboardSetting = async (settings, token) => {
   if (!resp.ok) {
     throw new Error(`HTTP ERROR !!! ${resp.status}`);
   }
-  const result = resp.text();
+  const result = resp.status;
   return result;
 };
 

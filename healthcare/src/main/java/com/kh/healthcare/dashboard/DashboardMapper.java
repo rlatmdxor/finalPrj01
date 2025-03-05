@@ -53,7 +53,7 @@ public interface DashboardMapper {
             AS SUM_CAL_CONSUME 
             FROM DUAL
             """)
-    WeeklyDataVo getDashboardData(String startDate, String endDate, int memberNo);
+    WeeklyDataVo getDashboardData(String startDate, String endDate, String memberNo);
 
     @Select("""
             SELECT NO, NAME, VISIBLE_YN
@@ -61,7 +61,7 @@ public interface DashboardMapper {
             WHERE MEMBER_NO = #{memberNo}
             ORDER BY NO
             """)
-    List<SettingVo> getDashboardSetting(int memberNo);
+    List<SettingVo> getDashboardSetting(String memberNo);
 
     @Update("""
             UPDATE DASHBOARD

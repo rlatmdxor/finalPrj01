@@ -1,5 +1,6 @@
 package com.kh.healthcare.notification;
 
+import com.kh.healthcare.diet.meal.MealService;
 import com.kh.healthcare.board.honeyTip.HoneyTipService;
 import com.kh.healthcare.cardiovascularManagement.bloodPressure.BloodPressureService;
 import com.kh.healthcare.cardiovascularManagement.bloodSugar.BloodSugarService;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Component;
 public class NotificationScheduler {
 
     private final ExerciseService exerciseService;
+    private final MealService dietService;
     private final HoneyTipService honeyTipService;
     private final InsulinService insulinService;
     private final BloodPressureService bloodPressureService;

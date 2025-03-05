@@ -14,9 +14,9 @@ public class DashboardController {
     private final DashboardService service;
 
     @GetMapping
-    public DashboardVo getDashboardData(@RequestParam String currentMonday, @RequestParam String currentSunday, @RequestParam int memberNo, @RequestHeader("Authorization") String authorization){
+    public DashboardVo getDashboardData(@RequestParam String currentMonday, @RequestParam String currentSunday, @RequestHeader("Authorization") String token){
         try {
-            DashboardVo dashboardVo = service.getDashboardData(currentMonday, currentSunday, memberNo);
+            DashboardVo dashboardVo = service.getDashboardData(currentMonday, currentSunday, token);
             return dashboardVo;
         }
         catch (Exception e){
@@ -26,9 +26,9 @@ public class DashboardController {
     }
 
     @GetMapping("setting")
-    public List<SettingVo> getDashboardSetting(@RequestParam int memberNo, @RequestHeader("Authorization") String authorization) {
+    public List<SettingVo> getDashboardSetting(@RequestHeader("Authorization") String token) {
         try {
-            List<SettingVo> settingVo = service.getDashboardSetting(memberNo);
+            List<SettingVo> settingVo = service.getDashboardSetting(token);
             return settingVo;
         }
         catch (Exception e){
@@ -38,10 +38,9 @@ public class DashboardController {
     }
 
     @PostMapping("setting")
-    public String editDashboardSetting(@RequestBody List<SettingVo> settings, @RequestHeader("Authorization") String authorization) {
+    public void editDashboardSetting(@RequestBody List<SettingVo> settings, @RequestHeader("Authorization") String token) {
         try {
             service.editDashboardSetting(settings);
-            return "SETTING SUCCESS";
         }
         catch (Exception e){
             e.printStackTrace();

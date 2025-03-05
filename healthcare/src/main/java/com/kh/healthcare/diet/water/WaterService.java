@@ -1,5 +1,6 @@
 package com.kh.healthcare.diet.water;
 
+import com.kh.healthcare.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,9 +13,13 @@ import java.util.List;
 public class WaterService {
 
     private final WaterMapper mapper;
+    private final JwtUtil jwtUtil;
 
-    public void waterEnroll(WaterVo vo) {
-        WaterVo waterVo = getWaterByDate(vo);
+    public void waterEnroll(WaterVo vo, String token) {
+        WaterVo waterVo = getWaterByDate(vo, token);
+        token = token.replace("Bearer ", "");
+        String no = jwtUtil.getNo(token);
+        vo.setMemberNo(no);
 
         if(waterVo == null) {
             mapper.waterEnroll(vo);
@@ -24,7 +29,11 @@ public class WaterService {
         }
     }
 
-    public WaterVo getWaterByDate(WaterVo vo) {
+    public WaterVo getWaterByDate(WaterVo vo, String token) {
+        token = token.replace("Bearer ", "");
+        String no = jwtUtil.getNo(token);
+        vo.setMemberNo(no);
+
         try {
             WaterVo waterVo = mapper.getWaterByDate(vo);
             if (waterVo == null) {
@@ -35,18 +44,6 @@ public class WaterService {
             e.getMessage();
             return null;
         }
-    }
-
-    public List<WaterVo> getDayWater(int memberNo, String month) {
-        return mapper.getDayWater(memberNo, month);
-    }
-
-    public List<WaterVo> getMonthAvgWater(int memberNo, String year) {
-        return mapper.getMonthAvgWater(memberNo, year);
-    }
-
-    public List<WaterVo> getYearAvgWater(int memberNo) {
-        return mapper.getYearAvgWater(memberNo);
     }
 
     //오늘 물내역 체크하고 메시지 반환

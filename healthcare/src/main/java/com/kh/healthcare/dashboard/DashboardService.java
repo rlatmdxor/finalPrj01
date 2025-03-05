@@ -1,5 +1,6 @@
 package com.kh.healthcare.dashboard;
 
+import com.kh.healthcare.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,8 +16,12 @@ import java.util.Map;
 public class DashboardService {
 
     private final DashboardMapper mapper;
+    private final JwtUtil jwtUtil;
 
-    public DashboardVo getDashboardData(String currentMonday, String currentSunday, int memberNo) {
+    public DashboardVo getDashboardData(String currentMonday, String currentSunday, String token) {
+        token = token.replace("Bearer ", "");
+        String memberNo = jwtUtil.getNo(token);
+
         // 이번주 데이터
         WeeklyDataVo currentWeek = mapper.getDashboardData(currentMonday, currentSunday, memberNo);
 
@@ -92,7 +97,10 @@ public class DashboardService {
         }
     }
 
-    public List<SettingVo> getDashboardSetting(int memberNo) {
+    public List<SettingVo> getDashboardSetting(String token) {
+        token = token.replace("Bearer ", "");
+        String memberNo = jwtUtil.getNo(token);
+
         return mapper.getDashboardSetting(memberNo);
     }
 

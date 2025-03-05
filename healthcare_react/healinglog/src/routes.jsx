@@ -45,6 +45,7 @@ import ChallengersList from './components/pages/Board/ChallengersList';
 import AdminBanner from './components/admin/banner/AdminBanner';
 import BoardDetail from './components/pages/Board/BoardDetail';
 import BoardEdit from './components/pages/Board/BoardEdit';
+import { Navigate } from 'react-router-dom';
 import NoticeWrite from './components/pages/Notice/NoticeWrite';
 import NoticeDetail from './components/pages/Notice/NoticeDetail';
 import NoticeEdit from './components/pages/Notice/NoticeEdit';
@@ -104,6 +105,7 @@ export const routes = [
   { path: '/admin/banner', component: <AdminBanner /> },
   { path: '/board/detail', component: <BoardDetail /> },
   { path: '/board/edit', component: <BoardEdit /> },
+  { path: '/admin', component: <Navigate to="/admin/usermanage" /> },
   { path: '/notice/write', component: <NoticeWrite /> },
   { path: '/notice/detail', component: <NoticeDetail /> },
   { path: '/notice/edit', component: <NoticeEdit /> },

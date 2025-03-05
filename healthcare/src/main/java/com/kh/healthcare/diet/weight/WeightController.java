@@ -13,9 +13,9 @@ public class WeightController {
     private final WeightService service;
 
     @PostMapping("enroll")
-    public void weightEnroll(@RequestBody WeightVo vo, @RequestHeader("Authorization") String authorization){
+    public void weightEnroll(@RequestBody WeightVo vo, @RequestHeader("Authorization") String token){
         try {
-            service.weightEnroll(vo);
+            service.weightEnroll(vo, token);
         }
         catch (Exception e){
             throw new IllegalStateException("[ERROR] WEIGHT ENROLL FAIL..");
@@ -23,49 +23,13 @@ public class WeightController {
     }
 
     @PostMapping
-    public WeightVo getWeightByDate(@RequestBody WeightVo vo, @RequestHeader("Authorization") String authorization){
+    public WeightVo getWeightByDate(@RequestBody WeightVo vo, @RequestHeader("Authorization") String token){
         try {
-            WeightVo weightVo = service.getWeightByDate(vo);
+            WeightVo weightVo = service.getWeightByDate(vo, token);
             return weightVo;
         }
         catch (Exception e){
             throw new IllegalStateException("[ERROR] WEIGHT VIEW FAIL..");
-        }
-    }
-
-    @GetMapping("/report/day")
-    public List<WeightVo> getDayWeight(@RequestParam int memberNo, @RequestParam(required = false) String month, @RequestHeader("Authorization") String authorization){
-        try {
-            List<WeightVo> voList = service.getDayWeight(memberNo, month);
-            return voList;
-        }
-        catch (Exception e){
-            e.printStackTrace();
-            throw new IllegalStateException("[ERROR] GET DAY WEIGHT FAIL..");
-        }
-    }
-
-    @GetMapping("/report/month")
-    public List<WeightVo> getMonthAvgWeight(@RequestParam int memberNo, @RequestParam(required = false) String year, @RequestHeader("Authorization") String authorization){
-        try {
-            List<WeightVo> voList = service.getMonthAvgWeight(memberNo, year);
-            return voList;
-        }
-        catch (Exception e){
-            e.printStackTrace();
-            throw new IllegalStateException("[ERROR] GET MONTH WEIGHT FAIL..");
-        }
-    }
-
-    @GetMapping("/report/year")
-    public List<WeightVo> getYearAvgWeight(@RequestParam int memberNo, @RequestHeader("Authorization") String authorization){
-        try {
-            List<WeightVo> voList = service.getYearAvgWeight(memberNo);
-            return voList;
-        }
-        catch (Exception e){
-            e.printStackTrace();
-            throw new IllegalStateException("[ERROR] GET YEAR WEIGHT FAIL..");
         }
     }
 
