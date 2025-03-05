@@ -1,6 +1,6 @@
 package com.kh.healthcare.notification;
 
-import com.kh.healthcare.diet.meal.DietMealService;
+import com.kh.healthcare.diet.meal.MealService;
 import com.kh.healthcare.diet.water.WaterService;
 import com.kh.healthcare.interceptor.StompChannelInterceptor;
 import com.kh.healthcare.exercise.ExerciseService;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 public class NotificationScheduler {
 
     private final ExerciseService exerciseService;
-    private final DietMealService dietService;
+    private final MealService dietService;
     private final WaterService waterService;
     private final SimpMessagingTemplate messagingTemplate;
 

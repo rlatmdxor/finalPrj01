@@ -17,7 +17,7 @@ public interface WeightMapper {
                 NO
                 , MEMBER_NO
                 , ENROLL_DATE
-                , AMOUNT 
+                , AMOUNT
             ) 
             VALUES 
             (
@@ -53,31 +53,4 @@ public interface WeightMapper {
             """)
     List<WaterVo> getWeightByMemberNo(int memberNo);
 
-    @Select("""
-            SELECT ENROLL_DATE, AMOUNT
-            FROM WEIGHT_LOG
-            WHERE MEMBER_NO = #{memberNo}
-            AND TO_CHAR(ENROLL_DATE, 'YYYY-MM') = #{month}
-            ORDER BY ENROLL_DATE
-            """)
-    List<WeightVo> getDayWeight(int memberNo, String month);
-
-    @Select("""
-            SELECT TO_CHAR(ENROLL_DATE, 'YYYY-MM') AS ENROLL_DATE,  ROUND(AVG(AMOUNT)) AS AMOUNT
-            FROM WEIGHT_LOG
-            WHERE MEMBER_NO = #{memberNo}
-            AND TO_CHAR(ENROLL_DATE, 'YYYY') = #{year}
-            GROUP BY TO_CHAR(ENROLL_DATE, 'YYYY-MM')
-            ORDER BY ENROLL_DATE
-            """)
-    List<WeightVo> getMonthAvgWeight(int memberNo, String year);
-
-    @Select("""
-            SELECT TO_CHAR(ENROLL_DATE, 'YYYY') AS ENROLL_DATE,  ROUND(AVG(AMOUNT)) AS AMOUNT
-            FROM WEIGHT_LOG
-            WHERE MEMBER_NO = #{memberNo}
-            GROUP BY TO_CHAR(ENROLL_DATE, 'YYYY')
-            ORDER BY ENROLL_DATE
-            """)
-    List<WeightVo> getYearAvgWeight(int memberNo);
 }

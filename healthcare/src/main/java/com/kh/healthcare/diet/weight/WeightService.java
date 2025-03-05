@@ -2,6 +2,7 @@ package com.kh.healthcare.diet.weight;
 
 import com.kh.healthcare.diet.water.WaterMapper;
 import com.kh.healthcare.diet.water.WaterVo;
+import com.kh.healthcare.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,9 +15,13 @@ import java.util.List;
 public class WeightService {
 
     private final WeightMapper mapper;
+    private final JwtUtil jwtUtil;
 
-    public void weightEnroll(WeightVo vo) {
-        WeightVo weightVo = getWeightByDate(vo);
+    public void weightEnroll(WeightVo vo, String token) {
+        WeightVo weightVo = getWeightByDate(vo, token);
+        token = token.replace("Bearer ", "");
+        String no = jwtUtil.getNo(token);
+        vo.setMemberNo(no);
 
         if(weightVo == null) {
             mapper.weightEnroll(vo);
@@ -26,7 +31,11 @@ public class WeightService {
         }
     }
 
-    public WeightVo getWeightByDate(WeightVo vo) {
+    public WeightVo getWeightByDate(WeightVo vo, String token) {
+        token = token.replace("Bearer ", "");
+        String no = jwtUtil.getNo(token);
+        vo.setMemberNo(no);
+
         try {
             WeightVo weightVo = mapper.getWeightByDate(vo);
             if (weightVo == null) {
@@ -39,16 +48,4 @@ public class WeightService {
         }
     }
 
-    public List<WeightVo> getDayWeight(int memberNo, String month) {
-        return mapper.getDayWeight(memberNo, month);
-    }
-
-    public List<WeightVo> getMonthAvgWeight(int memberNo, String year) {
-        return mapper.getMonthAvgWeight(memberNo, year);
-    }
-
-    public List<WeightVo> getYearAvgWeight(int memberNo) {
-        return mapper.getYearAvgWeight(memberNo);
-
-    }
 }

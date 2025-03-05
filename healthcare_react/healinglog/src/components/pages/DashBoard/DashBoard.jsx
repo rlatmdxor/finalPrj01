@@ -12,7 +12,7 @@ import Modal from '../../util/Modal';
 import { useDispatch } from 'react-redux';
 import { close, open } from '../../../redux/modalSlice';
 import { useNavigate } from 'react-router-dom';
-import { jwtDecode } from 'jwt-decode';
+// import { isTokenExpired, getRoleFromToken } from '../../util/JwtUtil';
 
 const NaviContainer = styled.div`
   display: grid;
@@ -85,7 +85,7 @@ const SmallTextDiv = styled.div`
   justify-content: center;
   align-items: center;
   height: 25px;
-  margin-top: 18px;
+  margin-top: 23px;
   padding: 0px 14px;
   font-size: 16px;
   font-weight: 500;
@@ -141,7 +141,7 @@ const BigCardInnerTopDiv = styled.div`
 const BigCardInnerMidDiv = styled.div`
   font-size: 25px;
   color: #000000;
-  margin-top: 3px;
+  margin-top: 5px;
   margin-bottom: 6px;
 `;
 
@@ -166,13 +166,12 @@ const SwitchInputDiv = styled.div`
 `;
 
 const DashBoard = () => {
-  const navigate = useNavigate();
+  const navi = useNavigate();
   const dispatch = useDispatch();
+  const Swal = require('sweetalert2');
 
   const token = localStorage.getItem('token');
-  const [memberVo, setMemberVo] = useState({
-    memberNo: 0,
-  });
+  const [isAuthorized, setIsAuthorized] = useState(false); // 로그인 여부 체크
 
   const { currentMonday, currentSunday, handlePrevWeek, handleNextWeek } = useWeekRange();
   const [dashboardData, setDashboardData] = useState({ currentWeek: {}, previousWeek: {}, difference: {} });
@@ -181,36 +180,30 @@ const DashBoard = () => {
   const [inputData, setInputData] = useState([]);
 
   const [isAllSelected, setIsAllSelected] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    //if (!token || isTokenExpired(token)) {
     if (!token) {
-      alert('로그인 정보가 없습니다.');
-      navigate('/login');
+      navi('/login'); // 로그인 페이지로 이동
+      Swal.fire({
+        icon: 'warning',
+        title: '로그인이 필요합니다',
+        text: '로그인 후 이용해주세요',
+        confirmButtonText: '확인',
+      });
+    } else {
+      setIsAuthorized(true); // 로그인 성공 시 데이터 요청 가능
     }
-  }, []);
+  }, [navi, token]);
 
   useEffect(() => {
-    if (token) {
-      try {
-        const decodedToken = jwtDecode(token);
-        setMemberVo({
-          memberNo: decodedToken.no,
-        });
-      } catch {
-        navigate('/login');
-      }
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!memberVo.memberNo || memberVo.memberNo === '') {
+    if (!isAuthorized) {
       return;
     }
 
     const fetchDashboardData = async () => {
       try {
-        const fetchData = await getDashboardData(currentMonday, currentSunday, memberVo.memberNo, token);
+        const fetchData = await getDashboardData(currentMonday, currentSunday, token);
         setDashboardData(fetchData);
       } catch (error) {
         console.error('[ERROR] GET DASHBOARD DATA FAIL', error);
@@ -219,7 +212,7 @@ const DashBoard = () => {
 
     const fetchDashboardSettings = async () => {
       try {
-        const fetchData = await getDashboardSetting(memberVo.memberNo, token);
+        const fetchData = await getDashboardSetting(token);
         setSettings(fetchData);
       } catch (error) {
         console.error('[ERROR] GET DASHBOARD SETTING FAIL', error);
@@ -229,10 +222,9 @@ const DashBoard = () => {
     const fetchData = async () => {
       await fetchDashboardData();
       await fetchDashboardSettings();
-      setIsLoading(false);
     };
     fetchData();
-  }, [currentMonday, currentSunday, memberVo.memberNo]);
+  }, [isAuthorized, token, currentMonday, currentSunday]);
 
   useEffect(() => {
     const allSelected = inputData.every((item) => item.visibleYn === 'Y');
@@ -258,13 +250,23 @@ const DashBoard = () => {
   const handleSave = () => {
     const getFetch = async () => {
       try {
-        await editDashboardSetting(inputData, token);
-        setSettings(inputData);
-        alert('저장되었습니다.');
-        dispatch(close('대시보드 설정'));
+        const result = await editDashboardSetting(inputData, token);
+        if (result == 200) {
+          Swal.fire({
+            title: '저장되었습니다.',
+            confirmButtonText: '확인',
+          });
+          setSettings(inputData);
+        } else {
+          Swal.fire({
+            title: '오류발생...',
+            confirmButtonText: '확인',
+          });
+        }
       } catch (error) {
         console.error('[ERROR] EDIT DASHBOARD SETTING FAIL', error);
       }
+      dispatch(close('대시보드 설정'));
     };
     getFetch();
   };
@@ -280,10 +282,6 @@ const DashBoard = () => {
 
     return `${hours}시간 ${remainMinutes.toString().padStart(2, '0')}분`;
   };
-
-  if (isLoading) {
-    return;
-  }
 
   return (
     <>

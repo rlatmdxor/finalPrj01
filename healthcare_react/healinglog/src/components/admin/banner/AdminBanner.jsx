@@ -113,29 +113,29 @@ const DeleteImgBtn = styled.button`
 `;
 
 const AdminBanner = () => {
-  const navigate = useNavigate();
-  const token = localStorage.getItem('token');
+  const navi = useNavigate();
   const Swal = require('sweetalert2');
+
+  const token = localStorage.getItem('token');
+  const [isAuthorized, setIsAuthorized] = useState(false); // 로그인 여부 체크
 
   const [adminNo, setAdminNo] = useState(0);
 
   useEffect(() => {
+    // if (!token || isTokenExpired(token) || getRoleFromToken(token) !== 'ROLE_ADMIN') {
     if (!token) {
-      alert('로그인 정보가 없습니다.');
-      navigate('/admin/login');
+      navi('/admin/login'); // 로그인 페이지로 이동
+      Swal.fire({
+        icon: 'warning',
+        title: '어드민 로그인이 필요합니다',
+        text: '어드민 로그인 후 이용해주세요',
+        confirmButtonText: '확인',
+      });
+      window.localStorage.removeItem('token'); // 토큰 삭제
+    } else {
+      setIsAuthorized(true); // 로그인 성공 시 데이터 요청 가능
     }
-  }, []);
-
-  useEffect(() => {
-    if (token) {
-      try {
-        const decodedToken = jwtDecode(token);
-        setAdminNo(decodedToken.no);
-      } catch {
-        navigate('/admin/login');
-      }
-    }
-  }, [token, dispatch]);
+  }, [navi, token]);
 
   const boardType = 'bannerManagement';
 
@@ -157,7 +157,6 @@ const AdminBanner = () => {
 
   const initialInputData = {
     no: '',
-    writer: adminNo,
     title: '',
     showYn: 'Y',
     imageUrl: '',
@@ -185,8 +184,11 @@ const AdminBanner = () => {
   };
 
   useEffect(() => {
+    if (!isAuthorized) {
+      return;
+    }
     getFetch(searchInput.showYn, searchInput.searchValue);
-  }, [currentPage, boardLimit]);
+  }, [isAuthorized, token, currentPage, boardLimit]);
 
   const handleOpenModal = () => {
     setInputData(initialInputData);
@@ -201,7 +203,6 @@ const AdminBanner = () => {
     setInputData((prev) => ({
       ...prev,
       no: vo.no,
-      writer: vo.writer || adminNo,
       title: vo.title,
       showYn: vo.showYn,
       imageUrl: vo.imageUrl || '',
@@ -273,7 +274,6 @@ const AdminBanner = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         const formData = new FormData();
-        formData.append('writer', inputData.writer);
         formData.append('title', inputData.title);
         formData.append('showYn', inputData.showYn);
         formData.append('f', inputData.imageUrl);

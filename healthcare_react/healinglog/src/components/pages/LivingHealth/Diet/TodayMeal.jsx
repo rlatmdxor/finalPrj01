@@ -82,7 +82,6 @@ const TodayMeal = ({ token }) => {
   const dispatch = useDispatch();
   const Swal = require('sweetalert2');
 
-  const memberNo = useSelector((state) => state.diet.memberNo);
   const day = useSelector((state) => state.diet.day);
   const mealDetailList = useSelector((state) => state.diet.mealDetailList);
   const mealKcalSum = useSelector((state) => state.diet.mealKcalSum);
@@ -91,7 +90,7 @@ const TodayMeal = ({ token }) => {
 
   const fetchMealData = async () => {
     try {
-      const data = await getMealData(memberNo, day, token);
+      const data = await getMealData(day, token);
       dispatch(setMealDetailList(data));
       let totalKcal = 0;
       const kcalSummary = {};
@@ -109,7 +108,7 @@ const TodayMeal = ({ token }) => {
 
   useEffect(() => {
     fetchMealData();
-  }, [day, memberNo]);
+  }, [day]);
 
   useEffect(() => {
     fetch('http://127.0.0.1:80/api/diet/food', {
@@ -127,7 +126,6 @@ const TodayMeal = ({ token }) => {
   // 식단 등록 폼데이터
   const initialInputData = {
     no: '',
-    memberNo: memberNo,
     dietDay: day,
     mealCode: '',
     foodList: [],
@@ -374,7 +372,6 @@ const TodayMeal = ({ token }) => {
     }).then((result) => {
       if (result.isConfirmed) {
         const formData = new FormData();
-        formData.append('memberNo', inputData.memberNo);
         formData.append('dietDay', inputData.dietDay);
         formData.append('mealCode', inputData.mealCode);
         formData.append('foodListArr', JSON.stringify(inputData.foodList));
@@ -412,7 +409,6 @@ const TodayMeal = ({ token }) => {
     setInputData((prev) => ({
       ...prev,
       no: mealDetail.no,
-      memberNo: memberNo,
       dietDay: day,
       mealCode: mealDetail.mealCode,
       foodList: mealDetail.foodList || [],
@@ -441,7 +437,6 @@ const TodayMeal = ({ token }) => {
       if (result.isConfirmed) {
         const formData = new FormData();
         formData.append('no', inputData.no);
-        formData.append('memberNo', inputData.memberNo);
         formData.append('dietDay', inputData.dietDay);
         formData.append('mealCode', inputData.mealCode);
         formData.append('foodListArr', JSON.stringify(inputData.foodList));

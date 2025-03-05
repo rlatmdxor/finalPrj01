@@ -16,11 +16,10 @@ import {
   setWeightAmount,
   setTotalKcal,
   setHeight,
-  setMemberNo,
 } from '../../../../redux/dietSlice';
-import { jwtDecode } from 'jwt-decode';
 import { useNavigate } from 'react-router-dom';
 import { getMealData, getMemberHeight, getTodayWater, getTodayWeight } from '../../../services/dietService';
+// import { isTokenExpired, getRoleFromToken } from '../../util/JwtUtil';
 
 const NaviContainer = styled.div`
   display: grid;
@@ -78,8 +77,8 @@ export const SmallTextDiv = styled.div`
   justify-content: space-between;
   align-items: center;
   height: 25px;
-  margin-top: 12px;
-  padding: 0px 14px;
+  margin-top: 13px;
+  padding: 0px 15px;
   font-size: 16px;
   font-weight: 500;
   color: #3b3b3b;
@@ -88,7 +87,7 @@ export const SmallTextDiv = styled.div`
 export const BigTextDiv = styled.div`
   margin-left: auto;
   margin-right: auto;
-  margin-top: 19px;
+  margin-top: 24px;
   font-size: 38px;
 `;
 
@@ -99,97 +98,100 @@ export const ModalContainer = styled.div`
 
 const Diet = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
+  const navi = useNavigate();
+  const Swal = require('sweetalert2');
 
   const token = localStorage.getItem('token');
+  const [isAuthorized, setIsAuthorized] = useState(false); // 로그인 여부 체크
 
-  const memberNo = useSelector((state) => state.diet.memberNo);
   const day = useSelector((state) => state.diet.day);
 
-  const [isLoading, setIsLoading] = useState(true);
-
   useEffect(() => {
+    //if (!token || isTokenExpired(token)) {
     if (!token) {
-      alert('로그인 정보가 없습니다.');
-      navigate('/login');
+      navi('/login'); // 로그인 페이지로 이동
+      Swal.fire({
+        icon: 'warning',
+        title: '로그인이 필요합니다',
+        text: '로그인 후 이용해주세요',
+        confirmButtonText: '확인',
+      });
+    } else {
+      setIsAuthorized(true); // 로그인 성공 시 데이터 요청 가능
     }
-  }, []);
+  }, [navi, token]);
 
   useEffect(() => {
-    if (token) {
+    if (!isAuthorized) {
+      return;
+    }
+
+    const fetchMemberHeight = async () => {
       try {
-        const decodedToken = jwtDecode(token);
-        dispatch(setMemberNo(decodedToken.no));
-        setIsLoading(false);
-      } catch {
-        navigate('/login');
+        const fetchData = await getMemberHeight(token);
+        if (fetchData) {
+          dispatch(setHeight(fetchData.height));
+        }
+      } catch (error) {
+        console.log(error);
       }
-    }
-  }, [token, dispatch]);
+    };
+    fetchMemberHeight();
+  }, [isAuthorized, token, dispatch]);
 
   useEffect(() => {
-    if (memberNo > 0) {
-      const fetchMemberHeight = async () => {
-        try {
-          const fetchData = await getMemberHeight(token);
-          if (fetchData) {
-            dispatch(setHeight(fetchData.height));
+    if (!isAuthorized) {
+      return;
+    }
+
+    const fetchTotalKcal = async () => {
+      try {
+        const fetchData = await getMealData(day, token);
+        let total = 0;
+        if (fetchData) {
+          for (let i = 0; i < fetchData.length; i++) {
+            total += Number(fetchData[i].sumKcal);
           }
-        } catch (error) {
-          console.log(error);
         }
-      };
-      fetchMemberHeight();
-    }
-  }, [memberNo, dispatch]);
+        dispatch(setTotalKcal(total || 0));
+      } catch {
+        dispatch(setTotalKcal(0));
+      }
+    };
+    fetchTotalKcal();
+  }, [isAuthorized, token, day, dispatch]);
 
   useEffect(() => {
-    if (memberNo > 0) {
-      const fetchTotalKcal = async () => {
-        try {
-          const fetchData = await getMealData(memberNo, day, token);
-          let total = 0;
-          if (fetchData) {
-            for (let i = 0; i < fetchData.length; i++) {
-              total += Number(fetchData[i].sumKcal);
-            }
-          }
-          dispatch(setTotalKcal(total || 0));
-        } catch {
-          dispatch(setTotalKcal(0));
-        }
-      };
-      fetchTotalKcal();
+    if (!isAuthorized) {
+      return;
     }
-  }, [day, memberNo, dispatch]);
+
+    const fetchWaterAmount = async () => {
+      try {
+        const fetchData = await getTodayWater(day, token);
+        dispatch(setWaterAmount(fetchData.amount));
+      } catch {
+        dispatch(setWaterAmount(0));
+      }
+    };
+    fetchWaterAmount();
+  }, [isAuthorized, token, day, dispatch]);
 
   useEffect(() => {
-    if (memberNo > 0) {
-      const fetchWaterAmount = async () => {
-        try {
-          const fetchData = await getTodayWater(memberNo, day, token);
-          dispatch(setWaterAmount(fetchData.amount || 0));
-        } catch {
-          dispatch(setWaterAmount(0));
-        }
-      };
-      fetchWaterAmount();
+    if (!isAuthorized) {
+      return;
     }
-  }, [day, memberNo, dispatch]);
 
-  useEffect(() => {
-    if (memberNo > 0) {
-      const fetchWeightAmount = async () => {
-        try {
-          const fetchData = await getTodayWeight(memberNo, day, token);
-          dispatch(setWeightAmount(fetchData.amount || 0));
-        } catch {
-          dispatch(setWeightAmount(0));
-        }
-      };
-      fetchWeightAmount();
-    }
-  }, [day, memberNo, dispatch]);
+    const fetchWeightAmount = async () => {
+      try {
+        const fetchData = await getTodayWeight(day, token);
+        dispatch(setWeightAmount(fetchData.amount));
+      } catch {
+        dispatch(setWeightAmount(0));
+      }
+    };
+    fetchWeightAmount();
+  }, [isAuthorized, token, day, dispatch]);
 
   const handleChangeDay = (e) => {
     dispatch(setDay(e.target.value));
@@ -202,10 +204,6 @@ const Diet = () => {
   const handleNextDay = () => {
     dispatch(updateDay(+1));
   };
-
-  if (isLoading) {
-    return;
-  }
 
   return (
     <>
