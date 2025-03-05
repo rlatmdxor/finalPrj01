@@ -12,6 +12,8 @@ import Input from '../../util/Input';
 import { open, close } from '../../../redux/modalSlice';
 import { getBannerList, enrollBanner, editBanner, deleteBanner, multiDeleteBanner } from '../../services/bannerService';
 import SearchBar from '../../util/SearchBar';
+import { useNavigate } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
 
 const SearchDiv = styled.div`
   display: flex;
@@ -111,15 +113,35 @@ const DeleteImgBtn = styled.button`
 `;
 
 const AdminBanner = () => {
+  const navigate = useNavigate();
   const token = localStorage.getItem('token');
   const Swal = require('sweetalert2');
+
+  const [adminNo, setAdminNo] = useState(0);
+
+  useEffect(() => {
+    if (!token) {
+      alert('로그인 정보가 없습니다.');
+      navigate('/admin/login');
+    }
+  }, []);
+
+  useEffect(() => {
+    if (token) {
+      try {
+        const decodedToken = jwtDecode(token);
+        setAdminNo(decodedToken.no);
+      } catch {
+        navigate('/admin/login');
+      }
+    }
+  }, [token, dispatch]);
 
   const boardType = 'bannerManagement';
 
   const dispatch = useDispatch();
 
   const [bannerList, setBannerList] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
   const [selectedNo, setSelectedNo] = useState([]);
   const [isAllSelected, setIsAllSelected] = useState(false);
 
@@ -135,7 +157,7 @@ const AdminBanner = () => {
 
   const initialInputData = {
     no: '',
-    writer: '1',
+    writer: adminNo,
     title: '',
     showYn: 'Y',
     imageUrl: '',
@@ -179,7 +201,7 @@ const AdminBanner = () => {
     setInputData((prev) => ({
       ...prev,
       no: vo.no,
-      writer: vo.writer || '1',
+      writer: vo.writer || adminNo,
       title: vo.title,
       showYn: vo.showYn,
       imageUrl: vo.imageUrl || '',
@@ -378,7 +400,6 @@ const AdminBanner = () => {
   const handleCheckboxClick = (no) => {
     setSelectedNo((prev) => {
       const updatedSelection = prev.includes(no) ? prev.filter((item) => item !== no) : [...prev, no];
-
       return updatedSelection;
     });
   };

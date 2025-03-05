@@ -24,10 +24,10 @@ public interface DietMealMapper {
                 , #{mealCode}
                 , #{dietDay}
                 , #{memo}
-                , 'https://picsum.photos/200/200'
+                , #{image}
             )
             """)
-    void dietEnroll(DietVo vo); // TODO : 픽숨 링크 지우고 #{image} 로 바꾸기
+    void dietEnroll(DietVo vo);
 
     @Insert("""
             INSERT INTO MEAL_LOG
@@ -94,10 +94,10 @@ public interface DietMealMapper {
             SET MEMO = #{memo}
                 , IMAGE = #{image}
                 , MODIFY_DATE = SYSDATE
-            WHERE NO = 'https://picsum.photos/200/200'
+            WHERE NO = #{no}
             AND DEL_YN = 'N'
             """)
-    void dietEdit(DietVo vo); // TODO : 픽숨 링크 지우고 #{image} 로 바꾸기
+    void dietEdit(DietVo vo);
 
     @Delete("""
             DELETE FROM MEAL_LOG

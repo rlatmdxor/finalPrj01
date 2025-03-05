@@ -14,10 +14,9 @@ public class WaterController {
     private final WaterService service;
 
     @PostMapping("enroll")
-    public String waterIntakeEnroll(@RequestBody WaterVo vo, @RequestHeader("Authorization") String authorization){
+    public void waterEnroll(@RequestBody WaterVo vo, @RequestHeader("Authorization") String authorization){
         try {
-            service.waterIntakeEnroll(vo);
-            return "WATER ENROLL SUCCESS";
+            service.waterEnroll(vo);
         }
         catch (Exception e){
             throw new IllegalStateException("[ERROR] WATER ENROLL FAIL..");
@@ -25,10 +24,10 @@ public class WaterController {
     }
 
     @PostMapping
-    public String getWaterIntakeByDate(@RequestBody WaterVo vo, @RequestHeader("Authorization") String authorization){
+    public WaterVo getWaterByDate(@RequestBody WaterVo vo, @RequestHeader("Authorization") String authorization){
         try {
-            String amount = service.getWaterIntakeByDate(vo);
-            return amount;
+            WaterVo waterVo = service.getWaterByDate(vo);
+            return waterVo;
         }
         catch (Exception e){
             throw new IllegalStateException("[ERROR] GET WATER BY DATE FAIL..");

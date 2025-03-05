@@ -43,8 +43,7 @@ public interface WeightMapper {
             WHERE MEMBER_NO = #{memberNo}
             AND TRUNC(ENROLL_DATE) = #{enrollDate}
             """)
-    String getWeightByDate(WeightVo vo);
-
+    WeightVo getWeightByDate(WeightVo vo);
 
     @Select("""
             SELECT ENROLL_DATE, AMOUNT

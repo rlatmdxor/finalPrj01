@@ -16,9 +16,9 @@ public class WeightService {
     private final WeightMapper mapper;
 
     public void weightEnroll(WeightVo vo) {
-        String amount = getWeightByDate(vo);
+        WeightVo weightVo = getWeightByDate(vo);
 
-        if(amount == null) {
+        if(weightVo == null) {
             mapper.weightEnroll(vo);
         }
         else {
@@ -26,13 +26,13 @@ public class WeightService {
         }
     }
 
-    public String getWeightByDate(WeightVo vo) {
+    public WeightVo getWeightByDate(WeightVo vo) {
         try {
-            String amount = mapper.getWeightByDate(vo);
-            if (amount == null) {
+            WeightVo weightVo = mapper.getWeightByDate(vo);
+            if (weightVo == null) {
                 return null;
             }
-            return amount;
+            return weightVo;
         } catch (Exception e) {
             e.getMessage();
             return null;
