@@ -3,9 +3,7 @@ package com.kh.healthcare.admin.userManage;
 
 import com.kh.healthcare.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.HashMap;
 import java.util.List;
@@ -25,24 +23,32 @@ public class UserManageService {
     }
 
     public Map<String, Object> searchUsers(String authorization, String keyword, String searchType, String delYn, int page, int size) {
+
         int offset = (page - 1) * size; // OFFSET 계산
 
-        if (delYn == null || delYn.isEmpty()) {
+
+        if (delYn != null && delYn.isEmpty()) {
             delYn = null;
         }
 
-        List<UserManageVo> users = mapper.searchUsers(authorization, keyword, searchType, delYn, size, offset);
+        if ((searchType == null || searchType.isEmpty()) || (keyword == null || keyword.isEmpty())) {
+            searchType = null;
+            keyword = null;
+        }
+
+        // ✅ 유저 목록 조회
+        List<UserManageVo> users = mapper.searchUsers(keyword, searchType, delYn, size, offset);
+
+        // ✅ 전체 데이터 개수 조회
         int totalElements = mapper.countUsers(keyword, searchType, delYn);
 
         Map<String, Object> response = new HashMap<>();
-        response.put("totalElements", totalElements);
-        response.put("totalCount", (int) Math.ceil((double) totalElements / size));
-        response.put("currentPage", page);
-        response.put("pageSize", size);
-        response.put("users", users);
-
+        response.put("totalElements", totalElements); // 전체 개수
+        response.put("totalPages", (int) Math.ceil((double) totalElements / size)); // 총 페이지 수
+        response.put("currentPage", page); // 현재 페이지
+        response.put("pageSize", size); // 한 페이지당 개수
+        response.put("users", users); // 유저 리스트
         return response;
     }
-
 
 }

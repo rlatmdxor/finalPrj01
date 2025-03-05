@@ -57,6 +57,4 @@ public class UserManageController {
             throw new IllegalStateException("관리자 권한이 필요합니다.");
         }
     }
-
-
 }
