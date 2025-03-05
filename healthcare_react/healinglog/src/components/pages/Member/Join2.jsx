@@ -22,6 +22,7 @@ import { useNavigate } from 'react-router-dom';
 import ContentLayout from '../../util/ContentLayout';
 import PostCode from '../../util/PostCode';
 import Profile from './Profile';
+import Swal from 'sweetalert2';
 
 const Join2 = () => {
   const theme = useTheme();
@@ -188,8 +189,12 @@ const Join2 = () => {
     e.preventDefault();
 
     if (!isSubmitEnabled) {
-      console.log('실패');
-      alert('필수 입력 항목을 다시 확인하세요.');
+      Swal.fire({
+        icon: 'error',
+        title: '필수 입력 항목을 다시 확인하세요.',
+        confirmButtonText: '확인',
+      });
+
       return;
     }
     console.log('성공');
@@ -208,28 +213,44 @@ const Join2 = () => {
     fd.append('profileImage', profile);
     fd.append('phone', phone);
 
-    if (window.confirm('회원 가입 하시겠습니까?')) {
-      fetch('http://127.0.0.1:80/api/member/join', {
-        method: 'POST',
-        headers: {
-          // 'Content-Type': 'application/json',
-        },
-        body: fd,
-      })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error('네트워크 오류 발생');
-          }
-          return response.json();
+    Swal.fire({
+      title: '회원 가입 하시겠습니까?', // 제목
+      icon: 'question', // 아이콘 유형 (warning, success, error 등)
+      showCancelButton: true, // 취소 버튼 표시
+      confirmButtonColor: '#3085d6', // 등록 버튼 색상
+      cancelButtonColor: '#d33', // 취소 버튼 색상
+      confirmButtonText: '등록', // 등록 버튼 텍스트
+      cancelButtonText: '취소', // 취소 버튼 텍스트
+    }).then((result) => {
+      if (result.isConfirmed) {
+        //패치 넣기
+        fetch('http://127.0.0.1:80/api/member/join', {
+          method: 'POST',
+          headers: {
+            // 'Content-Type': 'application/json',
+          },
+          body: fd,
         })
-        .then((result) => {
-          alert('회원가입 성공!');
-          window.location.href = '/login';
-        })
-        .catch((error) => {
-          console.error('전송 실패:', error);
-        });
-    }
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error('네트워크 오류 발생');
+            }
+            return response.json();
+          })
+          .then((result) => {
+            Swal.fire({
+              icon: 'success',
+              title: '회원가입 성공!',
+              confirmButtonText: '확인',
+            });
+
+            window.location.href = '/login';
+          })
+          .catch((error) => {
+            console.error('전송 실패:', error);
+          });
+      }
+    });
   };
 
   return (

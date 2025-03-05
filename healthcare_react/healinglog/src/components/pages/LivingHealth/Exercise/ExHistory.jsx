@@ -72,12 +72,22 @@ const ExHistory = () => {
 
     //입력 여부 체크
     if (!exDate || !startTime || !endTime) {
-      alert('모든 값을 입력해주세요.');
+      Swal.fire({
+        icon: 'error',
+        title: '모든 값을 입력해주세요.',
+        confirmButtonText: '확인',
+      });
+
       return;
     }
     //시간 비교
     if (startTime >= endTime) {
-      alert('시작 시간은 종료 시간보다 앞서야 합니다.');
+      Swal.fire({
+        icon: 'error',
+        title: '시작 시간은 종료 시간보다 앞서야 합니다.',
+        confirmButtonText: '확인',
+      });
+
       return;
     }
     const requestData = {
@@ -102,7 +112,12 @@ const ExHistory = () => {
       const message = await response.text();
 
       if (response.ok) {
-        alert(message);
+        Swal.fire({
+          icon: 'success',
+          title: message,
+          confirmButtonText: '확인',
+        });
+
         dispatch(close('유산소 운동 내역 수정'));
         fetchEvents();
       } else {
@@ -118,7 +133,12 @@ const ExHistory = () => {
   const handleAnAerobicSubmit = async () => {
     //입력 여부 체크
     if (!exDate || !reps) {
-      alert('올바른 값을 입력해주세요.');
+      Swal.fire({
+        icon: 'error',
+        title: '올바른 값을 입력해주세요.',
+        confirmButtonText: '확인',
+      });
+
       return;
     }
 
@@ -143,7 +163,12 @@ const ExHistory = () => {
       const message = await response.text();
 
       if (response.ok) {
-        alert(message);
+        Swal.fire({
+          icon: 'success',
+          title: message,
+          confirmButtonText: '확인',
+        });
+
         dispatch(close('무산소 운동 내역 수정'));
         fetchEvents();
       } else {
@@ -173,7 +198,12 @@ const ExHistory = () => {
       const message = await response.text();
 
       if (response.ok) {
-        alert(message);
+        Swal.fire({
+          icon: 'success',
+          title: message,
+          confirmButtonText: '확인',
+        });
+
         dispatch(close('운동 내역'));
         fetchEvents();
       } else {
@@ -202,7 +232,12 @@ const ExHistory = () => {
       const message = await response.text();
 
       if (response.ok) {
-        alert(message);
+        Swal.fire({
+          icon: 'success',
+          title: message,
+          confirmButtonText: '확인',
+        });
+
         dispatch(close('운동 내역'));
         fetchEvents();
       } else {
@@ -310,13 +345,24 @@ const ExHistory = () => {
                       str={'삭제'}
                       fc={'white'}
                       f={() => {
-                        if (window.confirm('삭제하시겠습니까?')) {
-                          if (exerciseType === 'aerobic') {
-                            handleAerobicDelete(item[0]);
-                          } else {
-                            handleAnAerobicDelete(item[0]);
+                        Swal.fire({
+                          title: '삭제하시겠습니까?', // 제목
+                          icon: 'question', // 아이콘 유형 (warning, success, error 등)
+                          showCancelButton: true, // 취소 버튼 표시
+                          confirmButtonColor: '#3085d6', // 등록 버튼 색상
+                          cancelButtonColor: '#d33', // 취소 버튼 색상
+                          confirmButtonText: '삭제', // 등록 버튼 텍스트
+                          cancelButtonText: '취소', // 취소 버튼 텍스트
+                        }).then((result) => {
+                          if (result.isConfirmed) {
+                            //패치 넣기
+                            if (exerciseType === 'aerobic') {
+                              handleAerobicDelete(item[0]);
+                            } else {
+                              handleAnAerobicDelete(item[0]);
+                            }
                           }
-                        }
+                        });
                       }}
                       mt={'0'}
                       mb={'0'}

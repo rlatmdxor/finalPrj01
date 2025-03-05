@@ -115,7 +115,11 @@ const AnAerobic = () => {
       .then((resp) => resp.text())
       .then((data) => {
         if (data == '즐겨찾기는 3개까지만 등록가능합니다.') {
-          alert(data);
+          Swal.fire({
+            icon: 'warning',
+            title: data,
+            confirmButtonText: '확인',
+          });
         }
         setFetchTry(fetchTry + 1);
       })
@@ -129,7 +133,12 @@ const AnAerobic = () => {
   const handleSubmit = async () => {
     //입력 여부 체크
     if (!exDate || !reps) {
-      alert('올바른 값을 입력해주세요.');
+      Swal.fire({
+        icon: 'error',
+        title: '올바른 값을 입력해주세요.',
+        confirmButtonText: '확인',
+      });
+
       return;
     }
 
@@ -152,7 +161,12 @@ const AnAerobic = () => {
 
       if (response.ok) {
         const message = await response.text();
-        alert(message);
+        Swal.fire({
+          icon: 'success',
+          title: message,
+          confirmButtonText: '확인',
+        });
+
         reset();
         dispatch(close('운동 기록'));
       } else {
