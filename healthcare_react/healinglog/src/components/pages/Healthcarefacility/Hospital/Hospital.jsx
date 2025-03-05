@@ -63,7 +63,7 @@ const Hospital = () => {
   const currentPage = useSelector((state) => state.paging[boardType]?.currentPage || 1);
   const boardLimit = useSelector((state) => state.paging[boardType]?.boardLimit || 12);
 
-  // 📌 초기 페이징 상태 리셋
+  // 초기 페이징 상태 리셋
   useEffect(() => {
     dispatch(resetPaging({ boardType }));
   }, []);
@@ -72,7 +72,7 @@ const Hospital = () => {
     handleSearch(); // 초기 로딩 시 검색 실행
   }, []);
 
-  // 📌 시 데이터 가져오기
+  // 시 데이터 가져오기
   useEffect(() => {
     fetch('http://127.0.0.1/api/location/cities')
       .then((res) => res.json())
@@ -80,7 +80,7 @@ const Hospital = () => {
       .catch((error) => console.error('시 데이터 로드 실패:', error));
   }, []);
 
-  // 📌 군/구 데이터 가져오기
+  // 군/구 데이터 가져오기
   useEffect(() => {
     if (selectedCity) {
       fetch(`http://127.0.0.1/api/location/districts/${selectedCity}`)
@@ -92,7 +92,7 @@ const Hospital = () => {
     }
   }, [selectedCity]);
 
-  // 📌 동 데이터 가져오기
+  // 동 데이터 가져오기
   useEffect(() => {
     if (selectedDistrict) {
       fetch(`http://127.0.0.1/api/location/dongs/${selectedDistrict}`)
@@ -117,12 +117,12 @@ const Hospital = () => {
       let finalHospitalType = hospitalType.trim(); // 병원과 값
       let finalSearchType = searchType.trim();
 
-      // ✅ 검색 키워드가 없고 시/구/동도 선택되지 않았을 경우
+      // 검색 키워드가 없고 시/구/동도 선택되지 않았을 경우
       if (!searchKeyword && !selectedCity && !selectedDistrict && !selectedDong && finalHospitalType) {
         finalSearchType = ''; // 검색 유형을 없애고 병원과(hospitalType)만으로 검색
       }
 
-      // ✅ 검색 키워드가 없을 경우, 시/구/동 정보를 자동으로 검색어로 설정
+      // 검색 키워드가 없을 경우, 시/구/동 정보를 자동으로 검색어로 설정
       if (!searchKeyword) {
         const cityName = cities.find((c) => c.no === selectedCity)?.cityName || '';
         const districtName = districts.find((d) => d.no === selectedDistrict)?.districtName || '';
@@ -132,7 +132,7 @@ const Hospital = () => {
         finalSearchType = searchKeyword ? 'address' : ''; // 주소 검색 또는 빈 값 유지
       }
 
-      // 📌 API 요청 URL
+      // API 요청 URL
       const requestUrl = `http://127.0.0.1/api/hospital/search?hospitalType=${encodeURIComponent(
         finalHospitalType
       )}&searchType=${finalSearchType}&keyword=${encodeURIComponent(
@@ -155,12 +155,12 @@ const Hospital = () => {
     setLoading(false);
   };
 
-  // 📌 검색어 업데이트 핸들러
+  // 검색어 업데이트 핸들러
   const handleKeywordChange = (e) => {
     setKeyword(e.target.value);
   };
 
-  // 📌 검색어 초기화 핸들러
+  // 검색어 초기화 핸들러
   const handleClearKeyword = () => {
     setKeyword('');
   };
@@ -238,7 +238,6 @@ const Hospital = () => {
             <option value="상급종합">상급종합</option>
           </SelectBox>
 
-          {/* 검색 옵션 */}
           <SelectBox value={searchType} onChange={(e) => setSearchType(e.target.value)}>
             <option value="name">병원명</option>
             <option value="address">주소</option>
@@ -246,7 +245,6 @@ const Hospital = () => {
             <option value="postNum">우편번호</option>
           </SelectBox>
 
-          {/* SearchBar */}
           <SearchBar
             handleClick={handleSearch} // 검색 버튼 클릭 시 handleSearch 실행
             handleChange={handleKeywordChange} // 검색어 입력 시 keyword 업데이트
