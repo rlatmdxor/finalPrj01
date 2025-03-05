@@ -31,4 +31,8 @@ public class BloodPressureDao {
     public void bloodPressureDelete(BloodPressureVo vo) {
         mapper.bloodPressureDelete(vo);
     }
+
+    public int checkTodayBloodPressure(String userNo) {
+        return mapper.checkTodayBloodPressure(userNo);
+    }
 }
