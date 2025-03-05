@@ -15,13 +15,13 @@
             B.TITLE,
             B.CONTENT,
             (SELECT COUNT(*) FROM BOARD_RECOMMEND R WHERE R.BOARD_NO = B.NO) AS RECOMMEND_COUNT,
+            (SELECT COUNT(*) FROM BOARD_COMMENT BC WHERE BC.BOARD_NO = B.NO) AS COMMENT_COUNT,
             B.HIT,
             TO_CHAR(B.MODIFY_DATE , 'YYYY-MM-DD-HH24:MI') AS MODIFY_DATE,
             TO_CHAR(B.ENROLL_DATE , 'YYYY-MM-DD-HH24:MI') AS ENROLL_DATE
         FROM BOARD B
         JOIN MEMBER M ON ( B.MEMBER_NO = M.NO )
         JOIN CATEGORY C ON ( B.CATEGORY_NO = C.NO )
-<!--        JOIN BOARD_RECOMMEND R ON ( B.NO = R.BOARD_NO )-->
         WHERE B.DEL_YN = 'N'
         <if test="category != null and category != '' and category != '0' and category != '' and category != 0">
             AND B.CATEGORY_NO = #{category}

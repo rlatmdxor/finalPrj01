@@ -17,6 +17,9 @@ import ContentLayout from '../../../util/ContentLayout';
 import Chart from '../../../util/Chart';
 import DateBtn from '../../../util/DateBtn';
 
+import Swal from 'sweetalert2';
+import { useNavigate } from 'react-router-dom';
+
 const NaviContainer = styled.div`
   display: grid;
   position: relative;
@@ -27,17 +30,6 @@ const NaviContainer = styled.div`
 `;
 
 const CigaretteReport = () => {
-  const url = 'http://127.0.0.1/api/cigarette/report/list';
-
-  const options = {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      // Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({ memberNo: '1' }),
-  };
-
   const [fullData, setFullData] = useState([]); // 전체 데이터 저장
   const [pagedData, setPagedData] = useState([]); // 페이징된 데이터
   const [filteredData, setFilteredData] = useState([]); // 차트용 필터링 데이터
@@ -66,11 +58,44 @@ const CigaretteReport = () => {
     dispatch(resetPaging({ boardType }));
   }, [boardType, dispatch]);
 
+  //토큰관련코드
+  const token = localStorage.getItem('token');
+
+  const navi = useNavigate();
+  const [isAuthorized, setIsAuthorized] = useState(false); // 로그인 여부 체크
+
+  useEffect(() => {
+    if (!token) {
+      Swal.fire({
+        icon: 'warning',
+        title: '로그인이 필요합니다',
+        text: '로그인 후 이용해주세요',
+        confirmButtonText: '확인',
+      }).then(() => {
+        navi('/login'); // 로그인 페이지로 이동
+      });
+    } else {
+      setIsAuthorized(true); // 로그인 성공 시 데이터 요청 가능
+    }
+  }, [navi, token]);
+
+  const url = 'http://127.0.0.1/api/cigarette/report/list';
+  const options = {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+
   // fetch실행
   useEffect(() => {
     fetch(url, options)
       .then((resp) => resp.json())
       .then((data) => {
+        if (!isAuthorized) {
+          return;
+        }
+
         if (data.length > 0) {
           dispatch(setTotalCount({ boardType, totalCount: data.length })); // 페이징 처리할때 totalCount 저장
           setFullData(data);
@@ -80,7 +105,7 @@ const CigaretteReport = () => {
         }
       })
       .catch((error) => console.error('데이터 불러오기 실패:', error));
-  }, []);
+  }, [isAuthorized, token]);
 
   // 테이블 페이징 처리
   useEffect(() => {
@@ -221,9 +246,6 @@ const CigaretteReport = () => {
   // 화면 렌더링
   const [num, setNum] = useState('');
 
-  //토큰관련코드
-  const token = localStorage.getItem('token');
-
   // 인풋 데이터 초기화
   const reset = () => {
     setInputData(initialInputData);
@@ -322,10 +344,11 @@ const CigaretteReport = () => {
   return (
     <>
       <Title>흡연관리</Title>
-      <NaviContainer>
+      {/* <NaviContainer>
         <Navi target="cigarette" tag={'캘린더'}></Navi>
         <Navi target="cigarette/report" tag={'리포트'}></Navi>
-      </NaviContainer>
+      </NaviContainer> */}
+      <div></div>
 
       <ContentLayout>
         <DateBtn dataBtn={dataBtn} onSelect={setSelectedRange} onChange={setSelectChart}></DateBtn>

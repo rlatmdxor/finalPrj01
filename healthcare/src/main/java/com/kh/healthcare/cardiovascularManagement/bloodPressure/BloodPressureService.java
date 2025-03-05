@@ -1,5 +1,6 @@
 package com.kh.healthcare.cardiovascularManagement.bloodPressure;
 
+import com.kh.healthcare.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -14,8 +15,13 @@ import java.util.List;
 public class BloodPressureService {
 
     private final BloodPressureDao dao;
+    private final JwtUtil jwtUtil;
 
-    public int bloodPressureWrite(BloodPressureVo vo) {
+    public int bloodPressureWrite(BloodPressureVo vo, String token) {
+
+        token = token.replace("Bearer ", "");
+        String memberNo = jwtUtil.getNo(token);
+        vo.setMemberNo(memberNo);
 
         int pulse = 0;
         if(vo.getSystole() == "" || vo.getDiastole() == ""){
@@ -24,6 +30,10 @@ public class BloodPressureService {
         if(vo.getPulse() != ""){
             pulse = Integer.parseInt(vo.getPulse());
         }
+        if(vo.getNote() == null || vo.getNote().equals("")){
+            vo.setNote("없음");
+        }
+
         double systole = Double.parseDouble(vo.getSystole());
         double diastole = Double.parseDouble(vo.getDiastole());
 
@@ -40,11 +50,21 @@ public class BloodPressureService {
         return dao.bloodPressureWrite(vo);
     }
 
-    public List<BloodPressureVo> bloodPressureList(String memberNo) {
+    public List<BloodPressureVo> bloodPressureList(String token) {
+        token = token.replace("Bearer ", "");
+        boolean ableToken = jwtUtil.checkToken(token);
+        if(ableToken == false){
+            throw new IllegalStateException("CODE [ BLOODPRESSURE / LIST / DISABLE_TOKEN ]");
+        }
+        String memberNo = jwtUtil.getNo(token);
         return dao.bloodPressureList(memberNo);
     }
 
-    public int bloodPressureEdit(BloodPressureVo vo) {
+    public int bloodPressureEdit(BloodPressureVo vo, String token) {
+
+        token = token.replace("Bearer ", "");
+        String memberNo = jwtUtil.getNo(token);
+        vo.setMemberNo(memberNo);
 
         int pulse = 0;
         if(vo.getSystole() == "" || vo.getDiastole() == ""){
@@ -68,7 +88,25 @@ public class BloodPressureService {
         return dao.bloodPressureEdit(vo);
     }
 
-    public void bloodPressureDelete(BloodPressureVo vo) {
-        dao.bloodPressureDelete(vo);
+    public int bloodPressureDelete(BloodPressureVo vo, String token) {
+        token = token.replace("Bearer ", "");
+        String memberNo = jwtUtil.getNo(token);
+        vo.setMemberNo(memberNo);
+        int result = dao.bloodPressureDelete(vo);
+        if(result != 1){
+            throw new IllegalStateException("CODE [ BLOODPRESSURE / DELETE / FAIL ]");
+        }
+        return result;
+
+    }
+
+    // 오늘 혈압 체크했는지
+    public String checkTodayBloodPressure(String userNo) {
+        int count = dao.checkTodayBloodPressure(userNo);
+        if (count == 0) {
+            return "오늘 혈압 측정 내역이 없습니다. 혈압 측정 내역을 기록해주세요!";
+        } else {
+            return "측정 내역 있음";
+        }
     }
 }

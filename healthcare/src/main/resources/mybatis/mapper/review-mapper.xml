@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kh.healthcare.board.review.ReviewMapper">
+
+    <select id="list">
+        SELECT
+            B.NO,
+            H.NAME,
+            M.NICK,
+            B.MEMBER_NO,
+            B.TITLE,
+            B.CONTENT,
+            (SELECT COUNT(*) FROM REVIEW_COMMENT BC WHERE BC.REVIEW_NO = B.NO) AS COMMENT_COUNT,
+            B.RATING,
+            TO_CHAR(B.MODIFY_DATE , 'YYYY-MM-DD') AS MODIFY_DATE,
+            TO_CHAR(B.ENROLL_DATE , 'YYYY-MM-DD') AS ENROLL_DATE
+        FROM REVIEW_BOARD B
+        JOIN MEMBER M ON ( B.MEMBER_NO = M.NO )
+        JOIN HOSPITAL H ON ( B.HOSPITAL_NO = H.NO )
+        WHERE B.DEL_YN = 'N'
+        <if test="searchValue != null and searchValue != ''">
+            <choose>
+                <when test="searchType == 1">
+                    AND B.CONTENT LIKE '%' || #{searchValue} || '%'
+                </when>
+                <when test="searchType == 2">
+                    AND (B.CONTENT LIKE '%' || #{searchValue} || '%'
+                    OR B.TITLE LIKE '%' || #{searchValue} || '%')
+                </when>
+                <when test="searchType == 3">
+                    AND M.NICK LIKE '%' || #{searchValue} || '%'
+                </when>
+                <when test="searchType == 4">
+                    AND H.NAME LIKE '%' || #{searchValue} || '%'
+                </when>
+                <otherwise>
+                    AND B.TITLE LIKE '%' || #{searchValue} || '%'
+                </otherwise>
+            </choose>
+        </if>
+        <choose>
+            <when test="order == 1">
+                ORDER BY B.NO ASC
+            </when>
+            <when test="order == 2">
+                ORDER BY B.RATING DESC
+            </when>
+            <when test="order == 3">
+                ORDER BY B.RATING
+            </when>
+            <otherwise>
+                ORDER BY B.NO DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="searchHospital">
+        SELECT
+            NO
+            , NAME
+            , HOSPITAL_TYPE
+            , CITY
+            , DISTRICT
+            , DONG
+            , ADDRESS
+            , TELL_NUM
+            , POST_NUM
+        FROM HOSPITAL
+        WHERE 1=1
+        <if test="searchValue != null and searchValue != ''">
+            AND (
+            NAME LIKE '%' || #{searchValue} || '%'
+            OR DISTRICT LIKE '%' || #{searchValue} || '%'
+            OR CITY LIKE '%' || #{searchValue} || '%'
+            OR DONG LIKE '%' || #{searchValue} || '%'
+            )
+        </if>
+    </select>
+
+    <insert id="insertAttachReview">
+        INSERT ALL
+        <foreach collection="list" item="x">
+            INTO REVIEW_ATTACHMENT
+            (
+            NO
+            , REVIEW_NO
+            , ORIGIN_NAME
+            , PATH
+            )
+            VALUES
+            (
+            (SELECT GET_REVIEW_ATTACHMENT_NO FROM DUAL)
+            , SEQ_REVIEW_BOARD.CURRVAL
+            , #{x.originName}
+            , #{x.path}
+            )
+        </foreach>
+        SELECT 1 FROM DUAL
+    </insert>
+
+
+</mapper>

@@ -7,7 +7,7 @@ const CommonBtn = styled.button`
   }};
   width: ${({ w }) => (w ? `${w}px` : '70px')};
   height: ${({ h }) => (h ? `${h}px` : '35px')};
-  border-radius: 15px;
+  border-radius: ${({ br }) => (br ? `${br}px` : '15px')};
   border: none;
   font-size: ${({ fs }) => (fs ? `${fs}px` : '17px')};
   /* font-weight: bold; */
@@ -22,7 +22,7 @@ const CommonBtn = styled.button`
   margin-right: ${({ mr }) => (mr ? `${mr}px` : '50px')};
 `;
 
-const Btn = ({ type, str, f, c, fc, w, h, fs, mt, mb, mr, ml, title }) => {
+const Btn = ({ type, str, f, c, fc, w, h, fs, mt, mb, mr, ml, title, br }) => {
   return (
     <CommonBtn
       ml={ml}
@@ -37,6 +37,7 @@ const Btn = ({ type, str, f, c, fc, w, h, fs, mt, mb, mr, ml, title }) => {
       mt={mt}
       mb={mb}
       mr={mr}
+      br={br}
     >
       {str}
     </CommonBtn>

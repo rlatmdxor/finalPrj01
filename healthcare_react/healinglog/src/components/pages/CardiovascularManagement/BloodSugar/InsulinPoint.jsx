@@ -168,18 +168,15 @@ const ModalContainer = styled.div`
 `;
 
 const InsulinPoint = () => {
-  const token = null;
+  const token = localStorage.getItem('token');
   const url = 'http://127.0.0.1:80/api/insulin/list';
 
   const options = {
-    method: 'POST',
+    method: 'GET',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-    body: JSON.stringify({ memberNo: '1' }),
   };
-  /////////////////////////////////////////////////////
   const initialInputData = {
     no: '',
-    memberNo: '1',
     point: '',
     enrollDate: '',
     ableDate: '',
@@ -209,7 +206,13 @@ const InsulinPoint = () => {
         console.log(data);
         console.log(disablePointList);
         setDisablePoint(disablePointList);
-
+        if (model == null) {
+          Swal.fire({
+            title: '다시 로그인해주세요.',
+            icon: 'success',
+            draggable: true,
+          }).then(() => (window.location.href = '/login'));
+        }
         if (data.length > 0) {
           dispatch(setTotalCount({ boardType, totalCount: data.length }));
           const pagedData = data.slice(offset, offset + boardLimit);
@@ -221,11 +224,6 @@ const InsulinPoint = () => {
       })
       .catch((error) => console.error('데이터 불러오기 실패:', error));
   }, [num]);
-  ////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////////////////////////////////////////
-  //인풋 안 쪽에 들어가는 데이터 ~~~Vo에 들어있는 이름으로 맞춰주기
-  // 모달 안 쪽 인풋에 데이터 관리
-  // 화면 렌더링
 
   // 인풋 입력값 받아오기
   const handleChange = (e) => {
@@ -399,6 +397,8 @@ const InsulinPoint = () => {
         <Navi target="bloodSugar" tag={'혈당 기록'}></Navi>
         <Navi target="insulin" tag={'인슐린 기록지'}></Navi>
       </NaviContainer>
+      <LineDiv />
+      <LineDiv />
       <ContentLayout>
         {/* // title 모달 위 쪽에 들어가는 제목 ,  */}
         <Modal title="인슐린 등록">
@@ -701,8 +701,10 @@ const InsulinPoint = () => {
             )}
           </tbody>
         </RadiusTable>
+        <LineDiv />
         <Pagination boardType={boardType}></Pagination>
       </ContentLayout>
+      <LineDiv />
     </>
   );
 };

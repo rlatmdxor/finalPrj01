@@ -148,7 +148,8 @@ const LayDiv = styled.div`
   height: 30px;
 `;
 const attachLayDiv = styled.div`
-  width: 95%;
+  display: grid;
+  grid-template-columns: auto 1fr;
 `;
 
 const staticToolbarPlugin = createToolbarPlugin();
@@ -180,8 +181,8 @@ const blockRendererFn = (block, contentState) => {
   return null;
 };
 
-const BoardWrite = () => {
-  const token = null;
+const BoardEdit = () => {
+  const token = localStorage.getItem('token');
   const [searchParams] = useSearchParams(); // 쿼리스트링 값 가져오기
   const bno = searchParams.get('bno'); // 'bno' 키의 값 가져오기
   const navigate = useNavigate();
@@ -191,16 +192,36 @@ const BoardWrite = () => {
   const editorRef = useRef(null);
   const [isFocused, setIsFocused] = useState(false);
   const [num, setNum] = useState(1);
+  const [newFiles, setNewFiles] = useState([]);
+  const [deleteFiles, setDeleteFiles] = useState([]);
 
   useEffect(() => {
-    fetch(`http://127.0.0.1:80/api/board/honeytip/detail?bno=${bno}&memberNo=1`)
-      .then((resp) => resp.json())
-      .then((data) => {
+    const fetchPost = async () => {
+      try {
+        const response = await fetch(`http://127.0.0.1:80/api/board/honeytip/detail?bno=${bno}`, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        });
+        const data = await response.json();
+        console.log('Fetched isRecommend:', data.isRecommend);
+        const isRec = Number(data.isRecommend);
+
         setInputData(data.detailVo);
-        setFiles(data.attachVoList);
-        const contentState = convertFromRaw(JSON.parse(data.detailVo.content));
-        setEditorState(EditorState.createWithContent(contentState));
-      });
+        if (data.attachVoList && data.attachVoList.length > 0) {
+          setFiles(data.attachVoList);
+        }
+
+        if (data.detailVo.content) {
+          const contentState = convertFromRaw(JSON.parse(data.detailVo.content));
+          setEditorState(EditorState.createWithContent(contentState));
+        }
+      } catch (error) {
+        console.error('데이터 불러오기 오류:', error);
+      }
+    };
+    if (bno) {
+      fetchPost();
+    }
   }, []);
 
   const focus = () => {
@@ -231,9 +252,13 @@ const BoardWrite = () => {
         const formData = new FormData();
         const jsonBlob = new Blob([JSON.stringify(inputData)], { type: 'application/json' });
         formData.append('data', jsonBlob);
-        f.forEach((file) => {
+        newFiles.forEach((file) => {
           formData.append('f', file);
         });
+        const deleteFilesBlob = new Blob([JSON.stringify(deleteFiles)], { type: 'application/json' });
+
+        formData.append('deleteFiles', deleteFilesBlob);
+
         const response = await fetch('http://127.0.0.1:80/api/board/honeytip/edit', {
           method: 'POST',
           headers: { Authorization: `Bearer ${token}` },
@@ -277,22 +302,27 @@ const BoardWrite = () => {
     }
   };
 
+  // const handleFileChange = (e) => {
+  //   const file = e.target.files;
+
+  //   for (let index = 0; index < file.length; index++) {
+  //     const files = e.target.files[index];
+  //     newFiles.push(files);
+  //   }
+  //   setFiles(() => newFiles);
+  // };
   const handleFileChange = (e) => {
-    const file = e.target.files;
-    for (let index = 0; index < file.length; index++) {
-      const files = e.target.files[index];
-      f.push(files);
-    }
-    setFiles(() => f);
-    handleCounter();
-    console.log('fffffffffffffffffffffffffffffffffffffffff', f);
-  };
-  const handleCounter = () => {
-    setNum((prev) => prev + 1);
+    const fileList = Array.from(e.target.files);
+    setNewFiles((prev) => [...prev, ...fileList]);
   };
 
   const removeFile = (index) => {
+    setDeleteFiles((prev) => [...prev, f[index]]);
     setFiles((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const removeNewFile = (index) => {
+    setNewFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
   return (
@@ -303,7 +333,7 @@ const BoardWrite = () => {
         <InputDiv>
           <div className="form-label">카테고리</div>
           <div className="form-input">
-            <select onChange={handleChangeInput} name="categoryNo">
+            <select onChange={handleChangeInput} name="categoryNo" value={inputData.categoryNo}>
               <option value="0">-- 카테고리 선택 --</option>
               <option value="1">병원</option>
               <option value="2">약국</option>
@@ -361,12 +391,21 @@ const BoardWrite = () => {
               </label>
             </div>
             <div>
-              {f?.map((file, index) => (
-                <>
-                  <span key={index}>{file.originName}</span>
-                  <button onClick={() => removeFile(index)}>삭제</button>
-                </>
-              ))}
+              <div>
+                {f?.map((file, index) => (
+                  <>
+                    <span key={index}>{file.originName}</span>
+                    <button onClick={() => removeFile(index)}>삭제</button>
+                  </>
+                ))}
+
+                {newFiles?.map((file, index) => (
+                  <>
+                    <span key={index}>{file.name}</span>
+                    <button onClick={() => removeNewFile(index)}>삭제</button>
+                  </>
+                ))}
+              </div>
             </div>
           </div>
         </AttachDiv>
@@ -385,21 +424,22 @@ const BoardWrite = () => {
                 파일 추가
               </label>
             </div>
-            <div>
-              {/* {f?.map((file, index) => (
-                <span key={index} onClick={() => removeFile(index)}>
-                  {file.name} 삭제
-                </span>
-              ))} */}
-            </div>
+            <div></div>
           </div>
         </AttachDiv>
       </ContentDiv>
       <ButtonDiv>
         <Btn str={'수정'} c={'#FF7F50'} fc={'#ffffff'} mr={'10'} h={'40'} f={handleEditBoard} />
-        <Btn str={'취소'} c={'#D9D9D9'} fc={'#3d4147'} mr={'65'} h={'40'} f={() => navigate('/board')} />
+        <Btn
+          str={'취소'}
+          c={'#D9D9D9'}
+          fc={'#3d4147'}
+          mr={'65'}
+          h={'40'}
+          f={() => navigate(`/board/detail?bno=${bno}`)}
+        />
       </ButtonDiv>
     </>
   );
 };
-export default BoardWrite;
+export default BoardEdit;

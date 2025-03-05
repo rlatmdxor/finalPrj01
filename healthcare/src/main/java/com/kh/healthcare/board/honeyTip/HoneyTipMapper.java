@@ -56,6 +56,7 @@ public interface HoneyTipMapper {
     @Select("""
             SELECT
                 NO
+                ,BOARD_NO
                 ,ORIGIN_NAME
                 ,PATH
                 ,UPLOAD_DATE
@@ -196,6 +197,60 @@ public interface HoneyTipMapper {
             AND B.DEL_YN = 'N'
             """)
     List<HoneyTipCommentVo> commentList(String bno);
+
+
+
+    @Update("""
+            UPDATE BOARD
+            SET
+                TITLE = #{title}
+                , CONTENT = #{content}
+                , CATEGORY_NO = #{categoryNo}
+            WHERE NO = #{no}               
+            """)
+    int edit(HoneyTipVo vo);
+
+
+
+    @Update("""
+            UPDATE BOARD_ATTACHMENT
+            SET
+                DEL_YN = 'Y'
+            WHERE NO = #{no}
+            """)
+    void deleteAttach(HoneyTipAttachVo vo);
+
+    @Insert("""
+            INSERT INTO BOARD_ATTACHMENT
+            (
+                NO
+                , BOARD_NO
+                , ORIGIN_NAME
+                , PATH
+            )
+            VALUES
+            (
+                SEQ_BOARD_ATTACHMENT.NEXTVAL
+                , #{bno}
+                , #{attachVo.originName}
+                , #{attachVo.path}
+            )
+            """)
+    int editAttachHoneyBoard(HoneyTipAttachVo attachVo, String bno);
+
+    @Select("""
+            SELECT COUNT(*)
+            FROM BOARD_COMMENT
+            WHERE BOARD_NO IN (
+                SELECT NO
+                FROM BOARD
+                WHERE MEMBER_NO = #{userNo}
+            )
+            AND ENROLL_DATE > SYSDATE - INTERVAL '1' MINUTE
+            AND DEL_YN = 'N'
+            """)
+    int checkNewComment(String userNo);
+
 }
 
 

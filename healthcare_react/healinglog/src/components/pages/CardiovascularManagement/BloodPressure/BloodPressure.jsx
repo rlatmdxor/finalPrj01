@@ -32,13 +32,17 @@ const ModalContainer = styled.div`
 `;
 
 const BloodPressure = () => {
-  const token = null;
+  const token = localStorage.getItem('token');
+  if (!token) {
+    alert('로그인 정보가 없습니다.');
+    window.location.href = '/login';
+  }
+
   const url = 'http://127.0.0.1:80/api/bloodPressure/list';
 
   const options = {
-    method: 'POST',
+    method: 'GET',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-    body: JSON.stringify({ memberNo: '1' }),
   };
 
   const [num, setNum] = useState(0);
@@ -46,7 +50,7 @@ const BloodPressure = () => {
   const [pagedData, setPagedData] = useState([]); // 페이징된 데이터
   const [filteredData, setFilteredData] = useState([]); // 차트용 필터링 데이터
   const [selectedRange, setSelectedRange] = useState('주'); // 기본값 '일'
-  const [selectChart, setSelectChart] = useState('Bar'); // 그래프 모양 정하는 state
+  const [selectChart, setSelectChart] = useState('Line'); // 그래프 모양 정하는 state
   const dispatch = useDispatch();
 
   const dataBtn = ['주', '월'];
@@ -56,9 +60,9 @@ const BloodPressure = () => {
 
   ////////////////////////////////////////////////////////////////////////////////////////////////
   //인풋 안 쪽에 들어가는 데이터 ~~~Vo에 들어있는 이름으로 맞춰주기
+
   const initialInputData = {
     no: '',
-    memberNo: '1',
     systole: '',
     diastole: '',
     pulse: '',
@@ -87,12 +91,11 @@ const BloodPressure = () => {
     Swal.fire({
       title: '등록하시겠습니까?',
       icon: 'question',
-      showCancelButton: true, // ❗ 취소 버튼 추가 (없으면 무조건 실행됨)
+      showCancelButton: true,
       confirmButtonText: '확인',
       cancelButtonText: '취소',
     }).then((result) => {
       if (result.isConfirmed) {
-        // ✅ 사용자가 '확인' 버튼을 눌렀을 때만 실행
         fetch('http://127.0.0.1:80/api/bloodPressure/write', {
           method: 'POST',
           headers: { 'content-type': 'application/json', Authorization: `Bearer ${token}` },
@@ -178,14 +181,21 @@ const BloodPressure = () => {
         })
           .then((resp) => resp.text())
           .then((data) => {
-            console.log(data);
-            setNum((x) => x - 1);
-            console.log(num);
-            Swal.fire({
-              title: '삭제되었습니다.',
-              icon: 'success',
-              draggable: true,
-            });
+            if (data == 1) {
+              setNum((x) => x - 1);
+              console.log(num);
+              Swal.fire({
+                title: '삭제되었습니다.',
+                icon: 'success',
+                draggable: true,
+              });
+            } else {
+              Swal.fire({
+                icon: 'error',
+                title: '삭제 실패.',
+                text: '다시 시도해주세요',
+              });
+            }
           });
 
         // 모달 창 닫기
@@ -203,6 +213,12 @@ const BloodPressure = () => {
         if (data.length > 0) {
           dispatch(setTotalCount({ boardType, totalCount: data.length })); // 페이징 처리할때 totalCount 저장
           setFullData(data);
+        } else if (data == null) {
+          Swal.fire({
+            title: '다시 로그인해주세요.',
+            icon: 'success',
+            draggable: true,
+          }).then(() => (window.location.href = '/login'));
         } else {
           dispatch(resetPaging({ boardType }));
           setFullData([]);
@@ -622,6 +638,7 @@ const BloodPressure = () => {
             )}
           </tbody>
         </RadiusTable>
+        <LineDiv />
         <Pagination boardType={boardType}></Pagination>
         <LineDiv />
       </ContentLayout>

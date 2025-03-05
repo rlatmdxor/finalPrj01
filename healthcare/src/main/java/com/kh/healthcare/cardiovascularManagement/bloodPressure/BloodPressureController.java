@@ -15,27 +15,32 @@ public class BloodPressureController {
     private final BloodPressureService service;
 
     @PostMapping("write")
-    public int bloodPressureWrite(@RequestBody BloodPressureVo vo , @RequestHeader("Authorization") String authorization){
-
-        System.out.println("BloodPressureController.bloodPressureWrite");
+    public int bloodPressureWrite(@RequestBody BloodPressureVo vo , @RequestHeader("Authorization") String token){
         try{
-            return service.bloodPressureWrite(vo);
+            return service.bloodPressureWrite(vo , token);
         }catch (Exception e){
             e.printStackTrace();
             return 0;
         }
     }
 
-    @PostMapping("list")
-    public List<BloodPressureVo> bloodPressureList(@RequestBody BloodPressureVo vo , @RequestHeader("Authorization") String authorization){
-        return service.bloodPressureList(vo.getMemberNo());
+    @GetMapping("list")
+    public List<BloodPressureVo> bloodPressureList(@RequestHeader("Authorization") String token){
+
+        try{
+            return service.bloodPressureList(token);
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+
     }
 
     @PostMapping("edit")
-    public int bloodPressureEdit(@RequestBody BloodPressureVo vo , @RequestHeader("Authorization") String authorization){
+    public int bloodPressureEdit(@RequestBody BloodPressureVo vo , @RequestHeader("Authorization") String token){
 
         try{
-            return service.bloodPressureEdit(vo);
+            return service.bloodPressureEdit(vo , token);
         }catch (Exception e){
             e.printStackTrace();
             return 0;
@@ -43,8 +48,12 @@ public class BloodPressureController {
 
     }
     @PostMapping("delete")
-    public String bloodPressureDelete(@RequestBody BloodPressureVo vo , @RequestHeader("Authorization") String authorization){
-        service.bloodPressureDelete(vo);
-        return "1";
+    public int bloodPressureDelete(@RequestBody BloodPressureVo vo , @RequestHeader("Authorization") String token){
+        try{
+            return service.bloodPressureDelete(vo , token);
+        }catch (Exception e){
+            e.printStackTrace();
+            return 0;
+        }
     }
 }

@@ -37,7 +37,8 @@ const BottomDiv = styled.div`
 `;
 
 const HoneytipBoard = () => {
-  const token = null;
+  const token = localStorage.getItem('token');
+
   const boardType = 'honeyTip';
   const initstate = {
     order: '',
@@ -193,7 +194,9 @@ const HoneytipBoard = () => {
               <tr key={vo.no} onClick={() => navigate(`/board/detail?bno=${vo.no}`)}>
                 <td>{vo.no}</td>
                 <td>{vo.categoryName}</td>
-                <td>{vo.title}</td>
+                <td>
+                  {vo.title}({vo.commentCount})
+                </td>
                 <td>{vo.recommendCount}</td>
                 <td>{vo.hit}</td>
                 <td>{vo.nick}</td>

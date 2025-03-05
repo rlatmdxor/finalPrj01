@@ -3,7 +3,6 @@ import Main from './components/home/Main';
 import Board from './components/pages/Board/Board';
 import BoardWrite from './components/pages/Board/BoardWrite';
 import DashBoard from './components/pages/DashBoard/DashBoard';
-import HospitalReview from './components/pages/Board/HospitalReview';
 import BloodPressure from './components/pages/CardiovascularManagement/BloodPressure/BloodPressure';
 import BloodSugar from './components/pages/CardiovascularManagement/BloodSugar/BloodSugar';
 import InsulinPoint from './components/pages/CardiovascularManagement/BloodSugar/InsulinPoint';
@@ -26,7 +25,7 @@ import Join from './components/pages/Member/Join';
 import Join2 from './components/pages/Member/Join2';
 import LoginPage from './components/pages/Member/LoginPage';
 import Mypage from './components/pages/Member/Mypage';
-import Notice from './components/pages/Notice/Notice';
+import NoticeList from './components/pages/Notice/NoticeList';
 import AnAerobicDetail from './components/pages/LivingHealth/Exercise/AnAerobicDetail';
 import AdminUserManage from './components/admin/AdminUserManage';
 import AlcReport from './components/pages/LivingHealth/Alc/AlcReport';
@@ -47,6 +46,13 @@ import AdminBanner from './components/admin/banner/AdminBanner';
 import BoardDetail from './components/pages/Board/BoardDetail';
 import BoardEdit from './components/pages/Board/BoardEdit';
 import { Navigate } from 'react-router-dom';
+import NoticeWrite from './components/pages/Notice/NoticeWrite';
+import NoticeDetail from './components/pages/Notice/NoticeDetail';
+import NoticeEdit from './components/pages/Notice/NoticeEdit';
+import Review from './components/pages/Board/review/Review';
+import ReviewDetail from './components/pages/Board/review/ReviewDetail';
+import ReviewWrite from './components/pages/Board/review/ReviewWrite';
+import ReviewEdit from './components/pages/Board/review/ReviewEdit';
 
 export const routes = [
   { path: '/', component: <Main /> },
@@ -58,8 +64,8 @@ export const routes = [
   { path: '/diet/report', component: <DietReport /> },
   { path: '/aerobic', component: <Aerobic /> },
   { path: '/anaerobic', component: <AnAerobic /> },
-  { path: '/alc', component: <Alc /> },
-  { path: '/cigarette', component: <Cigarette /> },
+  { path: '/alc/re', component: <Alc /> },
+  { path: '/cigarette/re', component: <Cigarette /> },
   { path: '/drug', component: <Drug /> },
   { path: '/drug1', component: <Drug1 /> },
   { path: '/bloodpressure', component: <BloodPressure /> },
@@ -69,8 +75,11 @@ export const routes = [
   { path: '/pharmacy', component: <Pharmacy /> },
   { path: '/publichealthcenter', component: <PulbicHealthCenter /> },
   { path: '/board', component: <Board /> },
-  { path: '/hospitalreview', component: <HospitalReview /> },
-  { path: '/notice', component: <Notice /> },
+  { path: '/review', component: <Review /> },
+  { path: '/review/write', component: <ReviewWrite /> },
+  { path: '/review/detail', component: <ReviewDetail /> },
+  { path: '/review/edit', component: <ReviewEdit /> },
+  { path: '/notice', component: <NoticeList /> },
   { path: '/dashboard', component: <DashBoard /> },
   { path: '/dashboard/report', component: <Report /> },
   { path: '/findid', component: <FindIdPage /> },
@@ -85,8 +94,8 @@ export const routes = [
   // { path: '/exercising/:name', component: <Exercising /> },
   { path: '/board/write', component: <BoardWrite /> },
   { path: '/admin/usermanage', component: <AdminUserManage /> },
-  { path: '/alc/report', component: <AlcReport /> },
-  { path: '/cigarette/report', component: <CigaretteReport /> },
+  { path: '/alc', component: <AlcReport /> },
+  { path: '/cigarette/', component: <CigaretteReport /> },
   { path: '/reported/honeytip', component: <ReportedHoneyBoard /> },
   { path: '/reported/honeytip/comment', component: <ReportedHoneyComment /> },
   { path: '/admin/board', component: <AdminBoard /> },
@@ -97,4 +106,7 @@ export const routes = [
   { path: '/board/detail', component: <BoardDetail /> },
   { path: '/board/edit', component: <BoardEdit /> },
   { path: '/admin', component: <Navigate to="/admin/usermanage" /> },
+  { path: '/notice/write', component: <NoticeWrite /> },
+  { path: '/notice/detail', component: <NoticeDetail /> },
+  { path: '/notice/edit', component: <NoticeEdit /> },
 ];

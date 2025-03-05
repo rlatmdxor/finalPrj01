@@ -22,24 +22,7 @@ public interface BloodSugarMapper {
             """)
     List<BloodSugarVo> list(String memberNo);
 
-    @Insert("""
-            INSERT INTO BLOOD_SUGAR
-            (
-                NO
-                , MEMBER_NO
-                , SUGAR
-                , ENROLL_DATE
-                , NOTE
-            )
-            VALUES
-            (
-                SEQ_BLOOD_SUGAR.NEXTVAL
-                , #{memberNo}
-                , #{sugar}
-                , TO_DATE(REPLACE(#{enrollDate}, 'T', ' '), 'YYYY-MM-DD HH24:MI')
-                , #{note}
-            )
-            """)
+
     int bsWrite(BloodSugarVo vo);
 
     @Update("""
@@ -58,5 +41,15 @@ public interface BloodSugarMapper {
             WHERE NO = #{no}
             AND MEMBER_NO = #{memberNo}
             """)
-    void bsDel(BloodSugarVo vo);
+    int bsDel(BloodSugarVo vo);
+
+
+    @Select("""
+            SELECT COUNT(*)
+            FROM BLOOD_SUGAR
+            WHERE MEMBER_NO = #{userNo}
+            AND TRUNC(ENROLL_DATE) = TRUNC(SYSDATE)
+            """)
+    int checkTodayBloodSugar(String userNo);
+
 }

@@ -181,9 +181,13 @@ const blockRendererFn = (block, contentState) => {
 };
 
 const BoardWrite = () => {
-  const token = null;
+  const token = localStorage.getItem('token');
+  if (!token) {
+    alert('로그인 정보가 없습니다.');
+    window.location.href = '/login';
+  }
   const navigate = useNavigate();
-  const [inputData, setInputData] = useState({ memberNo: '1', categoryNo: '', title: '', content: '' });
+  const [inputData, setInputData] = useState({ categoryNo: '', title: '', content: '' });
   const [f, setFiles] = useState([]);
   const [editorState, setEditorState] = useState(() => EditorState.createEmpty());
   const editorRef = useRef(null);
@@ -278,7 +282,6 @@ const BoardWrite = () => {
     }
     setFiles(() => f);
     handleCounter();
-    console.log('fffffffffffffffffffffffffffffffffffffffff', f);
   };
   const handleCounter = () => {
     setNum((prev) => prev + 1);

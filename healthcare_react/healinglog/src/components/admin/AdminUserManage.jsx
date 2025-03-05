@@ -9,7 +9,10 @@ import SearchBar from '../util/SearchBar';
 import Pagination from '../util/Pagination';
 import Btn from '../util/Btn';
 import { Navigate } from 'react-router-dom';
-import { getPayload } from '../util/JwtUtil';
+import { getPayload, getRoleFromToken, isTokenExpired } from '../util/JwtUtil';
+
+import Swal from 'sweetalert2';
+import { useNavigate } from 'react-router-dom';
 
 const NaviContainer = styled.div`
   display: grid;
@@ -57,34 +60,24 @@ const AdminUserManage = () => {
 
   const token = localStorage.getItem('token');
 
-  if (!token) {
-    alert('로그인 정보가 없습니다.');
-    localStorage.clear();
-    window.location.href = 'login';
-  }
+  const navi = useNavigate();
+  const [isAuthorized, setIsAuthorized] = useState(false); // 로그인 여부 체크
 
   useEffect(() => {
-    if (!token) {
-      alert('로그인 정보가 없습니다.');
-      console.log('로그인 정보가 없습니다.');
-      localStorage.clear();
-      window.location.href = 'login';
+    if (!token || isTokenExpired(token) || getRoleFromToken(token) !== 'ROLE_ADMIN') {
+      Swal.fire({
+        icon: 'warning',
+        title: '어드민 로그인이 필요합니다',
+        text: '어드민 로그인 후 이용해주세요',
+        confirmButtonText: '확인',
+      }).then(() => {
+        window.localStorage.removeItem('token'); // 토큰 삭제
+        navi('../../admin/login'); // 로그인 페이지로 이동
+      });
+    } else {
+      setIsAuthorized(true); // 로그인 성공 시 데이터 요청 가능
     }
-
-    // 토큰에서 role 값 가져오기
-    const role = getPayload(token, 'role');
-
-    if (role == 'ROLE_USER') {
-      alert('관리자 권한이 필요!!');
-      window.location.href = 'login';
-    }
-
-    if (role !== 'ROLE_ADMIN') {
-      alert('관리자 권한이 없습니다.');
-      console.log('관리자 권한이 없습니다.');
-      window.location.href = 'login';
-    }
-  }, [Navigate, token]);
+  }, [navi, token]);
 
   const url = 'http://127.0.0.1/api/admin/usermanage/search';
 
@@ -98,8 +91,11 @@ const AdminUserManage = () => {
   }, []);
 
   useEffect(() => {
+    if (!isAuthorized) {
+      return;
+    }
     handleSearch(); // 초기 로딩 시 검색 실행
-  }, []);
+  }, [isAuthorized, token]);
 
   // 📌 검색어 업데이트 핸들러
   const handleKeywordChange = (e) => {

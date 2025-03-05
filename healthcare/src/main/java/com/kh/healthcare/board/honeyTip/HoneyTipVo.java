@@ -16,6 +16,7 @@ public class HoneyTipVo {
     private String enrollDate;
     private String modifyDate;
     private String delYn;
+    private String commentCount;
 }
 
 

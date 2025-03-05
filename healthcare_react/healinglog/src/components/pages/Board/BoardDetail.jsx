@@ -36,6 +36,7 @@ const InputDiv = styled.div`
   height: 40px;
   display: grid;
   grid-template-columns: 130px 150px 130px 1fr;
+  margin-top: 5px;
 
   & .form-label {
     display: flex;
@@ -47,11 +48,11 @@ const InputDiv = styled.div`
     font-size: 14px;
     padding: 2px 0px;
     text-align: center;
-    /* height: 40px; */
+    height: 88%;
   }
   & .form-input {
     display: flex;
-    justify-content: start;
+    justify-content: center;
     align-items: center;
     box-sizing: border-box;
     width: 100%;
@@ -59,6 +60,7 @@ const InputDiv = styled.div`
     font-size: 14px;
     border: 1px solid #ccc;
     padding: 0px 8px;
+    height: 96%;
   }
 `;
 
@@ -131,6 +133,7 @@ const EditorDiv = styled.div`
   border: 1px solid #ccc;
   overflow: auto;
   padding: 10px;
+  margin-top: 8px;
 `;
 const MinDiv = styled.div`
   width: 95%;
@@ -149,7 +152,7 @@ const MinDiv = styled.div`
     font-size: 14px;
     padding: 2px 0px;
     text-align: center;
-    height: 40px;
+    height: 90%;
   }
   & .form-input {
     display: flex;
@@ -262,7 +265,7 @@ const blockRendererFn = (block, contentState) => {
 };
 
 const BoardDetail = () => {
-  const token = null;
+  const token = localStorage.getItem('token');
   const [searchParams] = useSearchParams(); // 쿼리스트링 값 가져오기
   const bno = searchParams.get('bno'); // 'bno' 키의 값 가져오기
   const navigate = useNavigate();
@@ -271,24 +274,27 @@ const BoardDetail = () => {
   const [editorState, setEditorState] = useState(() => EditorState.createEmpty());
   const [num, setNum] = useState(0);
   const [liked, setLiked] = useState(false);
-  const [sendData, setSendData] = useState({ memberNo: '1', isLike: false, bno });
-  const [sendReport, setSendReport] = useState({ memberNo: '2', boardNo: bno, reportType: '', commentNo: '' });
-  const [sendComment, setSendComment] = useState({ memberNo: '1', boardNo: bno, content: '', no: '' });
+  const [sendData, setSendData] = useState({ isLike: false, bno });
+  const [sendReport, setSendReport] = useState({ boardNo: bno, reportType: '', commentNo: '' });
+  const [sendComment, setSendComment] = useState({ boardNo: bno, content: '', no: '' });
   const [commentList, setCommentList] = useState([]);
-  const [isEdit, setIsEdit] = useState({ edit: false, commentNo: '' });
   const [radio, setRadio] = useState();
+  const [userNo, setUserNo] = useState('');
 
   const dispatch = useDispatch();
 
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const response = await fetch(`http://127.0.0.1:80/api/board/honeytip/detail?bno=${bno}&memberNo=1`);
+        const response = await fetch(`http://127.0.0.1:80/api/board/honeytip/detail?bno=${bno}`, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        });
         const data = await response.json();
         console.log('Fetched isRecommend:', data.isRecommend);
         const isRec = Number(data.isRecommend);
-        // 서버에서 받은 추천 상태로 초기 상태 설정
-        console.log(isRec);
+
+        setUserNo(() => data.userNo);
 
         if (isRec === 1) {
           setLiked(true);
@@ -355,7 +361,7 @@ const BoardDetail = () => {
       },
       body: bno,
     })
-      .then((resp) => resp.json())
+      .then((resp) => resp.text())
       .then((data) => {
         setBoardVo((prev) => {
           return {
@@ -434,8 +440,8 @@ const BoardDetail = () => {
     navigate(`/board/edit?bno=${bno}`);
   };
   const reset = () => {
-    setSendReport({ memberNo: '2', boardNo: bno, reportType: '', commentNo: '' });
-    setRadio('4');
+    setSendReport({ memberNo: '', boardNo: bno, reportType: '', commentNo: '' });
+    setRadio('1');
   };
   const handleNaviList = () => {
     navigate('/board');
@@ -456,7 +462,7 @@ const BoardDetail = () => {
             'content-type': 'application/json',
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ memberNo: '1', no: bno }),
+          body: JSON.stringify({ no: bno }),
         })
           .then((resp) => resp.text())
           .then((data) => {
@@ -631,7 +637,13 @@ const BoardDetail = () => {
   };
 
   useEffect(() => {
-    fetch(`http://127.0.0.1:80/api/board/honeytip/comment/list?bno=${bno}`, {})
+    fetch(`http://127.0.0.1:80/api/board/honeytip/comment/list?bno=${bno}`, {
+      method: 'GET',
+      headers: {
+        'content-type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    })
       .then((resp) => resp.json())
       .then((data) => setCommentList(() => data));
   }, [num]);
@@ -771,7 +783,7 @@ const BoardDetail = () => {
             </div>
           </div>
         </AttachDiv>
-        {boardVo.memberNo == 1 ? (
+        {boardVo.memberNo == userNo ? (
           <ButtonDiv>
             <Btn str={'수정하기'} c={'#FF7F50'} fc={'#ffffff'} h={'40'} w={'100'} mr={'10'} f={handleNaviEditPage} />
             <Btn str={'삭제하기'} c={'#D9D9D9'} fc={'#3d4147'} h={'40'} w={'100'} f={handleDeleteHoneyTip} />
@@ -817,7 +829,7 @@ const BoardDetail = () => {
             return (
               <>
                 <SamhangDiv>
-                  {vo.memberNo == '1' ? (
+                  {vo.memberNo == userNo ? (
                     <>
                       <StyledSpan commentNo={vo.no} onClick={handleFetchDeleteComment}>
                         삭제하기

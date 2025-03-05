@@ -5,12 +5,10 @@ import com.kh.healthcare.Aws.FileUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,16 +27,18 @@ public class HoneyTipController {
 
     @PostMapping("list")
     public List<HoneyTipVo> list(@RequestBody SearchFilterVo filterVo) {
-
-        List<HoneyTipVo> HoneyTipVoList = service.list(filterVo);
-        System.out.println("HoneyTipVoList = " + HoneyTipVoList);
-        return HoneyTipVoList;
+        try{
+            List<HoneyTipVo> HoneyTipVoList = service.list(filterVo);
+            return HoneyTipVoList;
+        } catch (Exception e) {
+            throw new IllegalStateException("CODE [ BOARD / LIST ]");
+        }
 
     }
     @PostMapping("write")
     public int write(
             @RequestPart("data") HoneyTipVo vo,
-            @RequestHeader("Authorization") String authorization,
+            @RequestHeader("Authorization") String token,
             @RequestPart(value = "f", required = false) List<MultipartFile> f
     ){
 
@@ -57,7 +57,7 @@ public class HoneyTipController {
                 }
             }
 
-            return service.write(vo, attachVoList);
+            return service.write(vo, attachVoList , token);
         } catch (Exception e) {
             throw new IllegalStateException("CODE [BOARD / WRITE]");
         }
@@ -65,8 +65,10 @@ public class HoneyTipController {
     @PostMapping("edit")
     public int edit(
             @RequestPart("data") HoneyTipVo vo,
-            @RequestHeader("Authorization") String authorization,
+            @RequestPart("deleteFiles") List<HoneyTipAttachVo> deleteFiles,
+            @RequestHeader("Authorization") String token,
             @RequestPart(value = "f", required = false) List<MultipartFile> f
+
     ){
 
         List<HoneyTipAttachVo> attachVoList = new ArrayList<>();
@@ -84,18 +86,19 @@ public class HoneyTipController {
                 }
             }
 
-            return service.edit(vo, attachVoList);
+            return service.edit(vo, attachVoList , deleteFiles);
         } catch (Exception e) {
             e.printStackTrace();
             return 0;
         }
     }
 
+
     @GetMapping("detail")
-    public Map detail(@RequestParam("bno") String bno ,@RequestParam("memberNo") String memberNo){
+    public Map detail(@RequestParam("bno") String bno ,@RequestHeader("Authorization") String token){
 
         try {
-            Map map = service.detail(bno , memberNo);
+            Map map = service.detail(bno , token);
 
             return map;
         }catch (Exception e){
@@ -104,10 +107,9 @@ public class HoneyTipController {
 
     }
     @PostMapping("recommend")
-    public int recommend(@RequestBody BoardRecommendVo vo){
+    public int recommend(@RequestBody BoardRecommendVo vo , @RequestHeader("Authorization") String token){
 
-        System.out.println("vo = " + vo);
-        service.recommend(vo);
+        service.recommend(vo , token);
         return '1';
     }
     @PostMapping("countLike")
@@ -115,27 +117,27 @@ public class HoneyTipController {
         return service.countLike(bno);
     }
     @PostMapping("report")
-    public int report(@RequestBody HoneyTipReportVo vo){
+    public int report(@RequestBody HoneyTipReportVo vo ,@RequestHeader("Authorization") String token){
 
         try{
-            return service.reportBoard(vo);
+            return service.reportBoard(vo , token);
         }catch (Exception e){
             e.printStackTrace();
             return 0;
         }
     }
     @PostMapping("delete")
-    public int deleteHoneyTip(@RequestBody HoneyTipVo vo){
+    public int deleteHoneyTip(@RequestBody HoneyTipVo vo , @RequestHeader("Authorization") String token){
         try{
-            return service.deleteHoneyTip(vo);
+            return service.deleteHoneyTip(vo , token);
         } catch (Exception e) {
-            throw new IllegalStateException("CODE [BOARD / DELETE / CONTROLLER");
+            throw new IllegalStateException("CODE [ BOARD / DELETE / CONTROLLER ]");
         }
     }
     @PostMapping("comment/write")
-    public int commentWrite(@RequestBody HoneyTipCommentVo vo){
+    public int commentWrite(@RequestBody HoneyTipCommentVo vo ,@RequestHeader("Authorization") String token){
         try{
-            return service.commentWrite(vo);
+            return service.commentWrite(vo , token);
         } catch (Exception e) {
             e.printStackTrace();
             return 0;
@@ -143,32 +145,31 @@ public class HoneyTipController {
     }
 
     @PostMapping("comment/delete")
-    public int commentDelete(@RequestBody HoneyTipCommentVo vo){
+    public int commentDelete(@RequestBody HoneyTipCommentVo vo , @RequestHeader("Authorization") String token){
         try{
-            return service.commentDelete(vo);
+            return service.commentDelete(vo , token);
         } catch (Exception e) {
             e.printStackTrace();
             return 0;
         }
     }
     @PostMapping("comment/report")
-    public int commentReport(@RequestBody HoneyTipCommentReportVo vo){
+    public int commentReport(@RequestBody HoneyTipCommentReportVo vo , @RequestHeader("Authorization") String token){
         try{
-            return service.commentReport(vo);
+            return service.commentReport(vo , token);
         } catch (Exception e) {
             e.printStackTrace();
             return 0;
         }
     }
     @GetMapping("comment/list")
-    public List<HoneyTipCommentVo> commentList(@RequestParam("bno") String bno){
+    public List<HoneyTipCommentVo> commentList(@RequestParam("bno") String bno ,  @RequestHeader("Authorization") String token){
         try{
-            return service.commentList(bno);
+            return service.commentList(bno , token);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
     }
-
 
 }
