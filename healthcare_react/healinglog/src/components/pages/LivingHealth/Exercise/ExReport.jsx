@@ -8,11 +8,33 @@ import { close } from '../../../../redux/modalSlice';
 import ContentLayout from '../../../util/ContentLayout';
 import DateBtn from '../../../util/DateBtn';
 import DateBtn2 from '../../../util/DateBtn2';
+import Swal from 'sweetalert2';
+import { useNavigate } from 'react-router-dom';
+import { isTokenExpired, getRoleFromToken } from '../../../util/JwtUtil';
 
 const ExReport = () => {
-  const token = localStorage.getItem('token');
+  const dispatch = useDispatch();
   const dataBtn = ['일', '주', '월'];
   const dataBtn2 = ['월', '년'];
+
+  const token = localStorage.getItem('token');
+  const navi = useNavigate();
+  const [isAuthorized, setIsAuthorized] = useState(false); // 로그인 여부 체크
+
+  useEffect(() => {
+    if (!token || isTokenExpired(token) || getRoleFromToken(token) == 'ROLE_ADMIN') {
+      window.localStorage.removeItem('token'); // 토큰 삭제
+      navi('/login'); // 로그인 페이지로 이동
+      Swal.fire({
+        icon: 'warning',
+        title: '로그인이 필요합니다',
+        text: '로그인 후 이용해주세요',
+        confirmButtonText: '확인',
+      });
+    } else {
+      setIsAuthorized(true); // 로그인 성공 시 데이터 요청 가능
+    }
+  }, [navi, token]);
 
   // 칼로리 (Calories) 전용 상태
   const [selectedRangeCalories, setSelectedRangeCalories] = useState('일');
@@ -432,6 +454,13 @@ const ExReport = () => {
       setSelectedMonthTypeCount(new Date().getMonth() + 1);
     }
   }, [selectedRangeTypeCount]);
+
+  useEffect(() => {
+    dispatch(close('운동 기록'));
+    if (!isAuthorized) {
+      return;
+    }
+  }, [isAuthorized, token]);
 
   return (
     <>

@@ -9,11 +9,11 @@ import { close, open } from '../../../../redux/modalSlice';
 import { useNavigate } from 'react-router-dom';
 import ContentLayout from '../../../util/ContentLayout';
 import Btn from '../../../util/Btn';
+import Swal from 'sweetalert2';
+import { isTokenExpired, getRoleFromToken } from '../../../util/JwtUtil';
 
 const AnAerobic = () => {
-  const token = localStorage.getItem('token');
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const theme = useTheme();
   const [fetchTry, setFetchTry] = useState(0);
   const [anaerobic, setAnaerobic] = useState([]);
@@ -30,6 +30,25 @@ const AnAerobic = () => {
     setWeight('');
     setReps('');
   };
+
+  const token = localStorage.getItem('token');
+  const navi = useNavigate();
+  const [isAuthorized, setIsAuthorized] = useState(false); // 로그인 여부 체크
+
+  useEffect(() => {
+    if (!token || isTokenExpired(token) || getRoleFromToken(token) == 'ROLE_ADMIN') {
+      window.localStorage.removeItem('token'); // 토큰 삭제
+      navi('/login'); // 로그인 페이지로 이동
+      Swal.fire({
+        icon: 'warning',
+        title: '로그인이 필요합니다',
+        text: '로그인 후 이용해주세요',
+        confirmButtonText: '확인',
+      });
+    } else {
+      setIsAuthorized(true); // 로그인 성공 시 데이터 요청 가능
+    }
+  }, [navi, token]);
 
   //페이지 렌더링(데이터 가져오기)
   useEffect(() => {
@@ -154,9 +173,12 @@ const AnAerobic = () => {
   const coreExercises = anaerobic.filter((ex) => ex.exPart === '코어');
   const etcExercises = anaerobic.filter((ex) => ex.exPart === '기타');
 
-  // useEffect(() => {
-  //   dispatch(close('운동시작'));
-  // }, []);
+  useEffect(() => {
+    dispatch(close('운동 기록'));
+    if (!isAuthorized) {
+      return;
+    }
+  }, [isAuthorized, token]);
 
   return (
     <>
@@ -200,7 +222,7 @@ const AnAerobic = () => {
                         c={theme.gray}
                         fs={'14'}
                         f={() => {
-                          navigate(`/anaerobic/${anaerobic.name}`);
+                          navi(`/anaerobic/${anaerobic.name}`);
                         }}
                         mt={'0'}
                         mb={'0'}
@@ -243,7 +265,7 @@ const AnAerobic = () => {
                         c={theme.gray}
                         fs={'14'}
                         f={() => {
-                          navigate(`/anaerobic/${anaerobic.name}`);
+                          navi(`/anaerobic/${anaerobic.name}`);
                         }}
                         mt={'0'}
                         mb={'0'}
@@ -286,7 +308,7 @@ const AnAerobic = () => {
                         c={theme.gray}
                         fs={'14'}
                         f={() => {
-                          navigate(`/anaerobic/${anaerobic.name}`);
+                          navi(`/anaerobic/${anaerobic.name}`);
                         }}
                         mt={'0'}
                         mb={'0'}
@@ -329,7 +351,7 @@ const AnAerobic = () => {
                         c={theme.gray}
                         fs={'14'}
                         f={() => {
-                          navigate(`/anaerobic/${anaerobic.name}`);
+                          navi(`/anaerobic/${anaerobic.name}`);
                         }}
                         mt={'0'}
                         mb={'0'}
@@ -372,7 +394,7 @@ const AnAerobic = () => {
                         c={theme.gray}
                         fs={'14'}
                         f={() => {
-                          navigate(`/anaerobic/${anaerobic.name}`);
+                          navi(`/anaerobic/${anaerobic.name}`);
                         }}
                         mt={'0'}
                         mb={'0'}
@@ -415,7 +437,7 @@ const AnAerobic = () => {
                         c={theme.gray}
                         fs={'14'}
                         f={() => {
-                          navigate(`/anaerobic/${anaerobic.name}`);
+                          navi(`/anaerobic/${anaerobic.name}`);
                         }}
                         mt={'0'}
                         mb={'0'}
@@ -458,7 +480,7 @@ const AnAerobic = () => {
                         c={theme.gray}
                         fs={'14'}
                         f={() => {
-                          navigate(`/anaerobic/${anaerobic.name}`);
+                          navi(`/anaerobic/${anaerobic.name}`);
                         }}
                         mt={'0'}
                         mb={'0'}
