@@ -93,6 +93,16 @@ public interface AerobicMapper {
             """)
     void record(String userNo, String exNo, AerobicHistoryVo vo);
 
+    //수정하려는 내역의 날짜 가져오기
+    @Select("""
+            SELECT TO_CHAR(EX_DATE, 'YYYY-MM-DD') AS EX_DATE
+            FROM AEROBIC_HISTORY
+            WHERE
+                USER_NO = #{userNo}
+                AND NO = #{vo.no}
+            """)
+    String getDate(String userNo, AerobicHistoryVo vo);
+    
     //운동 내역 업데이트
     @Update("""
             UPDATE AEROBIC_HISTORY
@@ -114,4 +124,5 @@ public interface AerobicMapper {
             AND NO = #{vo.no}
             """)
     boolean deleteAerobic(String userNo, AerobicHistoryVo vo);
+
 }

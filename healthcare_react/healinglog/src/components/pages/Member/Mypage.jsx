@@ -22,6 +22,8 @@ import Input from '../../util/Input';
 import ContentLayout from '../../util/ContentLayout';
 import Postcode from '../../util/PostCode';
 import { useNavigate } from 'react-router-dom';
+import { Switch } from '@mui/material';
+import Modal2 from '../../util/Modal2';
 
 const Mypage = () => {
   const theme = useTheme();
@@ -31,11 +33,28 @@ const Mypage = () => {
   const [newNick, setNewNick] = useState('');
   const heightOptions = Array.from({ length: 71 }, (_, i) => i + 140); // 140 ~ 210 cm
   const weightOptions = Array.from({ length: 81 }, (_, i) => i + 40); // 40 ~ 120 kg
+  const [settings, setSettings] = useState({
+    전체푸시: true,
+    식단푸시: false,
+    물섭취푸시: true,
+    운동푸시: true,
+    댓글푸시: false,
+    혈압푸시: true,
+    혈당푸시: false,
+    인슐린투약푸시: false,
+  });
+
+  const handleToggle = (setting) => {
+    setSettings({
+      ...settings,
+      [setting]: !settings[setting],
+    });
+  };
   const token = localStorage.getItem('token');
 
   if (!token) {
     alert('로그인 정보가 없습니다.');
-    window.location.href = '/';
+    window.location.href = '/login';
   }
 
   ///////////////// 주소 관련 데이터////////////////
@@ -259,7 +278,10 @@ const Mypage = () => {
               str="푸시알람 설정"
               fc={'white'}
               fs={'18'}
-              f={() => {}}
+              f={() => {
+                reset();
+                dispatch(open({ title: '푸시알람 설정', value: 'block' }));
+              }}
               mt={'0'}
               mb={'0'}
               ml={'0'}
@@ -504,6 +526,8 @@ const Mypage = () => {
               </option>
             ))}
           </SelectInput>
+          <br />
+          <br />
 
           <InputTitle>몸무게</InputTitle>
           <SelectInput className="weight" value={newWeight} onChange={(e) => setNewWeight(e.target.value)}>
@@ -551,6 +575,149 @@ const Mypage = () => {
             ></Btn>
           </ModalContainer>
         </Modal>
+
+        {/* 푸시알람 설정 모달 */}
+        <Modal2 title="푸시알람 설정" width={'350'}>
+          <ItemContainer>
+            <PushLabel>전체 푸시</PushLabel>
+            <SwitchContainer>
+              <Switch
+                checked={settings['전체푸시']}
+                onChange={() => handleToggle('전체푸시')}
+                name={'전체푸시'}
+                color="primary"
+              />
+            </SwitchContainer>
+          </ItemContainer>
+          <br />
+
+          <ItemContainer>
+            <PushLabel>식단 푸시</PushLabel>
+            <SwitchContainer>
+              <Switch
+                checked={settings['식단푸시']}
+                onChange={() => handleToggle('식단푸시')}
+                name={'식단푸시'}
+                color="primary"
+              />
+            </SwitchContainer>
+          </ItemContainer>
+          <ItemContainer>
+            <PushLabel>물 섭취 푸시</PushLabel>
+            <SwitchContainer>
+              <Switch
+                checked={settings['물섭취푸시']}
+                onChange={() => handleToggle('물섭취푸시')}
+                name={'물섭취푸시'}
+                color="primary"
+              />
+            </SwitchContainer>
+          </ItemContainer>
+          <ItemContainer>
+            <PushLabel>운동 푸시</PushLabel>
+            <SwitchContainer>
+              <Switch
+                checked={settings['운동푸시']}
+                onChange={() => handleToggle('운동푸시')}
+                name={'운동푸시'}
+                color="primary"
+              />
+            </SwitchContainer>
+          </ItemContainer>
+          <ItemContainer>
+            <PushLabel>댓글 푸시</PushLabel>
+            <SwitchContainer>
+              <Switch
+                checked={settings['댓글푸시']}
+                onChange={() => handleToggle('댓글푸시')}
+                name={'댓글푸시'}
+                color="primary"
+              />
+            </SwitchContainer>
+          </ItemContainer>
+          <ItemContainer>
+            <PushLabel>혈압 푸시</PushLabel>
+            <SwitchContainer>
+              <Switch
+                checked={settings['혈압푸시']}
+                onChange={() => handleToggle('혈압푸시')}
+                name={'혈압푸시'}
+                color="primary"
+              />
+            </SwitchContainer>
+          </ItemContainer>
+          <ItemContainer>
+            <PushLabel>혈당 푸시</PushLabel>
+            <SwitchContainer>
+              <Switch
+                checked={settings['혈당푸시']}
+                onChange={() => handleToggle('혈당푸시')}
+                name={'혈당푸시'}
+                color="primary"
+              />
+            </SwitchContainer>
+          </ItemContainer>
+          <ItemContainer>
+            <PushLabel>인슐린 투약 푸시</PushLabel>
+            <SwitchContainer>
+              <Switch
+                checked={settings['인슐린투약푸시']}
+                onChange={() => handleToggle('인슐린투약푸시')}
+                name={'인슐린투약푸시'}
+                color="primary"
+              />
+            </SwitchContainer>
+          </ItemContainer>
+          <br />
+          <ModalContainer>
+            <Btn
+              title={'푸시알람 설정'}
+              mt={'10'}
+              mb={'20'}
+              mr={'-10'}
+              c={theme.green}
+              fc={'white'}
+              str={'저장'}
+              f={(e) => {
+                if (window.confirm('변경하시겠습니까?')) {
+                  const formData = new FormData();
+                  formData.append('height', newHeight);
+                  formData.append('weight', newWeight);
+
+                  fetch('http://127.0.0.1:80/api/notification/setNotification', {
+                    method: 'POST',
+                    headers: {
+                      Authorization: `Bearer ${token}`,
+                    },
+                    body: formData,
+                  })
+                    .then((resp) => {
+                      resp.text();
+                    })
+                    .then((data) => {
+                      dispatch(setHeight(newHeight));
+                      dispatch(setWeight(newWeight));
+                      alert('신체정보 수정 완료!');
+                    });
+                  dispatch(close(e.target.title));
+                }
+              }}
+            ></Btn>
+            <Btn
+              title={'푸시알람 설정'}
+              mt={'10'}
+              mb={'20'}
+              ml={'20'}
+              mr={'10'}
+              c={theme.gray}
+              fc={'black'}
+              str={'취소'}
+              f={(e) => {
+                dispatch(close(e.target.title));
+              }}
+            />
+          </ModalContainer>
+        </Modal2>
       </ContentLayout>
     </>
   );
@@ -671,4 +838,17 @@ const SelectInput = styled.select`
     outline: none;
     border-color: #666;
   }
+`;
+
+const PushLabel = styled.label``;
+
+const ItemContainer = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  color: #757575;
+`;
+
+const SwitchContainer = styled.div`
+  justify-self: end;
 `;

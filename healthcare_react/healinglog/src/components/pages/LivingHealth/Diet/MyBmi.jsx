@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { IconButton, Tooltip } from '@mui/material';
 import { InfoOutlined } from '@mui/icons-material';
 import styled from 'styled-components';
-import { useSelector } from 'react-redux';
 import BigCard from '../../../util/BigCard';
+import { useSelector } from 'react-redux';
 
 const BigCardInnerDiv = styled.div`
   display: flex;
@@ -26,51 +26,48 @@ const BigCardInnerMidDiv = styled.div`
   margin-right: 12px;
 `;
 
-const MyBmi = ({ reRender }) => {
-  const token = localStorage.getItem('token');
+const SmallTextDiv = styled.div`
+  font-size: 14px;
+  color: #252525;
+  margin-top: 2px;
+`;
 
-  const day = useSelector((state) => state.diet.day);
-  const height = 1.62;
-
+const MyBmi = () => {
   const [bmi, setBmi] = useState(0);
+  const [bmiState, setBmiState] = useState('');
   const [standardWeight, setStandardWeight] = useState(0);
   const [recommendedKcal, setRecommendedKcal] = useState(0);
   const [recommendedWater, setRecommendedWater] = useState(0);
 
+  const weight = useSelector((state) => state.diet.weight);
+  const memberHeight = useSelector((state) => state.diet.height);
+  const height = memberHeight * 0.01;
+
   useEffect(() => {
-    fetch('http://127.0.0.1:80/api/weight', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        memberNo: '1',
-        enrollDate: day,
-      }),
-    })
-      .then((resp) => resp.text())
-      .then((weight) => {
-        if (weight) {
-          const calculatedBmi = weight / (height * height);
-          setBmi(calculatedBmi.toFixed(1));
+    const calculatedBmi = weight / (height * height);
+    setBmi(calculatedBmi.toFixed(1));
 
-          const calculatedStandardWeight = height * height * 22;
-          setStandardWeight(calculatedStandardWeight.toFixed(1));
+    let state;
+    if (calculatedBmi < 18.5) {
+      state = '저체중';
+    } else if (calculatedBmi < 23) {
+      state = '정상';
+    } else if (calculatedBmi < 25) {
+      state = '과체중';
+    } else {
+      state = '비만';
+    }
+    setBmiState(state);
 
-          const calculatedKcal = weight * 32;
-          setRecommendedKcal(calculatedKcal.toFixed(0));
+    const calculatedStandardWeight = height * height * 22;
+    setStandardWeight(calculatedStandardWeight.toFixed(1));
 
-          const calculatedWater = weight * 30;
-          setRecommendedWater(calculatedWater.toFixed(0));
-        } else {
-          setBmi(0);
-          setStandardWeight(0);
-          setRecommendedKcal(0);
-          setRecommendedWater(0);
-        }
-      });
-  }, [day, reRender]);
+    const calculatedKcal = weight * 32;
+    setRecommendedKcal(calculatedKcal.toFixed(0));
+
+    const calculatedWater = weight * 30;
+    setRecommendedWater(calculatedWater.toFixed(0));
+  }, [weight, height]);
 
   return (
     <>
@@ -78,13 +75,31 @@ const MyBmi = ({ reRender }) => {
         <BigCardInnerDiv>
           <BigCardInnerTopDiv>
             <div>나의 BMI</div>
-            <Tooltip title="BMI = 체중(kg) / (키(m)× 키(m))">
+            <Tooltip
+              title={
+                <>
+                  BMI = 체중(kg) / (키(m)× 키(m)) <br />
+                  - 저체중 : 18.5 미만 <br />
+                  - 정상 : 18.5이상 23미만 <br />
+                  - 과체중 : 23이상 25미만 <br />- 비만 : 25 이상
+                </>
+              }
+            >
               <IconButton sx={{ paddingTop: '11px' }}>
                 <InfoOutlined sx={{ fontSize: '1.1rem' }} />
               </IconButton>
             </Tooltip>
           </BigCardInnerTopDiv>
-          <BigCardInnerMidDiv>{bmi} kg/㎡</BigCardInnerMidDiv>
+          {!height || height <= 0 ? (
+            <>
+              <SmallTextDiv>마이페이지에서</SmallTextDiv>
+              <SmallTextDiv>키를 설정해주세요.</SmallTextDiv>
+            </>
+          ) : (
+            <BigCardInnerMidDiv>
+              {bmi} kg/㎡ ({bmiState})
+            </BigCardInnerMidDiv>
+          )}
         </BigCardInnerDiv>
         <BigCardInnerDiv>
           <BigCardInnerTopDiv>
@@ -102,7 +117,14 @@ const MyBmi = ({ reRender }) => {
               </IconButton>
             </Tooltip>
           </BigCardInnerTopDiv>
-          <BigCardInnerMidDiv>{standardWeight} kg</BigCardInnerMidDiv>
+          {!height || height <= 0 ? (
+            <>
+              <SmallTextDiv>마이페이지에서</SmallTextDiv>
+              <SmallTextDiv>키를 설정해주세요.</SmallTextDiv>
+            </>
+          ) : (
+            <BigCardInnerMidDiv>{standardWeight} kg</BigCardInnerMidDiv>
+          )}
         </BigCardInnerDiv>
         <BigCardInnerDiv>
           <BigCardInnerTopDiv>

@@ -7,10 +7,35 @@ import { resetPaging, setTotalCount } from '../../../redux/pagingSlice';
 import Pagination from '../../util/Pagination';
 import Btn from '../../util/Btn';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
 import Modal from '../../util/Modal';
 import Input from '../../util/Input';
 import { open, close } from '../../../redux/modalSlice';
+import { getBannerList, enrollBanner, editBanner, deleteBanner, multiDeleteBanner } from '../../services/bannerService';
+import SearchBar from '../../util/SearchBar';
+import { useNavigate } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
+
+const SearchDiv = styled.div`
+  display: flex;
+  justify-content: end;
+  gap: 5px;
+  align-items: center;
+  margin-top: 10px;
+  margin-bottom: 7px;
+`;
+
+const SelectBox = styled.select`
+  width: ${(props) => props.width || '100px'};
+  height: 40px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin: 0px 3px;
+  &:focus {
+    border-color: #007bff;
+    outline: none;
+  }
+`;
 
 const ButtonAreaDiv = styled.div`
   display: flex;
@@ -19,9 +44,7 @@ const ButtonAreaDiv = styled.div`
   gap: 10px;
 `;
 
-const TableAreaDiv = styled.div`
-  margin-top: 30px;
-`;
+const TableAreaDiv = styled.div``;
 
 const TitleTd = styled.td`
   max-width: 450px;
@@ -51,7 +74,7 @@ const ModalContentText = styled.div`
 
 const ModalContentSmallText = styled.div`
   margin-top: 7px;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
   font-size: 13px;
   color: blue;
 `;
@@ -78,7 +101,7 @@ const PreviewDiv = styled.div`
 `;
 
 const UploadedImg = styled.img`
-  width: 99%;
+  width: 98%;
   object-fit: contain;
 `;
 
@@ -90,15 +113,43 @@ const DeleteImgBtn = styled.button`
 `;
 
 const AdminBanner = () => {
+  const navigate = useNavigate();
   const token = localStorage.getItem('token');
   const Swal = require('sweetalert2');
+
+  const [adminNo, setAdminNo] = useState(0);
+
+  useEffect(() => {
+    if (!token) {
+      alert('로그인 정보가 없습니다.');
+      navigate('/admin/login');
+    }
+  }, []);
+
+  useEffect(() => {
+    if (token) {
+      try {
+        const decodedToken = jwtDecode(token);
+        setAdminNo(decodedToken.no);
+      } catch {
+        navigate('/admin/login');
+      }
+    }
+  }, [token, dispatch]);
 
   const boardType = 'bannerManagement';
 
   const dispatch = useDispatch();
 
   const [bannerList, setBannerList] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [selectedNo, setSelectedNo] = useState([]);
+  const [isAllSelected, setIsAllSelected] = useState(false);
+
+  const initstate = {
+    showYn: '',
+    searchValue: '',
+  };
+  const [searchInput, setSearchInput] = useState(initstate);
 
   const currentPage = useSelector((state) => state.paging[boardType]?.currentPage || 1);
   const boardLimit = useSelector((state) => state.paging[boardType]?.boardLimit || 12);
@@ -106,7 +157,7 @@ const AdminBanner = () => {
 
   const initialInputData = {
     no: '',
-    writer: '1',
+    writer: adminNo,
     title: '',
     showYn: 'Y',
     imageUrl: '',
@@ -117,49 +168,24 @@ const AdminBanner = () => {
   const enrollImgRef = useRef(null);
   const editImgRef = useRef(null);
 
-  const fetchBannerList = () => {
-    fetch('http://127.0.0.1:80/api/banner', {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((resp) => resp.json())
-      .then((data) => {
-        if (data.length > 0) {
-          dispatch(setTotalCount({ boardType, totalCount: data.length }));
-          const pagedData = data.slice(offset, offset + boardLimit);
-          setBannerList(pagedData);
-        } else {
-          dispatch(resetPaging({ boardType }));
-          setBannerList([]);
-        }
-      });
+  const getFetch = async (showYn, searchValue) => {
+    try {
+      const data = await getBannerList(showYn, searchValue, token);
+      if (data.length > 0) {
+        dispatch(setTotalCount({ boardType, totalCount: data.length }));
+        const pagedData = data.slice(offset, offset + boardLimit);
+        setBannerList(pagedData);
+      } else {
+        dispatch(resetPaging({ boardType }));
+        setBannerList([]);
+      }
+    } catch (error) {
+      console.error('[ERROR] GET DASHBOARD DATA FAIL', error);
+    }
   };
 
   useEffect(() => {
-    dispatch(resetPaging({ boardType }));
-    fetchBannerList();
-  }, []);
-
-  useEffect(() => {
-    fetch('http://127.0.0.1:80/api/banner', {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((resp) => resp.json())
-      .then((data) => {
-        if (data.length > 0) {
-          dispatch(setTotalCount({ boardType, totalCount: data.length }));
-          const pagedData = data.slice(offset, offset + boardLimit);
-          setBannerList(pagedData);
-        } else {
-          dispatch(resetPaging({ boardType }));
-          setBannerList([]);
-        }
-      });
+    getFetch(searchInput.showYn, searchInput.searchValue);
   }, [currentPage, boardLimit]);
 
   const handleOpenModal = () => {
@@ -172,11 +198,10 @@ const AdminBanner = () => {
 
   const handleOpenDetailModal = (no) => {
     const vo = bannerList.find((vo) => vo.no === no);
-    //setSelectedBanner(vo);
     setInputData((prev) => ({
       ...prev,
       no: vo.no,
-      writer: vo.writer || '1',
+      writer: vo.writer || adminNo,
       title: vo.title,
       showYn: vo.showYn,
       imageUrl: vo.imageUrl || '',
@@ -253,27 +278,28 @@ const AdminBanner = () => {
         formData.append('showYn', inputData.showYn);
         formData.append('f', inputData.imageUrl);
 
-        fetch('http://127.0.0.1:80/api/banner/enroll', {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: formData,
-        }).then((resp) => {
-          if (resp.status == 200) {
-            Swal.fire({
-              title: '등록되었습니다.',
-              confirmButtonText: '확인',
-            });
-          } else {
-            Swal.fire({
-              title: '오류발생...',
-              confirmButtonText: '확인',
-            });
+        const enrollBannerFetch = async () => {
+          try {
+            const result = await enrollBanner(formData, token);
+            if (result == 200) {
+              Swal.fire({
+                title: '등록되었습니다.',
+                confirmButtonText: '확인',
+              });
+            } else {
+              Swal.fire({
+                title: '오류발생...',
+                confirmButtonText: '확인',
+              });
+            }
+          } catch (error) {
+            console.error('[ERROR] ENROLL BANNER FAIL', error);
           }
           dispatch(close('배너 등록'));
-          fetchBannerList();
-        });
+          dispatch(resetPaging({ boardType }));
+          getFetch(searchInput.showYn, searchInput.searchValue);
+        };
+        enrollBannerFetch();
       }
     });
   };
@@ -308,27 +334,27 @@ const AdminBanner = () => {
         formData.append('showYn', inputData.showYn);
         formData.append('f', inputData.imageUrl);
 
-        fetch('http://127.0.0.1:80/api/banner/edit', {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: formData,
-        }).then((resp) => {
-          if (resp.status == 200) {
-            Swal.fire({
-              title: '저장되었습니다.',
-              confirmButtonText: '확인',
-            });
-          } else {
-            Swal.fire({
-              title: '오류발생...',
-              confirmButtonText: '확인',
-            });
+        const editBannerFetch = async () => {
+          try {
+            const result = await editBanner(formData, token);
+            if (result == 200) {
+              Swal.fire({
+                title: '수정되었습니다.',
+                confirmButtonText: '확인',
+              });
+            } else {
+              Swal.fire({
+                title: '오류발생...',
+                confirmButtonText: '확인',
+              });
+            }
+          } catch (error) {
+            console.error('[ERROR] EDIT BANNER FAIL', error);
           }
           dispatch(close('배너 수정'));
-          fetchBannerList();
-        });
+          getFetch(searchInput.showYn, searchInput.searchValue);
+        };
+        editBannerFetch();
       }
     });
   };
@@ -342,34 +368,149 @@ const AdminBanner = () => {
       cancelButtonText: '취소',
     }).then((result) => {
       if (result.isConfirmed) {
-        fetch(`http://127.0.0.1:80/api/banner/delete?no=${inputData.no}`, {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }).then((resp) => {
-          if (resp.status == 200) {
-            Swal.fire({
-              title: '삭제되었습니다.',
-              confirmButtonText: '확인',
-            });
-          } else {
-            Swal.fire({
-              title: '오류발생...',
-              confirmButtonText: '확인',
-            });
+        const deleteBannerFetch = async () => {
+          try {
+            const result = await deleteBanner(inputData.no, token);
+            if (result == 200) {
+              Swal.fire({
+                title: '삭제되었습니다.',
+                confirmButtonText: '확인',
+              });
+            } else {
+              Swal.fire({
+                title: '오류발생...',
+                confirmButtonText: '확인',
+              });
+            }
+          } catch (error) {
+            console.error('[ERROR] EDIT BANNER FAIL', error);
           }
           dispatch(close('배너 수정'));
-          fetchBannerList();
-        });
+          getFetch(searchInput.showYn, searchInput.searchValue);
+        };
+        deleteBannerFetch();
       }
     });
+  };
+
+  useEffect(() => {
+    setIsAllSelected(selectedNo.length > 0 && selectedNo.length === bannerList.length);
+  }, [selectedNo, bannerList]);
+
+  const handleCheckboxClick = (no) => {
+    setSelectedNo((prev) => {
+      const updatedSelection = prev.includes(no) ? prev.filter((item) => item !== no) : [...prev, no];
+      return updatedSelection;
+    });
+  };
+  const handleAllCheckBoxClick = () => {
+    if (isAllSelected) {
+      setSelectedNo([]);
+    } else {
+      setSelectedNo(bannerList.map((vo) => vo.no));
+    }
+  };
+
+  const handleMultiDeleteClick = () => {
+    if (!selectedNo || selectedNo?.length === 0) {
+      Swal.fire({
+        title: '선택된 건이 없습니다.',
+        confirmButtonText: '확인',
+      });
+      return;
+    }
+
+    Swal.fire({
+      title: '삭제하시겠습니까?',
+      showCancelButton: true,
+      confirmButtonText: '확인',
+      cancelButtonText: '취소',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const multiDeleteBannerFetch = async () => {
+          try {
+            const result = await multiDeleteBanner(selectedNo, token);
+            if (result == 200) {
+              Swal.fire({
+                title: '삭제되었습니다.',
+                confirmButtonText: '확인',
+              });
+            } else {
+              Swal.fire({
+                title: '오류발생...',
+                confirmButtonText: '확인',
+              });
+            }
+          } catch (error) {
+            console.error('[ERROR] MULTI DELETE BANNER FAIL', error);
+          }
+          setSelectedNo([]);
+          setIsAllSelected(false);
+          getFetch(searchInput.showYn, searchInput.searchValue);
+        };
+        multiDeleteBannerFetch();
+      }
+    });
+  };
+
+  const searchFilter = {
+    showYn: ['노출여부 전체', 'Y', 'N'],
+  };
+
+  const handleFilter = (e) => {
+    setSearchInput((prev) => {
+      return {
+        ...prev,
+        showYn: e.target.value,
+      };
+    });
+  };
+
+  const handleChange = (e) => {
+    setSearchInput((prev) => {
+      return {
+        ...prev,
+        searchValue: e.target.value,
+      };
+    });
+  };
+
+  const handleClearClick = () => {
+    console.log('zzz');
+    setSearchInput((prev) => {
+      return {
+        ...prev,
+        searchValue: '',
+      };
+    });
+  };
+
+  const handleClick = (showYn, searchValue) => {
+    dispatch(resetPaging({ boardType }));
+    getFetch(showYn, searchValue);
   };
 
   return (
     <>
       <Title>배너 관리</Title>
       <ContentLayout>
+        <SearchDiv>
+          <SelectBox width={'120'} onChange={handleFilter}>
+            {searchFilter.showYn.map((option, idx) => (
+              <option key={idx} value={option} name={option}>
+                {option}
+              </option>
+            ))}
+          </SelectBox>
+          <SearchBar
+            value={searchInput.searchValue}
+            handleChange={handleChange}
+            handleClearClick={handleClearClick}
+            handleClick={() => {
+              handleClick(searchInput.showYn, searchInput.searchValue);
+            }}
+          />
+        </SearchDiv>
         <TableAreaDiv>
           <Table>
             <thead>
@@ -380,7 +521,7 @@ const AdminBanner = () => {
                 <th>작성자</th>
                 <th>등록일자</th>
                 <th>
-                  <input type="checkbox" />
+                  <input type="checkbox" checked={isAllSelected} onChange={handleAllCheckBoxClick} />
                 </th>
               </tr>
             </thead>
@@ -393,8 +534,14 @@ const AdminBanner = () => {
                     <td>{vo.showYn}</td>
                     <td>{vo.nick}</td>
                     <td>{vo.enrollDate}</td>
-                    <td>
-                      <input type="checkbox" />
+                    <td onClick={(e) => e.stopPropagation()}>
+                      <input
+                        type="checkbox"
+                        checked={selectedNo.includes(vo.no)}
+                        onChange={() => {
+                          handleCheckboxClick(vo.no);
+                        }}
+                      />
                     </td>
                   </tr>
                 );
@@ -407,7 +554,7 @@ const AdminBanner = () => {
           <Pagination boardType={boardType} />
           <ButtonAreaDiv>
             <Btn str={'등록'} c={'#FF7F50'} fc={'#ffffff'} mr={'0'} f={handleOpenModal} />
-            <Btn str={'삭제'} mr={'0'} f={''} />
+            <Btn str={'삭제'} mr={'0'} f={handleMultiDeleteClick} />
           </ButtonAreaDiv>
         </BottomAreaDiv>
 
@@ -443,7 +590,7 @@ const AdminBanner = () => {
             N
           </ModalRadioBtnDiv>
           <ModalContentText>배너사진</ModalContentText>
-          <ModalContentSmallText>* 적정 사이즈 : 1380 * 500 px</ModalContentSmallText>
+          <ModalContentSmallText>적정 사이즈 : 1380 * 500 px</ModalContentSmallText>
           <FileInput type="file" accept="image/*" onChange={() => handleImageChange(enrollImgRef)} ref={enrollImgRef} />
           <PreviewDiv>
             {inputData.imageUrl ? (
@@ -501,7 +648,7 @@ const AdminBanner = () => {
             N
           </ModalRadioBtnDiv>
           <ModalContentText>배너사진</ModalContentText>
-          <ModalContentSmallText>* 적정 사이즈 : 1380 * 500 px</ModalContentSmallText>
+          <ModalContentSmallText>적정 사이즈 : 1380 * 500 px</ModalContentSmallText>
           <FileInput type="file" accept="image/*" onChange={() => handleImageChange(editImgRef)} ref={editImgRef} />
           <PreviewDiv>
             {inputData.imageUrl ? (

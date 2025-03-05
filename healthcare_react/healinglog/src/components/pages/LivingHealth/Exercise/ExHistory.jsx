@@ -55,6 +55,7 @@ const ExHistory = () => {
     }
     const requestData = {
       no: extraInfo1,
+      exName: exercise,
       exDate,
       startTime,
       endTime,
@@ -127,6 +128,7 @@ const ExHistory = () => {
     }
   };
 
+  //유산소 삭제
   const handleAerobicDelete = async (historyNo) => {
     const requestData = {
       no: historyNo,

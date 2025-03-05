@@ -85,6 +85,7 @@ public class AnAerobicService {
     public String updateAnAerobic(String token, AnAerobicHistoryVo vo) {
         token = token.replace("Bearer ", "");
         String userNo = jwtUtil.getNo(token);
+        System.out.println("userNo = " + userNo);
 
         //이름으로 운동번호 가져오기
         String exName = vo.getExName();

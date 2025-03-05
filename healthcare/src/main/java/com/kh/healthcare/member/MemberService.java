@@ -188,4 +188,29 @@ public class MemberService {
         String id = jwtUtil.getId(token);
         mapper.withdrawal(id);
     }
+
+    // 아이디 찾기
+    public String findId(String userName, String userPhone) {
+        String findedId = mapper.findId(userName, userPhone);
+
+        if(findedId != null){
+            return "회원님의 아이디는 " + findedId + " 입니다.";
+        } else {
+            return "등록된 정보가 없습니다.";
+        }
+
+    }
+
+    // 이메일(+아이디)로 사용자 존재여부 체크
+    public MemberVo findByEmail(String id, String email) {
+        return mapper.findByEmail(id, email);
+    }
+
+    // 임시 패스워드 업데이트
+    public void updatePassword(MemberVo memberVo, String tempPassword) {
+        String encodedPwd = encoder.encode(tempPassword);
+        mapper.updatePwd(encodedPwd, memberVo.getId());
+    }
+
+
 }

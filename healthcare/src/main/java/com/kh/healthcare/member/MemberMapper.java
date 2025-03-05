@@ -202,4 +202,22 @@ public interface MemberMapper {
             )
             """)
     void createMemberDashboard(String name);
+
+    @Select("""
+            SELECT ID
+            FROM MEMBER
+            WHERE
+                NAME = #{userName}
+                AND PHONE = #{userPhone}
+            """)
+    String findId(String userName, String userPhone);
+
+    @Select("""
+            SELECT NO, ID
+            FROM MEMBER
+            WHERE
+                ID = #{id}
+                AND EMAIL = #{email}
+            """)
+    MemberVo findByEmail(String id, String email);
 }

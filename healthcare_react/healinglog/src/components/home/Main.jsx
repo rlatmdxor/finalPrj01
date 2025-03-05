@@ -9,7 +9,7 @@ import 'swiper/css/scrollbar';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import Avatar from '@mui/material/Avatar';
-import { getNoticeList, getBoardList, getReviewList } from '../services/homeService';
+import { getBannerList, getNoticeList, getBoardList, getReviewList } from '../services/mainService';
 
 const LayoutDiv = styled.div`
   display: flex;
@@ -28,7 +28,7 @@ const LayoutDiv = styled.div`
 `;
 
 const ContentArea = styled.div`
-  margin-top: 430px;
+  margin-top: 445px;
   margin-bottom: 30px;
 `;
 
@@ -78,7 +78,7 @@ const Card = styled.div`
 
 const CardTitleTextDiv = styled.div`
   width: 100%;
-  font-size: 19px;
+  font-size: 20px;
   font-weight: 700;
   overflow: hidden;
   display: -webkit-box;
@@ -121,10 +121,10 @@ const ReviewAreDiv = styled.div`
 
 const ReviewCard = styled.div`
   width: 234px;
-  height: 210px;
+  height: 200px;
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: 1fr 1fr 1fr 32px 1fr;
+  grid-template-rows: 1fr 1fr 1fr 17px 1fr;
   padding: 20px;
   box-sizing: border-box;
   border: 1px solid lightgray;
@@ -173,7 +173,7 @@ const AreaDiv = styled.div`
 
 const ProfileAreaDiv = styled.div`
   display: flex;
-  margin-top: 15px;
+  margin-top: 7px;
   gap: 7px;
   align-items: center;
 `;
@@ -209,6 +209,7 @@ const Main = () => {
   const navigate = useNavigate();
   const token = localStorage.getItem('token');
 
+  const [bannerList, setBannerList] = useState([]);
   const [noticeList, setNoticeList] = useState([]);
   const [boardList, setBoardList] = useState([]);
   const [reviewList, setReviewList] = useState([]);
@@ -216,9 +217,11 @@ const Main = () => {
   useEffect(() => {
     const getFetch = async () => {
       try {
+        const bannerData = await getBannerList(token);
         const boardData = await getBoardList(token);
         const noticeData = await getNoticeList(token);
         const reviewData = await getReviewList(token);
+        setBannerList(bannerData);
         setBoardList(boardData);
         setNoticeList(noticeData);
         setReviewList(reviewData);
@@ -245,15 +248,13 @@ const Main = () => {
             waitForTransition: false,
           }}
         >
-          <SwiperSlide>
-            <BannerImg src="https://www.kdca.go.kr/cdc/img/new/newsBanner_034.jpg" alt="메인배너1" />
-          </SwiperSlide>
-          <SwiperSlide>
-            <BannerImg src="https://www.kdca.go.kr/cdc/img/new/newsBanner_030.jpg" alt="메인배너2" />
-          </SwiperSlide>
-          <SwiperSlide>
-            <BannerImg src="https://www.kdca.go.kr/cdc/img/new/newsBanner_035.jpg" alt="메인배너3" />
-          </SwiperSlide>
+          {bannerList.map((vo, index) => {
+            return (
+              <SwiperSlide key={index}>
+                <BannerImg src={vo.imageUrl} alt="배너이미지" />
+              </SwiperSlide>
+            );
+          })}
         </Swiper>
       </LayoutDiv>
       <ContentLayout>

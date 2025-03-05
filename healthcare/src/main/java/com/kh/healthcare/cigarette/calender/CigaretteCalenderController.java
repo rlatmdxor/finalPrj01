@@ -15,27 +15,36 @@ public class CigaretteCalenderController {
 
     @PostMapping("list")
     public List<CigaretteCalenderVo> CigaretteCalenderVoList(@RequestBody CigaretteCalenderVo vo){
-        System.out.println("vo = " + vo);
     return service.list(vo.getMemberNo());
-
     }
 
     @PostMapping("write")
     public String write(@RequestBody CigaretteCalenderVo vo){
+        try{
         service.write(vo);
-        System.out.println("vo = " + vo);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         return "write";
     }
 
     @PostMapping("update")
     public String update(@RequestBody CigaretteCalenderVo vo) {
+        try{
         service.update(vo);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         return "update";
     }
 
     @DeleteMapping("delete")
     public String delete(@RequestBody CigaretteCalenderVo vo) {
+        try {
         service.delete(vo);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         return "delete";
     }
 

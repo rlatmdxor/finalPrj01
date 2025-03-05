@@ -1,3 +1,19 @@
+import { BASE_URL } from './config';
+
+const getBannerList = async (token) => {
+  const resp = await fetch(`${BASE_URL}/api/main/banner`, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!resp.ok) {
+    throw new Error(`HTTP ERROR !!! ${resp.status}`);
+  }
+  const bannerList = resp.json();
+  return bannerList;
+};
+
 const getNoticeList = async (token) => {
   const resp = await fetch(`http://127.0.0.1:80/api/main/notice`, {
     method: 'GET',
@@ -40,4 +56,4 @@ const getReviewList = async (token) => {
   return boardList;
 };
 
-export { getNoticeList, getBoardList, getReviewList };
+export { getNoticeList, getBoardList, getReviewList, getBannerList };

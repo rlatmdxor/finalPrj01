@@ -41,7 +41,7 @@ const SearchInput = styled.input`
   height: ${({ h }) => (h ? `${h}px` : '40px')};
 `;
 
-const SearchBar = ({ handleClick, handleChange, handleClearClick, w, h, mb, mt, ml, mr }) => {
+const SearchBar = ({ handleClick, handleChange, handleClearClick, w, h, mb, mt, ml, mr, value }) => {
   return (
     <SearchWrapper mt={mt} mb={mb} ml={ml} mr={mr}>
       <SearchInputWrapper>
@@ -55,7 +55,7 @@ const SearchBar = ({ handleClick, handleChange, handleClearClick, w, h, mb, mt, 
             />
           </svg>
         </SearchIcon>
-        <SearchInput w={w} h={h} type="text" placeholder="검색어를 입력하세요" onChange={handleChange} />
+        <SearchInput w={w} h={h} type="text" value={value} placeholder="검색어를 입력하세요" onChange={handleChange} />
         <ClearIcon onClick={handleClearClick}>
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path

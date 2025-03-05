@@ -199,6 +199,7 @@ public interface HoneyTipMapper {
     List<HoneyTipCommentVo> commentList(String bno);
 
 
+
     @Update("""
             UPDATE BOARD
             SET
@@ -236,6 +237,19 @@ public interface HoneyTipMapper {
             )
             """)
     int editAttachHoneyBoard(HoneyTipAttachVo attachVo, String bno);
+
+    @Select("""
+            SELECT COUNT(*)
+            FROM BOARD_COMMENT
+            WHERE BOARD_NO IN (
+                SELECT NO
+                FROM BOARD
+                WHERE MEMBER_NO = #{userNo}
+            )
+            AND ENROLL_DATE > SYSDATE - INTERVAL '1' MINUTE
+            AND DEL_YN = 'N'
+            """)
+    int checkNewComment(String userNo);
 
 }
 

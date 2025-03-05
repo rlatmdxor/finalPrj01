@@ -8,6 +8,11 @@ import styled from 'styled-components';
 import SearchBar from '../util/SearchBar';
 import Pagination from '../util/Pagination';
 import Btn from '../util/Btn';
+import { Navigate } from 'react-router-dom';
+import { getPayload, getRoleFromToken, isTokenExpired } from '../util/JwtUtil';
+
+import Swal from 'sweetalert2';
+import { useNavigate } from 'react-router-dom';
 
 const NaviContainer = styled.div`
   display: grid;
@@ -53,11 +58,32 @@ const AdminUserManage = () => {
   const currentPage = useSelector((state) => state.paging[boardType]?.currentPage || 1);
   const boardLimit = useSelector((state) => state.paging[boardType]?.boardLimit || 12);
 
+  const token = localStorage.getItem('token');
+
+  const navi = useNavigate();
+  const [isAuthorized, setIsAuthorized] = useState(false); // 로그인 여부 체크
+
+  useEffect(() => {
+    if (!token || isTokenExpired(token) || getRoleFromToken(token) !== 'ROLE_ADMIN') {
+      Swal.fire({
+        icon: 'warning',
+        title: '어드민 로그인이 필요합니다',
+        text: '어드민 로그인 후 이용해주세요',
+        confirmButtonText: '확인',
+      }).then(() => {
+        window.localStorage.removeItem('token'); // 토큰 삭제
+        navi('../../admin/login'); // 로그인 페이지로 이동
+      });
+    } else {
+      setIsAuthorized(true); // 로그인 성공 시 데이터 요청 가능
+    }
+  }, [navi, token]);
+
   const url = 'http://127.0.0.1/api/admin/usermanage/search';
 
-  const options = {
+  const option = {
     method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
   };
 
   useEffect(() => {
@@ -65,12 +91,11 @@ const AdminUserManage = () => {
   }, []);
 
   useEffect(() => {
+    if (!isAuthorized) {
+      return;
+    }
     handleSearch(); // 초기 로딩 시 검색 실행
-  }, []);
-
-  useEffect(() => {
-    handleSearch();
-  }, [currentPage]);
+  }, [isAuthorized, token]);
 
   // 📌 검색어 업데이트 핸들러
   const handleKeywordChange = (e) => {
@@ -82,12 +107,17 @@ const AdminUserManage = () => {
     setKeyword('');
   };
 
-  //시군구 고르면 자동으로 검색
   useEffect(() => {
-    if (delYn) {
-      handleSearch();
-    }
+    handleSearch();
   }, [delYn]);
+
+  // Enter 키 입력 시 검색 실행
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault(); // 기본 이벤트(폼 제출) 방지
+      handleSearch(); // 검색 실행
+    }
+  };
 
   //검색
   const handleSearch = async () => {
@@ -106,7 +136,10 @@ const AdminUserManage = () => {
         finalKeyword
       )}&page=${currentPage}&size=${boardLimit}`;
 
-      const response = await fetch(requestUrl, { method: 'GET', headers: { 'Content-Type': 'application/json' } });
+      const response = await fetch(requestUrl, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      });
       if (!response.ok) {
         throw new Error(`API 요청 실패: ${response.status}`);
       }
@@ -121,7 +154,7 @@ const AdminUserManage = () => {
         setUsers([]);
       }
     } catch (error) {
-      console.error('❌ 데이터 불러오기 실패:', error);
+      console.error(' 데이터 불러오기 실패:', error);
       setUsers([]);
     }
     setLoading(false);
@@ -136,6 +169,7 @@ const AdminUserManage = () => {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ id: id }),
       });
@@ -145,14 +179,13 @@ const AdminUserManage = () => {
       if (!response.ok) {
         throw new Error(result || `삭제 실패: ${response.status}`);
       }
-
       alert(' 유저가 삭제되었습니다.');
       handleSearch(); // 삭제 후 다시 검색
     } catch (error) {
       if (error.message.includes('이미 삭제된 유저')) {
-        alert('⚠️ 이미 삭제된 유저입니다.');
+        alert('이미 삭제된 유저입니다.');
       } else {
-        alert('❌ 삭제 실패');
+        alert('삭제 실패');
       }
     }
   };
@@ -183,6 +216,7 @@ const AdminUserManage = () => {
             handleClick={handleSearch} // 검색 버튼 클릭 시 handleSearch 실행
             handleChange={handleKeywordChange} // 검색어 입력 시 keyword 업데이트
             handleClearClick={handleClearKeyword} // 검색어 초기화 버튼
+            handleKeyPress={handleKeyPress}
             w={300}
             h={40}
           />
@@ -222,7 +256,6 @@ const AdminUserManage = () => {
                     c={'#FF7F50'}
                     fc={'white'}
                     f={() => {
-                      console.log('🟢 삭제 버튼 클릭됨! ID:', vo.id);
                       handleDeleteUser(vo.id);
                     }}
                   />

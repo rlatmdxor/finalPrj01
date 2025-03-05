@@ -13,10 +13,9 @@ public class WeightController {
     private final WeightService service;
 
     @PostMapping("enroll")
-    public String weightEnroll(@RequestBody WeightVo vo, @RequestHeader("Authorization") String authorization){
+    public void weightEnroll(@RequestBody WeightVo vo, @RequestHeader("Authorization") String authorization){
         try {
             service.weightEnroll(vo);
-            return "WEIGHT ENROLL SUCCESS";
         }
         catch (Exception e){
             throw new IllegalStateException("[ERROR] WEIGHT ENROLL FAIL..");
@@ -24,10 +23,10 @@ public class WeightController {
     }
 
     @PostMapping
-    public String getWeightByDate(@RequestBody WeightVo vo, @RequestHeader("Authorization") String authorization){
+    public WeightVo getWeightByDate(@RequestBody WeightVo vo, @RequestHeader("Authorization") String authorization){
         try {
-            String amount = service.getWeightByDate(vo);
-            return amount;
+            WeightVo weightVo = service.getWeightByDate(vo);
+            return weightVo;
         }
         catch (Exception e){
             throw new IllegalStateException("[ERROR] WEIGHT VIEW FAIL..");

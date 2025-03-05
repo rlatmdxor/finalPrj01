@@ -1,5 +1,6 @@
 package com.kh.healthcare.home;
 
+import com.kh.healthcare.banner.BannerVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
@@ -123,4 +124,13 @@ SELECT * FROM (
             WHERE ROWNUM <= 4
             """)
     List<ReviewVo> getReviewList();
+
+    @Select("""
+            SELECT IMAGE_URL
+            FROM BANNER
+            WHERE SHOW_YN = 'Y'
+            AND DEL_YN = 'N'
+            ORDER BY NO DESC
+            """)
+    List<BannerVo> getBannerList();
 }

@@ -3,8 +3,6 @@ package com.kh.healthcare.banner;
 import com.amazonaws.services.s3.AmazonS3;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kh.healthcare.Aws.FileUtil;
-import com.kh.healthcare.dashboard.SettingVo;
-import com.kh.healthcare.diet.meal.DietVo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
@@ -29,7 +27,6 @@ public class BannerController {
         try {
             if (f != null) {
                 String url = FileUtil.uploadFileToAwsS3(f , s3 , bucket);
-                System.out.println("url = " + url);
                 vo.setImageUrl(url);
             }
             service.bannerEnroll(vo);
@@ -41,9 +38,9 @@ public class BannerController {
     }
 
     @GetMapping
-    public List<BannerVo> getBannerList(){
+    public List<BannerVo> getBannerList(@RequestParam String showYn, @RequestParam String searchValue){
         try {
-            List<BannerVo> voList = service.getBannerList();
+            List<BannerVo> voList = service.getBannerList(showYn, searchValue);
             return voList;
         }
         catch (Exception e){
@@ -57,7 +54,6 @@ public class BannerController {
         try {
             if (f != null) {
                 String url = FileUtil.uploadFileToAwsS3(f , s3 , bucket);
-                System.out.println("url = " + url);
                 vo.setImageUrl(url);
             }
             service.bannerEdit(vo);
@@ -76,6 +72,17 @@ public class BannerController {
         catch (Exception e){
             e.printStackTrace();
             throw new IllegalStateException("[ERROR] BANNER DELETE FAIL..");
+        }
+    }
+
+    @PostMapping("delete")
+    public void multiDeleteBanner(@RequestBody List<String> no, @RequestHeader("Authorization") String authorization){
+        try {
+            service.multiDeleteBanner(no);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            throw new IllegalStateException("[ERROR] BANNER MULTI DELETE FAIL..");
         }
     }
 

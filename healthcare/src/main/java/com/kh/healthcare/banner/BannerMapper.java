@@ -25,35 +25,19 @@ public interface BannerMapper {
                 SEQ_BANNER.NEXTVAL
                 , #{writer}
                 , #{title}
-                , 'https://picsum.photos/1380/500'
+                , #{imageUrl}
                 , #{showYn}
             )
             """)
     void bannerEnroll(BannerVo vo);
 
-    @Select("""
-            SELECT
-                B.NO
-                , B.WRITER
-                , A.NICK
-                , B.TITLE
-                , B.IMAGE_URL
-                , B.SHOW_YN
-                , B.ENROLL_DATE
-                , B.MODIFY_DATE
-                , B.DEL_YN
-            FROM BANNER B
-            JOIN ADMIN A ON (B.WRITER = A.NO)
-            WHERE B.DEL_YN = 'N'
-            ORDER BY B.NO DESC
-            """)
-    List<BannerVo> getBannerList();
+    List<BannerVo> getBannerList(String showYn, String searchValue);
 
     @Update("""
             UPDATE BANNER
             SET TITLE = #{title}
                 , SHOW_YN = #{showYn}
-                , IMAGE_URL = 'https://picsum.photos/1380/500'
+                , IMAGE_URL = #{imageUrl}
                 , MODIFY_DATE = SYSDATE
             WHERE NO = #{no}
             AND DEL_YN = 'N'
@@ -67,4 +51,6 @@ public interface BannerMapper {
             WHERE NO = #{no}
             """)
     void deleteBanner(String no);
+
+    void multiDeleteBanner(List<String> no);
 }

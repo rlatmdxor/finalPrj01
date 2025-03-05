@@ -124,7 +124,146 @@ const getYearAvgWeight = async (memberNo, token) => {
   return weightData;
 };
 
+const getMemberHeight = async (token) => {
+  const resp = await fetch(`http://127.0.0.1:80/api/member/mypage`, {
+    method: 'GET',
+    headers: {
+      'content-type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!resp.ok) {
+    throw new Error(`HTTP ERROR !!! ${resp.status}`);
+  }
+
+  const data = resp.json();
+  return data;
+};
+
+const getTodayWater = async (memberNo, day, token) => {
+  const resp = await fetch(`http://127.0.0.1:80/api/water`, {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      memberNo: memberNo,
+      enrollDate: day,
+    }),
+  });
+  if (!resp.ok) {
+    throw new Error(`HTTP ERROR !!! ${resp.status}`);
+  }
+
+  const data = resp.json();
+  return data;
+};
+
+const enrollTodayWater = async (memberNo, day, inputData, token) => {
+  const resp = await fetch(`http://127.0.0.1:80/api/water/enroll`, {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      memberNo: memberNo,
+      enrollDate: day,
+      amount: inputData.amount,
+    }),
+  });
+  if (!resp.ok) {
+    throw new Error(`HTTP ERROR !!! ${resp.status}`);
+  }
+  const result = resp.status;
+  return result;
+};
+
+const getTodayWeight = async (memberNo, day, token) => {
+  const resp = await fetch(`http://127.0.0.1:80/api/weight`, {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      memberNo: memberNo,
+      enrollDate: day,
+    }),
+  });
+  if (!resp.ok) {
+    throw new Error(`HTTP ERROR !!! ${resp.status}`);
+  }
+  const data = resp.json();
+  return data;
+};
+
+const enrollTodayWeight = async (memberNo, day, inputData, token) => {
+  const resp = await fetch(`http://127.0.0.1:80/api/weight/enroll`, {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      memberNo: memberNo,
+      enrollDate: day,
+      amount: inputData.amount,
+    }),
+  });
+  if (!resp.ok) {
+    throw new Error(`HTTP ERROR !!! ${resp.status}`);
+  }
+  const result = resp.status;
+  return result;
+};
+
+const getTotalKcal = async (memberNo, day, token) => {
+  const resp = await fetch(`http://127.0.0.1:80/api/diet`, {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      memberNo: memberNo,
+      dietDay: day,
+    }),
+  });
+  if (!resp.ok) {
+    throw new Error(`HTTP ERROR !!! ${resp.status}`);
+  }
+  const data = resp.json();
+  return data;
+};
+
+const getMealData = async (memberNo, day, token) => {
+  const resp = await fetch(`http://127.0.0.1:80/api/diet`, {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      memberNo: memberNo,
+      dietDay: day,
+    }),
+  });
+  if (!resp.ok) {
+    throw new Error(`HTTP ERROR !!! ${resp.status}`);
+  }
+  const data = resp.json();
+  return data;
+};
+
 export {
+  getMemberHeight,
+  getTodayWater,
+  enrollTodayWater,
+  getTodayWeight,
+  enrollTodayWeight,
+  getMealData,
   getDayKcal,
   getDayWater,
   getDayWeight,

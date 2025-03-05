@@ -41,5 +41,17 @@ public interface BloodSugarMapper {
             WHERE NO = #{no}
             AND MEMBER_NO = #{memberNo}
             """)
+
     int bsDel(BloodSugarVo vo);
-}
+
+    void bsDel(BloodSugarVo vo);
+
+    @Select("""
+            SELECT COUNT(*)
+            FROM BLOOD_SUGAR
+            WHERE MEMBER_NO = #{userNo}
+            AND TRUNC(ENROLL_DATE) = TRUNC(SYSDATE)
+            """)
+    int checkTodayBloodSugar(String userNo);
+
+

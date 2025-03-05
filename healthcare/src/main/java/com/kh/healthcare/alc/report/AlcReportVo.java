@@ -4,8 +4,8 @@ import lombok.Data;
 
 @Data
 public class AlcReportVo {
-    private Long no;
-    private Long memberNo;
+    private String no;
+    private String memberNo;
     private String alcType;
     private Long abv;
     private Long cc;

@@ -18,8 +18,8 @@ public class BannerService {
         mapper.bannerEnroll(vo);
     }
 
-    public List<BannerVo> getBannerList() {
-        return mapper.getBannerList();
+    public List<BannerVo> getBannerList(String showYn, String searchValue) {
+        return mapper.getBannerList(showYn, searchValue);
     }
 
     public void bannerEdit(BannerVo vo) {
@@ -28,5 +28,9 @@ public class BannerService {
 
     public void deleteBanner(String no) {
         mapper.deleteBanner(no);
+    }
+
+    public void multiDeleteBanner(List<String> no) {
+        mapper.multiDeleteBanner(no);
     }
 }

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { BigTextDiv, SmallTextDiv } from './Diet';
 import Btn from '../../../util/Btn';
 import { open } from '../../../../redux/modalSlice';
@@ -8,51 +8,24 @@ import Input from '../../../util/Input';
 import { close } from '../../../../redux/modalSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import SmallCard from '../../../util/SmallCard';
+import { enrollTodayWeight } from '../../../services/dietService';
+import { setWeightAmount } from '../../../../redux/dietSlice';
 
-const TodayWeight = ({ reRender, setReRender }) => {
+const TodayWeight = ({ token }) => {
   const dispatch = useDispatch();
-  const token = localStorage.getItem('token');
+  const Swal = require('sweetalert2');
 
+  const memberNo = useSelector((state) => state.diet.memberNo);
   const day = useSelector((state) => state.diet.day);
 
-  const [amount, setAmount] = useState(0);
+  const amount = useSelector((state) => state.diet.weight);
 
-  const initialInputData = {
-    memberNo: '1',
-    enrollDate: day,
-    amount: 0,
-  };
-  const [inputData, setInputData] = useState(initialInputData);
-
-  useEffect(() => {
-    fetch('http://127.0.0.1:80/api/weight', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        memberNo: '1',
-        enrollDate: day,
-      }),
-    })
-      .then((resp) => resp.text())
-      .then((data) => {
-        if (data) {
-          setAmount(data);
-        } else {
-          setAmount(0);
-        }
-      });
-  }, [day, reRender]);
+  const [inputData, setInputData] = useState({ amount: 0 });
 
   const handleOpenWeightModal = () => {
-    setInputData((prev) => ({
-      ...prev,
-      enrollDate: day,
-      amount: amount,
+    setInputData(() => ({
+      amount: parseFloat(amount),
     }));
-
     dispatch(open({ title: '체중 등록', value: 'block' }));
   };
 
@@ -65,27 +38,47 @@ const TodayWeight = ({ reRender, setReRender }) => {
     });
   };
 
-  const handleSubmit = (e) => {
-    if (inputData.amount < 0) {
-      alert('0 이상 입력해주세요.');
+  const handleSubmit = () => {
+    const amountValue = Number(inputData.amount);
+
+    if (isNaN(amountValue) || amountValue <= 0) {
+      Swal.fire({
+        title: '0 이상 입력해주세요.',
+        confirmButtonText: '확인',
+      });
       return;
     }
 
-    fetch('http://127.0.0.1:80/api/weight/enroll', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(inputData),
-    })
-      .then((resp) => resp.text())
-      .then((data) => {
-        setAmount(inputData.amount);
-        setReRender(() => reRender + 1);
-        dispatch(close('체중 등록'));
-        alert('등록되었습니다.');
-      });
+    Swal.fire({
+      title: '등록하시겠습니까?',
+      showCancelButton: true,
+      confirmButtonText: '확인',
+      cancelButtonText: '취소',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const enrollWeight = async () => {
+          try {
+            const result = await enrollTodayWeight(memberNo, day, inputData, token);
+            if (result == 200) {
+              Swal.fire({
+                title: '등록되었습니다.',
+                confirmButtonText: '확인',
+              });
+              dispatch(setWeightAmount(amountValue));
+            } else {
+              Swal.fire({
+                title: '오류발생...',
+                confirmButtonText: '확인',
+              });
+            }
+          } catch (error) {
+            console.error('[ERROR] WEIGHT ENROLL FAIL', error);
+          }
+          dispatch(close('체중 등록'));
+        };
+        enrollWeight();
+      }
+    });
   };
 
   return (

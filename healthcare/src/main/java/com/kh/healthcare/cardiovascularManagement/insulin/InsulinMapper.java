@@ -71,6 +71,14 @@ public interface InsulinMapper {
             """)
     String[] findDisablePointList(String vo);
 
+    @Select("""
+            SELECT COUNT(*)
+            FROM INSULIN
+            WHERE MEMBER_NO = #{userNo}
+            AND TRUNC(ENROLL_DATE) = TRUNC(SYSDATE)
+            """)
+    int checkTodayInsulin(String userNo);
+
 //    @Update("""
 //            UPDATE INSULIN
 //            SET

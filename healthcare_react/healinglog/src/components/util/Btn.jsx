@@ -10,7 +10,8 @@ const CommonBtn = styled.button`
   border-radius: ${({ br }) => (br ? `${br}px` : '15px')};
   border: none;
   font-size: ${({ fs }) => (fs ? `${fs}px` : '17px')};
-  font-weight: bold;
+  /* font-weight: bold; */
+  font-family: 'goorm-sans-code';
   color: ${({ fc }) => (fc ? `${fc}` : 'black')};
   align-items: center;
   justify-content: center;

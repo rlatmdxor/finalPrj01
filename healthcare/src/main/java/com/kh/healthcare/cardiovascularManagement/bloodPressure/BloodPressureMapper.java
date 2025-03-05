@@ -46,4 +46,11 @@ public interface BloodPressureMapper {
             """)
     int bloodPressureDelete(BloodPressureVo vo);
 
+    @Select("""
+            SELECT COUNT(*)
+            FROM BLOOD_PRESSURE
+            WHERE MEMBER_NO = #{userNo}
+            AND TRUNC(ENROLL_DATE) = TRUNC(SYSDATE)
+            """)
+    int checkTodayBloodPressure(String userNo);
 }

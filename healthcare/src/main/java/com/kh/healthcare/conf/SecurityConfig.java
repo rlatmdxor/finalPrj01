@@ -18,8 +18,13 @@ public class SecurityConfig {
 
         //api로 시작하는 요청만 허용(나중엔 인증하게 바꿀거임)
         http.authorizeHttpRequests(auth->auth
+                //admin관련해서 주석쳐진부분은 실테스트시 주석 해제 요망
+//                .requestMatchers("/api/admin/login").permitAll()
                 .requestMatchers("/api/**").permitAll()
+//                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+//                .requestMatchers("/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
+
 //                .anyRequest().permitAll()
         );
 
@@ -32,6 +37,7 @@ public class SecurityConfig {
             conf.addAllowedMethod("DELETE");
             conf.addAllowedMethod("PUT");
             conf.addAllowedHeader("*");
+            conf.setAllowCredentials(true); // 웹소켓 때문에 해놈
             return conf;
         } ) );
 

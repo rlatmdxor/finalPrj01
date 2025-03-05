@@ -52,7 +52,7 @@ const Hospital = () => {
   const [selectedCity, setSelectedCity] = useState(null);
   const [selectedDistrict, setSelectedDistrict] = useState(null);
   const [selectedDong, setSelectedDong] = useState(null);
-  const [searchType, setSearchType] = useState('');
+  const [searchType, setSearchType] = useState('name');
   const [keyword, setKeyword] = useState('');
   const [hospitals, setHospitals] = useState([]);
   const [hospitalType, setHospitalType] = useState('');
@@ -63,7 +63,7 @@ const Hospital = () => {
   const currentPage = useSelector((state) => state.paging[boardType]?.currentPage || 1);
   const boardLimit = useSelector((state) => state.paging[boardType]?.boardLimit || 12);
 
-  // 📌 초기 페이징 상태 리셋
+  // 초기 페이징 상태 리셋
   useEffect(() => {
     dispatch(resetPaging({ boardType }));
   }, []);
@@ -72,7 +72,7 @@ const Hospital = () => {
     handleSearch(); // 초기 로딩 시 검색 실행
   }, []);
 
-  // 📌 시 데이터 가져오기
+  // 시 데이터 가져오기
   useEffect(() => {
     fetch('http://127.0.0.1/api/location/cities')
       .then((res) => res.json())
@@ -80,7 +80,7 @@ const Hospital = () => {
       .catch((error) => console.error('시 데이터 로드 실패:', error));
   }, []);
 
-  // 📌 군/구 데이터 가져오기
+  // 군/구 데이터 가져오기
   useEffect(() => {
     if (selectedCity) {
       fetch(`http://127.0.0.1/api/location/districts/${selectedCity}`)
@@ -92,7 +92,7 @@ const Hospital = () => {
     }
   }, [selectedCity]);
 
-  // 📌 동 데이터 가져오기
+  // 동 데이터 가져오기
   useEffect(() => {
     if (selectedDistrict) {
       fetch(`http://127.0.0.1/api/location/dongs/${selectedDistrict}`)
@@ -114,34 +114,30 @@ const Hospital = () => {
 
     try {
       let searchKeyword = keyword.trim();
-      let finalHospitalType = hospitalType.trim(); // 공백 제거
+      let finalHospitalType = hospitalType.trim(); // 병원과 값
       let finalSearchType = searchType.trim();
 
-      console.log('🔍 검색 실행 - hospitalType:', finalHospitalType); // 디버깅 로그
+      // 검색 키워드가 없고 시/구/동도 선택되지 않았을 경우
+      if (!searchKeyword && !selectedCity && !selectedDistrict && !selectedDong && finalHospitalType) {
+        finalSearchType = ''; // 검색 유형을 없애고 병원과(hospitalType)만으로 검색
+      }
 
+      // 검색 키워드가 없을 경우, 시/구/동 정보를 자동으로 검색어로 설정
       if (!searchKeyword) {
         const cityName = cities.find((c) => c.no === selectedCity)?.cityName || '';
         const districtName = districts.find((d) => d.no === selectedDistrict)?.districtName || '';
         const dongName = dongs.find((d) => d.no === selectedDong)?.dongName || '';
 
         searchKeyword = dongName || districtName || cityName;
-        finalSearchType = 'address';
+        finalSearchType = searchKeyword ? 'address' : ''; // 주소 검색 또는 빈 값 유지
       }
 
-      if (!searchKeyword) {
-        searchKeyword = '';
-        finalSearchType = '';
-        finalHospitalType = '';
-      }
-
-      // 📌 API 요청 URL 확인
+      // API 요청 URL
       const requestUrl = `http://127.0.0.1/api/hospital/search?hospitalType=${encodeURIComponent(
         finalHospitalType
       )}&searchType=${finalSearchType}&keyword=${encodeURIComponent(
         searchKeyword
       )}&page=${currentPage}&size=${boardLimit}`;
-
-      console.log('📡 API 요청 URL:', requestUrl); // 디버깅 로그
 
       const response = await fetch(requestUrl);
       if (!response.ok) {
@@ -149,6 +145,7 @@ const Hospital = () => {
       }
       const data = await response.json();
 
+      // 검색 결과를 상태값으로 저장
       dispatch(setTotalCount({ boardType: 'hospital', totalCount: data.totalElements || data.hospitals.length }));
       setHospitals(data.hospitals || []);
     } catch (error) {
@@ -158,12 +155,12 @@ const Hospital = () => {
     setLoading(false);
   };
 
-  // 📌 검색어 업데이트 핸들러
+  // 검색어 업데이트 핸들러
   const handleKeywordChange = (e) => {
     setKeyword(e.target.value);
   };
 
-  // 📌 검색어 초기화 핸들러
+  // 검색어 초기화 핸들러
   const handleClearKeyword = () => {
     setKeyword('');
   };
@@ -226,6 +223,8 @@ const Hospital = () => {
             <option value="">과 선택</option>
             <option value="내과">내과</option>
             <option value="이비인후과">이비인후과</option>
+            <option value="치과">치과</option>
+            <option value="안과">안과</option>
             <option value="외과">외과</option>
             <option value="정형외과">정형외과</option>
             <option value="신경외과">신경외과</option>
@@ -236,18 +235,16 @@ const Hospital = () => {
             <option value="산부인과">산부인과</option>
             <option value="가정의학과">가정의학과</option>
             <option value="비뇨의학과">비뇨의학과</option>
+            <option value="상급종합">상급종합</option>
           </SelectBox>
 
-          {/* 검색 옵션 */}
           <SelectBox value={searchType} onChange={(e) => setSearchType(e.target.value)}>
-            <option value="">검색 조건 선택</option>
             <option value="name">병원명</option>
             <option value="address">주소</option>
             <option value="tellNum">전화번호</option>
             <option value="postNum">우편번호</option>
           </SelectBox>
 
-          {/* SearchBar */}
           <SearchBar
             handleClick={handleSearch} // 검색 버튼 클릭 시 handleSearch 실행
             handleChange={handleKeywordChange} // 검색어 입력 시 keyword 업데이트
@@ -256,24 +253,26 @@ const Hospital = () => {
             h={40}
           />
         </SearchDiv>
+
         <Table>
           <thead>
             <tr>
               <th>병원명</th>
               <th>전화번호</th>
-              <th>우편번호</th>
+              {/* <th>우편번호</th> */}
               <th>주소</th>
-              <th>진단과</th>
+              {/* <th>진단과</th> */}
             </tr>
           </thead>
-          <tbody>
+
+          <tbody style={{ fontSize: '10px', color: '#ffffff' }}>
             {hospitals.map((hospital, idx) => (
               <tr key={idx}>
-                <td>{hospital.name}</td>
-                <td>{hospital.tellNum}</td>
-                <td>{hospital.postNum}</td>
+                <td width="195px">{hospital.name}</td>
+                <td width="110px">{hospital.tellNum}</td>
+                {/* <td width="110px">{hospital.postNum}</td> */}
                 <td>{hospital.address}</td>
-                <td>{hospital.hospitalType}</td>
+                {/* <td width="90px">{hospital.hospitalType}</td> */}
               </tr>
             ))}
           </tbody>
