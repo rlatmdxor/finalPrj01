@@ -71,4 +71,12 @@ public interface WaterMapper {
             ORDER BY ENROLL_DATE
             """)
     List<WaterVo> getYearAvgWater(int memberNo);
+
+    @Select("""
+            SELECT COUNT(*)
+            FROM WATER_LOG
+            WHERE MEMBER_NO = #{userNo}
+            AND TRUNC(ENROLL_DATE) = TRUNC(SYSDATE)
+            """)
+    int checkTodayWater(String userNo);
 }

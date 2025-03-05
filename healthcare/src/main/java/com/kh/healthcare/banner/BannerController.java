@@ -27,7 +27,6 @@ public class BannerController {
         try {
             if (f != null) {
                 String url = FileUtil.uploadFileToAwsS3(f , s3 , bucket);
-                System.out.println("url = " + url);
                 vo.setImageUrl(url);
             }
             service.bannerEnroll(vo);
@@ -40,8 +39,6 @@ public class BannerController {
 
     @GetMapping
     public List<BannerVo> getBannerList(@RequestParam String showYn, @RequestParam String searchValue){
-        System.out.println("showYn = " + showYn);
-        System.out.println("searchValue = " + searchValue);
         try {
             List<BannerVo> voList = service.getBannerList(showYn, searchValue);
             return voList;
@@ -57,7 +54,6 @@ public class BannerController {
         try {
             if (f != null) {
                 String url = FileUtil.uploadFileToAwsS3(f , s3 , bucket);
-                System.out.println("url = " + url);
                 vo.setImageUrl(url);
             }
             service.bannerEdit(vo);
@@ -81,7 +77,6 @@ public class BannerController {
 
     @PostMapping("delete")
     public void multiDeleteBanner(@RequestBody List<String> no, @RequestHeader("Authorization") String authorization){
-        System.out.println("noList = " + no);
         try {
             service.multiDeleteBanner(no);
         }
