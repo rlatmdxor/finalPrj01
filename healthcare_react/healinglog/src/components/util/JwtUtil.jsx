@@ -14,12 +14,11 @@ const getPayload = (token, key) => {
 function isTokenExpired(token) {
   try {
     // JWT 디코딩
-    const decodedToken = jwt_decode(token);
+    const decodedToken = jwtDecode(token);
 
     // 현재 시간(초 단위)
     const currentTime = Date.now() / 1000;
 
-    // 토큰의 만료 시간 확인 (exp는 JWT에서 초 단위로 제공)
     if (decodedToken.exp < currentTime) {
       return true; // 토큰이 만료됨
     } else {
