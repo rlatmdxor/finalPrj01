@@ -376,33 +376,69 @@ const AlcReport = () => {
   };
 
   // 인풋 입력값 보내기
+
   const handleSubmit = (e) => {
-    fetch('http://127.0.0.1:80/api/alc/report/write', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(inputData),
-    })
-      .then((resp) => resp.text())
-      .then((data) => {});
-    setNum(num - 1);
-    // 입력 후 모달 창 닫기
-    dispatch(close(e.target.title));
-    alert('등록완료');
+    Swal.fire({
+      title: '등록하시겠습니까?',
+      icon: 'warning', // 아이콘 유형 (success, warning, error 등)
+      showCancelButton: true, // 취소 버튼 표시
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: '등록',
+      cancelButtonText: '취소',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        fetch('http://127.0.0.1:80/api/alc/report/write', {
+          method: 'POST',
+          headers: {
+            'content-type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(inputData),
+        })
+          .then((resp) => {
+            if (!resp.ok) {
+              throw new Error(`HTTP error! Status: ${resp.status}`);
+            }
+            return resp.text();
+          })
+          .then((data) => {
+            // 실제 등록이 성공적으로 처리되었다면 성공 알림을 띄움
+            Swal.fire({
+              title: '등록 완료!',
+              text: '등록이 성공적으로 처리되었습니다.',
+              icon: 'success',
+              confirmButtonColor: '#3085d6',
+            }).then(() => {
+              // 모달 닫기
+              dispatch(close(e.target.title));
+              // 페이지 새로고침 등 필요한 추가 동작
+              window.location.reload();
+            });
+          })
+          .catch((error) => {
+            console.error('등록 실패:', error);
+            Swal.fire({
+              title: '등록 실패',
+              text: '오류가 발생했습니다. 다시 시도해주세요.',
+              icon: 'error',
+              confirmButtonColor: '#d33',
+            });
+          });
+      }
+    });
   };
 
   //수정모달
   const handleEditSubmit = (e) => {
     Swal.fire({
-      title: '수정하시겠습니까?', // 제목
-      icon: 'success', // 아이콘 유형 (warning, success, error 등)
-      showCancelButton: true, // 취소 버튼 표시
-      confirmButtonColor: '#3085d6', // 등록 버튼 색상
-      cancelButtonColor: '#d33', // 취소 버튼 색상
-      confirmButtonText: '수정', // 등록 버튼 텍스트
-      cancelButtonText: '취소', // 취소 버튼 텍스트
+      title: '수정하시겠습니까?',
+      icon: 'warning', // 아이콘 유형
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: '수정',
+      cancelButtonText: '취소',
     }).then((result) => {
       if (result.isConfirmed) {
         fetch('http://127.0.0.1:80/api/alc/report/update', {
@@ -417,48 +453,90 @@ const AlcReport = () => {
             if (!resp.ok) {
               throw new Error(`HTTP error! Status: ${resp.status}`);
             }
-            return resp.text(); // 또는 .json() (응답 형식에 따라)
+            return resp.text(); // 또는 resp.json()
           })
           .then((data) => {
-            console.log('수정 완료:', data);
+            // 수정 성공 시 다시 알림 표시
+            Swal.fire({
+              title: '수정 완료!',
+              text: '수정이 성공적으로 처리되었습니다.',
+              icon: 'success',
+              confirmButtonColor: '#3085d6',
+            }).then(() => {
+              // 모달 닫기
+              dispatch(close('음주 수정'));
+              // 필요 시 페이지 새로고침
+              // window.location.reload();
+            });
           })
           .catch((error) => {
             console.error('수정 실패:', error);
+            // 수정 실패 시 알림
+            Swal.fire({
+              title: '수정 실패',
+              text: '오류가 발생했습니다. 다시 시도해주세요.',
+              icon: 'error',
+              confirmButtonColor: '#d33',
+            });
           });
       }
     });
-    Swal.fire({
-      icon: 'success',
-      title: '작성 완료.',
-      confirmButtonText: '확인',
-    });
-
-    dispatch(close('음주 수정'));
   };
+
   //삭제모달
+
   const handleDeleteSubmit = (e) => {
-    fetch('http://127.0.0.1/api/alc/report/delete', {
-      method: 'DELETE',
-      headers: {
-        'content-type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(inputData),
-    })
-      .then((resp) => {
-        if (!resp.ok) {
-          throw new Error(`HTTP error! Status: ${resp.status}`);
-        }
-        return resp.text(); // 또는 .json() (응답 형식에 따라)
-      })
-      .then((data) => {
-        console.log('삭제 완료:', data);
-      })
-      .catch((error) => {
-        console.error('삭제 실패:', error);
-      });
-    //창닫기
-    dispatch(close('음주 수정'));
+    Swal.fire({
+      title: '삭제하시겠습니까?',
+      icon: 'warning', // 경고 아이콘
+      showCancelButton: true, // 취소 버튼 표시
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: '삭제',
+      cancelButtonText: '취소',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // 삭제 fetch 호출
+        fetch('http://127.0.0.1/api/alc/report/delete', {
+          method: 'DELETE',
+          headers: {
+            'content-type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(inputData),
+        })
+          .then((resp) => {
+            if (!resp.ok) {
+              throw new Error(`HTTP error! Status: ${resp.status}`);
+            }
+            return resp.text(); // 또는 resp.json()
+          })
+          .then((data) => {
+            // 삭제 성공 시 메시지
+            Swal.fire({
+              title: '삭제 완료!',
+              text: '데이터가 삭제되었습니다.',
+              icon: 'success',
+              confirmButtonColor: '#3085d6',
+            }).then(() => {
+              // 모달 닫기
+              dispatch(close('음주 수정'));
+              // 필요 시 페이지 새로고침
+              window.location.reload();
+            });
+          })
+          .catch((error) => {
+            console.error('삭제 실패:', error);
+            // 삭제 실패 시 메시지
+            Swal.fire({
+              title: '삭제 실패',
+              text: '오류가 발생했습니다. 다시 시도해주세요.',
+              icon: 'error',
+              confirmButtonColor: '#d33',
+            });
+          });
+      }
+    });
   };
 
   // datasetData에서 가장 큰 값 찾기
