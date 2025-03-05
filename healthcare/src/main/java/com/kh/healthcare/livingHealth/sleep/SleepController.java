@@ -22,7 +22,7 @@ public class SleepController {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
 
     @PostMapping("write")
-    public String write(@RequestBody  SleepVo vo){
+    public String write(@RequestHeader ("Authorization") String token, @RequestBody  SleepVo vo){
         LocalTime sleepStart = LocalTime.parse(vo.getSleepStart(), formatter);
         LocalTime sleepEnd = LocalTime.parse(vo.getSleepEnd(), formatter);
         long betweenTime = ChronoUnit.MINUTES.between(sleepStart, sleepEnd);
@@ -31,20 +31,19 @@ public class SleepController {
         }
         String sleepMinutes = String.valueOf(betweenTime);
         vo.setSleepDuration(sleepMinutes);
-        service.write(vo);
+        service.write(token, vo);
         return "write ok~~~";
     }
 
     @PostMapping("list")
-    public List<SleepVo> list (){
-       List<SleepVo> voList =  service.list();
+    public List<SleepVo> list (@RequestHeader ("Authorization") String token){
+       List<SleepVo> voList =  service.list(token);
 
         return voList;
     }
 
     @PostMapping("edit")
-    public String edit(@RequestBody SleepVo vo){
-        System.out.println("vo = " + vo);
+    public String edit(@RequestHeader ("Authorization") String token, @RequestBody SleepVo vo){
         LocalTime sleepStart = LocalTime.parse(vo.getSleepStart(), formatter);
         LocalTime sleepEnd = LocalTime.parse(vo.getSleepEnd(), formatter);
 
@@ -56,8 +55,7 @@ public class SleepController {
 
 
         vo.setSleepDuration(sleepMinutes);
-        System.out.println("vo = " + vo);
-        service.edit(vo);
+        service.edit(token, vo);
         return "edit ok ~~~";
     }
 

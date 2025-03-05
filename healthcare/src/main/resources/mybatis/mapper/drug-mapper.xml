@@ -31,7 +31,7 @@
             SET
                 DEL_YN = 'Y',
                 DEL_TIME = SYSDATE
-        WHERE MEMBER = '1'
+        WHERE MEMBER = #{userNo}
         AND NO IN
         <foreach item="item" collection="vo" open="(" separator="," close=")">
             #{item}
@@ -40,7 +40,7 @@
 
     <delete id="removeDrug">
         DELETE USER_MEDICATION
-        WHERE MEMBER ='1'
+        WHERE MEMBER = #{userNo}
         AND NO IN
         <foreach item="item" collection="vo" open="(" separator="," close=")">
             #{item}

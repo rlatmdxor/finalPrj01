@@ -13,6 +13,14 @@ import Table from '../../../util/Table';
 import ContentLayout from '../../../util/ContentLayout';
 import Pagination from '../../../util/Pagination';
 import { addDays, addMonths, endOfMonth, startOfDay, startOfMonth, startOfYear, subYears } from 'date-fns';
+import Swal from 'sweetalert2';
+import { useNavigate } from 'react-router-dom';
+import { isTokenExpired, getRoleFromToken } from '../../util/JwtUtil';
+
+const BottomDiv = styled.div`
+  margin-top: 25px;
+  margin-bottom: 35px;
+`;
 
 const YearContainer = styled.div`
   display: flex;
@@ -36,6 +44,25 @@ const ModalContainer = styled.div`
 `;
 
 const Sleep = () => {
+  const token = localStorage.getItem('token');
+  const navi = useNavigate();
+  const [isAuthorized, setIsAuthorized] = useState(false); // 로그인 여부 체크
+
+  useEffect(() => {
+    if (!token || isTokenExpired(token) || getRoleFromToken(token) == 'ROLE_ADMIN') {
+      window.localStorage.removeItem('token'); // 토큰 삭제
+      navi('/login'); // 로그인 페이지로 이동
+      Swal.fire({
+        icon: 'warning',
+        title: '로그인이 필요합니다',
+        text: '로그인 후 이용해주세요',
+        confirmButtonText: '확인',
+      });
+    } else {
+      setIsAuthorized(true); // 로그인 성공 시 데이터 요청 가능
+    }
+  }, [navi, token]);
+
   const [dataVoList, setDataVoList] = useState([]);
   const [chartVoList, setChartVoList] = useState([]);
   const [num, setNum] = useState(0);
@@ -52,6 +79,7 @@ const Sleep = () => {
     method: 'post',
     headers: {
       'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(inputData),
   };
@@ -225,6 +253,9 @@ const Sleep = () => {
   }, [dataVoList.length, state]);
 
   useEffect(() => {
+    if (!isAuthorized) {
+      return;
+    }
     fetch(`${url}list`, options)
       .then((resp) => resp.json())
       .then((data) => {
@@ -237,7 +268,7 @@ const Sleep = () => {
         setDataVoList(data);
         setChartVoList(data);
       });
-  }, [num]);
+  }, [num, isAuthorized, token]);
   chartVoList.sort((a, b) => new Date(b.day) - new Date(a.day));
 
   const getChartData = () => {
@@ -319,23 +350,98 @@ const Sleep = () => {
   };
 
   const handleSubmit = (e) => {
-    fetch(`${url}write`, options)
-      .then((resp) => resp.text())
-      .then((data) => {
-        setNum((prev) => prev + 1);
+    if (!isAuthorized) {
+      return;
+    }
+    if (inputData.recordDate === '' && inputData.sleepStart === '' && inputData.sleepEnd === '') {
+      Swal.fire({
+        icon: 'warning',
+        title: '작성해주세요.',
+        confirmButtonText: '확인',
       });
 
-    dispatch(close(e.target.title));
+      return;
+    }
+
+    if (inputData.recordDate === '') {
+      Swal.fire({
+        icon: 'warning',
+        title: '날짜를 선택하세요.',
+        confirmButtonText: '확인',
+      });
+
+      return;
+    }
+    if (inputData.sleepStart === '') {
+      Swal.fire({
+        icon: 'warning',
+        title: '수면 시작 시간을 입력하세요.',
+        confirmButtonText: '확인',
+      });
+
+      return;
+    }
+    if (inputData.sleepEnd === '') {
+      Swal.fire({
+        icon: 'warning',
+        title: '수면 종료 시간을 입력하세요.',
+        confirmButtonText: '확인',
+      });
+
+      return;
+    }
+    Swal.fire({
+      title: '등록하시겠습니까?', // 제목
+      icon: 'success', // 아이콘 유형 (warning, success, error 등)
+      showCancelButton: true, // 취소 버튼 표시
+      confirmButtonColor: '#3085d6', // 등록 버튼 색상
+      cancelButtonColor: '#d33', // 취소 버튼 색상
+      confirmButtonText: '등록', // 등록 버튼 텍스트
+      cancelButtonText: '취소', // 취소 버튼 텍스트
+    }).then((result) => {
+      if (result.isConfirmed) {
+        fetch(`${url}write`, options)
+          .then((resp) => resp.text())
+          .then((data) => {
+            setNum((prev) => prev + 1);
+          });
+
+        dispatch(close(e.target.title));
+      }
+    });
   };
 
   const handleEditSubmit = (e) => {
-    fetch(`${url}edit`, options)
-      .then((resp) => resp.text())
-      .then((data) => {
-        setNum((prev) => prev + 1);
-      });
+    if (!isAuthorized) {
+      return;
+    }
 
-    dispatch(close(e.target.title));
+    Swal.fire({
+      title: '수정하시겠습니까?', // 제목
+      icon: 'success', // 아이콘 유형 (warning, success, error 등)
+      showCancelButton: true, // 취소 버튼 표시
+      confirmButtonColor: '#3085d6', // 등록 버튼 색상
+      cancelButtonColor: '#d33', // 취소 버튼 색상
+      confirmButtonText: '수정', // 등록 버튼 텍스트
+      cancelButtonText: '취소', // 취소 버튼 텍스트
+    }).then((result) => {
+      if (result.isConfirmed) {
+        //패치 넣기
+
+        fetch(`${url}edit`, options)
+          .then((resp) => resp.text())
+          .then((data) => {
+            setNum((prev) => prev + 1);
+            Swal.fire({
+              icon: 'warning',
+              title: '수정 완료.',
+              confirmButtonText: '확인',
+            });
+          });
+
+        dispatch(close(e.target.title));
+      }
+    });
   };
 
   const handleMinusYear = () => {
@@ -452,7 +558,13 @@ const Sleep = () => {
           )}
           <div onClick={handlePlusYear}>{'>'}</div>
         </YearContainer>
-        <DateBtn dataBtn={dataBtn} onSelect={setSelectedRange} line={'Bar'} onChange={setSelectChart}></DateBtn>
+        <DateBtn
+          dataBtn={dataBtn}
+          onSelect={setSelectedRange}
+          line={'Line'}
+          onChange={setSelectChart}
+          setState={setState}
+        ></DateBtn>
         <Chart
           chartType={selectChart}
           labels={label()}
@@ -505,7 +617,9 @@ const Sleep = () => {
             })}
           </tbody>
         </Table>
-        <Pagination boardType={boardType}></Pagination>
+        <BottomDiv>
+          <Pagination boardType={boardType}></Pagination>
+        </BottomDiv>
       </ContentLayout>
     </>
   );
