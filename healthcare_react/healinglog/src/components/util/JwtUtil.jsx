@@ -30,4 +30,16 @@ function isTokenExpired(token) {
   }
 }
 
-export { getPayload, isTokenExpired };
+function getRoleFromToken(token) {
+  try {
+    // JWT 디코딩
+    const decodedToken = jwtDecode(token);
+
+    return decodedToken.role;
+  } catch (error) {
+    console.error('JWT 디코딩 실패:', error);
+    return null; // 디코딩 실패 시 null 반환
+  }
+}
+
+export { getPayload, isTokenExpired, getRoleFromToken };
