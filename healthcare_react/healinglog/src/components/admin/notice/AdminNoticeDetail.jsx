@@ -248,7 +248,6 @@ const AdminNoticeDetail = () => {
           const contentState = convertFromRaw(JSON.parse(data.detailVo.content));
           setEditorState(EditorState.createWithContent(contentState));
         }
-        setIsAdmin(data.isAdmin);
       } catch (error) {
         console.error('데이터 불러오기 오류:', error);
       }
