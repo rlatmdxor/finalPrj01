@@ -8,6 +8,8 @@ import SearchBar from '../../../util/SearchBar';
 import Table from '../../../util/Table';
 import { useNavigate } from 'react-router-dom';
 import { FaStar } from 'react-icons/fa';
+import { isTokenExpired, getRoleFromToken } from '../../../util/JwtUtil';
+import Swal from 'sweetalert2';
 
 const SearchDiv = styled.div`
   display: flex;
@@ -36,9 +38,24 @@ const BottomDiv = styled.div`
   justify-content: space-between;
   align-items: center;
 `;
+const LayDiv = styled.div`
+  height: 40px;
+`;
 
 const HospitalReview = () => {
+  const navi = useNavigate();
   const token = localStorage.getItem('token');
+  useEffect(() => {
+    if (!token || isTokenExpired(token)) {
+      setIsLogin(false);
+    }
+    if (getRoleFromToken(token) == 'ROLE_ADMIN') {
+      setIsAdmin(true);
+    }
+    if (!token || isTokenExpired(token)) {
+      setIsLogin(false);
+    }
+  }, [navi, token]);
 
   const boardType = 'review';
   const initstate = {
@@ -51,6 +68,8 @@ const HospitalReview = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isLogin, setIsLogin] = useState(true);
   const [dataVoList, setVoList] = useState([]);
   const [pagedData, setPagedData] = useState([]);
   const [searchInput, setSearchInput] = useState(initstate);
@@ -137,6 +156,19 @@ const HospitalReview = () => {
       };
     });
   };
+  const handleNaviDetail = (e, no) => {
+    const bno = no;
+    if (isLogin == false) {
+      navigate(`/review`);
+      Swal.fire({
+        icon: 'error',
+        title: 'ERROR',
+        text: '로그인해주세요',
+      });
+    } else if (isLogin === true) {
+      navigate(`/review/detail?bno=${bno}`);
+    }
+  };
 
   return (
     <>
@@ -170,7 +202,7 @@ const HospitalReview = () => {
         <tbody>
           {pagedData.map((vo) => {
             return (
-              <tr key={vo.no} onClick={() => navigate(`/review/detail?bno=${vo.no}`)}>
+              <tr key={vo.no} value={vo.no} onClick={(e) => handleNaviDetail(e, vo.no)}>
                 <td>{vo.name}</td>
                 <td>
                   {vo.title}({vo.commentCount})
@@ -201,10 +233,15 @@ const HospitalReview = () => {
         <div>
           <Pagination boardType={boardType} />
         </div>
-        <div>
-          <Btn str={'등록'} c={'#FF7F50'} fc={'#ffffff'} h={'40'} f={() => navigate('/review/write')} />
-        </div>
+        {isLogin ? (
+          <div>
+            <Btn str={'등록'} mr={'0'} c={'#FF7F50'} fc={'#ffffff'} f={() => navigate('/review/write')} />
+          </div>
+        ) : (
+          <LayDiv></LayDiv>
+        )}
       </BottomDiv>
+      <LayDiv />
     </>
   );
 };

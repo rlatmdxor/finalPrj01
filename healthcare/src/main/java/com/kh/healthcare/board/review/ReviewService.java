@@ -1,6 +1,8 @@
 package com.kh.healthcare.board.review;
 
 import com.kh.healthcare.board.honeyTip.HoneyTipAttachVo;
+import com.kh.healthcare.board.honeyTip.HoneyTipCommentVo;
+import com.kh.healthcare.board.honeyTip.HoneyTipVo;
 import com.kh.healthcare.board.honeyTip.SearchFilterVo;
 import com.kh.healthcare.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -163,5 +165,64 @@ public class ReviewService {
             }
         }
         return result1*result2;
+    }
+
+    public List<ReviewReportVo> reportedList() {
+        return mapper.reportedList();
+    }
+
+    public int reportedReviewDel(String[] numList, String token) {
+        token = token.replace("Bearer ", "");
+        String memberNo = jwtUtil.getNo(token);
+
+        if(numList.length < 1){
+            throw new IllegalStateException("CODE [REPORTED / REVIEW / DELETE ]");
+        }
+        ReviewVo vo = new ReviewVo();
+
+
+        int result = 0;
+        for (String no : numList) {
+            vo.setNo(no);
+            mapper.deleteReview(vo);
+            mapper.deleteReportedReview(vo);
+            result++;
+        }
+        return result;
+    }
+
+    public List<ReviewCommentReportVo> reportedCommentList() {
+        return mapper.reportedCommentList();
+    }
+
+    public int reportedReviewCommentDel(String[] numList, String token) {
+        token = token.replace("Bearer ", "");
+        String memberNo = jwtUtil.getNo(token);
+
+        if(numList.length < 1){
+            throw new IllegalStateException("CODE [REPORTED / REVIEW / COMMENT / DELETE ]");
+        }
+        ReviewCommentVo vo = new ReviewCommentVo();
+
+
+        int result = 0;
+        for (String no : numList) {
+            vo.setNo(no);
+            mapper.commentDelete(vo);
+            mapper.deleteReportedReviewComment(vo);
+            result++;
+        }
+        return result;
+    }
+
+    public int commentReport(ReviewCommentReportVo vo, String token) {
+        token = token.replace("Bearer ", "");
+        String memberNo = jwtUtil.getNo(token);
+        vo.setMemberNo(memberNo);
+        int type = Integer.parseInt(vo.getReportType());
+        if (type < 1 || type > 9) {
+            throw new IllegalStateException("CODE [ REVIEW / COMMENT / REPORT ]");
+        }
+        return mapper.commentReport(vo);
     }
 }

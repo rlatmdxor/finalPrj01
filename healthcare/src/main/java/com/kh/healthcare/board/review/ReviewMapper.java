@@ -1,10 +1,7 @@
 package com.kh.healthcare.board.review;
 
 import com.kh.healthcare.board.honeyTip.SearchFilterVo;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 @Mapper
@@ -100,7 +97,6 @@ public interface ReviewMapper {
             SET
                 DEL_YN = 'Y'
             WHERE NO = #{no}
-            AND MEMBER_NO = #{memberNo}
             """)
     int deleteReview(ReviewVo vo);
 
@@ -127,8 +123,6 @@ public interface ReviewMapper {
             SET
                 DEL_YN = 'Y'
             WHERE NO = #{no}
-            AND MEMBER_NO = #{memberNo}
-            AND REVIEW_NO = #{reviewNo}
             """)
     int commentDelete(ReviewCommentVo vo);
 
@@ -186,4 +180,76 @@ public interface ReviewMapper {
             )
             """)
     int editAttachReview(ReviewAttachVo attachVo, String bno);
+
+
+    @Select("""
+            SELECT
+                MIN(R.NO) AS NO,
+                B.TITLE,
+                R.REPORT_TYPE,
+                RT.NAME AS NAME,
+                R.REVIEW_NO,
+                R.MEMBER_NO,
+                TO_CHAR(MIN(R.ENROLL_DATE), 'YYYY-MM-DD-HH24:MI') AS ENROLL_DATE,
+                M.NICK,
+                COUNT(*) AS REPORT_COUNT
+            FROM REPORTED_REVIEW R
+            JOIN REPORT_TYPE RT ON R.REPORT_TYPE = RT.NO
+            JOIN REVIEW_BOARD B ON ( R.REVIEW_NO = B.NO )
+            JOIN MEMBER M ON B.MEMBER_NO = M.NO
+            GROUP BY R.REVIEW_NO, R.REPORT_TYPE, RT.NAME, R.MEMBER_NO, M.NICK , B.TITLE
+            ORDER BY NO DESC
+            """)
+    List<ReviewReportVo> reportedList();
+
+    @Delete("""
+            DELETE REPORTED_REVIEW
+            WHERE REVIEW_NO = #{no}
+            """)
+    void deleteReportedReview(ReviewVo vo);
+
+    @Select("""
+            SELECT
+                MIN(RBC.NO) AS NO,
+                BC.CONTENT,
+                RBC.REPORT_TYPE,
+                RT.NAME AS NAME,
+                RBC.COMMENT_NO,
+                BC.REVIEW_NO,
+                RBC.MEMBER_NO,
+                TO_CHAR(MIN(RBC.ENROLL_DATE), 'YYYY-MM-DD-HH24:MI') AS ENROLL_DATE,
+                M.NICK,
+                COUNT(*) AS REPORT_COUNT
+            FROM REPORTED_REVIEW_COMMENT RBC
+            JOIN REPORT_TYPE RT ON RBC.REPORT_TYPE = RT.NO
+            JOIN REVIEW_COMMENT BC ON ( RBC.COMMENT_NO = BC.NO )
+            JOIN MEMBER M ON BC.MEMBER_NO = M.NO
+            GROUP BY RBC.COMMENT_NO, RBC.REPORT_TYPE, RT.NAME, RBC.MEMBER_NO, M.NICK , BC.CONTENT , BC.REVIEW_NO
+            ORDER BY NO DESC
+            """)
+    List<ReviewCommentReportVo> reportedCommentList();
+
+    @Delete("""
+            DELETE REPORTED_REVIEW_COMMENT
+            WHERE COMMENT_NO = #{no}
+            """)
+    void deleteReportedReviewComment(ReviewCommentVo vo);
+
+    @Insert("""
+            INSERT INTO REPORTED_REVIEW_COMMENT
+            (
+                NO
+                , REPORT_TYPE
+                , COMMENT_NO
+                , MEMBER_NO
+            )
+            VALUES
+            (
+                SEQ_REPORTED_REVIEW_COMMENT.NEXTVAL
+                , #{reportType}
+                , #{commentNo}
+                , #{memberNo}
+            )
+            """)
+    int commentReport(ReviewCommentReportVo vo);
 }

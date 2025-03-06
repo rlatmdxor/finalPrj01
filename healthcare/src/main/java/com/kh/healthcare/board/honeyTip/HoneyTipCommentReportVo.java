@@ -9,4 +9,9 @@ public class HoneyTipCommentReportVo {
     private String commentNo;
     private String memberNo;
     private String enrollDate;
+    private String nick;
+    private String reportCount;
+    private String name;
+    private String content;
+    private String boardNo;
 }

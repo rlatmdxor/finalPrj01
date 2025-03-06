@@ -14,6 +14,8 @@ import Modal from '../../../util/Modal';
 import InputTag from '../../../util/Input';
 import { close, open } from '../../../../redux/modalSlice';
 import Swal from 'sweetalert2';
+import { isTokenExpired, getRoleFromToken } from '../../../util/JwtUtil';
+import { useNavigate } from 'react-router-dom';
 
 //모달 밖의 버튼 컨테이너
 const BtnContainer = styled.div`
@@ -42,11 +44,22 @@ const NaviContainer = styled.div`
 `;
 
 const BloodSugar = () => {
+  const navi = useNavigate();
   const token = localStorage.getItem('token');
-  if (!token) {
-    alert('로그인 정보가 없습니다.');
-    window.location.href = '/login';
-  }
+  useEffect(() => {
+    if (!token || isTokenExpired(token) || getRoleFromToken(token) == 'ROLE_ADMIN') {
+      window.localStorage.removeItem('token');
+      navi('/login');
+      Swal.fire({
+        icon: 'warning',
+        title: '로그인이 필요합니다',
+        text: '로그인 후 이용해주세요',
+        confirmButtonText: '확인',
+      });
+    } else {
+      setIsAuthorized(true);
+    }
+  }, [navi, token]);
 
   const url = 'http://127.0.0.1:80/api/bloodSugar/list';
 
@@ -60,13 +73,16 @@ const BloodSugar = () => {
   const [filteredData, setFilteredData] = useState([]); // 차트용 필터링 데이터
   const [selectedRange, setSelectedRange] = useState('주'); // 기본값 '일'
   const [selectChart, setSelectChart] = useState('Line'); // 그래프 모양 정하는 state
-
+  const [isAuthorized, setIsAuthorized] = useState(false);
   const boardType = 'bloodSugar';
   const { currentPage, boardLimit } = useSelector((state) => state.paging[boardType] || {});
   const offset = (currentPage - 1) * boardLimit;
 
   // fetch실행
   useEffect(() => {
+    if (!isAuthorized) {
+      return;
+    }
     fetch(url, options)
       .then((resp) => resp.json())
       .then((data) => {

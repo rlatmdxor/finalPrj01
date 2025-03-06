@@ -10,4 +10,7 @@ public class HoneyTipReportVo {
     private String memberNo;
     private String enrollDate;
     private String nick;
+    private String reportCount;
+    private String name;
+    private String title;
 }

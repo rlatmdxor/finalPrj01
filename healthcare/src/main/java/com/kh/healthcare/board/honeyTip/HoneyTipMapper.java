@@ -132,7 +132,6 @@ public interface HoneyTipMapper {
             SET
                 DEL_YN = 'Y'
             WHERE NO = #{no}
-            AND MEMBER_NO = #{memberNo}
             """)
     int deleteHoneyTip(HoneyTipVo vo);
 
@@ -159,8 +158,6 @@ public interface HoneyTipMapper {
             SET
                 DEL_YN = 'Y'
             WHERE NO = #{no}
-            AND MEMBER_NO = #{memberNo}
-            AND BOARD_NO = #{boardNo}
             """)
     int commentDelete(HoneyTipCommentVo vo);
 
@@ -171,7 +168,7 @@ public interface HoneyTipMapper {
                 NO
                 , REPORT_TYPE
                 , COMMENT_NO
-                , MEMBER
+                , MEMBER_NO
             )
             VALUES
             (
@@ -251,6 +248,59 @@ public interface HoneyTipMapper {
             """)
     int checkNewComment(String userNo);
 
+    @Select("""
+            SELECT
+                MIN(R.NO) AS NO,
+                B.TITLE,
+                R.REPORT_TYPE,
+                RT.NAME AS NAME,
+                R.BOARD_NO,
+                R.MEMBER_NO,
+                TO_CHAR(MIN(R.ENROLL_DATE), 'YYYY-MM-DD-HH24:MI') AS ENROLL_DATE,
+                M.NICK,
+                COUNT(*) AS REPORT_COUNT
+            FROM REPORTED_HONEY_TIP R
+            JOIN REPORT_TYPE RT ON R.REPORT_TYPE = RT.NO
+            JOIN BOARD B ON ( R.BOARD_NO = B.NO )
+            JOIN MEMBER M ON B.MEMBER_NO = M.NO
+            GROUP BY R.BOARD_NO, R.REPORT_TYPE, RT.NAME, R.MEMBER_NO, M.NICK , B.TITLE
+            ORDER BY NO DESC
+            """)
+    List<HoneyTipReportVo> reportedList();
+
+    @Delete("""
+            DELETE REPORTED_HONEY_TIP
+            WHERE BOARD_NO = #{no}
+            """)
+    void deleteReportedHoneyTip(HoneyTipVo vo);
+
+
+    @Select("""
+            SELECT
+                MIN(RBC.NO) AS NO,
+                BC.CONTENT,
+                RBC.REPORT_TYPE,
+                RT.NAME AS NAME,
+                RBC.COMMENT_NO,
+                BC.BOARD_NO,
+                RBC.MEMBER_NO,
+                TO_CHAR(MIN(RBC.ENROLL_DATE), 'YYYY-MM-DD-HH24:MI') AS ENROLL_DATE,
+                M.NICK,
+                COUNT(*) AS REPORT_COUNT
+            FROM REPORTED_BOARD_COMMENT RBC
+            JOIN REPORT_TYPE RT ON RBC.REPORT_TYPE = RT.NO
+            JOIN BOARD_COMMENT BC ON ( RBC.COMMENT_NO = BC.NO )
+            JOIN MEMBER M ON BC.MEMBER_NO = M.NO
+            GROUP BY RBC.COMMENT_NO, RBC.REPORT_TYPE, RT.NAME, RBC.MEMBER_NO, M.NICK , BC.CONTENT , BC.BOARD_NO
+            ORDER BY NO DESC
+            """)
+    List<HoneyTipCommentReportVo> reportedCommentList();
+
+    @Delete("""
+            DELETE REPORTED_BOARD_COMMENT
+            WHERE COMMENT_NO = #{no}
+            """)
+    void deleteReportedHoneyTipComment(HoneyTipCommentVo vo);
 }
 
 

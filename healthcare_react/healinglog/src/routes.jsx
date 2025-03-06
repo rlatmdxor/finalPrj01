@@ -52,6 +52,9 @@ import Review from './components/pages/Board/review/Review';
 import ReviewDetail from './components/pages/Board/review/ReviewDetail';
 import ReviewWrite from './components/pages/Board/review/ReviewWrite';
 import ReviewEdit from './components/pages/Board/review/ReviewEdit';
+import AdminReview from './components/admin/review/AdminReview';
+import ReportedReview from './components/admin/review/ReportedReview';
+import ReportedReviewComment from './components/admin/review/ReportedReviewComment';
 
 export const routes = [
   { path: '/', component: <Main /> },
@@ -97,7 +100,10 @@ export const routes = [
   { path: '/cigarette/', component: <CigaretteReport /> },
   { path: '/reported/honeytip', component: <ReportedHoneyBoard /> },
   { path: '/reported/honeytip/comment', component: <ReportedHoneyComment /> },
+  { path: '/reported/review', component: <ReportedReview /> },
+  { path: '/reported/review/comment', component: <ReportedReviewComment /> },
   { path: '/admin/board', component: <AdminBoard /> },
+  { path: '/admin/review', component: <AdminReview /> },
   { path: '/challengers', component: <Challengers /> },
   { path: '/challengersBoard', component: <ChallengersBoard /> },
   { path: '/challengersList', component: <ChallengersList /> },

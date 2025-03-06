@@ -19,18 +19,11 @@ public class NoticeService {
     private final NoticeMapper mapper;
     private final JwtUtil jwtUtil;
 
-    public Map list(SearchFilterVo filterVo, String token) {
+    public List<NoticeVo> list(SearchFilterVo filterVo, String token) {
         token = token.replace("Bearer ", "");
-        String role = jwtUtil.getRole(token);
-        boolean isAdmin = false;
-        if(role.equals("admin")){
-            isAdmin = true;
-        }
-        Map map = new HashMap<>();
-        List<NoticeVo> list = mapper.list(filterVo);
-        map.put("list" ,list);
-        map.put("isAdmin" , isAdmin);
-        return map;
+
+
+        return mapper.list(filterVo);
     }
 
     public int write(NoticeVo vo, List<NoticeAttachVo> attachVoList, String token) {
@@ -57,20 +50,15 @@ public class NoticeService {
 
     public Map detail(String bno, String token) {
         token = token.replace("Bearer ", "");
-        String role = jwtUtil.getRole(token);
-        boolean isAdmin = false;
-        if(role.equals("ADMIN")){
-            isAdmin = true;
-        }
+
 
         Map map = new HashMap<>();
         mapper.increaseHit(bno);
         NoticeVo detailVo = mapper.detailVo(bno);
-        List<NoticeVo> attachVoList = mapper.detailAttachList(bno);
+        List<NoticeAttachVo> attachVoList = mapper.detailAttachList(bno);
         if(attachVoList.size() > 0){
             map.put("attachVoList" , attachVoList);
         }
-        map.put("isAdmin" , isAdmin);
         map.put("detailVo" , detailVo);
         return map;
     }

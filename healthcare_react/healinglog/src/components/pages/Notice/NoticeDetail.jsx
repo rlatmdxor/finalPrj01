@@ -13,6 +13,7 @@ import '@draft-js-plugins/static-toolbar/lib/plugin.css';
 import '@draft-js-plugins/text-alignment/lib/plugin.css';
 import Swal from 'sweetalert2';
 import { useDispatch } from 'react-redux';
+import { isTokenExpired, getRoleFromToken } from '../../util/JwtUtil';
 
 //모달 안의 버튼 컨테이너
 
@@ -28,7 +29,7 @@ const InputDiv = styled.div`
   width: 95%;
   height: 40px;
   display: grid;
-  grid-template-columns: 130px 150px 130px 1fr;
+  grid-template-columns: 155px 1fr;
   margin-top: 5px;
 
   & .form-label {
@@ -204,7 +205,21 @@ const blockRendererFn = (block, contentState) => {
 };
 
 const NoticeDetail = () => {
+  const navi = useNavigate();
   const token = localStorage.getItem('token');
+  useEffect(() => {
+    if (!token || isTokenExpired(token)) {
+      setIsLogin(false);
+    }
+    if (getRoleFromToken(token) == 'ROLE_ADMIN') {
+      setIsAdmin(true);
+    }
+    if (!token || isTokenExpired(token)) {
+      setIsLogin(false);
+    }
+  }, [navi, token]);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isLogin, setIsLogin] = useState(true);
   const [searchParams] = useSearchParams();
   const bno = searchParams.get('bno');
   const navigate = useNavigate();
@@ -212,7 +227,6 @@ const NoticeDetail = () => {
   const [f, setFiles] = useState([]);
   const [editorState, setEditorState] = useState(() => EditorState.createEmpty());
   const [num, setNum] = useState(0);
-  const [isAdmin, setIsAdmin] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -306,8 +320,8 @@ const NoticeDetail = () => {
       <LayDiv></LayDiv>
       <ContentDiv>
         <MinDiv>
-          <div className="form-label">추천수</div>
-          <div className="form-input">{boardVo.recommendCount}</div>
+          <div className="form-label">카테고리</div>
+          <div className="form-input">공지</div>
           <div className="form-label">조회수</div>
           <div className="form-input">{boardVo.hit}</div>
           <div className="form-label">작성자</div>
@@ -316,8 +330,6 @@ const NoticeDetail = () => {
           <div className="form-input">{boardVo.enrollDate}</div>
         </MinDiv>
         <InputDiv>
-          <div className="form-label">카테고리</div>
-          <div className="form-input">공지</div>
           <div className="form-label">제목</div>
           <div className="form-input">{boardVo.title}</div>
         </InputDiv>
@@ -348,11 +360,11 @@ const NoticeDetail = () => {
         </AttachDiv>
         {isAdmin ? (
           <ButtonDiv>
-            <Btn str={'수정하기'} c={'#FF7F50'} fc={'#ffffff'} h={'40'} w={'100'} mr={'10'} f={handleNaviEditPage} />
-            <Btn str={'삭제하기'} c={'#D9D9D9'} fc={'#3d4147'} h={'40'} w={'100'} f={handleDeleteHoneyTip} />
+            <Btn str={'수정하기'} c={'#FF7F50'} fc={'#ffffff'} w={'100'} mr={'10'} f={handleNaviEditPage} />
+            <Btn str={'삭제하기'} c={'#D9D9D9'} fc={'#3d4147'} w={'100'} f={handleDeleteHoneyTip} />
           </ButtonDiv>
         ) : (
-          <ReportDiv></ReportDiv>
+          <ButtonDiv></ButtonDiv>
         )}
         <ThumbsupDiv></ThumbsupDiv>
         <ButtonDiv>

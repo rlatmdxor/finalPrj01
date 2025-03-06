@@ -52,4 +52,16 @@ public interface BloodSugarMapper {
             """)
     int checkTodayBloodSugar(String userNo);
 
+    @Select("""
+            SELECT COUNT(*)
+            FROM NOTIFICATION_SETTINGS
+            WHERE
+                MEMBER_NO = #{userNo}
+                AND ALL_PUSH = 'Y'
+                AND BLOOD_SUGAR_PUSH = 'Y'
+            """)
+    int isBloodSugarPushEnabled(String userNo);
+
+
+
 }

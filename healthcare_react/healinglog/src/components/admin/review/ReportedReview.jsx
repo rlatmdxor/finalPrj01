@@ -34,10 +34,10 @@ const BtnContainer = styled.div`
   justify-content: end;
   margin-right: -45px;
 `;
-const ReportedHoneyBoardComment = () => {
+const ReportedReview = () => {
   const token = localStorage.getItem('token');
 
-  const boardType = 'reportedHoneyTipComment';
+  const boardType = 'reportedHoneyTip';
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -51,7 +51,7 @@ const ReportedHoneyBoardComment = () => {
   const [num, setNum] = useState(0);
   const offset = (currentPage - 1) * boardLimit;
 
-  const url = `http://127.0.0.1:80/api/board/honeytip/reported/comment/list`;
+  const url = `http://127.0.0.1:80/api/review/reported/list`;
   const options = {
     method: 'POST',
     headers: {
@@ -82,11 +82,9 @@ const ReportedHoneyBoardComment = () => {
       })
       .catch((error) => console.error('데이터 불러오기 실패:', error));
   }, [num]);
-  const handleCheckboxChange = (commentNo) => {
+  const handleCheckboxChange = (boardNo) => {
     setSelectedItems((prevSelected) =>
-      prevSelected.includes(commentNo)
-        ? prevSelected.filter((item) => item !== commentNo)
-        : [...prevSelected, commentNo]
+      prevSelected.includes(boardNo) ? prevSelected.filter((item) => item !== boardNo) : [...prevSelected, boardNo]
     );
   };
 
@@ -101,14 +99,14 @@ const ReportedHoneyBoardComment = () => {
     }
 
     Swal.fire({
-      title: `${selectedItems.length}개의 댓글을 삭제하시겠습니까?`,
+      title: `${selectedItems.length}개의 게시글을 삭제하시겠습니까?`,
       icon: 'question',
       showCancelButton: true,
       confirmButtonText: '확인',
       cancelButtonText: '취소',
     }).then((result) => {
       if (result.isConfirmed) {
-        fetch('http://127.0.0.1:80/api/board/honeytip/reported/comment/delete', {
+        fetch('http://127.0.0.1:80/api/review/reported/delete', {
           method: 'POST',
           headers: {
             'content-type': 'application/json',
@@ -122,7 +120,7 @@ const ReportedHoneyBoardComment = () => {
             setNum((x) => x - 1);
             console.log(num);
             Swal.fire({
-              title: `${data}개의 댓글이 삭제되었습니다.`,
+              title: `${data}개의 게시글이 삭제되었습니다.`,
               icon: 'success',
               draggable: true,
             });
@@ -132,11 +130,11 @@ const ReportedHoneyBoardComment = () => {
   };
   return (
     <>
-      <Title>꿀팁 게시판</Title>
+      <Title>병원 리뷰</Title>
       <NaviContainer>
-        <Navi target="admin/board" tag={'게시글 목록'}></Navi>
-        <Navi target="reported/honeytip" tag={'게시글 신고현황'}></Navi>
-        <Navi target="reported/honeytip/comment" tag={'댓글 신고현황'}></Navi>
+        <Navi target="admin/review" tag={'리뷰 목록'}></Navi>
+        <Navi target="reported/review" tag={'리뷰 신고현황'}></Navi>
+        <Navi target="reported/review/comment" tag={'댓글 신고현황'}></Navi>
       </NaviContainer>
       <ContentLayout>
         <LayDiv />
@@ -148,8 +146,9 @@ const ReportedHoneyBoardComment = () => {
         <Table>
           <thead>
             <tr>
+              <th>게시글번호</th>
               <th>신고사유</th>
-              <th>댓글</th>
+              <th>제목</th>
               <th>신고일</th>
               <th>작성자</th>
               <th>신고수</th>
@@ -160,18 +159,19 @@ const ReportedHoneyBoardComment = () => {
             {pagedData.map((vo) => {
               return (
                 <tr key={vo.no}>
-                  <td onClick={() => navigate(`/board/detail?bno=${vo.boardNo}`)}>{vo.name}</td>
-                  <td onClick={() => navigate(`/board/detail?bno=${vo.boardNo}`)}>{vo.content}</td>
-                  <td onClick={() => navigate(`/board/detail?bno=${vo.boardNo}`)}>{vo.enrollDate}</td>
-                  <td onClick={() => navigate(`/board/detail?bno=${vo.boardNo}`)}>{vo.nick}</td>
-                  <td onClick={() => navigate(`/board/detail?bno=${vo.boardNo}`)}>{vo.reportCount}</td>
+                  <td onClick={() => navigate(`/review/detail?bno=${vo.reviewNo}`)}>{vo.reviewNo}</td>
+                  <td onClick={() => navigate(`/review/detail?bno=${vo.reviewNo}`)}>{vo.name}</td>
+                  <td onClick={() => navigate(`/review/detail?bno=${vo.reviewNo}`)}>{vo.title}</td>
+                  <td onClick={() => navigate(`/review/detail?bno=${vo.reviewNo}`)}>{vo.enrollDate}</td>
+                  <td onClick={() => navigate(`/review/detail?bno=${vo.reviewNo}`)}>{vo.nick}</td>
+                  <td onClick={() => navigate(`/review/detail?bno=${vo.reviewNo}`)}>{vo.reportCount}</td>
                   <td>
                     <input
                       type="checkbox"
-                      checked={selectedItems.includes(vo.commentNo)}
+                      checked={selectedItems.includes(vo.reviewNo)}
                       onChange={(e) => {
                         e.stopPropagation();
-                        handleCheckboxChange(vo.commentNo);
+                        handleCheckboxChange(vo.reviewNo);
                       }}
                     />
                   </td>
@@ -194,4 +194,4 @@ const ReportedHoneyBoardComment = () => {
   );
 };
 
-export default ReportedHoneyBoardComment;
+export default ReportedReview;

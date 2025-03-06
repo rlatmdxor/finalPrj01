@@ -7,6 +7,8 @@ import { setTotalCount, resetPaging } from '../../../redux/pagingSlice';
 import SearchBar from '../../util/SearchBar';
 import Table from '../../util/Table';
 import { useNavigate } from 'react-router-dom';
+import { isTokenExpired, getRoleFromToken } from '../../util/JwtUtil';
+import Swal from 'sweetalert2';
 
 const SearchDiv = styled.div`
   display: flex;
@@ -15,6 +17,10 @@ const SearchDiv = styled.div`
   align-items: center;
   margin-top: 15px;
   margin-bottom: 5px;
+`;
+
+const LayDiv = styled.div`
+  height: 40px;
 `;
 
 const SelectBox = styled.select`
@@ -37,7 +43,18 @@ const BottomDiv = styled.div`
 `;
 
 const HoneytipBoard = () => {
+  const navi = useNavigate();
+  const [isLogin, setIsLogin] = useState(true);
   const token = localStorage.getItem('token');
+
+  useEffect(() => {
+    if (!token || isTokenExpired(token)) {
+      setIsLogin(false);
+    }
+    if (getRoleFromToken(token) == 'ROLE_ADMIN') {
+      setIsAdmin(true);
+    }
+  }, [navi, token]);
 
   const boardType = 'honeyTip';
   const initstate = {
@@ -49,7 +66,7 @@ const HoneytipBoard = () => {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
+  const [isAdmin, setIsAdmin] = useState(false);
   const [dataVoList, setVoList] = useState([]);
   const [pagedData, setPagedData] = useState([]);
   const [searchInput, setSearchInput] = useState(initstate);
@@ -149,6 +166,19 @@ const HoneytipBoard = () => {
       };
     });
   };
+  const handleNaviDetail = (e, no) => {
+    const bno = no;
+    if (isLogin == false) {
+      navigate(`/board`);
+      Swal.fire({
+        icon: 'error',
+        title: 'ERROR',
+        text: '로그인해주세요',
+      });
+    } else if (isLogin === true) {
+      navigate(`/board/detail?bno=${bno}`);
+    }
+  };
 
   return (
     <>
@@ -191,7 +221,7 @@ const HoneytipBoard = () => {
         <tbody>
           {pagedData.map((vo) => {
             return (
-              <tr key={vo.no} onClick={() => navigate(`/board/detail?bno=${vo.no}`)}>
+              <tr key={vo.no} value={vo.no} onClick={(e) => handleNaviDetail(e, vo.no)}>
                 <td>{vo.no}</td>
                 <td>{vo.categoryName}</td>
                 <td>
@@ -211,10 +241,15 @@ const HoneytipBoard = () => {
         <div>
           <Pagination boardType={boardType} />
         </div>
-        <div>
-          <Btn str={'등록'} c={'#FF7F50'} fc={'#ffffff'} h={'40'} f={() => navigate('/board/write')} />
-        </div>
+        {isLogin ? (
+          <div>
+            <Btn str={'등록'} c={'#FF7F50'} fc={'#ffffff'} mr={'0'} f={() => navigate('/board/write')} />
+          </div>
+        ) : (
+          <LayDiv></LayDiv>
+        )}
       </BottomDiv>
+      <LayDiv></LayDiv>
     </>
   );
 };

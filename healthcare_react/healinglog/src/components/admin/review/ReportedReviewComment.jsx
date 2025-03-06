@@ -16,10 +16,10 @@ import Swal from 'sweetalert2';
 const NaviContainer = styled.div`
   display: grid;
   position: relative;
-  width: 500px; // 항목수에 비례해서 주시면 됩니다.
+  width: 500px;
   top: 20px;
   left: 40px;
-  grid-template-columns: 5fr 7fr 6fr; // 글자수만큼 fr 주면 됩니다. ex) 유산소 3글자니까 3fr
+  grid-template-columns: 5fr 7fr 6fr;
 `;
 const BottomDiv = styled.div`
   display: flex;
@@ -34,7 +34,7 @@ const BtnContainer = styled.div`
   justify-content: end;
   margin-right: -45px;
 `;
-const ReportedHoneyBoardComment = () => {
+const ReportedReviewComment = () => {
   const token = localStorage.getItem('token');
 
   const boardType = 'reportedHoneyTipComment';
@@ -51,7 +51,7 @@ const ReportedHoneyBoardComment = () => {
   const [num, setNum] = useState(0);
   const offset = (currentPage - 1) * boardLimit;
 
-  const url = `http://127.0.0.1:80/api/board/honeytip/reported/comment/list`;
+  const url = `http://127.0.0.1:80/api/review/reported/comment/list`;
   const options = {
     method: 'POST',
     headers: {
@@ -82,6 +82,7 @@ const ReportedHoneyBoardComment = () => {
       })
       .catch((error) => console.error('데이터 불러오기 실패:', error));
   }, [num]);
+
   const handleCheckboxChange = (commentNo) => {
     setSelectedItems((prevSelected) =>
       prevSelected.includes(commentNo)
@@ -95,7 +96,7 @@ const ReportedHoneyBoardComment = () => {
       Swal.fire({
         icon: 'error',
         title: 'Oops...',
-        text: '삭제하실 게시글을 선택해주세요',
+        text: '삭제하실 댓글을 선택해주세요',
       });
       return;
     }
@@ -108,7 +109,7 @@ const ReportedHoneyBoardComment = () => {
       cancelButtonText: '취소',
     }).then((result) => {
       if (result.isConfirmed) {
-        fetch('http://127.0.0.1:80/api/board/honeytip/reported/comment/delete', {
+        fetch('http://127.0.0.1:80/api/review/reported/comment/delete', {
           method: 'POST',
           headers: {
             'content-type': 'application/json',
@@ -132,11 +133,11 @@ const ReportedHoneyBoardComment = () => {
   };
   return (
     <>
-      <Title>꿀팁 게시판</Title>
+      <Title>병원 리뷰</Title>
       <NaviContainer>
-        <Navi target="admin/board" tag={'게시글 목록'}></Navi>
-        <Navi target="reported/honeytip" tag={'게시글 신고현황'}></Navi>
-        <Navi target="reported/honeytip/comment" tag={'댓글 신고현황'}></Navi>
+        <Navi target="admin/review" tag={'리뷰 목록'}></Navi>
+        <Navi target="reported/review" tag={'리뷰 신고현황'}></Navi>
+        <Navi target="reported/review/comment" tag={'댓글 신고현황'}></Navi>
       </NaviContainer>
       <ContentLayout>
         <LayDiv />
@@ -160,11 +161,11 @@ const ReportedHoneyBoardComment = () => {
             {pagedData.map((vo) => {
               return (
                 <tr key={vo.no}>
-                  <td onClick={() => navigate(`/board/detail?bno=${vo.boardNo}`)}>{vo.name}</td>
-                  <td onClick={() => navigate(`/board/detail?bno=${vo.boardNo}`)}>{vo.content}</td>
-                  <td onClick={() => navigate(`/board/detail?bno=${vo.boardNo}`)}>{vo.enrollDate}</td>
-                  <td onClick={() => navigate(`/board/detail?bno=${vo.boardNo}`)}>{vo.nick}</td>
-                  <td onClick={() => navigate(`/board/detail?bno=${vo.boardNo}`)}>{vo.reportCount}</td>
+                  <td onClick={() => navigate(`/review/detail?bno=${vo.reviewNo}`)}>{vo.name}</td>
+                  <td onClick={() => navigate(`/review/detail?bno=${vo.reviewNo}`)}>{vo.content}</td>
+                  <td onClick={() => navigate(`/review/detail?bno=${vo.reviewNo}`)}>{vo.enrollDate}</td>
+                  <td onClick={() => navigate(`/review/detail?bno=${vo.reviewNo}`)}>{vo.nick}</td>
+                  <td onClick={() => navigate(`/review/detail?bno=${vo.reviewNo}`)}>{vo.reportCount}</td>
                   <td>
                     <input
                       type="checkbox"
@@ -194,4 +195,4 @@ const ReportedHoneyBoardComment = () => {
   );
 };
 
-export default ReportedHoneyBoardComment;
+export default ReportedReviewComment;

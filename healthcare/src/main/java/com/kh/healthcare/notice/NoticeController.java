@@ -26,11 +26,10 @@ public class NoticeController {
     private String bucket;
 
     @PostMapping("list")
-    public Map list(@RequestHeader("Authorization") String token, @RequestBody SearchFilterVo filterVo) {
+    public List<NoticeVo> list(@RequestHeader("Authorization") String token, @RequestBody SearchFilterVo filterVo) {
 
         try{
-            Map map = service.list(filterVo , token);
-            return map;
+            return service.list(filterVo , token);
         } catch (Exception e) {
             throw new IllegalStateException("CODE [ NOTICE / LIST ]");
         }

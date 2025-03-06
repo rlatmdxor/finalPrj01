@@ -200,6 +200,53 @@ public class HoneyTipService {
         }
     }
 
+    public List<HoneyTipReportVo> reportedList() {
+        return mapper.reportedList();
+    }
+
+    public int reportedHoneyTipDel(String[] numList, String token) {
+        token = token.replace("Bearer ", "");
+        String memberNo = jwtUtil.getNo(token);
+
+        if(numList.length < 1){
+            throw new IllegalStateException("CODE [REPORTED / HONEYTIP / DELETE ]");
+        }
+        HoneyTipVo vo = new HoneyTipVo();
+
+
+        int result = 0;
+        for (String no : numList) {
+            vo.setNo(no);
+            mapper.deleteHoneyTip(vo);
+            mapper.deleteReportedHoneyTip(vo);
+            result++;
+        }
+        return result;
+    }
+
+    public List<HoneyTipCommentReportVo> reportedCommentList() {
+        return mapper.reportedCommentList();
+    }
+
+    public int reportedHoneyTipCommentDel(String[] numList, String token) {
+        token = token.replace("Bearer ", "");
+        String memberNo = jwtUtil.getNo(token);
+
+        if(numList.length < 1){
+            throw new IllegalStateException("CODE [REPORTED / HONEYTIP / COMMENT / DELETE ]");
+        }
+        HoneyTipCommentVo vo = new HoneyTipCommentVo();
+
+
+        int result = 0;
+        for (String no : numList) {
+            vo.setNo(no);
+            mapper.commentDelete(vo);
+            mapper.deleteReportedHoneyTipComment(vo);
+            result++;
+        }
+        return result;
+    }
 }
 
 
