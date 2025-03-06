@@ -192,6 +192,7 @@ public interface HoneyTipMapper {
             JOIN MEMBER M ON ( B.MEMBER_NO = M.NO )
             WHERE B.BOARD_NO = #{bno}
             AND B.DEL_YN = 'N'
+            ORDER BY B.NO DESC
             """)
     List<HoneyTipCommentVo> commentList(String bno);
 
