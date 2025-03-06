@@ -14,14 +14,14 @@ import { useNavigate } from 'react-router-dom';
 import { isTokenExpired, getRoleFromToken } from '../../util/JwtUtil';
 
 const BottomDiv = styled.div`
-  margin-top: 25px;
+  margin-top: 10px;
   margin-bottom: 35px;
 `;
 
 const BtnContainer = styled.div`
   display: flex;
   position: absolute;
-  margin-left: 920px;
+  margin-left: 910px;
   margin-top: -80px;
 `;
 
@@ -59,7 +59,11 @@ const LayoutInput = styled.input`
     margin-left: 20px;
   }
   &[name='writer'] {
-    width: 100px;
+    width: 80px;
+    text-align: center;
+  }
+  &[name='no'] {
+    margin-left: 25px;
   }
 `;
 
@@ -234,7 +238,7 @@ const ChallengersBoard = () => {
     if (inputData.title === '') {
       Swal.fire({
         icon: 'warning',
-        title: '제목을 작성해주세요',
+        title: '제목을 입력하세요.',
         confirmButtonText: '확인',
       });
       return;
@@ -243,7 +247,7 @@ const ChallengersBoard = () => {
     if (inputData.no === '') {
       Swal.fire({
         icon: 'warning',
-        title: '챌린지를 선택해주세요',
+        title: '챌린지를 선택하세요.',
         confirmButtonText: '확인',
       });
       return;
@@ -251,7 +255,7 @@ const ChallengersBoard = () => {
     if (inputData.content === '') {
       Swal.fire({
         icon: 'warning',
-        title: '내용을 입력해주세요',
+        title: '내용을 입력하세요.',
         confirmButtonText: '확인',
       });
       return;
@@ -290,7 +294,7 @@ const ChallengersBoard = () => {
             if (data === '2') {
               Swal.fire({
                 icon: 'warning',
-                title: '이미 등록하였습니다.',
+                title: '이미 등록했습니다.',
                 confirmButtonText: '확인',
               });
               return;
@@ -365,16 +369,7 @@ const ChallengersBoard = () => {
           </div>
           <div>
             <RightDiv id="challneger">챌린지</RightDiv>
-            <Select value={inputData.challengerNo} readOnly name="no">
-              <option value=""></option>
-              {titleData.map((vo) => {
-                return (
-                  <option key={vo.no} value={vo.no}>
-                    {vo.title}
-                  </option>
-                );
-              })}
-            </Select>
+            <LayoutInput type="text" value={inputData.challengerName} name="no" title="챌린지" readOnly />
           </div>
         </ModalDiv>
         <div>
@@ -423,6 +418,7 @@ const ChallengersBoard = () => {
                           writer: vo.nick,
                           no: vo.no,
                           challengerNo: vo.challengerNo,
+                          challengerName: vo.challengerName,
                         };
                       });
 

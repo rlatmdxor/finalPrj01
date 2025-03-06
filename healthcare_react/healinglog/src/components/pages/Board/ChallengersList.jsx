@@ -368,7 +368,7 @@ const ChallengersList = () => {
 
     if (inputData.status === '진행중') {
       Swal.fire({
-        title: '신청하시겠습니다?', // 제목
+        title: '신청하시겠습니까?', // 제목
         icon: 'question', // 아이콘 유형 (warning, success, error 등)
         showCancelButton: true, // 취소 버튼 표시
         confirmButtonColor: '#3085d6', // 등록 버튼 색상
@@ -396,7 +396,7 @@ const ChallengersList = () => {
                 dispatch(close(e.target.title));
                 Swal.fire({
                   icon: 'warning',
-                  title: '이미 신청돼었습니다.',
+                  title: '참여중인 챌린지입니다.',
                   confirmButtonText: '확인',
                 });
               } else {

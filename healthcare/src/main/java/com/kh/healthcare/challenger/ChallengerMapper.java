@@ -138,8 +138,10 @@ public interface ChallengerMapper {
             , P.MEMBER_NO
             , P.IMAGE_URL
             , M.NICK
+            , C.TITLE as challengerName
             FROM CHALLENGER_POST P
             JOIN MEMBER M ON (P.MEMBER_NO = M.NO)
+            JOIN CHALLENGER C ON (P.CHALLENGER_NO = C.NO)
             ORDER BY P.NO DESC
             """)
     List<ChallengerVo> postList();
