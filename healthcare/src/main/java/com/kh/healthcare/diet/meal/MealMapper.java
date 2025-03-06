@@ -5,7 +5,7 @@ import org.apache.ibatis.annotations.*;
 import java.util.List;
 
 @Mapper
-public interface DietMealMapper {
+public interface MealMapper {
 
     @Insert("""
             INSERT INTO DIET
@@ -135,6 +135,16 @@ public interface DietMealMapper {
     void dietMealDelete(String no);
 
     @Select("""
+            SELECT COUNT(*)
+            FROM NOTIFICATION_SETTINGS
+            WHERE
+                MEMBER_NO = #{userNo}
+                AND ALL_PUSH = 'Y'
+                AND DIET_PUSH = 'Y'
+            """)
+    int isDietPushEnabled(String userNo);
+
+    @Select("""
             SELECT 
                 NO
                 , NAME AS LABEL
@@ -145,41 +155,6 @@ public interface DietMealMapper {
             ORDER BY LABEL 
             """)
     List<FoodVo> getFoodData();
-
-    @Select("""
-            SELECT DIET_DAY, SUM(M.KCAL) AS TOTAL_KCAL
-            FROM DIET D
-            LEFT JOIN MEAL_LOG M ON (D.NO = M.DIET_NO)
-            WHERE D.MEMBER_NO = #{memberNo}
-            AND TO_CHAR(D.DIET_DAY, 'YYYY-MM') = #{month}
-            AND D.DEL_YN = 'N'
-            GROUP BY D.MEMBER_NO, D.DIET_DAY
-            ORDER BY D.DIET_DAY
-            """)
-    List<TotalKcalVo> getDayKcal(int memberNo, String month);
-
-    @Select("""
-            SELECT TO_CHAR(D.DIET_DAY, 'YYYY-MM') AS DIET_DAY, ROUND(SUM(M.KCAL)/COUNT(DISTINCT D.DIET_DAY),0) AS TOTAL_KCAL
-            FROM DIET D
-            LEFT JOIN MEAL_LOG M ON (D.NO = M.DIET_NO)
-            WHERE D.MEMBER_NO = #{memberNo}
-            AND TO_CHAR(D.DIET_DAY, 'YYYY') = #{year}
-            AND D.DEL_YN = 'N'
-            GROUP BY D.MEMBER_NO, TO_CHAR(D.DIET_DAY, 'YYYY-MM')
-            ORDER BY DIET_DAY
-            """)
-    List<TotalKcalVo> getMonthAvgKcal(int memberNo, String year);
-
-    @Select("""
-            SELECT TO_CHAR(D.DIET_DAY, 'YYYY') AS DIET_DAY, ROUND(SUM(M.KCAL)/COUNT(DISTINCT D.DIET_DAY),0) AS TOTAL_KCAL
-            FROM DIET D
-            LEFT JOIN MEAL_LOG M ON (D.NO = M.DIET_NO)
-            WHERE D.MEMBER_NO = #{memberNo}
-            AND D.DEL_YN = 'N'
-            GROUP BY D.MEMBER_NO, TO_CHAR(D.DIET_DAY, 'YYYY')
-            ORDER BY DIET_DAY
-            """)
-    List<TotalKcalVo> getYearAvgKcal(int memberNo);
 
     @Select("""
             SELECT COUNT(*)

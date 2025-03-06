@@ -16,20 +16,11 @@ import java.util.List;
 public class BannerController {
 
     private final BannerService service;
-    private final AmazonS3 s3;
-    private final ObjectMapper objectMapper;
-
-    @Value("${cloud.aws.s3.bucket}")
-    private String bucket;
 
     @PostMapping("enroll")
-    public void bannerEnroll(BannerVo vo, MultipartFile f, @RequestHeader("Authorization") String authorization){
+    public void bannerEnroll(BannerVo vo, MultipartFile f, @RequestHeader("Authorization") String token){
         try {
-            if (f != null) {
-                String url = FileUtil.uploadFileToAwsS3(f , s3 , bucket);
-                vo.setImageUrl(url);
-            }
-            service.bannerEnroll(vo);
+            service.bannerEnroll(vo, f, token);
         }
         catch (Exception e){
             e.printStackTrace();
@@ -50,13 +41,9 @@ public class BannerController {
     }
 
     @PostMapping("edit")
-    public void editBanner(BannerVo vo, MultipartFile f, @RequestHeader("Authorization") String authorization){
+    public void editBanner(BannerVo vo, @RequestParam(required = false) MultipartFile f, @RequestParam(required = false) String imageUrl, @RequestHeader("Authorization") String token){
         try {
-            if (f != null) {
-                String url = FileUtil.uploadFileToAwsS3(f , s3 , bucket);
-                vo.setImageUrl(url);
-            }
-            service.bannerEdit(vo);
+            service.bannerEdit(vo, f, imageUrl, token);
         }
         catch (Exception e){
             e.printStackTrace();
@@ -65,7 +52,7 @@ public class BannerController {
     }
 
     @GetMapping("delete")
-    public void deleteBanner(@RequestParam String no, @RequestHeader("Authorization") String authorization) {
+    public void deleteBanner(@RequestParam String no, @RequestHeader("Authorization") String token) {
         try {
             service.deleteBanner(no);
         }

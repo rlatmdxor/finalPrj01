@@ -22,45 +22,55 @@ public class SleepController {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
 
     @PostMapping("write")
-    public String write(@RequestBody  SleepVo vo){
-        LocalTime sleepStart = LocalTime.parse(vo.getSleepStart(), formatter);
-        LocalTime sleepEnd = LocalTime.parse(vo.getSleepEnd(), formatter);
-        long betweenTime = ChronoUnit.MINUTES.between(sleepStart, sleepEnd);
-        if(betweenTime < 0 ){
-            betweenTime = betweenTime+1440;
+    public String write(@RequestHeader ("Authorization") String token, @RequestBody  SleepVo vo){
+        try {
+            LocalTime sleepStart = LocalTime.parse(vo.getSleepStart(), formatter);
+            LocalTime sleepEnd = LocalTime.parse(vo.getSleepEnd(), formatter);
+            long betweenTime = ChronoUnit.MINUTES.between(sleepStart, sleepEnd);
+            if(betweenTime < 0 ){
+                betweenTime = betweenTime+1440;
+            }
+            String sleepMinutes = String.valueOf(betweenTime);
+            vo.setSleepDuration(sleepMinutes);
+            service.write(token, vo);
+            return "write ok~~~";
+        }catch (Exception e){
+            throw new IllegalStateException("CODE [ CHALLENGER / WRITE ]");
         }
-        String sleepMinutes = String.valueOf(betweenTime);
-        vo.setSleepDuration(sleepMinutes);
-        service.write(vo);
-        return "write ok~~~";
+
     }
 
     @PostMapping("list")
-    public List<SleepVo> list (){
-       List<SleepVo> voList =  service.list();
+    public List<SleepVo> list (@RequestHeader ("Authorization") String token){
+        try {
+            List<SleepVo> voList =  service.list(token);
+            return voList;
+        }catch (Exception e){
+            throw new IllegalStateException("CODE [ CHALLENGER / LIST ]");
+        }
 
-        return voList;
     }
 
     @PostMapping("edit")
-    public String edit(@RequestBody SleepVo vo){
-        System.out.println("vo = " + vo);
-        LocalTime sleepStart = LocalTime.parse(vo.getSleepStart(), formatter);
-        LocalTime sleepEnd = LocalTime.parse(vo.getSleepEnd(), formatter);
+    public String edit(@RequestHeader ("Authorization") String token, @RequestBody SleepVo vo){
+        try {
+            LocalTime sleepStart = LocalTime.parse(vo.getSleepStart(), formatter);
+            LocalTime sleepEnd = LocalTime.parse(vo.getSleepEnd(), formatter);
 
-        long betweenTime = ChronoUnit.MINUTES.between(sleepStart, sleepEnd);
-        if(betweenTime < 0 ){
-            betweenTime = betweenTime+1440;
+            long betweenTime = ChronoUnit.MINUTES.between(sleepStart, sleepEnd);
+            if(betweenTime < 0 ){
+                betweenTime = betweenTime+1440;
+            }
+            String sleepMinutes = String.valueOf(betweenTime);
+
+
+            vo.setSleepDuration(sleepMinutes);
+            service.edit(token, vo);
+            return "edit ok ~~~";
+        }catch (Exception e){
+            throw new IllegalStateException("CODE [ CHALLENGER / LIST ]");
         }
-        String sleepMinutes = String.valueOf(betweenTime);
 
-
-        vo.setSleepDuration(sleepMinutes);
-        System.out.println("vo = " + vo);
-        service.edit(vo);
-        return "edit ok ~~~";
     }
-
-
 
 }

@@ -45,38 +45,27 @@ public interface WaterMapper {
     WaterVo getWaterByDate(WaterVo vo);
 
     @Select("""
-            SELECT ENROLL_DATE, AMOUNT
-            FROM WATER_LOG
-            WHERE MEMBER_NO = #{memberNo}
-            AND TO_CHAR(ENROLL_DATE, 'YYYY-MM') = #{month}
-            ORDER BY ENROLL_DATE
-            """)
-    List<WaterVo> getDayWater(int memberNo, String month);
-
-    @Select("""
-            SELECT TO_CHAR(ENROLL_DATE, 'YYYY-MM') AS ENROLL_DATE,  ROUND(AVG(AMOUNT)) AS AMOUNT
-            FROM WATER_LOG
-            WHERE MEMBER_NO = #{memberNo}
-            AND TO_CHAR(ENROLL_DATE, 'YYYY') = #{year}
-            GROUP BY TO_CHAR(ENROLL_DATE, 'YYYY-MM')
-            ORDER BY ENROLL_DATE
-            """)
-    List<WaterVo> getMonthAvgWater(int memberNo, String year);
-
-    @Select("""
-            SELECT TO_CHAR(ENROLL_DATE, 'YYYY') AS ENROLL_DATE,  ROUND(AVG(AMOUNT)) AS AMOUNT
-            FROM WATER_LOG
-            WHERE MEMBER_NO = #{memberNo}
-            GROUP BY TO_CHAR(ENROLL_DATE, 'YYYY')
-            ORDER BY ENROLL_DATE
-            """)
-    List<WaterVo> getYearAvgWater(int memberNo);
-
-    @Select("""
             SELECT COUNT(*)
             FROM WATER_LOG
             WHERE MEMBER_NO = #{userNo}
             AND TRUNC(ENROLL_DATE) = TRUNC(SYSDATE)
+            AND EXISTS (
+                    SELECT 1
+                    FROM NOTIFICATION_SETTINGS NS
+                    WHERE NS.MEMBER_NO = #{userNo}
+                        AND NS.ALL_PUSH = 'Y'
+                        AND NS.WATER_PUSH = 'Y'
+                )
             """)
     int checkTodayWater(String userNo);
+
+    @Select("""
+            SELECT COUNT(*)
+            FROM NOTIFICATION_SETTINGS
+            WHERE
+                MEMBER_NO = #{userNo}
+                AND ALL_PUSH = 'Y'
+                AND WATER_PUSH = 'Y'
+            """)
+    int isWaterPushEnabled(String userNo);
 }

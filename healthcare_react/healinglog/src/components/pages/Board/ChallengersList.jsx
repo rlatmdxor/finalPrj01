@@ -9,6 +9,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { close, open } from '../../../redux/modalSlice';
 import { resetPaging, setTotalCount } from '../../../redux/pagingSlice';
 import Pagination from '../../util/Pagination';
+import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
+import { isTokenExpired, getRoleFromToken } from '../../util/JwtUtil';
+
+const BottomDiv = styled.div`
+  margin-top: 25px;
+  margin-bottom: 35px;
+`;
 
 const NaviContainer = styled.div`
   display: grid;
@@ -21,7 +29,7 @@ const NaviContainer = styled.div`
 `;
 const TableWrapper = styled.div`
   width: 100%;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 `;
 
 const TableTag = styled.table`
@@ -105,6 +113,25 @@ const ModalDiv = styled.div`
 `;
 
 const ChallengersList = () => {
+  const token = localStorage.getItem('token');
+  const navi = useNavigate();
+  const [isAuthorized, setIsAuthorized] = useState(false); // 로그인 여부 체크
+
+  useEffect(() => {
+    if (!token || isTokenExpired(token) || getRoleFromToken(token) == 'ROLE_ADMIN') {
+      window.localStorage.removeItem('token'); // 토큰 삭제
+      navi('/login'); // 로그인 페이지로 이동
+      Swal.fire({
+        icon: 'warning',
+        title: '로그인이 필요합니다',
+        text: '로그인 후 이용해주세요',
+        confirmButtonText: '확인',
+      });
+    } else {
+      setIsAuthorized(true); // 로그인 성공 시 데이터 요청 가능
+    }
+  }, [navi, token]);
+
   const dispatch = useDispatch();
   const [challengerData, setChallengerData] = useState([]);
   const [inputData, setInputData] = useState({});
@@ -135,22 +162,149 @@ const ChallengersList = () => {
     setInputData(initialInputData);
   };
   const handleAdd = (e) => {
-    fetch('http://127.0.0.1:80/api/challenger/write', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify(inputData),
-    })
-      .then((resp) => resp.json())
-      .then((data) => {
-        setNum(num + 1);
+    if (inputData.title === '') {
+      Swal.fire({
+        icon: 'warning',
+        title: '제목을 입력하세요.',
+        confirmButtonText: '확인',
       });
-    // 입력 후 모달 창 닫기
-    dispatch(close(e.target.title));
+      return;
+    }
+    if (inputData.recruitmentStart === '') {
+      Swal.fire({
+        icon: 'warning',
+        title: '모집 시작일을 입력하세요.',
+        confirmButtonText: '확인',
+      });
+      return;
+    }
+    if (inputData.recruitmentEnd === '') {
+      Swal.fire({
+        icon: 'warning',
+        title: '모집 종료일을 입력하세요.',
+        confirmButtonText: '확인',
+      });
+      return;
+    }
+    if (inputData.performanceStart === '') {
+      Swal.fire({
+        icon: 'warning',
+        title: '수행 시작일을 입력하세요.',
+        confirmButtonText: '확인',
+      });
+      return;
+    }
+    if (inputData.performanceEnd === '') {
+      Swal.fire({
+        icon: 'warning',
+        title: '수행 종료일을 입력하세요.',
+        confirmButtonText: '확인',
+      });
+      return;
+    }
+    if (inputData.content === '') {
+      Swal.fire({
+        icon: 'warning',
+        title: '내용을 입력하세요.',
+        confirmButtonText: '확인',
+      });
+      return;
+    }
+
+    Swal.fire({
+      title: '등록하시겠습니까?', // 제목
+      icon: 'question', // 아이콘 유형 (warning, success, error 등)
+      showCancelButton: true, // 취소 버튼 표시
+      confirmButtonColor: '#3085d6', // 등록 버튼 색상
+      cancelButtonColor: '#d33', // 취소 버튼 색상
+      confirmButtonText: '등록', // 등록 버튼 텍스트
+      cancelButtonText: '취소', // 취소 버튼 텍스트
+    }).then((result) => {
+      if (result.isConfirmed) {
+        //패치 넣기
+        fetch('http://127.0.0.1:80/api/challenger/write', {
+          method: 'POST',
+          headers: {
+            'content-type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(inputData),
+        })
+          .then((resp) => resp.json())
+          .then((data) => {
+            if (data === 0) {
+              Swal.fire({
+                icon: 'warning',
+                title: '작성 실패',
+                confirmButtonText: '확인',
+              });
+              return;
+            }
+
+            if (data === 2) {
+              Swal.fire({
+                icon: 'warning',
+                title: '작성 실패',
+                text: '모집 시작이 현재 시간보다 이전입니다!',
+                confirmButtonText: '확인',
+              });
+              return;
+            }
+            if (data === 3) {
+              Swal.fire({
+                icon: 'warning',
+                title: '작성 실패',
+                title: '모집 종료가 모집 시작보다 이전입니다!',
+                confirmButtonText: '확인',
+              });
+              return;
+            }
+            if (data === 4) {
+              Swal.fire({
+                icon: 'warning',
+                title: '작성 실패',
+                title: '수행 시작이 모집 종료보다 이전입니다!',
+                confirmButtonText: '확인',
+              });
+              return;
+            }
+            if (data === 5) {
+              Swal.fire({
+                icon: 'warning',
+                title: '작성 실패',
+                title: '수행 종료가 수행 시작보다 이전입니다!',
+                confirmButtonText: '확인',
+              });
+              return;
+            }
+
+            Swal.fire({
+              icon: 'success',
+              title: '작성 완료.',
+              confirmButtonText: '확인',
+            });
+            setNum(num + 1);
+          });
+        // 입력 후 모달 창 닫기
+        dispatch(close(e.target.title));
+      }
+    });
   };
 
   const handleChange = (e) => {
+    if (e.target.name === 'maxMembers' && e.target.value < 1) {
+      Swal.fire({
+        icon: 'warning',
+        title: '1명 이상 필수입니다.',
+        confirmButtonText: '확인',
+      });
+
+      setInputData((prev) => ({
+        ...prev,
+        maxMembers: 1, // 최소값 1로 설정
+      }));
+      return;
+    }
     setInputData((props) => {
       return {
         ...props,
@@ -160,6 +314,9 @@ const ChallengersList = () => {
   };
 
   useEffect(() => {
+    if (!isAuthorized) {
+      return;
+    }
     fetch('http://127.0.0.1:/api/challenger/list')
       .then((resp) => resp.json())
       .then((data) => {
@@ -172,56 +329,95 @@ const ChallengersList = () => {
           setChallengerData([]); // 데이터가 없을 경우 초기화
         }
       });
-  }, [currentPage, boardLimit, num]);
+  }, [isAuthorized, token, currentPage, boardLimit, num]);
 
   const handleJoin = (e) => {
     const memberNo = '1';
 
     if (inputData.maxMembers - inputData.countMember === 0) {
-      alert('정원이 꽉 찼습니다.');
+      Swal.fire({
+        icon: 'warning',
+        title: '정원이 꽉 찼습니다.',
+        confirmButtonText: '확인',
+      });
+
       dispatch(close(e.target.title));
       return;
     }
     if (inputData.status === '대기') {
-      alert('대기중입니다.');
+      Swal.fire({
+        icon: 'warning',
+        title: '대기중입니다.',
+        confirmButtonText: '확인',
+      });
+
       dispatch(close(e.target.title));
       return;
     }
 
     if (inputData.status === '완료') {
-      alert('마감됐습니다.');
+      Swal.fire({
+        icon: 'warning',
+        title: '마감됐습니다.',
+        confirmButtonText: '확인',
+      });
+
       dispatch(close(e.target.title));
       return;
     }
 
     if (inputData.status === '진행중') {
-      fetch('http://127.0.0.1:/api/challenger/join', {
-        method: 'post',
-        headers: {
-          'content-type': 'application/json',
-        },
-        body: JSON.stringify({
-          no: inputData.no,
-          memberNo: memberNo,
-        }),
-      })
-        .then((resp) => resp.text())
-        .then((data) => {
-          if (data === 2) {
-            dispatch(close(e.target.title));
-            alert('이미 신청돼었습니다.');
-          } else {
-            setNum(num + 1);
-            dispatch(close(e.target.title));
-            alert('신청됐습니다.');
-          }
-        });
+      Swal.fire({
+        title: '신청하시겠습니까?', // 제목
+        icon: 'question', // 아이콘 유형 (warning, success, error 등)
+        showCancelButton: true, // 취소 버튼 표시
+        confirmButtonColor: '#3085d6', // 등록 버튼 색상
+        cancelButtonColor: '#d33', // 취소 버튼 색상
+        confirmButtonText: '등록', // 등록 버튼 텍스트
+        cancelButtonText: '취소', // 취소 버튼 텍스트
+      }).then((result) => {
+        if (result.isConfirmed) {
+          //패치 넣기
+
+          fetch('http://127.0.0.1:/api/challenger/join', {
+            method: 'post',
+            headers: {
+              'content-type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              no: inputData.no,
+              memberNo: memberNo,
+            }),
+          })
+            .then((resp) => resp.text())
+            .then((data) => {
+              if (data === '2') {
+                dispatch(close(e.target.title));
+                Swal.fire({
+                  icon: 'warning',
+                  title: '참여중인 챌린지입니다.',
+                  confirmButtonText: '확인',
+                });
+              } else {
+                setNum(num + 1);
+
+                dispatch(close(e.target.title));
+                Swal.fire({
+                  icon: 'success',
+                  title: '신청됐습니다.',
+                  confirmButtonText: '확인',
+                });
+              }
+            });
+        }
+      });
     }
   };
 
   return (
     <>
-      <Title>챌린저스</Title>
+      <Title>챌린지</Title>
 
       <Modal title={'챌린지 등록'} width={'905'} mt={'-25'} ml={'860'}>
         <ModalDiv>
@@ -230,10 +426,10 @@ const ChallengersList = () => {
             <LayoutInput type="text" value={inputData.title} name="title" title="제목" onChange={handleChange} />
           </div>
           <div>
-            <TitleDiv>인원</TitleDiv>
+            <TitleDiv>정원</TitleDiv>
             <LayoutInput
               type="number"
-              value={inputData.maxMembers}
+              value={`${inputData.maxMembers}` ? `${inputData.maxMembers}` : 1}
               name="maxMembers"
               title="모집 인원"
               onChange={handleChange}
@@ -464,7 +660,9 @@ const ChallengersList = () => {
           </TableTag>
         </TableWrapper>
       </ContentLayout>
-      <Pagination boardType={boardType}></Pagination>
+      <BottomDiv>
+        <Pagination boardType={boardType}></Pagination>
+      </BottomDiv>
     </>
   );
 };

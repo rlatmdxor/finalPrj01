@@ -38,7 +38,6 @@ public class MemberService {
             // 기본 이미지 URL 설정
             profileUrl = "https://healinglog-kh.s3.ap-northeast-2.amazonaws.com/default_profile.jpg";
         } else {
-            System.out.println("profile = " + profile.getOriginalFilename());
 
             // 파일명 랜덤값 주기
             String originName = profile.getOriginalFilename();

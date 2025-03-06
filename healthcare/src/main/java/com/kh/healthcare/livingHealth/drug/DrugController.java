@@ -15,53 +15,89 @@ public class DrugController {
 
     private final DrugService service;
 
-    @GetMapping("list")
-    public List<DrugVo>  list(){
-        List<DrugVo> voList = service.list();
-        System.out.println("voList = " + voList);
-        return  voList;
+    @PostMapping("list")
+    public List<DrugVo>  list(@RequestHeader ("Authorization") String token){
+        try {
+            List<DrugVo> voList = service.list(token);
+            return  voList;
+        }catch (Exception e){
+            throw new IllegalStateException("CODE [ CHALLENGER / LIST ]");
+        }
+
     }
 
-    @GetMapping("delList")
-    public List<DrugVo>  delList(){
-        System.out.println("DrugController.delList");
-        List<DrugVo> voList = service.delList();
-        return  voList;
+    @PostMapping("delList")
+    public List<DrugVo>  delList(@RequestHeader ("Authorization") String token){
+        try {
+            List<DrugVo> voList = service.delList(token);
+            return  voList;
+        }catch (Exception e){
+            throw new IllegalStateException("CODE [ CHALLENGER / DELLIST ]");
+        }
+
     }
 
     @PostMapping("find")
     public List<DrugVo> find(@RequestBody DrugVo vo){
-        List<DrugVo> voList = service.find(vo);
-        return voList;
+        try {
+            List<DrugVo> voList = service.find(vo);
+            return voList;
+        }catch (Exception e){
+            throw new IllegalStateException("CODE [ CHALLENGER / FIND ]");
+        }
+
     }
 
     @PostMapping("write")
-    public int write(@RequestBody DrugVo vo){
-        System.out.println("vo = " + vo);
-       int result =  service.write(vo);
-        return result;
+    public int write(@RequestHeader ("Authorization") String token, @RequestBody DrugVo vo){
+        try {
+            int result =  service.write(token,vo);
+            return result;
+        }catch (Exception e){
+            throw new IllegalStateException("CODE [ CHALLENGER / WRITE ]");
+        }
+
     }
 
     @GetMapping("color")
     public List<DrugColorCategoryVo> color(){
-       List<DrugColorCategoryVo> result =  service.color();
-       return result;
+        try {
+            List<DrugColorCategoryVo> result =  service.color();
+            return result;
+        }catch (Exception e){
+            throw new IllegalStateException("CODE [ CHALLENGER / COLOR ]");
+        }
+
     }
 
     @GetMapping("form")
     public List<DrugFormCategoryVo> form(){
-        List<DrugFormCategoryVo> result = service.form();
-        return result;
+        try {
+            List<DrugFormCategoryVo> result = service.form();
+            return result;
+        }catch (Exception e){
+            throw new IllegalStateException("CODE [ CHALLENGER / FORM ]");
+        }
+
     }
 
     @PostMapping("del")
-    public void del(@RequestBody List<String> vo ){
-        service.del(vo);
+    public void del(@RequestHeader ("Authorization") String token, @RequestBody List<String> vo ){
+        try {
+            service.del(token,vo);
+        }catch (Exception e){
+            throw new IllegalStateException("CODE [ CHALLENGER / DEL ]");
+        }
+
     }
     @PostMapping("removeDrug")
-    public void removeDrug(@RequestBody List<String> vo ){
-        System.out.println("vo = " + vo);
-        service.removeDrug(vo);
+    public void removeDrug(@RequestHeader ("Authorization") String token, @RequestBody List<String> vo ){
+        try {
+            service.removeDrug(token, vo);
+        }catch (Exception e){
+            throw new IllegalStateException("CODE [ CHALLENGER / REMOVEDRUG ]");
+        }
+
     }
 
 }

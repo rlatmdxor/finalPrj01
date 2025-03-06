@@ -21,8 +21,14 @@ public class ExerciseController {
             , @RequestParam(required = false) Integer month
             , @RequestParam String rangeType) {
 
-        List<Map<String, Object>> data = service.getCalories(token, rangeType, year, month);
-        return ResponseEntity.ok(data);
+        try {
+            List<Map<String, Object>> data = service.getCalories(token, rangeType, year, month);
+            return ResponseEntity.ok(data);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @GetMapping("getDuration")
@@ -31,15 +37,28 @@ public class ExerciseController {
             , @RequestParam(required = false) Integer month
             , @RequestParam String rangeType) {
 
-        List<Map<String, Object>> data = service.getDuration(token, rangeType, year, month);
-        return ResponseEntity.ok(data);
+        try {
+            List<Map<String, Object>> data = service.getDuration(token, rangeType, year, month);
+            return ResponseEntity.ok(data);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @GetMapping("getMonthlyMaxWeight")
     public ResponseEntity<List<Map<String, Object>>> getMonthlyMaxWeight(@RequestHeader("Authorization") String token) {
 
-        List<Map<String, Object>> data = service.getMonthlyMaxWeight(token);
-        return ResponseEntity.ok(data);
+        try {
+            List<Map<String, Object>> data = service.getMonthlyMaxWeight(token);
+            return ResponseEntity.ok(data);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+
     }
 
     @GetMapping("getTypeCount")
@@ -48,8 +67,15 @@ public class ExerciseController {
             , @RequestParam int year
             , @RequestParam(required = false) Integer month) {
 
-        List<Map<String, Object>> result = service.getTypeCount(token, rangeType, year, month);
-        return ResponseEntity.ok(result);
+        try {
+            List<Map<String, Object>> result = service.getTypeCount(token, rangeType, year, month);
+            return ResponseEntity.ok(result);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+
     }
 
 
@@ -59,15 +85,29 @@ public class ExerciseController {
             , @RequestParam int year
             , @RequestParam(required = false) Integer month
     ) {
-        List<Map<String, Object>> result = service.getCategoryCount(token, rangeType, year, month);
-        return ResponseEntity.ok(result);
+
+        try {
+            List<Map<String, Object>> result = service.getCategoryCount(token, rangeType, year, month);
+            return ResponseEntity.ok(result);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @GetMapping("getHistory")
     public ResponseEntity<Map<String, List<List<String>>>> getExerciseHistory(@RequestHeader("Authorization") String token
             , @RequestParam String type) {
-        Map<String, List<List<String>>> events = service.getExerciseHistory(token, type);
-        return ResponseEntity.ok(events);
+
+        try {
+            Map<String, List<List<String>>> events = service.getExerciseHistory(token, type);
+            return ResponseEntity.ok(events);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
 }

@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import Btn from '../../util/Btn';
 import styled, { useTheme } from 'styled-components';
 import { setProfile } from '../../../redux/JoinSlice';
+import Swal from 'sweetalert2';
 
 const Profile = () => {
   const dispatch = useDispatch();
@@ -30,11 +31,22 @@ const Profile = () => {
 
   //프로필 삭제
   const handleFileDelete = async () => {
-    if (window.confirm('이미지를 삭제하겠습니까?')) {
-      dispatch(setProfile(''));
-      setProfileImg('/img/profile.jpg');
-      fileInputRef.current.value = '';
-    }
+    Swal.fire({
+      title: '이미지를 삭제하시겠습니까?', // 제목
+      icon: 'question', // 아이콘 유형 (warning, success, error 등)
+      showCancelButton: true, // 취소 버튼 표시
+      confirmButtonColor: '#3085d6', // 등록 버튼 색상
+      cancelButtonColor: '#d33', // 취소 버튼 색상
+      confirmButtonText: '삭제', // 등록 버튼 텍스트
+      cancelButtonText: '취소', // 취소 버튼 텍스트
+    }).then((result) => {
+      if (result.isConfirmed) {
+        //패치 넣기
+        dispatch(setProfile(''));
+        setProfileImg('/img/profile.jpg');
+        fileInputRef.current.value = '';
+      }
+    });
   };
 
   const handleImageClick = () => {

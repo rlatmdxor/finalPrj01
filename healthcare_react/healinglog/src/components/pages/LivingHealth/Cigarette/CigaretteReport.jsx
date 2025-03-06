@@ -19,6 +19,7 @@ import DateBtn from '../../../util/DateBtn';
 
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
+import { getRoleFromToken, isTokenExpired } from '../../../util/JwtUtil';
 
 const NaviContainer = styled.div`
   display: grid;
@@ -28,14 +29,50 @@ const NaviContainer = styled.div`
   left: 40px;
   grid-template-columns: 3fr 3fr; // 글자수만큼 fr 주면 됩니다. ex) 유산소 3글자니까 3fr
 `;
+const YearDiv = styled.div`
+  display: flex;
+  height: 30px;
+  box-sizing: border-box;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid rgb(118, 118, 118);
+`;
+
+const YearBtn = styled.button`
+  background-color: transparent;
+  border: none;
+  padding: 0px 12px;
+  cursor: pointer;
+  font-size: 16px;
+`;
+
+const SearchArea = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 9px;
+  margin-top: 10px;
+`;
+
+const Input = styled.input`
+  box-sizing: border-box;
+  font-family: '맑은 고딕';
+  height: 30px;
+  padding: 0px 4px;
+`;
+
+const BottomDiv = styled.div`
+  margin-top: 25px;
+  margin-bottom: 35px;
+`;
 
 const CigaretteReport = () => {
+  const dispatch = useDispatch();
   const [fullData, setFullData] = useState([]); // 전체 데이터 저장
   const [pagedData, setPagedData] = useState([]); // 페이징된 데이터
   const [filteredData, setFilteredData] = useState([]); // 차트용 필터링 데이터
   const [selectedRange, setSelectedRange] = useState('주'); // 기본값 '주'
   const [selectChart, setSelectChart] = useState('Line'); // 그래프 모양 정하는 state
-  const dispatch = useDispatch();
 
   const boardType = 'CigaretteReport';
   const { currentPage, boardLimit } = useSelector((state) => state.paging[boardType] || {});
@@ -65,14 +102,14 @@ const CigaretteReport = () => {
   const [isAuthorized, setIsAuthorized] = useState(false); // 로그인 여부 체크
 
   useEffect(() => {
-    if (!token) {
+    if (!token || isTokenExpired(token) || getRoleFromToken(token) == 'ROLE_ADMIN') {
+      window.localStorage.removeItem('token'); // 토큰 삭제
+      navi('/login'); // 로그인 페이지로 이동
       Swal.fire({
         icon: 'warning',
         title: '로그인이 필요합니다',
         text: '로그인 후 이용해주세요',
         confirmButtonText: '확인',
-      }).then(() => {
-        navi('/login'); // 로그인 페이지로 이동
       });
     } else {
       setIsAuthorized(true); // 로그인 성공 시 데이터 요청 가능
@@ -95,7 +132,6 @@ const CigaretteReport = () => {
         if (!isAuthorized) {
           return;
         }
-
         if (data.length > 0) {
           dispatch(setTotalCount({ boardType, totalCount: data.length })); // 페이징 처리할때 totalCount 저장
           setFullData(data);
@@ -112,23 +148,11 @@ const CigaretteReport = () => {
     setPagedData(fullData.slice(offset, offset + boardLimit));
   }, [fullData, currentPage, boardLimit]);
 
-  // date버튼의 값에 따라서 그래프에 표시되는 데이터를 설정하는 부분
-  useEffect(() => {
-    if (selectedRange == '주') {
-      setFilteredData(filterData('week'));
-    } else if (selectedRange == '월') {
-      setFilteredData(filterData('month'));
-    } else if (selectedRange == '년') {
-      setFilteredData(filterData('year'));
-    } else {
-      setFilteredData(filterData('all'));
-    }
-  }, [selectedRange]);
-
   // 차트용 필터링 데이터의 마지막 기록 날짜를 기준으로 최근 7일간의 데이터와 해당 날짜가 포함된 달의 데이터를 가져옴
   const filterData = (type) => {
     // const today = new Date(); // 오늘 날짜 가져오기
 
+    //데이터의 최근날짜
     const voList = [];
 
     for (const vo of fullData) {
@@ -177,6 +201,91 @@ const CigaretteReport = () => {
     setFilteredData(filterData('week'));
   }, [fullData]);
 
+  //테스트
+  const currentYear = new Date().getFullYear();
+  const currentMonth = String(new Date().getMonth() + 1).padStart(2, '0');
+  const currentYearMonth = currentYear + '-' + currentMonth;
+  const [year, setYear] = useState(currentYear);
+  const [month, setMonth] = useState(currentYearMonth);
+
+  const handleIncrease = () => {
+    setYear((prev) => prev + 1);
+  };
+
+  const handleDecrease = () => {
+    setYear((prev) => prev - 1);
+  };
+
+  const handleDateChange = (e) => {
+    setMonth(e.target.value);
+  };
+
+  const getYearCigaretteList = async () => {
+    const token = localStorage.getItem('token');
+
+    try {
+      const response = await fetch('http://127.0.0.1/api/cigarette/report/list', {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('데이터 불러오기 실패:', error);
+      return [];
+    }
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const cigaretteList = await getYearCigaretteList(); // 전체 데이터 가져오기
+
+        let filteredData = [];
+
+        if (selectedRange === '주') {
+          // 최근 7일 데이터 필터링
+          const today = new Date();
+          const oneWeekAgo = new Date(today);
+          oneWeekAgo.setDate(today.getDate() - 7);
+
+          filteredData = cigaretteList.filter((item) => {
+            const itemDate = new Date(item.endDate);
+            return itemDate >= oneWeekAgo && itemDate <= today;
+          });
+        } else if (selectedRange === '월') {
+          // 월별 데이터 필터링
+          filteredData = cigaretteList.filter((item) => {
+            const itemDate = new Date(item.endDate);
+            const itemYear = itemDate.getFullYear();
+            const itemMonth = (itemDate.getMonth() + 1).toString().padStart(2, '0');
+            return itemYear === year && itemMonth === month.split('-')[1];
+          });
+        } else if (selectedRange === '년') {
+          // 연도별 데이터 필터링
+          filteredData = cigaretteList.filter((item) => {
+            const itemYear = new Date(item.endDate).getFullYear();
+            return itemYear === year;
+          });
+        }
+
+        setFilteredData(filteredData);
+      } catch (error) {
+        console.error('[ERROR] GET DATA', error);
+      }
+    };
+
+    fetchData();
+  }, [selectedRange, year, month]);
+  //테스트
+
   const dataBtn = ['주', '월', '년'];
 
   // 날짜 기준 오름차순 정렬 (과거 → 현재)
@@ -191,12 +300,12 @@ const CigaretteReport = () => {
     return Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1; // 시작일부터 포함하여 계산
   };
 
-  const datasetData = sortedData.map((vo) => {
+  const cigaretteList = sortedData.map((vo) => {
     const days = getDaysConsumed(vo.startDate, vo.endDate);
     return days > 0 ? parseFloat((1 / days).toFixed(2)) : 0;
   });
 
-  const cigaretteList = [];
+  // const cigaretteList = [];
   // 차트에 들어갈 1번 데이터의 내용
   for (const vo of filteredData) {
     cigaretteList.push(vo.endDate);
@@ -208,7 +317,7 @@ const CigaretteReport = () => {
       // Bar , Pie , Doughnut에서는 마우스를 해당 부분에 호버하면 이 label의 이름이 표시된다.
 
       label: '일당 소모갑 수',
-      data: datasetData,
+      data: cigaretteList,
       backgroundColor: [
         'rgba(255, 99, 132, 0.2)',
         'rgba(54, 162, 235, 0.2)',
@@ -232,7 +341,7 @@ const CigaretteReport = () => {
   ];
 
   // datasetData에서 가장 큰 값 찾기
-  const maxValue = Math.max(...datasetData);
+  const maxValue = Math.max(...cigaretteList);
 
   // yMax 값 설정 (최대값 + 0.5)
   const yMaxValue = maxValue + 0.2;
@@ -262,83 +371,163 @@ const CigaretteReport = () => {
 
   // 인풋 입력값 보내기
   const handleSubmit = (e) => {
-    fetch('http://127.0.0.1:80/api/cigarette/report/write', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(inputData),
-    })
-      .then((resp) => resp.text())
-      .then((data) => {
-        alert('등록 완료');
-        window.location.reload();
-      })
-      .catch((error) => {
-        alert('등록 실패');
-        console.error('등록 실패:', error);
-      });
-    //렌
-    setNum(num - 1);
-    // 입력 후 모달 창 닫기
-    dispatch(close(e.target.title));
+    Swal.fire({
+      title: '등록하시겠습니까?',
+      icon: 'warning', // 아이콘 유형 (success, warning, error 등)
+      showCancelButton: true, // 취소 버튼 표시
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: '등록',
+      cancelButtonText: '취소',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        fetch('http://127.0.0.1:80/api/cigarette/report/write', {
+          method: 'POST',
+          headers: {
+            'content-type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(inputData),
+        })
+          .then((resp) => {
+            if (!resp.ok) {
+              throw new Error(`HTTP error! Status: ${resp.status}`);
+            }
+            return resp.text();
+          })
+          .then((data) => {
+            // 실제 등록이 성공적으로 처리되었다면 성공 알림을 띄움
+            Swal.fire({
+              title: '등록 완료!',
+              text: '등록이 성공적으로 처리되었습니다.',
+              icon: 'success',
+              confirmButtonColor: '#3085d6',
+            }).then(() => {
+              // 모달 닫기
+              dispatch(close(e.target.title));
+              // 페이지 새로고침 등 필요한 추가 동작
+              window.location.reload();
+            });
+          })
+          .catch((error) => {
+            console.error('등록 실패:', error);
+            Swal.fire({
+              title: '등록 실패',
+              text: '오류가 발생했습니다. 다시 시도해주세요.',
+              icon: 'error',
+              confirmButtonColor: '#d33',
+            });
+          });
+      }
+    });
   };
 
   //수정모달
   const handleEditSubmit = (e) => {
-    fetch('http://127.0.0.1:80/api/cigarette/report/update', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(inputData),
-    })
-      .then((resp) => {
-        if (!resp.ok) {
-          throw new Error(`HTTP error! Status: ${resp.status}`);
-        }
-        return resp.text(); // 또는 .json() (응답 형식에 따라)
-      })
-      .then((data) => {
-        alert('수정 완료');
-        window.location.reload();
-      })
-      .catch((error) => {
-        alert('수정 실패');
-        console.error('수정 실패:', error);
-      });
-
-    dispatch(close('흡연 수정'));
+    Swal.fire({
+      title: '수정하시겠습니까?',
+      icon: 'warning', // 아이콘 유형
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: '수정',
+      cancelButtonText: '취소',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        fetch('http://127.0.0.1:80/api/cigarette/report/update', {
+          method: 'POST',
+          headers: {
+            'content-type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(inputData),
+        })
+          .then((resp) => {
+            if (!resp.ok) {
+              throw new Error(`HTTP error! Status: ${resp.status}`);
+            }
+            return resp.text(); // 또는 resp.json()
+          })
+          .then((data) => {
+            // 수정 성공 시 다시 알림 표시
+            Swal.fire({
+              title: '수정 완료!',
+              text: '수정이 성공적으로 처리되었습니다.',
+              icon: 'success',
+              confirmButtonColor: '#3085d6',
+            }).then(() => {
+              // 모달 닫기
+              dispatch(close('흡연 수정'));
+              // 필요 시 페이지 새로고침
+              window.location.reload();
+            });
+          })
+          .catch((error) => {
+            console.error('수정 실패:', error);
+            // 수정 실패 시 알림
+            Swal.fire({
+              title: '수정 실패',
+              text: '오류가 발생했습니다. 다시 시도해주세요.',
+              icon: 'error',
+              confirmButtonColor: '#d33',
+            });
+          });
+      }
+    });
   };
 
   const handleDeleteSubmit = (e) => {
-    fetch('http://127.0.0.1/api/cigarette/report/delete', {
-      method: 'DELETE',
-      headers: {
-        'content-type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(inputData),
-    })
-      .then((resp) => {
-        if (!resp.ok) {
-          throw new Error(`HTTP error! Status: ${resp.status}`);
-        }
-        return resp.text(); // 또는 .json() (응답 형식에 따라)
-      })
-      .then((data) => {
-        alert('삭제 완료');
-        console.log('삭제 완료:', data);
-        window.location.reload();
-      })
-      .catch((error) => {
-        alert('삭제 수정');
-        console.error('삭제 실패:', error);
-      });
-    //창닫기
-    dispatch(close('흡연 수정'));
+    Swal.fire({
+      title: '삭제하시겠습니까?',
+      icon: 'warning', // 경고 아이콘
+      showCancelButton: true, // 취소 버튼 표시
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: '삭제',
+      cancelButtonText: '취소',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // 삭제 fetch 호출
+        fetch('http://127.0.0.1/api/cigarette/report/delete', {
+          method: 'DELETE',
+          headers: {
+            'content-type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(inputData),
+        })
+          .then((resp) => {
+            if (!resp.ok) {
+              throw new Error(`HTTP error! Status: ${resp.status}`);
+            }
+            return resp.text(); // 또는 resp.json()
+          })
+          .then((data) => {
+            // 삭제 성공 시 메시지
+            Swal.fire({
+              title: '삭제 완료!',
+              text: '데이터가 삭제되었습니다.',
+              icon: 'success',
+              confirmButtonColor: '#3085d6',
+            }).then(() => {
+              // 모달 닫기
+              dispatch(close('흡연 수정'));
+              // 필요 시 페이지 새로고침
+              window.location.reload();
+            });
+          })
+          .catch((error) => {
+            console.error('삭제 실패:', error);
+            // 삭제 실패 시 메시지
+            Swal.fire({
+              title: '삭제 실패',
+              text: '오류가 발생했습니다. 다시 시도해주세요.',
+              icon: 'error',
+              confirmButtonColor: '#d33',
+            });
+          });
+      }
+    });
   };
 
   return (
@@ -351,11 +540,25 @@ const CigaretteReport = () => {
       <div></div>
 
       <ContentLayout>
-        <DateBtn dataBtn={dataBtn} onSelect={setSelectedRange} onChange={setSelectChart}></DateBtn>
+        <SearchArea>
+          {selectedRange === '월' ? (
+            <Input type="month" name="month" defaultValue={month} onChange={handleDateChange} />
+          ) : selectedRange === '년' ? (
+            <YearDiv>
+              <YearBtn onClick={handleDecrease}>{'<'}</YearBtn>
+              <span>{year}</span>
+              <YearBtn onClick={handleIncrease}>{'>'}</YearBtn>
+            </YearDiv>
+          ) : (
+            ''
+          )}
+          <DateBtn dataBtn={dataBtn} onSelect={setSelectedRange} onChange={setSelectChart}></DateBtn>
+        </SearchArea>
+
         <Chart
           chartType={selectChart} // 차트 타입지정
           labels={labels} // 위랑 동일
-          dataset={dataset} // 위랑 동일
+          dataset={dataset} // 위랑 동일111111111111
           width={100} // 위랑 동일
           height={450} // 위랑 동일
           xAxisColor="rgba(54, 162, 235, 1)" // 위랑 동일
@@ -543,9 +746,9 @@ const CigaretteReport = () => {
           </tbody>
         </Table>
         <div></div>
-        <div>
-          <Pagination boardType={boardType} />
-        </div>
+        <BottomDiv>
+          <Pagination boardType={boardType}></Pagination>
+        </BottomDiv>
         <div></div>
       </ContentLayout>
     </>

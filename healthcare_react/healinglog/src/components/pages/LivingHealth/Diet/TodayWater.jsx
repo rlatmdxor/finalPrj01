@@ -15,9 +15,7 @@ const TodayWater = ({ token }) => {
   const dispatch = useDispatch();
   const Swal = require('sweetalert2');
 
-  const memberNo = useSelector((state) => state.diet.memberNo);
   const day = useSelector((state) => state.diet.day);
-
   const amount = useSelector((state) => state.diet.water);
 
   const [inputData, setInputData] = useState({ amount: 0 });
@@ -58,7 +56,7 @@ const TodayWater = ({ token }) => {
       if (result.isConfirmed) {
         const enrollWater = async () => {
           try {
-            const result = await enrollTodayWater(memberNo, day, inputData, token);
+            const result = await enrollTodayWater(day, inputData, token);
             if (result == 200) {
               Swal.fire({
                 title: '등록되었습니다.',

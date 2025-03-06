@@ -8,6 +8,7 @@ import { useDispatch } from 'react-redux';
 import { getPayload } from '../../util/JwtUtil';
 import { login } from '../../../redux/MemberSlice';
 import { setNick } from '../../../redux/JoinSlice';
+import Swal from 'sweetalert2';
 
 const LoginPage = () => {
   const navi = useNavigate();
@@ -32,7 +33,12 @@ const LoginPage = () => {
       .then((resp) => resp.text())
       .then((token) => {
         if (!token) {
-          alert('로그인에 실패했습니다.');
+          Swal.fire({
+            icon: 'error',
+            title: '로그인에 실패했습니다.',
+            confirmButtonText: '확인',
+          });
+
           return;
         }
         // console.log('token ::: ', token);
@@ -43,7 +49,12 @@ const LoginPage = () => {
         const nick = getPayload(token, 'nick');
         dispatch(setNick(nick));
         dispatch(login({ no, id, nick }));
-        alert(`환영합니다 ${nick}님`);
+        Swal.fire({
+          icon: 'success',
+          title: `환영합니다. ${nick}님`,
+          confirmButtonText: '확인',
+        });
+
         navi('/dashboard');
       })
       .catch((error) => console.error('fetch 에러 발생:', error));

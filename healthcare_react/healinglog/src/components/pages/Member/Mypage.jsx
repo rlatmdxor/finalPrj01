@@ -24,25 +24,45 @@ import Postcode from '../../util/PostCode';
 import { useNavigate } from 'react-router-dom';
 import { Switch } from '@mui/material';
 import Modal2 from '../../util/Modal2';
+import { isTokenExpired, getRoleFromToken } from '../../util/JwtUtil';
+import Swal from 'sweetalert2';
 
 const Mypage = () => {
   const theme = useTheme();
   const dispatch = useDispatch();
-  const navi = useNavigate();
   const { id, pwd, nick, name, address, email, phone, height, weight, profile } = useSelector((state) => state.join);
   const [newNick, setNewNick] = useState('');
   const heightOptions = Array.from({ length: 71 }, (_, i) => i + 140); // 140 ~ 210 cm
   const weightOptions = Array.from({ length: 81 }, (_, i) => i + 40); // 40 ~ 120 kg
   const [settings, setSettings] = useState({
-    전체푸시: true,
-    식단푸시: false,
-    물섭취푸시: true,
-    운동푸시: true,
-    댓글푸시: false,
-    혈압푸시: true,
-    혈당푸시: false,
-    인슐린투약푸시: false,
+    allPush: true,
+    dietPush: true,
+    waterPush: true,
+    exercisePush: true,
+    commentPush: true,
+    bloodPressurePush: true,
+    bloodSugarPush: true,
+    insulinPush: true,
   });
+
+  const token = localStorage.getItem('token');
+  const navi = useNavigate();
+  const [isAuthorized, setIsAuthorized] = useState(false); // 로그인 여부 체크
+
+  useEffect(() => {
+    if (!token || isTokenExpired(token) || getRoleFromToken(token) == 'ROLE_ADMIN') {
+      window.localStorage.removeItem('token'); // 토큰 삭제
+      navi('/login'); // 로그인 페이지로 이동
+      Swal.fire({
+        icon: 'warning',
+        title: '로그인이 필요합니다',
+        text: '로그인 후 이용해주세요',
+        confirmButtonText: '확인',
+      });
+    } else {
+      setIsAuthorized(true); // 로그인 성공 시 데이터 요청 가능
+    }
+  }, [navi, token]);
 
   const handleToggle = (setting) => {
     setSettings({
@@ -50,12 +70,6 @@ const Mypage = () => {
       [setting]: !settings[setting],
     });
   };
-  const token = localStorage.getItem('token');
-
-  if (!token) {
-    alert('로그인 정보가 없습니다.');
-    window.location.href = '/login';
-  }
 
   ///////////////// 주소 관련 데이터////////////////
   const [zoneAddress, setZoneAddress] = useState('');
@@ -217,12 +231,12 @@ const Mypage = () => {
               w={'150'}
               h={'40'}
               c={theme.green}
-              str="주소 수정"
+              str="주소 변경"
               fc={'white'}
               fs={'18'}
               f={(e) => {
                 reset();
-                dispatch(open({ title: '주소 수정', value: 'block' }));
+                dispatch(open({ title: '주소 변경', value: 'block' }));
               }}
               mt={'0'}
               mb={'0'}
@@ -278,8 +292,29 @@ const Mypage = () => {
               str="푸시알람 설정"
               fc={'white'}
               fs={'18'}
-              f={() => {
+              f={async () => {
                 reset();
+                const response = await fetch('http://127.0.0.1:80/api/notification/getPushSettings', {
+                  method: 'GET',
+                  headers: { Authorization: `Bearer ${token}` },
+                });
+                if (!response.ok) {
+                  throw new Error('서버 응답 오류');
+                }
+                const data = await response.json();
+                //가져온 데이터로 푸시알림설정 세팅
+                setSettings((prevSettings) => ({
+                  ...prevSettings,
+                  allPush: data.allPush === 'Y' ? true : false,
+                  dietPush: data.dietPush === 'Y' ? true : false,
+                  waterPush: data.waterPush === 'Y' ? true : false,
+                  exercisePush: data.exercisePush === 'Y' ? true : false,
+                  commentPush: data.commentPush === 'Y' ? true : false,
+                  bloodPressurePush: data.bloodPressurePush === 'Y' ? true : false,
+                  bloodSugarPush: data.bloodSugarPush === 'Y' ? true : false,
+                  insulinPush: data.insulinPush === 'Y' ? true : false,
+                }));
+
                 dispatch(open({ title: '푸시알람 설정', value: 'block' }));
               }}
               mt={'0'}
@@ -296,17 +331,32 @@ const Mypage = () => {
               str="회원 탈퇴"
               fs={'18'}
               f={(e) => {
-                if (window.confirm('정말 탈퇴하시겠습니까?')) {
-                  fetch('http://127.0.0.1:80/api/member/withdrawal', {
-                    method: 'POST',
-                    headers: {
-                      Authorization: `Bearer ${token}`,
-                    },
-                  })
-                    .then((resp) => resp.text())
-                    .then((data) => localStorage.removeItem('token'), (window.location.href = '/login'));
-                  alert('탈퇴 처리 되었습니다.');
-                }
+                Swal.fire({
+                  title: '정말 탈퇴하시겠습니까?', // 제목
+                  icon: 'question', // 아이콘 유형 (warning, success, error 등)
+                  showCancelButton: true, // 취소 버튼 표시
+                  confirmButtonColor: '#3085d6', // 등록 버튼 색상
+                  cancelButtonColor: '#d33', // 취소 버튼 색상
+                  confirmButtonText: '탈퇴', // 등록 버튼 텍스트
+                  cancelButtonText: '취소', // 취소 버튼 텍스트
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                    //패치 넣기
+                    fetch('http://127.0.0.1:80/api/member/withdrawal', {
+                      method: 'POST',
+                      headers: {
+                        Authorization: `Bearer ${token}`,
+                      },
+                    })
+                      .then((resp) => resp.text())
+                      .then((data) => localStorage.removeItem('token'), (window.location.href = '/login'));
+                    Swal.fire({
+                      icon: 'success',
+                      title: '탈퇴 처리 되었습니다.',
+                      confirmButtonText: '확인',
+                    });
+                  }
+                });
               }}
               mt={'0'}
               mb={'0'}
@@ -355,24 +405,39 @@ const Mypage = () => {
               fc={'white'}
               str={'변경'}
               f={(e) => {
-                if (window.confirm('변경하시겠습니까?')) {
-                  const formData = new FormData();
-                  formData.append('currentPwd', currentPwd);
-                  formData.append('newPwd', newPwd);
+                Swal.fire({
+                  title: '변경하시겠습니까?', // 제목
+                  icon: 'question', // 아이콘 유형 (warning, success, error 등)
+                  showCancelButton: true, // 취소 버튼 표시
+                  confirmButtonColor: '#3085d6', // 등록 버튼 색상
+                  cancelButtonColor: '#d33', // 취소 버튼 색상
+                  confirmButtonText: '변경', // 등록 버튼 텍스트
+                  cancelButtonText: '취소', // 취소 버튼 텍스트
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                    //패치 넣기
+                    const formData = new FormData();
+                    formData.append('currentPwd', currentPwd);
+                    formData.append('newPwd', newPwd);
 
-                  fetch('http://127.0.0.1:80/api/member/changePwd', {
-                    method: 'POST',
-                    headers: {
-                      Authorization: `Bearer ${token}`,
-                    },
-                    body: formData,
-                  })
-                    .then((resp) => resp.text())
-                    .then((data) => {
-                      alert(data);
-                    });
-                  dispatch(close(e.target.title));
-                }
+                    fetch('http://127.0.0.1:80/api/member/changePwd', {
+                      method: 'POST',
+                      headers: {
+                        Authorization: `Bearer ${token}`,
+                      },
+                      body: formData,
+                    })
+                      .then((resp) => resp.text())
+                      .then((data) => {
+                        Swal.fire({
+                          icon: 'success',
+                          title: data,
+                          confirmButtonText: '확인',
+                        });
+                      });
+                    dispatch(close(e.target.title));
+                  }
+                });
               }}
             ></Btn>
           </ModalContainer>
@@ -404,64 +469,94 @@ const Mypage = () => {
               fc={'white'}
               str={'변경'}
               f={(e) => {
-                if (window.confirm('변경하시겠습니까?')) {
-                  const formData = new FormData();
-                  formData.append('nick', newNick);
+                Swal.fire({
+                  title: '변경하시겠습니까?', // 제목
+                  icon: 'question', // 아이콘 유형 (warning, success, error 등)
+                  showCancelButton: true, // 취소 버튼 표시
+                  confirmButtonColor: '#3085d6', // 등록 버튼 색상
+                  cancelButtonColor: '#d33', // 취소 버튼 색상
+                  confirmButtonText: '변경', // 등록 버튼 텍스트
+                  cancelButtonText: '취소', // 취소 버튼 텍스트
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                    //패치 넣기
+                    const formData = new FormData();
+                    formData.append('nick', newNick);
 
-                  fetch('http://127.0.0.1:80/api/member/changeNick', {
-                    method: 'POST',
-                    headers: {
-                      Authorization: `Bearer ${token}`,
-                    },
-                    body: formData,
-                  })
-                    .then((resp) => {
-                      resp.text();
+                    fetch('http://127.0.0.1:80/api/member/changeNick', {
+                      method: 'POST',
+                      headers: {
+                        Authorization: `Bearer ${token}`,
+                      },
+                      body: formData,
                     })
-                    .then((data) => {
-                      dispatch(setNick(newNick));
-                      alert('닉네임 변경 성공!');
-                    });
-                  dispatch(close(e.target.title));
-                }
+                      .then((resp) => {
+                        resp.text();
+                      })
+                      .then((data) => {
+                        dispatch(setNick(newNick));
+                        Swal.fire({
+                          icon: 'success',
+                          title: '닉네임 변경 성공!',
+                          confirmButtonText: '확인',
+                        });
+                      });
+                    dispatch(close(e.target.title));
+                  }
+                });
               }}
             ></Btn>
           </ModalContainer>
         </Modal>
 
         {/* 주소 모달 */}
-        <Modal title="주소 수정">
+        <Modal title="주소 변경">
           <Postcode receiveData={handleAddressComplete} />
           <ModalContainer>
             <Btn
-              title={'주소 수정'}
+              title={'주소 변경'}
               mt={'10'}
               mb={'20'}
               mr={'-10'}
               c={'#FF7F50'}
               fc={'white'}
-              str={'수정'}
+              str={'변경'}
               f={(e) => {
-                if (window.confirm('수정하시겠습니까?')) {
-                  const formData = new FormData();
-                  formData.append('address', newAddress);
+                Swal.fire({
+                  title: '변경하시겠습니까?', // 제목
+                  icon: 'question', // 아이콘 유형 (warning, success, error 등)
+                  showCancelButton: true, // 취소 버튼 표시
+                  confirmButtonColor: '#3085d6', // 등록 버튼 색상
+                  cancelButtonColor: '#d33', // 취소 버튼 색상
+                  confirmButtonText: '변경', // 등록 버튼 텍스트
+                  cancelButtonText: '취소', // 취소 버튼 텍스트
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                    //패치 넣기
+                    const formData = new FormData();
+                    formData.append('address', newAddress);
 
-                  fetch('http://127.0.0.1:80/api/member/changeAddress', {
-                    method: 'POST',
-                    headers: {
-                      Authorization: `Bearer ${token}`,
-                    },
-                    body: formData,
-                  })
-                    .then((resp) => {
-                      resp.text();
+                    fetch('http://127.0.0.1:80/api/member/changeAddress', {
+                      method: 'POST',
+                      headers: {
+                        Authorization: `Bearer ${token}`,
+                      },
+                      body: formData,
                     })
-                    .then((data) => {
-                      dispatch(setAddress(newAddress));
-                      alert('주소 수정 완료!');
-                    });
-                  dispatch(close(e.target.title));
-                }
+                      .then((resp) => {
+                        resp.text();
+                      })
+                      .then((data) => {
+                        dispatch(setAddress(newAddress));
+                        Swal.fire({
+                          icon: 'success',
+                          title: '주소 변경 완료!',
+                          confirmButtonText: '확인',
+                        });
+                      });
+                    dispatch(close(e.target.title));
+                  }
+                });
               }}
             />
           </ModalContainer>
@@ -489,27 +584,42 @@ const Mypage = () => {
               fc={'white'}
               str={'변경'}
               f={(e) => {
-                if (window.confirm('변경하시겠습니까?')) {
-                  const formData = new FormData();
-                  formData.append('phone', newPhone);
+                Swal.fire({
+                  title: '변경하시겠습니까?', // 제목
+                  icon: 'question', // 아이콘 유형 (warning, success, error 등)
+                  showCancelButton: true, // 취소 버튼 표시
+                  confirmButtonColor: '#3085d6', // 등록 버튼 색상
+                  cancelButtonColor: '#d33', // 취소 버튼 색상
+                  confirmButtonText: '변경', // 등록 버튼 텍스트
+                  cancelButtonText: '취소', // 취소 버튼 텍스트
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                    //패치 넣기
+                    const formData = new FormData();
+                    formData.append('phone', newPhone);
 
-                  fetch('http://127.0.0.1:80/api/member/changePhone', {
-                    method: 'POST',
-                    headers: {
-                      Authorization: `Bearer ${token}`,
-                    },
-                    body: formData,
-                  })
-                    .then((resp) => {
-                      resp.text();
+                    fetch('http://127.0.0.1:80/api/member/changePhone', {
+                      method: 'POST',
+                      headers: {
+                        Authorization: `Bearer ${token}`,
+                      },
+                      body: formData,
                     })
-                    .then((data) => {
-                      dispatch(setPhone(newPhone));
-                      setPhoneCheckMsg('');
-                      alert('전화번호 변경 완료!');
-                    });
-                  dispatch(close(e.target.title));
-                }
+                      .then((resp) => {
+                        resp.text();
+                      })
+                      .then((data) => {
+                        dispatch(setPhone(newPhone));
+                        setPhoneCheckMsg('');
+                        Swal.fire({
+                          icon: 'success',
+                          title: '전화번호 변경 완료!',
+                          confirmButtonText: '확인',
+                        });
+                      });
+                    dispatch(close(e.target.title));
+                  }
+                });
               }}
             />
           </ModalContainer>
@@ -549,28 +659,43 @@ const Mypage = () => {
               fc={'white'}
               str={'변경'}
               f={(e) => {
-                if (window.confirm('변경하시겠습니까?')) {
-                  const formData = new FormData();
-                  formData.append('height', newHeight);
-                  formData.append('weight', newWeight);
+                Swal.fire({
+                  title: '변경하시겠습니까?', // 제목
+                  icon: 'question', // 아이콘 유형 (warning, success, error 등)
+                  showCancelButton: true, // 취소 버튼 표시
+                  confirmButtonColor: '#3085d6', // 등록 버튼 색상
+                  cancelButtonColor: '#d33', // 취소 버튼 색상
+                  confirmButtonText: '변경', // 등록 버튼 텍스트
+                  cancelButtonText: '취소', // 취소 버튼 텍스트
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                    //패치 넣기
+                    const formData = new FormData();
+                    formData.append('height', newHeight);
+                    formData.append('weight', newWeight);
 
-                  fetch('http://127.0.0.1:80/api/member/changePhysical', {
-                    method: 'POST',
-                    headers: {
-                      Authorization: `Bearer ${token}`,
-                    },
-                    body: formData,
-                  })
-                    .then((resp) => {
-                      resp.text();
+                    fetch('http://127.0.0.1:80/api/member/changePhysical', {
+                      method: 'POST',
+                      headers: {
+                        Authorization: `Bearer ${token}`,
+                      },
+                      body: formData,
                     })
-                    .then((data) => {
-                      dispatch(setHeight(newHeight));
-                      dispatch(setWeight(newWeight));
-                      alert('신체정보 수정 완료!');
-                    });
-                  dispatch(close(e.target.title));
-                }
+                      .then((resp) => {
+                        resp.text();
+                      })
+                      .then((data) => {
+                        dispatch(setHeight(newHeight));
+                        dispatch(setWeight(newWeight));
+                        Swal.fire({
+                          icon: 'success',
+                          title: '신체정보 수정 완료!',
+                          confirmButtonText: '확인',
+                        });
+                      });
+                    dispatch(close(e.target.title));
+                  }
+                });
               }}
             ></Btn>
           </ModalContainer>
@@ -582,9 +707,9 @@ const Mypage = () => {
             <PushLabel>전체 푸시</PushLabel>
             <SwitchContainer>
               <Switch
-                checked={settings['전체푸시']}
-                onChange={() => handleToggle('전체푸시')}
-                name={'전체푸시'}
+                checked={settings['allPush']}
+                onChange={() => handleToggle('allPush')}
+                name={'allPush'}
                 color="primary"
               />
             </SwitchContainer>
@@ -595,9 +720,9 @@ const Mypage = () => {
             <PushLabel>식단 푸시</PushLabel>
             <SwitchContainer>
               <Switch
-                checked={settings['식단푸시']}
-                onChange={() => handleToggle('식단푸시')}
-                name={'식단푸시'}
+                checked={settings['dietPush']}
+                onChange={() => handleToggle('dietPush')}
+                name={'dietPush'}
                 color="primary"
               />
             </SwitchContainer>
@@ -606,9 +731,9 @@ const Mypage = () => {
             <PushLabel>물 섭취 푸시</PushLabel>
             <SwitchContainer>
               <Switch
-                checked={settings['물섭취푸시']}
-                onChange={() => handleToggle('물섭취푸시')}
-                name={'물섭취푸시'}
+                checked={settings['waterPush']}
+                onChange={() => handleToggle('waterPush')}
+                name={'waterPush'}
                 color="primary"
               />
             </SwitchContainer>
@@ -617,9 +742,9 @@ const Mypage = () => {
             <PushLabel>운동 푸시</PushLabel>
             <SwitchContainer>
               <Switch
-                checked={settings['운동푸시']}
-                onChange={() => handleToggle('운동푸시')}
-                name={'운동푸시'}
+                checked={settings['exercisePush']}
+                onChange={() => handleToggle('exercisePush')}
+                name={'exercisePush'}
                 color="primary"
               />
             </SwitchContainer>
@@ -628,9 +753,9 @@ const Mypage = () => {
             <PushLabel>댓글 푸시</PushLabel>
             <SwitchContainer>
               <Switch
-                checked={settings['댓글푸시']}
-                onChange={() => handleToggle('댓글푸시')}
-                name={'댓글푸시'}
+                checked={settings['commentPush']}
+                onChange={() => handleToggle('commentPush')}
+                name={'commentPush'}
                 color="primary"
               />
             </SwitchContainer>
@@ -639,9 +764,9 @@ const Mypage = () => {
             <PushLabel>혈압 푸시</PushLabel>
             <SwitchContainer>
               <Switch
-                checked={settings['혈압푸시']}
-                onChange={() => handleToggle('혈압푸시')}
-                name={'혈압푸시'}
+                checked={settings['bloodPressurePush']}
+                onChange={() => handleToggle('bloodPressurePush')}
+                name={'bloodPressurePush'}
                 color="primary"
               />
             </SwitchContainer>
@@ -650,9 +775,9 @@ const Mypage = () => {
             <PushLabel>혈당 푸시</PushLabel>
             <SwitchContainer>
               <Switch
-                checked={settings['혈당푸시']}
-                onChange={() => handleToggle('혈당푸시')}
-                name={'혈당푸시'}
+                checked={settings['bloodSugarPush']}
+                onChange={() => handleToggle('bloodSugarPush')}
+                name={'bloodSugarPush'}
                 color="primary"
               />
             </SwitchContainer>
@@ -661,9 +786,9 @@ const Mypage = () => {
             <PushLabel>인슐린 투약 푸시</PushLabel>
             <SwitchContainer>
               <Switch
-                checked={settings['인슐린투약푸시']}
-                onChange={() => handleToggle('인슐린투약푸시')}
-                name={'인슐린투약푸시'}
+                checked={settings['insulinPush']}
+                onChange={() => handleToggle('insulinPush')}
+                name={'insulinPush'}
                 color="primary"
               />
             </SwitchContainer>
@@ -679,28 +804,47 @@ const Mypage = () => {
               fc={'white'}
               str={'저장'}
               f={(e) => {
-                if (window.confirm('변경하시겠습니까?')) {
-                  const formData = new FormData();
-                  formData.append('height', newHeight);
-                  formData.append('weight', newWeight);
+                Swal.fire({
+                  title: '변경하시겠습니까?', // 제목
+                  icon: 'question', // 아이콘 유형 (warning, success, error 등)
+                  showCancelButton: true, // 취소 버튼 표시
+                  confirmButtonColor: '#3085d6', // 등록 버튼 색상
+                  cancelButtonColor: '#d33', // 취소 버튼 색상
+                  confirmButtonText: '변경', // 등록 버튼 텍스트
+                  cancelButtonText: '취소', // 취소 버튼 텍스트
+                }).then(async (result) => {
+                  if (result.isConfirmed) {
+                    //패치 넣기
+                    const settingData = {
+                      allPush: settings.allPush ? 'Y' : 'N',
+                      dietPush: settings.dietPush ? 'Y' : 'N',
+                      waterPush: settings.waterPush ? 'Y' : 'N',
+                      exercisePush: settings.exercisePush ? 'Y' : 'N',
+                      commentPush: settings.commentPush ? 'Y' : 'N',
+                      bloodPressurePush: settings.bloodPressurePush ? 'Y' : 'N',
+                      bloodSugarPush: settings.bloodSugarPush ? 'Y' : 'N',
+                      insulinPush: settings.insulinPush ? 'Y' : 'N',
+                    };
 
-                  fetch('http://127.0.0.1:80/api/notification/setNotification', {
-                    method: 'POST',
-                    headers: {
-                      Authorization: `Bearer ${token}`,
-                    },
-                    body: formData,
-                  })
-                    .then((resp) => {
-                      resp.text();
-                    })
-                    .then((data) => {
-                      dispatch(setHeight(newHeight));
-                      dispatch(setWeight(newWeight));
-                      alert('신체정보 수정 완료!');
+                    const response = await fetch('http://127.0.0.1:80/api/notification/setPushSettings', {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`,
+                      },
+                      body: JSON.stringify(settingData),
                     });
-                  dispatch(close(e.target.title));
-                }
+                    if (!response.ok) {
+                      throw new Error('서버 응답 오류');
+                    }
+                    Swal.fire({
+                      title: '변경 완료!',
+                      icon: 'success',
+                      confirmButtonText: '확인',
+                    });
+                    dispatch(close(e.target.title));
+                  }
+                });
               }}
             ></Btn>
             <Btn
@@ -710,7 +854,6 @@ const Mypage = () => {
               ml={'20'}
               mr={'10'}
               c={theme.gray}
-              fc={'black'}
               str={'취소'}
               f={(e) => {
                 dispatch(close(e.target.title));

@@ -4,6 +4,7 @@ import HomePage from './components/home/HomePage';
 import { ThemeProvider } from 'styled-components';
 import store from './redux/store';
 import NotificationProvider from './components/pages/Notification/NotificationProvider';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 function App() {
   const theme = {
@@ -15,7 +16,9 @@ function App() {
     <Provider store={store}>
       <NotificationProvider>
         <ThemeProvider theme={theme}>
-          <HomePage></HomePage>
+          <BrowserRouter>
+            <HomePage />
+          </BrowserRouter>
         </ThemeProvider>
       </NotificationProvider>
     </Provider>

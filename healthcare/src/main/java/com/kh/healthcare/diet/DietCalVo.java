@@ -1,4 +1,4 @@
-package com.kh.healthcare.diet.calendar;
+package com.kh.healthcare.diet;
 
 import lombok.Data;
 

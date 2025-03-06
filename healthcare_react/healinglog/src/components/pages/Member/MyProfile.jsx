@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import Btn from '../../util/Btn';
 import styled, { useTheme } from 'styled-components';
 import { setProfile } from '../../../redux/JoinSlice';
+import Swal from 'sweetalert2';
 
 const MyProfile = () => {
   const dispatch = useDispatch();
@@ -30,33 +31,47 @@ const MyProfile = () => {
       .then((resp) => resp.text())
       .then((data) => {
         dispatch(setProfile(data));
-        console.log(data);
 
-        alert('프로필 변경 완료!');
+        Swal.fire({
+          icon: 'success',
+          title: '프로필 변경 완료!',
+          confirmButtonText: '확인',
+        });
       });
   };
 
   //프로필 삭제
   const handleFileDelete = async () => {
-    if (window.confirm('이미지를 삭제하겠습니까?')) {
-      dispatch(setProfile('https://healinglog-kh.s3.ap-northeast-2.amazonaws.com/default_profile.jpg'));
-
-      fetch('http://127.0.0.1:80/api/member/profileDelete', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: {},
-      })
-        .then((resp) => resp.text())
-        .then((data) => {
-          dispatch(setProfile(data));
-          console.log(data);
-
-          alert('프로필 삭제 완료!');
-        });
-      fileInputRef.current.value = '';
-    }
+    Swal.fire({
+      title: '이미지를 삭제하시겠습니까?', // 제목
+      icon: 'question', // 아이콘 유형 (warning, success, error 등)
+      showCancelButton: true, // 취소 버튼 표시
+      confirmButtonColor: '#3085d6', // 등록 버튼 색상
+      cancelButtonColor: '#d33', // 취소 버튼 색상
+      confirmButtonText: '삭제', // 등록 버튼 텍스트
+      cancelButtonText: '취소', // 취소 버튼 텍스트
+    }).then((result) => {
+      if (result.isConfirmed) {
+        //패치 넣기
+        fetch('http://127.0.0.1:80/api/member/profileDelete', {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: {},
+        })
+          .then((resp) => resp.text())
+          .then((data) => {
+            dispatch(setProfile(data));
+            Swal.fire({
+              icon: 'success',
+              title: '프로필 삭제 완료!',
+              confirmButtonText: '확인',
+            });
+          });
+        fileInputRef.current.value = '';
+      }
+    });
   };
 
   const handleImageClick = () => {

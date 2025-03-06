@@ -35,4 +35,8 @@ public class BloodPressureDao {
     public int checkTodayBloodPressure(String userNo) {
         return mapper.checkTodayBloodPressure(userNo);
     }
+
+    public int isBloodPressurePushEnabled(String userNo) {
+        return mapper.isBloodPressurePushEnabled(userNo);
+    }
 }

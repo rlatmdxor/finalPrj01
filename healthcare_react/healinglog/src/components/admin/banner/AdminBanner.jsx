@@ -13,7 +13,7 @@ import { open, close } from '../../../redux/modalSlice';
 import { getBannerList, enrollBanner, editBanner, deleteBanner, multiDeleteBanner } from '../../services/bannerService';
 import SearchBar from '../../util/SearchBar';
 import { useNavigate } from 'react-router-dom';
-import { jwtDecode } from 'jwt-decode';
+import { getRoleFromToken, isTokenExpired } from '../../util/JwtUtil';
 
 const SearchDiv = styled.div`
   display: flex;
@@ -113,29 +113,26 @@ const DeleteImgBtn = styled.button`
 `;
 
 const AdminBanner = () => {
-  const navigate = useNavigate();
-  const token = localStorage.getItem('token');
+  const navi = useNavigate();
   const Swal = require('sweetalert2');
 
-  const [adminNo, setAdminNo] = useState(0);
+  const token = localStorage.getItem('token');
+  const [isAuthorized, setIsAuthorized] = useState(false); // 로그인 여부 체크
 
   useEffect(() => {
-    if (!token) {
-      alert('로그인 정보가 없습니다.');
-      navigate('/admin/login');
+    if (!token || isTokenExpired(token) || getRoleFromToken(token) !== 'ROLE_ADMIN') {
+      navi('/admin/login'); // 로그인 페이지로 이동
+      Swal.fire({
+        icon: 'warning',
+        title: '어드민 로그인이 필요합니다',
+        text: '어드민 로그인 후 이용해주세요',
+        confirmButtonText: '확인',
+      });
+      window.localStorage.removeItem('token'); // 토큰 삭제
+    } else {
+      setIsAuthorized(true); // 로그인 성공 시 데이터 요청 가능
     }
-  }, []);
-
-  useEffect(() => {
-    if (token) {
-      try {
-        const decodedToken = jwtDecode(token);
-        setAdminNo(decodedToken.no);
-      } catch {
-        navigate('/admin/login');
-      }
-    }
-  }, [token, dispatch]);
+  }, [navi, token]);
 
   const boardType = 'bannerManagement';
 
@@ -157,7 +154,6 @@ const AdminBanner = () => {
 
   const initialInputData = {
     no: '',
-    writer: adminNo,
     title: '',
     showYn: 'Y',
     imageUrl: '',
@@ -185,8 +181,11 @@ const AdminBanner = () => {
   };
 
   useEffect(() => {
+    if (!isAuthorized) {
+      return;
+    }
     getFetch(searchInput.showYn, searchInput.searchValue);
-  }, [currentPage, boardLimit]);
+  }, [isAuthorized, token, currentPage, boardLimit]);
 
   const handleOpenModal = () => {
     setInputData(initialInputData);
@@ -201,7 +200,6 @@ const AdminBanner = () => {
     setInputData((prev) => ({
       ...prev,
       no: vo.no,
-      writer: vo.writer || adminNo,
       title: vo.title,
       showYn: vo.showYn,
       imageUrl: vo.imageUrl || '',
@@ -273,7 +271,6 @@ const AdminBanner = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         const formData = new FormData();
-        formData.append('writer', inputData.writer);
         formData.append('title', inputData.title);
         formData.append('showYn', inputData.showYn);
         formData.append('f', inputData.imageUrl);
@@ -332,7 +329,12 @@ const AdminBanner = () => {
         formData.append('no', inputData.no);
         formData.append('title', inputData.title);
         formData.append('showYn', inputData.showYn);
-        formData.append('f', inputData.imageUrl);
+
+        if (typeof inputData.imageUrl === 'string') {
+          formData.append('imageUrl', inputData.imageUrl); // 기존 이미지 URL 유지
+        } else if (inputData.imageUrl) {
+          formData.append('f', inputData.imageUrl); // 새 이미지 업로드
+        }
 
         const editBannerFetch = async () => {
           try {
@@ -457,13 +459,15 @@ const AdminBanner = () => {
     showYn: ['노출여부 전체', 'Y', 'N'],
   };
 
-  const handleFilter = (e) => {
+  const handleFilter = (e, searchValue) => {
     setSearchInput((prev) => {
       return {
         ...prev,
         showYn: e.target.value,
       };
     });
+    dispatch(resetPaging({ boardType }));
+    getFetch(e.target.value, searchValue);
   };
 
   const handleChange = (e) => {
@@ -476,13 +480,15 @@ const AdminBanner = () => {
   };
 
   const handleClearClick = () => {
-    console.log('zzz');
     setSearchInput((prev) => {
       return {
         ...prev,
+        showYn: '노출여부 전체',
         searchValue: '',
       };
     });
+    dispatch(resetPaging({ boardType }));
+    getFetch('노출여부 전체', '');
   };
 
   const handleClick = (showYn, searchValue) => {
@@ -495,7 +501,13 @@ const AdminBanner = () => {
       <Title>배너 관리</Title>
       <ContentLayout>
         <SearchDiv>
-          <SelectBox width={'120'} onChange={handleFilter}>
+          <SelectBox
+            width={'120'}
+            value={searchInput.showYn}
+            onChange={(e) => {
+              handleFilter(e, searchInput.searchValue);
+            }}
+          >
             {searchFilter.showYn.map((option, idx) => (
               <option key={idx} value={option} name={option}>
                 {option}
@@ -506,7 +518,7 @@ const AdminBanner = () => {
             value={searchInput.searchValue}
             handleChange={handleChange}
             handleClearClick={handleClearClick}
-            handleClick={() => {
+            handleClick={(e) => {
               handleClick(searchInput.showYn, searchInput.searchValue);
             }}
           />

@@ -24,7 +24,7 @@ const Select = styled.select`
   margin-right: 15px;
 `;
 
-const DateBtn = ({ dataBtn, onSelect, line, onChange }) => {
+const DateBtn = ({ dataBtn, onSelect, line, onChange, setState }) => {
   const [activeIndex, setActiveIndex] = useState(0);
 
   const handleSelect = (event) => {
@@ -35,7 +35,7 @@ const DateBtn = ({ dataBtn, onSelect, line, onChange }) => {
   return (
     <>
       <DataDiv>
-        {line == 'Line' ? (
+        {line === 'Line' ? (
           <Select onChange={handleSelect}>
             <option value="Bar">막대</option>
             <option value="Line">꺽은 선</option>
@@ -53,7 +53,14 @@ const DateBtn = ({ dataBtn, onSelect, line, onChange }) => {
             isActive={activeIndex === index}
             onClick={() => {
               setActiveIndex(index);
-              onSelect(label);
+              if (setState) {
+                setState((prev) => {
+                  return 0;
+                });
+              }
+              onSelect(() => {
+                return label;
+              });
             }}
           >
             {label}

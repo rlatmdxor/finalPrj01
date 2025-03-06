@@ -9,11 +9,11 @@ import { close, open } from '../../../../redux/modalSlice';
 import { useNavigate } from 'react-router-dom';
 import ContentLayout from '../../../util/ContentLayout';
 import Btn from '../../../util/Btn';
+import Swal from 'sweetalert2';
+import { isTokenExpired, getRoleFromToken } from '../../../util/JwtUtil';
 
 const Aerobic = () => {
-  const token = localStorage.getItem('token');
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const theme = useTheme();
   const [fetchTry, setFetchTry] = useState(0);
   const [aerobic, setAerobic] = useState([]);
@@ -30,6 +30,25 @@ const Aerobic = () => {
     setStartTime('');
     setEndTime('');
   };
+
+  const token = localStorage.getItem('token');
+  const navi = useNavigate();
+  const [isAuthorized, setIsAuthorized] = useState(false); // 로그인 여부 체크
+
+  useEffect(() => {
+    if (!token || isTokenExpired(token) || getRoleFromToken(token) == 'ROLE_ADMIN') {
+      window.localStorage.removeItem('token'); // 토큰 삭제
+      navi('/login'); // 로그인 페이지로 이동
+      Swal.fire({
+        icon: 'warning',
+        title: '로그인이 필요합니다',
+        text: '로그인 후 이용해주세요',
+        confirmButtonText: '확인',
+      });
+    } else {
+      setIsAuthorized(true); // 로그인 성공 시 데이터 요청 가능
+    }
+  }, [navi, token]);
 
   //페이지 렌더링(데이터 가져오기)
   useEffect(() => {
@@ -96,12 +115,20 @@ const Aerobic = () => {
       .then((resp) => resp.text())
       .then((data) => {
         if (data == '즐겨찾기는 3개까지만 등록가능합니다.') {
-          alert(data);
+          Swal.fire({
+            icon: 'warning',
+            title: data,
+            confirmButtonText: '확인',
+          });
         }
         setFetchTry(fetchTry + 1);
       })
       .catch((error) => {
-        alert('요청 에러:', error);
+        Swal.fire({
+          icon: 'error',
+          title: '요청 에러:' + error,
+          confirmButtonText: '확인',
+        });
         console.error('POST 요청 에러:', error);
       });
   };
@@ -121,12 +148,21 @@ const Aerobic = () => {
 
     //입력 여부 체크
     if (!exDate || !startTime || !endTime) {
-      alert('모든 값을 입력해주세요.');
+      Swal.fire({
+        icon: 'error',
+        title: '모든 값을 입력해주세요.',
+        confirmButtonText: '확인',
+      });
+
       return;
     }
     //시간 비교
     if (startTime >= endTime) {
-      alert('시작 시간은 종료 시간보다 앞서야 합니다.');
+      Swal.fire({
+        icon: 'error',
+        title: '시작 시간은 종료 시간보다 앞서야 합니다.',
+        confirmButtonText: '확인',
+      });
       return;
     }
 
@@ -151,7 +187,12 @@ const Aerobic = () => {
       const message = await response.text();
 
       if (response.ok) {
-        alert(message);
+        Swal.fire({
+          icon: 'success',
+          title: message,
+          confirmButtonText: '확인',
+        });
+
         reset();
         dispatch(close('운동 기록'));
       } else {
@@ -166,7 +207,10 @@ const Aerobic = () => {
 
   useEffect(() => {
     dispatch(close('운동 기록'));
-  }, []);
+    if (!isAuthorized) {
+      return;
+    }
+  }, [isAuthorized, token]);
 
   return (
     <>
@@ -211,7 +255,7 @@ const Aerobic = () => {
                         c={theme.gray}
                         fs={'14'}
                         f={() => {
-                          navigate(`/aerobic/${aerobic.name}`);
+                          navi(`/aerobic/${aerobic.name}`);
                         }}
                         mt={'0'}
                         mb={'0'}
@@ -254,7 +298,7 @@ const Aerobic = () => {
                         c={theme.gray}
                         fs={'14'}
                         f={() => {
-                          navigate(`/aerobic/${aerobic.name}`);
+                          navi(`/aerobic/${aerobic.name}`);
                         }}
                         mt={'0'}
                         mb={'0'}

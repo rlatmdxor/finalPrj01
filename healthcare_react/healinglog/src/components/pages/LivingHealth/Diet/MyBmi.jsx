@@ -17,6 +17,11 @@ const BigCardInnerTopDiv = styled.div`
   justify-content: center;
   align-items: center;
   color: #5f5f5f;
+  margin-bottom: 3px;
+`;
+
+const BigCardTitleDiv = styled.div`
+  margin-top: 2px;
 `;
 
 const BigCardInnerMidDiv = styled.div`
@@ -74,7 +79,7 @@ const MyBmi = () => {
       <BigCard>
         <BigCardInnerDiv>
           <BigCardInnerTopDiv>
-            <div>나의 BMI</div>
+            <BigCardTitleDiv>나의 BMI</BigCardTitleDiv>
             <Tooltip
               title={
                 <>
@@ -103,7 +108,7 @@ const MyBmi = () => {
         </BigCardInnerDiv>
         <BigCardInnerDiv>
           <BigCardInnerTopDiv>
-            <div>표준체중</div>
+            <BigCardTitleDiv>표준체중</BigCardTitleDiv>
             <Tooltip
               title={
                 <>
@@ -128,7 +133,7 @@ const MyBmi = () => {
         </BigCardInnerDiv>
         <BigCardInnerDiv>
           <BigCardInnerTopDiv>
-            <div>권장섭취칼로리</div>
+            <BigCardTitleDiv>권장섭취칼로리</BigCardTitleDiv>
             <Tooltip title={<>보통활동 기준 : 체중(kg) x 32Kcal</>}>
               <IconButton sx={{ paddingTop: '11px' }}>
                 <InfoOutlined sx={{ fontSize: '1.1rem' }} />
@@ -139,7 +144,7 @@ const MyBmi = () => {
         </BigCardInnerDiv>
         <BigCardInnerDiv>
           <BigCardInnerTopDiv>
-            <div>권장섭취물양</div>
+            <BigCardTitleDiv>권장섭취물양</BigCardTitleDiv>
             <Tooltip title={<>체중(kg) x 30ml</>}>
               <IconButton sx={{ paddingTop: '11px' }}>
                 <InfoOutlined sx={{ fontSize: '1.1rem' }} />

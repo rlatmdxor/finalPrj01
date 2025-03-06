@@ -45,6 +45,11 @@ const SelectBox = styled.select`
   }
 `;
 
+const BottomDiv = styled.div`
+  margin-top: 25px;
+  margin-bottom: 35px;
+`;
+
 const AdminUserManage = () => {
   const dispatch = useDispatch();
   const boardType = 'userManage';
@@ -110,14 +115,15 @@ const AdminUserManage = () => {
   useEffect(() => {
     handleSearch();
   }, [delYn]);
+  useEffect(() => {
+    dispatch(resetPaging({ boardType }));
+  }, [boardType, dispatch]);
 
-  // Enter 키 입력 시 검색 실행
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault(); // 기본 이벤트(폼 제출) 방지
-      handleSearch(); // 검색 실행
+  useEffect(() => {
+    if (isAuthorized) {
+      handleSearch();
     }
-  };
+  }, [currentPage, boardLimit, isAuthorized]);
 
   //검색
   const handleSearch = async () => {
@@ -216,7 +222,6 @@ const AdminUserManage = () => {
             handleClick={handleSearch} // 검색 버튼 클릭 시 handleSearch 실행
             handleChange={handleKeywordChange} // 검색어 입력 시 keyword 업데이트
             handleClearClick={handleClearKeyword} // 검색어 초기화 버튼
-            handleKeyPress={handleKeyPress}
             w={300}
             h={40}
           />
@@ -264,7 +269,9 @@ const AdminUserManage = () => {
             ))}
           </tbody>
         </Table>
-        <Pagination boardType={boardType} />
+        <BottomDiv>
+          <Pagination boardType={boardType}></Pagination>
+        </BottomDiv>
       </ContentLayout>
     </>
   );

@@ -4,9 +4,10 @@ import Sider2 from './Sider2';
 import Header from './Header';
 import styled from 'styled-components';
 import Footer from './Footer';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { routes } from '../../routes';
 import ScrollToTop from '../util/ScrollToTop';
+import AdminHeader from './AdminHeader';
 
 const Layout = styled.div`
   display: grid;
@@ -24,24 +25,23 @@ const MainContainer = styled.div`
 
 const HomePage = () => {
   document.body.style.overflow = 'hidden';
+  const location = useLocation();
+  const isAdminPage = location.pathname.startsWith('/admin');
 
   return (
     <Layout>
-      <BrowserRouter>
-        <Header></Header>
-        <Sider></Sider>
-        <MainContainer>
-          <ScrollToTop />
-          <Routes>
-            {routes.map(({ path, component }) => (
-              <Route key={path} path={path} element={component} />
-            ))}
-          </Routes>
-          <Footer></Footer>
-        </MainContainer>
-
-        <Sider2></Sider2>
-      </BrowserRouter>
+      {isAdminPage ? <AdminHeader /> : <Header />}
+      <Sider></Sider>
+      <MainContainer>
+        <ScrollToTop />
+        <Routes>
+          {routes.map(({ path, component }) => (
+            <Route key={path} path={path} element={component} />
+          ))}
+        </Routes>
+        <Footer></Footer>
+      </MainContainer>
+      <Sider2></Sider2>
     </Layout>
   );
 };

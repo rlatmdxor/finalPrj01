@@ -1,10 +1,10 @@
 package com.kh.healthcare.notification;
 
+import com.kh.healthcare.diet.meal.MealService;
 import com.kh.healthcare.board.honeyTip.HoneyTipService;
 import com.kh.healthcare.cardiovascularManagement.bloodPressure.BloodPressureService;
 import com.kh.healthcare.cardiovascularManagement.bloodSugar.BloodSugarService;
 import com.kh.healthcare.cardiovascularManagement.insulin.InsulinService;
-import com.kh.healthcare.diet.meal.DietMealService;
 import com.kh.healthcare.diet.water.WaterService;
 import com.kh.healthcare.interceptor.StompChannelInterceptor;
 import com.kh.healthcare.exercise.ExerciseService;
@@ -18,11 +18,11 @@ import org.springframework.stereotype.Component;
 public class NotificationScheduler {
 
     private final ExerciseService exerciseService;
+    private final MealService dietService;
     private final HoneyTipService honeyTipService;
     private final InsulinService insulinService;
     private final BloodPressureService bloodPressureService;
     private final BloodSugarService bloodSugarService;
-    private final DietMealService dietService;
     private final WaterService waterService;
     private final SimpMessagingTemplate messagingTemplate;
 
@@ -46,7 +46,6 @@ public class NotificationScheduler {
         StompChannelInterceptor.getAllUserSessions().forEach(userInfo -> {
             String userNo = userInfo.getUserNo();
             String message = honeyTipService.checkNewComment(userNo);
-            System.out.println("message = " + message);
             if(message.equals("회원님의 게시글에 새로운 댓글이 있습니다.")){
                 messagingTemplate.convertAndSend("/topic/notifications", message);
             }
@@ -59,11 +58,7 @@ public class NotificationScheduler {
         // 각 사용자에게 알림 메시지 전송
         StompChannelInterceptor.getAllUserSessions().forEach(userInfo -> {
             String userNo = userInfo.getUserNo();
-//            String userId = userInfo.getUserId();
-//            String userNick = userInfo.getUserNick();
-//            String userRole = userInfo.getUserRole();
             String message = dietService.checkTodayDiet(userNo);
-//            System.out.println("message = " + message);
             if(message.equals("오늘 등록된 식단내역이 없습니다. 식단 내역을 등록해주세요!")){
                 messagingTemplate.convertAndSend("/topic/notifications", message);
             }
@@ -114,11 +109,7 @@ public class NotificationScheduler {
         // 각 사용자에게 알림 메시지 전송
         StompChannelInterceptor.getAllUserSessions().forEach(userInfo -> {
             String userNo = userInfo.getUserNo();
-//            String userId = userInfo.getUserId();
-//            String userNick = userInfo.getUserNick();
-//            String userRole = userInfo.getUserRole();
             String message = waterService.checkTodayWater(userNo);
-//            System.out.println("message = " + message);
             if(message.equals("오늘 물을 마시지 않았어요. 건강을 위해 충분한 물을 섭취해주세요!")){
                 messagingTemplate.convertAndSend("/topic/notifications", message);
             }

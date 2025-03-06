@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { close } from '../../../../redux/modalSlice';
 import { useNavigate } from 'react-router-dom';
 import { setDay } from '../../../../redux/dietSlice';
-import { jwtDecode } from 'jwt-decode';
+import { getRoleFromToken, isTokenExpired } from '../../../util/JwtUtil';
 
 const NaviContainer = styled.div`
   display: grid;
@@ -30,29 +30,27 @@ const CalAreaDiv = styled.div`
 `;
 
 const DietCal = () => {
-  const navigate = useNavigate();
+  const navi = useNavigate();
   const dispatch = useDispatch();
+  const Swal = require('sweetalert2');
 
   const token = localStorage.getItem('token');
-  const [memberNo, setMemberNo] = useState(0);
+  const [isAuthorized, setIsAuthorized] = useState(false); // 로그인 여부 체크
 
   useEffect(() => {
-    if (!token) {
-      alert('로그인 정보가 없습니다.');
-      navigate('/login');
+    if (!token || isTokenExpired(token) || getRoleFromToken(token) == 'ROLE_ADMIN') {
+      window.localStorage.removeItem('token'); // 토큰 삭제
+      navi('/login'); // 로그인 페이지로 이동
+      Swal.fire({
+        icon: 'warning',
+        title: '로그인이 필요합니다',
+        text: '로그인 후 이용해주세요',
+        confirmButtonText: '확인',
+      });
+    } else {
+      setIsAuthorized(true); // 로그인 성공 시 데이터 요청 가능
     }
-  }, []);
-
-  useEffect(() => {
-    if (token) {
-      try {
-        const decodedToken = jwtDecode(token);
-        setMemberNo(decodedToken.no);
-      } catch {
-        navigate('/login');
-      }
-    }
-  }, [token]);
+  }, [navi, token]);
 
   const [events, setEvents] = useState({});
 
@@ -73,38 +71,41 @@ const DietCal = () => {
   };
 
   useEffect(() => {
-    if (memberNo > 0) {
-      fetch('http://127.0.0.1:80/api/dietcal', {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          memberNo: memberNo,
-        }),
-      })
-        .then((resp) => resp.json())
-        .then((data) => {
-          const formattedData = formatData(data);
-          setEvents(formattedData);
-        });
+    if (!isAuthorized) {
+      return;
     }
-  }, [memberNo]);
+
+    fetch('http://127.0.0.1:80/api/diet/cal', {
+      method: 'GET',
+      headers: {
+        'content-type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((resp) => resp.json())
+      .then((data) => {
+        const formattedData = formatData(data);
+        setEvents(formattedData);
+      });
+  }, [isAuthorized, token]);
 
   const modalState = useSelector((state) => state.modal.modals['캘린더 모달']);
   const selectedDate = useSelector((state) => state.modal.selectedDate);
 
   useEffect(() => {
+    if (!isAuthorized) {
+      return;
+    }
+
     if (modalState === 'block' && selectedDate) {
       dispatch(close('캘린더 모달'));
       const [year, month, day] = selectedDate.split('-');
       const formattedDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
 
       dispatch(setDay(formattedDate));
-      navigate('/diet');
+      navi('/diet');
     }
-  }, [modalState, selectedDate]);
+  }, [isAuthorized, token, modalState, selectedDate]);
 
   return (
     <>

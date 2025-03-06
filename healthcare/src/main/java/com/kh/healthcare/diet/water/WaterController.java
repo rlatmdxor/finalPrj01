@@ -14,9 +14,9 @@ public class WaterController {
     private final WaterService service;
 
     @PostMapping("enroll")
-    public void waterEnroll(@RequestBody WaterVo vo, @RequestHeader("Authorization") String authorization){
+    public void waterEnroll(@RequestBody WaterVo vo, @RequestHeader("Authorization") String token){
         try {
-            service.waterEnroll(vo);
+            service.waterEnroll(vo, token);
         }
         catch (Exception e){
             throw new IllegalStateException("[ERROR] WATER ENROLL FAIL..");
@@ -24,49 +24,13 @@ public class WaterController {
     }
 
     @PostMapping
-    public WaterVo getWaterByDate(@RequestBody WaterVo vo, @RequestHeader("Authorization") String authorization){
+    public WaterVo getWaterByDate(@RequestBody WaterVo vo, @RequestHeader("Authorization") String token){
         try {
-            WaterVo waterVo = service.getWaterByDate(vo);
+            WaterVo waterVo = service.getWaterByDate(vo, token);
             return waterVo;
         }
         catch (Exception e){
             throw new IllegalStateException("[ERROR] GET WATER BY DATE FAIL..");
-        }
-    }
-
-    @GetMapping("/report/day")
-    public List<WaterVo> getDayWater(@RequestParam int memberNo, @RequestParam(required = false) String month, @RequestHeader("Authorization") String authorization){
-        try {
-            List<WaterVo> voList = service.getDayWater(memberNo, month);
-            return voList;
-        }
-        catch (Exception e){
-            e.printStackTrace();
-            throw new IllegalStateException("[ERROR] GET DAY WATER FAIL..");
-        }
-    }
-
-    @GetMapping("/report/month")
-    public List<WaterVo> getMonthAvgWater(@RequestParam int memberNo, @RequestParam(required = false) String year, @RequestHeader("Authorization") String authorization){
-        try {
-            List<WaterVo> voList = service.getMonthAvgWater(memberNo, year);
-            return voList;
-        }
-        catch (Exception e){
-            e.printStackTrace();
-            throw new IllegalStateException("[ERROR] GET MONTH WATER FAIL..");
-        }
-    }
-
-    @GetMapping("/report/year")
-    public List<WaterVo> getYearAvgWater(@RequestParam int memberNo, @RequestHeader("Authorization") String authorization){
-        try {
-            List<WaterVo> voList = service.getYearAvgWater(memberNo);
-            return voList;
-        }
-        catch (Exception e){
-            e.printStackTrace();
-            throw new IllegalStateException("[ERROR] GET YEAR WATER FAIL..");
         }
     }
 

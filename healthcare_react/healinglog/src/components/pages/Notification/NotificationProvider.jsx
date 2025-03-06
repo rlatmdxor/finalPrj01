@@ -29,6 +29,7 @@ const NotificationProvider = ({ children }) => {
           if (Notification.permission === 'granted') {
             new Notification('새로운 알림', {
               body: notification,
+              icon: '/img/logo.png',
               requireInteraction: true,
             });
           } else if (Notification.permission !== 'denied') {

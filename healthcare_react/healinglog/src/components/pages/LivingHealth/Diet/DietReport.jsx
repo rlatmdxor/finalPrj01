@@ -5,19 +5,9 @@ import Navi from '../../../util/Navi';
 import ContentLayout from '../../../util/ContentLayout';
 import Chart from '../../../util/Chart';
 import DateBtn from '../../../util/DateBtn';
-import {
-  getDayKcal,
-  getDayWater,
-  getDayWeight,
-  getMonthAvgKcal,
-  getMonthAvgWater,
-  getMonthAvgWeight,
-  getYearAvgKcal,
-  getYearAvgWater,
-  getYearAvgWeight,
-} from '../../../services/dietService';
-import { jwtDecode } from 'jwt-decode';
+import { getDayData, getMonthData, getYearData } from '../../../services/dietService';
 import { useNavigate } from 'react-router-dom';
+import { getRoleFromToken, isTokenExpired } from '../../../util/JwtUtil';
 
 const NaviContainer = styled.div`
   display: grid;
@@ -66,28 +56,26 @@ const YearBtn = styled.button`
 `;
 
 const DietReport = () => {
-  const navigate = useNavigate();
+  const navi = useNavigate();
+  const Swal = require('sweetalert2');
 
   const token = localStorage.getItem('token');
-  const [memberNo, setMemberNo] = useState(0);
+  const [isAuthorized, setIsAuthorized] = useState(false); // 로그인 여부 체크
 
   useEffect(() => {
-    if (!token) {
-      alert('로그인 정보가 없습니다.');
-      navigate('/login');
+    if (!token || isTokenExpired(token) || getRoleFromToken(token) == 'ROLE_ADMIN') {
+      window.localStorage.removeItem('token'); // 토큰 삭제
+      navi('/login'); // 로그인 페이지로 이동
+      Swal.fire({
+        icon: 'warning',
+        title: '로그인이 필요합니다',
+        text: '로그인 후 이용해주세요',
+        confirmButtonText: '확인',
+      });
+    } else {
+      setIsAuthorized(true); // 로그인 성공 시 데이터 요청 가능
     }
-  }, []);
-
-  useEffect(() => {
-    if (token) {
-      try {
-        const decodedToken = jwtDecode(token);
-        setMemberNo(decodedToken.no);
-      } catch {
-        navigate('/login');
-      }
-    }
-  }, [token]);
+  }, [navi, token]);
 
   const [kcalLabel, setkcalLabel] = useState([]);
   const [kcalData, setKcalData] = useState([]);
@@ -120,47 +108,40 @@ const DietReport = () => {
   };
 
   useEffect(() => {
-    if (memberNo > 0) {
-      const fetchData = async () => {
-        try {
-          let kcalData;
-          let waterData;
-          let weightData;
-
-          switch (selectedRange) {
-            case '일':
-              kcalData = await getDayKcal(memberNo, month, token);
-              waterData = await getDayWater(memberNo, month, token);
-              weightData = await getDayWeight(memberNo, month, token);
-              break;
-            case '월':
-              kcalData = await getMonthAvgKcal(memberNo, year, token);
-              waterData = await getMonthAvgWater(memberNo, year, token);
-              weightData = await getMonthAvgWeight(memberNo, year, token);
-              break;
-            case '년':
-              kcalData = await getYearAvgKcal(memberNo, token);
-              waterData = await getYearAvgWater(memberNo, token);
-              weightData = await getYearAvgWeight(memberNo, token);
-              break;
-            default:
-              return;
-          }
-
-          setkcalLabel(kcalData.map((item) => item.dietDay.split(' ')[0]));
-          setKcalData(kcalData.map((item) => item.totalKcal));
-          setWaterLabel(waterData.map((item) => item.enrollDate.split(' ')[0]));
-          setWaterData(waterData.map((item) => item.amount));
-          setWeightLabel(weightData.map((item) => item.enrollDate.split(' ')[0]));
-          setWeightData(weightData.map((item) => item.amount));
-        } catch (error) {
-          alert('GET KCAL DATA FAIL ...');
-          console.error('[ERROR] GET DATA', error);
-        }
-      };
-      fetchData();
+    if (!isAuthorized) {
+      return;
     }
-  }, [selectedRange, year, month, memberNo]);
+
+    const fetchData = async () => {
+      try {
+        let reportData;
+
+        switch (selectedRange) {
+          case '일':
+            reportData = await getDayData(month, token);
+            break;
+          case '월':
+            reportData = await getMonthData(year, token);
+            break;
+          case '년':
+            reportData = await getYearData(token);
+            break;
+          default:
+            return;
+        }
+
+        setkcalLabel(reportData.kcal.map((item) => item.dietDay.split(' ')[0]));
+        setKcalData(reportData.kcal.map((item) => item.totalKcal));
+        setWaterLabel(reportData.water.map((item) => item.enrollDate.split(' ')[0]));
+        setWaterData(reportData.water.map((item) => item.amount));
+        setWeightLabel(reportData.weight.map((item) => item.enrollDate.split(' ')[0]));
+        setWeightData(reportData.weight.map((item) => item.amount));
+      } catch (error) {
+        console.error('[ERROR] GET REPORT DATA FAIL', error);
+      }
+    };
+    fetchData();
+  }, [isAuthorized, token, selectedRange, year, month]);
 
   const kcalDataset = [
     {

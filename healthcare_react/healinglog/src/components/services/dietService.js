@@ -1,129 +1,3 @@
-const getDayKcal = async (memberNo, month, token) => {
-  const resp = await fetch(`http://127.0.0.1:80/api/diet/report/day?memberNo=${memberNo}&month=${month}`, {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  if (!resp.ok) {
-    throw new Error(`HTTP ERROR !!! ${resp.status}`);
-  }
-  const kcalData = resp.json();
-  return kcalData;
-};
-
-const getDayWater = async (memberNo, month, token) => {
-  const resp = await fetch(`http://127.0.0.1:80/api/water/report/day?memberNo=${memberNo}&month=${month}`, {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  if (!resp.ok) {
-    throw new Error(`HTTP ERROR !!! ${resp.status}`);
-  }
-  const waterData = resp.json();
-  return waterData;
-};
-
-const getDayWeight = async (memberNo, month, token) => {
-  const resp = await fetch(`http://127.0.0.1:80/api/weight/report/day?memberNo=${memberNo}&month=${month}`, {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  if (!resp.ok) {
-    throw new Error(`HTTP ERROR !!! ${resp.status}`);
-  }
-  const weightData = resp.json();
-  return weightData;
-};
-
-const getMonthAvgKcal = async (memberNo, year, token) => {
-  const resp = await fetch(`http://127.0.0.1:80/api/diet/report/month?memberNo=${memberNo}&year=${year}`, {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  if (!resp.ok) {
-    throw new Error(`HTTP ERROR !!! ${resp.status}`);
-  }
-  const kcalData = resp.json();
-  return kcalData;
-};
-
-const getMonthAvgWater = async (memberNo, year, token) => {
-  const resp = await fetch(`http://127.0.0.1:80/api/water/report/month?memberNo=${memberNo}&year=${year}`, {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  if (!resp.ok) {
-    throw new Error(`HTTP ERROR !!! ${resp.status}`);
-  }
-  const waterData = resp.json();
-  return waterData;
-};
-
-const getMonthAvgWeight = async (memberNo, year, token) => {
-  const resp = await fetch(`http://127.0.0.1:80/api/weight/report/month?memberNo=${memberNo}&year=${year}`, {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  if (!resp.ok) {
-    throw new Error(`HTTP ERROR !!! ${resp.status}`);
-  }
-  const weightData = resp.json();
-  return weightData;
-};
-
-const getYearAvgKcal = async (memberNo, token) => {
-  const resp = await fetch(`http://127.0.0.1:80/api/diet/report/year?memberNo=${memberNo}`, {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  if (!resp.ok) {
-    throw new Error(`HTTP ERROR !!! ${resp.status}`);
-  }
-  const weightData = resp.json();
-  return weightData;
-};
-
-const getYearAvgWater = async (memberNo, token) => {
-  const resp = await fetch(`http://127.0.0.1:80/api/water/report/year?memberNo=${memberNo}`, {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  if (!resp.ok) {
-    throw new Error(`HTTP ERROR !!! ${resp.status}`);
-  }
-  const weightData = resp.json();
-  return weightData;
-};
-
-const getYearAvgWeight = async (memberNo, token) => {
-  const resp = await fetch(`http://127.0.0.1:80/api/weight/report/year?memberNo=${memberNo}`, {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  if (!resp.ok) {
-    throw new Error(`HTTP ERROR !!! ${resp.status}`);
-  }
-  const weightData = resp.json();
-  return weightData;
-};
-
 const getMemberHeight = async (token) => {
   const resp = await fetch(`http://127.0.0.1:80/api/member/mypage`, {
     method: 'GET',
@@ -140,7 +14,7 @@ const getMemberHeight = async (token) => {
   return data;
 };
 
-const getTodayWater = async (memberNo, day, token) => {
+const getTodayWater = async (day, token) => {
   const resp = await fetch(`http://127.0.0.1:80/api/water`, {
     method: 'POST',
     headers: {
@@ -148,7 +22,6 @@ const getTodayWater = async (memberNo, day, token) => {
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({
-      memberNo: memberNo,
       enrollDate: day,
     }),
   });
@@ -160,7 +33,7 @@ const getTodayWater = async (memberNo, day, token) => {
   return data;
 };
 
-const enrollTodayWater = async (memberNo, day, inputData, token) => {
+const enrollTodayWater = async (day, inputData, token) => {
   const resp = await fetch(`http://127.0.0.1:80/api/water/enroll`, {
     method: 'POST',
     headers: {
@@ -168,7 +41,6 @@ const enrollTodayWater = async (memberNo, day, inputData, token) => {
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({
-      memberNo: memberNo,
       enrollDate: day,
       amount: inputData.amount,
     }),
@@ -180,7 +52,7 @@ const enrollTodayWater = async (memberNo, day, inputData, token) => {
   return result;
 };
 
-const getTodayWeight = async (memberNo, day, token) => {
+const getTodayWeight = async (day, token) => {
   const resp = await fetch(`http://127.0.0.1:80/api/weight`, {
     method: 'POST',
     headers: {
@@ -188,7 +60,6 @@ const getTodayWeight = async (memberNo, day, token) => {
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({
-      memberNo: memberNo,
       enrollDate: day,
     }),
   });
@@ -199,7 +70,7 @@ const getTodayWeight = async (memberNo, day, token) => {
   return data;
 };
 
-const enrollTodayWeight = async (memberNo, day, inputData, token) => {
+const enrollTodayWeight = async (day, inputData, token) => {
   const resp = await fetch(`http://127.0.0.1:80/api/weight/enroll`, {
     method: 'POST',
     headers: {
@@ -207,7 +78,6 @@ const enrollTodayWeight = async (memberNo, day, inputData, token) => {
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({
-      memberNo: memberNo,
       enrollDate: day,
       amount: inputData.amount,
     }),
@@ -219,7 +89,7 @@ const enrollTodayWeight = async (memberNo, day, inputData, token) => {
   return result;
 };
 
-const getTotalKcal = async (memberNo, day, token) => {
+const getMealData = async (day, token) => {
   const resp = await fetch(`http://127.0.0.1:80/api/diet`, {
     method: 'POST',
     headers: {
@@ -227,7 +97,6 @@ const getTotalKcal = async (memberNo, day, token) => {
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({
-      memberNo: memberNo,
       dietDay: day,
     }),
   });
@@ -238,23 +107,46 @@ const getTotalKcal = async (memberNo, day, token) => {
   return data;
 };
 
-const getMealData = async (memberNo, day, token) => {
-  const resp = await fetch(`http://127.0.0.1:80/api/diet`, {
-    method: 'POST',
+const getDayData = async (month, token) => {
+  const resp = await fetch(`http://127.0.0.1:80/api/diet/report/day?month=${month}`, {
+    method: 'GET',
     headers: {
-      'content-type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify({
-      memberNo: memberNo,
-      dietDay: day,
-    }),
   });
   if (!resp.ok) {
     throw new Error(`HTTP ERROR !!! ${resp.status}`);
   }
-  const data = resp.json();
-  return data;
+  const reportData = resp.json();
+  return reportData;
+};
+
+const getMonthData = async (year, token) => {
+  const resp = await fetch(`http://127.0.0.1:80/api/diet/report/month?year=${year}`, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!resp.ok) {
+    throw new Error(`HTTP ERROR !!! ${resp.status}`);
+  }
+  const reportData = resp.json();
+  return reportData;
+};
+
+const getYearData = async (token) => {
+  const resp = await fetch(`http://127.0.0.1:80/api/diet/report/year`, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!resp.ok) {
+    throw new Error(`HTTP ERROR !!! ${resp.status}`);
+  }
+  const reportData = resp.json();
+  return reportData;
 };
 
 export {
@@ -264,13 +156,7 @@ export {
   getTodayWeight,
   enrollTodayWeight,
   getMealData,
-  getDayKcal,
-  getDayWater,
-  getDayWeight,
-  getMonthAvgKcal,
-  getMonthAvgWater,
-  getMonthAvgWeight,
-  getYearAvgKcal,
-  getYearAvgWater,
-  getYearAvgWeight,
+  getDayData,
+  getMonthData,
+  getYearData,
 };
