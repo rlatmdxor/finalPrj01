@@ -12,11 +12,26 @@ public class NotificationController {
 
     @GetMapping("getPushSettings")
     public NotificationVo getPushSettings(@RequestHeader("Authorization") String token){
-        return service.getPushSettings(token);
+
+        try {
+            return service.getPushSettings(token);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @PostMapping("setPushSettings")
     public void setPushSettings(@RequestHeader("Authorization") String token, @RequestBody NotificationVo vo){
-        service.setPushSettings(token, vo);
+
+        try {
+            service.setPushSettings(token, vo);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
+
 }
