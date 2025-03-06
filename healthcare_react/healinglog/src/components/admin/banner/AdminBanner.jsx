@@ -459,13 +459,15 @@ const AdminBanner = () => {
     showYn: ['노출여부 전체', 'Y', 'N'],
   };
 
-  const handleFilter = (e) => {
+  const handleFilter = (e, searchValue) => {
     setSearchInput((prev) => {
       return {
         ...prev,
         showYn: e.target.value,
       };
     });
+    dispatch(resetPaging({ boardType }));
+    getFetch(e.target.value, searchValue);
   };
 
   const handleChange = (e) => {
@@ -478,13 +480,15 @@ const AdminBanner = () => {
   };
 
   const handleClearClick = () => {
-    console.log('zzz');
     setSearchInput((prev) => {
       return {
         ...prev,
+        showYn: '노출여부 전체',
         searchValue: '',
       };
     });
+    dispatch(resetPaging({ boardType }));
+    getFetch('노출여부 전체', '');
   };
 
   const handleClick = (showYn, searchValue) => {
@@ -497,7 +501,13 @@ const AdminBanner = () => {
       <Title>배너 관리</Title>
       <ContentLayout>
         <SearchDiv>
-          <SelectBox width={'120'} onChange={handleFilter}>
+          <SelectBox
+            width={'120'}
+            value={searchInput.showYn}
+            onChange={(e) => {
+              handleFilter(e, searchInput.searchValue);
+            }}
+          >
             {searchFilter.showYn.map((option, idx) => (
               <option key={idx} value={option} name={option}>
                 {option}
@@ -508,7 +518,7 @@ const AdminBanner = () => {
             value={searchInput.searchValue}
             handleChange={handleChange}
             handleClearClick={handleClearClick}
-            handleClick={() => {
+            handleClick={(e) => {
               handleClick(searchInput.showYn, searchInput.searchValue);
             }}
           />
