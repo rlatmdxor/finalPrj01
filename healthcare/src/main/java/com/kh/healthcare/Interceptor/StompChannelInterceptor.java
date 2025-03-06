@@ -20,7 +20,7 @@ public class StompChannelInterceptor implements ChannelInterceptor {
 
     private final JwtUtil jwtUtil;
 
-    // static 저장소: 세션 ID를 키로 사용자 정보를 저장합니다.
+    // static 저장소: 세션 ID를 키로 사용자 정보를 저장
     private static final ConcurrentMap<String, UserInfo> userSessions = new ConcurrentHashMap<>();
 
     @Override
