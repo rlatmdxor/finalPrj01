@@ -231,12 +231,12 @@ const Mypage = () => {
               w={'150'}
               h={'40'}
               c={theme.green}
-              str="주소 수정"
+              str="주소 변경"
               fc={'white'}
               fs={'18'}
               f={(e) => {
                 reset();
-                dispatch(open({ title: '주소 수정', value: 'block' }));
+                dispatch(open({ title: '주소 변경', value: 'block' }));
               }}
               mt={'0'}
               mb={'0'}
@@ -510,25 +510,25 @@ const Mypage = () => {
         </Modal>
 
         {/* 주소 모달 */}
-        <Modal title="주소 수정">
+        <Modal title="주소 변경">
           <Postcode receiveData={handleAddressComplete} />
           <ModalContainer>
             <Btn
-              title={'주소 수정'}
+              title={'주소 변경'}
               mt={'10'}
               mb={'20'}
               mr={'-10'}
               c={'#FF7F50'}
               fc={'white'}
-              str={'수정'}
+              str={'변경'}
               f={(e) => {
                 Swal.fire({
-                  title: '수정하시겠습니까?', // 제목
+                  title: '변경하시겠습니까?', // 제목
                   icon: 'question', // 아이콘 유형 (warning, success, error 등)
                   showCancelButton: true, // 취소 버튼 표시
                   confirmButtonColor: '#3085d6', // 등록 버튼 색상
                   cancelButtonColor: '#d33', // 취소 버튼 색상
-                  confirmButtonText: '수정', // 등록 버튼 텍스트
+                  confirmButtonText: '변경', // 등록 버튼 텍스트
                   cancelButtonText: '취소', // 취소 버튼 텍스트
                 }).then((result) => {
                   if (result.isConfirmed) {
@@ -550,7 +550,7 @@ const Mypage = () => {
                         dispatch(setAddress(newAddress));
                         Swal.fire({
                           icon: 'success',
-                          title: '주소 수정 완료!',
+                          title: '주소 변경 완료!',
                           confirmButtonText: '확인',
                         });
                       });
