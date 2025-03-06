@@ -52,7 +52,7 @@
                 ORDER BY B.HIT DESC
             </when>
             <when test="order == 3">
-                ORDER BY COUNT( R.MEMBER_NO ) DESC
+                ORDER BY RECOMMEND_COUNT DESC
             </when>
             <otherwise>
                 ORDER BY B.NO DESC
