@@ -64,6 +64,17 @@ const InputDiv = styled.div`
     border: 1px solid #ccc;
     padding: 0px 8px;
   }
+  & > div:nth-child(2) {
+    box-sizing: border-box;
+    width: 100%;
+    height: 40px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    padding: 0px 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 `;
 const ToolboxDiv = styled.div`
   height: 40px;

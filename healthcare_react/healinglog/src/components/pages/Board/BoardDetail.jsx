@@ -16,6 +16,7 @@ import { FaThumbsUp, FaStar } from 'react-icons/fa';
 import Modal from '../../util/Modal';
 import { useDispatch } from 'react-redux';
 import { close, open } from '../../../redux/modalSlice';
+import { isTokenExpired, getRoleFromToken } from '../../util/JwtUtil';
 
 //모달 안의 버튼 컨테이너
 const ModalContainer = styled.div`
@@ -265,7 +266,21 @@ const blockRendererFn = (block, contentState) => {
 };
 
 const BoardDetail = () => {
+  const navi = useNavigate();
   const token = localStorage.getItem('token');
+  useEffect(() => {
+    if (!token || isTokenExpired(token)) {
+      setIsLogin(false);
+    }
+    if (getRoleFromToken(token) == 'ROLE_ADMIN') {
+      setIsAdmin(true);
+    }
+    if (!token || isTokenExpired(token)) {
+      setIsLogin(false);
+    }
+  }, [navi, token]);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isLogin, setIsLogin] = useState(true);
   const [searchParams] = useSearchParams(); // 쿼리스트링 값 가져오기
   const bno = searchParams.get('bno'); // 'bno' 키의 값 가져오기
   const navigate = useNavigate();
@@ -291,7 +306,6 @@ const BoardDetail = () => {
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         });
         const data = await response.json();
-        console.log('Fetched isRecommend:', data.isRecommend);
         const isRec = Number(data.isRecommend);
 
         setUserNo(() => data.userNo);
@@ -379,13 +393,14 @@ const BoardDetail = () => {
   };
 
   const handleReportModalOpen = (e) => {
+    const commentNo = e.target.getAttribute('value');
+    setRadio('1');
     setSendReport((prev) => {
       return {
         ...prev,
-        commentNo: e.target.value,
+        commentNo: commentNo,
       };
     });
-    reset();
     dispatch(open({ title: '꿀팁댓글 신고', value: 'block' }));
   };
 
@@ -445,6 +460,9 @@ const BoardDetail = () => {
   };
   const handleNaviList = () => {
     navigate('/board');
+  };
+  const handleNaviAdminList = () => {
+    navigate('/admin/board');
   };
 
   const handleDeleteHoneyTip = () => {
@@ -785,13 +803,16 @@ const BoardDetail = () => {
         </AttachDiv>
         {boardVo.memberNo == userNo ? (
           <ButtonDiv>
-            <Btn str={'수정하기'} c={'#FF7F50'} fc={'#ffffff'} h={'40'} w={'100'} mr={'10'} f={handleNaviEditPage} />
-            <Btn str={'삭제하기'} c={'#D9D9D9'} fc={'#3d4147'} h={'40'} w={'100'} f={handleDeleteHoneyTip} />
+            <Btn str={'수정하기'} c={'#FF7F50'} fc={'#ffffff'} w={'100'} mr={'10'} f={handleNaviEditPage} />
+            <Btn str={'삭제하기'} c={'#D9D9D9'} fc={'#3d4147'} w={'100'} f={handleDeleteHoneyTip} />
+          </ButtonDiv>
+        ) : isAdmin ? (
+          <ButtonDiv>
+            <Btn str={'삭제하기'} c={'#D9D9D9'} fc={'#3d4147'} w={'100'} f={handleDeleteHoneyTip} />
           </ButtonDiv>
         ) : (
           <ReportDiv
             onClick={() => {
-              console.log(sendReport);
               reset();
               dispatch(open({ title: '게시글 신고', value: 'block' }));
             }}
@@ -800,17 +821,31 @@ const BoardDetail = () => {
           </ReportDiv>
         )}
         <ThumbsupDiv>
-          <FaThumbsUp
-            onClick={handleLike}
-            style={{
-              color: liked ? 'blue' : 'grey',
-              cursor: 'pointer',
-              fontSize: '48px',
-            }}
-          />
+          {isAdmin ? (
+            <FaThumbsUp
+              style={{
+                color: liked ? 'blue' : 'grey',
+                cursor: 'pointer',
+                fontSize: '48px',
+              }}
+            />
+          ) : (
+            <FaThumbsUp
+              onClick={handleLike}
+              style={{
+                color: liked ? 'blue' : 'grey',
+                cursor: 'pointer',
+                fontSize: '48px',
+              }}
+            />
+          )}
         </ThumbsupDiv>
         <ButtonDiv>
-          <Btn str={'목록으로'} c={'lightgray'} fc={'black'} h={'40'} w={'120'} f={handleNaviList} />
+          {isAdmin ? (
+            <Btn str={'목록으로'} c={'lightgray'} fc={'black'} h={'40'} w={'120'} f={handleNaviAdminList} />
+          ) : (
+            <Btn str={'목록으로'} c={'lightgray'} fc={'black'} h={'40'} w={'120'} f={handleNaviList} />
+          )}
         </ButtonDiv>
         <CommentWriteDiv>
           <CommentTextArea>
@@ -829,7 +864,7 @@ const BoardDetail = () => {
             return (
               <>
                 <SamhangDiv>
-                  {vo.memberNo == userNo ? (
+                  {vo.memberNo == userNo || isAdmin ? (
                     <>
                       <StyledSpan commentNo={vo.no} onClick={handleFetchDeleteComment}>
                         삭제하기

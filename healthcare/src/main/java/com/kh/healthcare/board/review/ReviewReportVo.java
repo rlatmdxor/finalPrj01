@@ -10,4 +10,7 @@ public class ReviewReportVo {
     private String memberNo;
     private String enrollDate;
     private String nick;
+    private String title;
+    private String name;
+    private String reportCount;
 }

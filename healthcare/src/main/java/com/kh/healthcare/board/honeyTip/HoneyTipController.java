@@ -171,5 +171,47 @@ public class HoneyTipController {
             return null;
         }
     }
+    @PostMapping("reported/list")
+    public List<HoneyTipReportVo> reportedList() {
+        try{
+            List<HoneyTipReportVo> honeyTipReportVoList = service.reportedList();
+            return honeyTipReportVoList;
+        } catch (Exception e) {
+            throw new IllegalStateException("CODE [ BOARD / REPORTED / LIST ]");
+        }
+    }
+    @PostMapping("reported/delete")
+    public int reportedHoneyTipDel(@RequestBody String[] numList , @RequestHeader("Authorization") String token){
+        try{
+            int result = service.reportedHoneyTipDel(numList , token);
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    @PostMapping("reported/comment/list")
+    public List<HoneyTipCommentReportVo> reportedCommentList() {
+        try{
+            List<HoneyTipCommentReportVo> honeyTipCommentReportVoList = service.reportedCommentList();
+            System.out.println("honeyTipCommentReportVoList = " + honeyTipCommentReportVoList);
+            return honeyTipCommentReportVoList;
+        } catch (Exception e) {
+            throw new IllegalStateException("CODE [ BOARD/ COMMENT / REPORTED / LIST ]");
+        }
+    }
+    @PostMapping("reported/comment/delete")
+    public int reportedHoneyTipCommentDel(@RequestBody String[] numList , @RequestHeader("Authorization") String token){
+        try{
+            int result = service.reportedHoneyTipCommentDel(numList , token);
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+
 
 }

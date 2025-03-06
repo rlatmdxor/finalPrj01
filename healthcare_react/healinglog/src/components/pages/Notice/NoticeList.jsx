@@ -9,6 +9,8 @@ import Table from '../../util/Table';
 import { useNavigate } from 'react-router-dom';
 import Title from '../../util/Title';
 import ContentLayout from '../../util/ContentLayout';
+import { isTokenExpired, getRoleFromToken } from '../../util/JwtUtil';
+import Swal from 'sweetalert2';
 
 const SearchDiv = styled.div`
   display: flex;
@@ -31,6 +33,9 @@ const SelectBox = styled.select`
     outline: none;
   }
 `;
+const LayDiv = styled.div`
+  height: 40px;
+`;
 
 const BottomDiv = styled.div`
   display: flex;
@@ -39,7 +44,20 @@ const BottomDiv = styled.div`
 `;
 
 const NoticeList = () => {
+  const navi = useNavigate();
   const token = localStorage.getItem('token');
+
+  useEffect(() => {
+    if (!token || isTokenExpired(token)) {
+      setIsLogin(false);
+    }
+    if (getRoleFromToken(token) == 'ROLE_ADMIN') {
+      setIsAdmin(true);
+    }
+    if (!token || isTokenExpired(token)) {
+      setIsLogin(false);
+    }
+  }, [navi, token]);
 
   const boardType = 'notice';
   const initstate = {
@@ -51,10 +69,11 @@ const NoticeList = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isLogin, setIsLogin] = useState(true);
   const [dataVoList, setVoList] = useState([]);
   const [pagedData, setPagedData] = useState([]);
   const [searchInput, setSearchInput] = useState(initstate);
-  const [isAdmin, setIsAdmin] = useState(false);
 
   const currentPage = useSelector((state) => state.paging[boardType]?.currentPage || 1);
   const boardLimit = useSelector((state) => state.paging[boardType]?.boardLimit || 12);
@@ -83,14 +102,13 @@ const NoticeList = () => {
     fetch(url, options)
       .then((resp) => resp.json())
       .then((data) => {
-        if (data.list.length > 0) {
+        if (data.length > 0) {
           dispatch(setTotalCount({ boardType, totalCount: data.length }));
-          setVoList(data.list);
+          setVoList(data);
         } else {
           dispatch(resetPaging({ boardType }));
           setVoList([]);
         }
-        setIsAdmin(data.isAdmin);
       })
       .catch((error) => console.error('데이터 불러오기 실패:', error));
   }, [num]);
@@ -139,6 +157,19 @@ const NoticeList = () => {
       };
     });
   };
+  const handleNaviDetail = (e, no) => {
+    const bno = no;
+    if (isLogin == false) {
+      navigate(`/notice`);
+      Swal.fire({
+        icon: 'error',
+        title: 'ERROR',
+        text: '로그인해주세요',
+      });
+    } else if (isLogin === true) {
+      navigate(`/notice/detail?bno=${bno}`);
+    }
+  };
 
   return (
     <>
@@ -176,7 +207,7 @@ const NoticeList = () => {
           <tbody>
             {pagedData.map((vo) => {
               return (
-                <tr key={vo.no} onClick={() => navigate(`/notice/detail?bno=${vo.no}`)}>
+                <tr key={vo.no} value={vo.no} onClick={(e) => handleNaviDetail(e, vo.no)}>
                   <td>{vo.no}</td>
                   <td>공지</td>
                   <td>{vo.title}</td>
@@ -195,10 +226,10 @@ const NoticeList = () => {
           </div>
           {isAdmin ? (
             <div>
-              <Btn str={'등록'} c={'#FF7F50'} fc={'#ffffff'} h={'40'} f={() => navigate('/notice/write')} />
+              <Btn str={'등록'} c={'#FF7F50'} fc={'#ffffff'} mr={'0'} f={() => navigate('/notice/write')} />
             </div>
           ) : (
-            <div></div>
+            <LayDiv />
           )}
         </BottomDiv>
       </ContentLayout>

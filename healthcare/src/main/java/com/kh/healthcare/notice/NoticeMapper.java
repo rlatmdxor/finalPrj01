@@ -23,7 +23,7 @@ public interface NoticeMapper {
             )
             VALUES
             (
-                SEQ_BOARD.NEXTVAL
+                SEQ_NOTICE.NEXTVAL
                 , #{writer}
                 , #{title}
                 , #{content}
@@ -70,7 +70,7 @@ public interface NoticeMapper {
             WHERE NOTICE_NO = #{bno}
             AND DEL_YN = 'N'
             """)
-    List<NoticeVo> detailAttachList(String bno);
+    List<NoticeAttachVo> detailAttachList(String bno);
 
     @Update("""
             UPDATE NOTICE

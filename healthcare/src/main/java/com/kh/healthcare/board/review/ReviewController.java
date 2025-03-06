@@ -157,6 +157,15 @@ public class ReviewController {
             return 0;
         }
     }
+    @PostMapping("comment/report")
+    public int commentReport(@RequestBody ReviewCommentReportVo vo , @RequestHeader("Authorization") String token){
+        try{
+            return service.commentReport(vo , token);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
     @GetMapping("comment/list")
     public List<ReviewCommentVo> commentList(@RequestParam("bno") String bno ,  @RequestHeader("Authorization") String token){
         try{
@@ -164,6 +173,45 @@ public class ReviewController {
         } catch (Exception e) {
             e.printStackTrace();
             return null;
+        }
+    }
+    @PostMapping("reported/list")
+    public List<ReviewReportVo> reportedList() {
+        try{
+            List<ReviewReportVo> reviewReportVoList = service.reportedList();
+            return reviewReportVoList;
+        } catch (Exception e) {
+            throw new IllegalStateException("CODE [ REVIEW / REPORTED / LIST ]");
+        }
+
+    }
+    @PostMapping("reported/delete")
+    public int reportedReviewDel(@RequestBody String[] numList , @RequestHeader("Authorization") String token){
+        try{
+            int result = service.reportedReviewDel(numList , token);
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+    @PostMapping("reported/comment/list")
+    public List<ReviewCommentReportVo> reportedCommentList() {
+        try{
+            List<ReviewCommentReportVo> reviewCommentReportVoList = service.reportedCommentList();
+            return reviewCommentReportVoList;
+        } catch (Exception e) {
+            throw new IllegalStateException("CODE [ BOARD/ COMMENT / REPORTED / LIST ]");
+        }
+    }
+    @PostMapping("reported/comment/delete")
+    public int reportedReviewCommentDel(@RequestBody String[] numList , @RequestHeader("Authorization") String token){
+        try{
+            int result = service.reportedReviewCommentDel(numList , token);
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
         }
     }
 }

@@ -16,6 +16,7 @@ import { FaThumbsUp, FaStar } from 'react-icons/fa';
 import Modal from '../../../util/Modal';
 import { useDispatch } from 'react-redux';
 import { close, open } from '../../../../redux/modalSlice';
+import { isTokenExpired, getRoleFromToken } from '../../../util/JwtUtil';
 
 const ModalContainer = styled.div`
   display: flex;
@@ -307,7 +308,21 @@ const blockRendererFn = (block, contentState) => {
 };
 
 const ReviewDetail = () => {
+  const navi = useNavigate();
   const token = localStorage.getItem('token');
+  useEffect(() => {
+    if (!token || isTokenExpired(token)) {
+      setIsLogin(false);
+    }
+    if (getRoleFromToken(token) == 'ROLE_ADMIN') {
+      setIsAdmin(true);
+    }
+    if (!token || isTokenExpired(token)) {
+      setIsLogin(false);
+    }
+  }, [navi, token]);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isLogin, setIsLogin] = useState(true);
   const [searchParams] = useSearchParams();
   const bno = searchParams.get('bno');
   const navigate = useNavigate();
@@ -367,13 +382,14 @@ const ReviewDetail = () => {
   };
 
   const handleReportModalOpen = (e) => {
+    const commentNo = e.target.getAttribute('value');
+    setRadio('1');
     setSendReport((prev) => {
       return {
         ...prev,
-        commentNo: e.target.value,
+        commentNo: commentNo,
       };
     });
-    reset();
     dispatch(open({ title: '리뷰댓글 신고', value: 'block' }));
   };
 
@@ -433,6 +449,9 @@ const ReviewDetail = () => {
   };
   const handleNaviList = () => {
     navigate('/review');
+  };
+  const handleNaviAdminList = () => {
+    navigate('/admin/review');
   };
 
   const handleDeleteHoneyTip = () => {
@@ -786,13 +805,16 @@ const ReviewDetail = () => {
         </AttachDiv>
         {boardVo.memberNo == userNo ? (
           <ButtonDiv>
-            <Btn str={'수정하기'} c={'#FF7F50'} fc={'#ffffff'} h={'40'} w={'100'} mr={'10'} f={handleNaviEditPage} />
-            <Btn str={'삭제하기'} c={'#D9D9D9'} fc={'#3d4147'} h={'40'} w={'100'} f={handleDeleteHoneyTip} />
+            <Btn str={'수정하기'} c={'#FF7F50'} fc={'#ffffff'} w={'100'} mr={'10'} f={handleNaviEditPage} />
+            <Btn str={'삭제하기'} c={'#D9D9D9'} fc={'#3d4147'} w={'100'} f={handleDeleteHoneyTip} />
+          </ButtonDiv>
+        ) : isAdmin ? (
+          <ButtonDiv>
+            <Btn str={'삭제하기'} c={'#D9D9D9'} fc={'#3d4147'} w={'100'} f={handleDeleteHoneyTip} />
           </ButtonDiv>
         ) : (
           <ReportDiv
             onClick={() => {
-              console.log(sendReport);
               reset();
               dispatch(open({ title: '병원 리뷰 신고', value: 'block' }));
             }}
@@ -802,7 +824,11 @@ const ReviewDetail = () => {
         )}
         <ThumbsupDiv></ThumbsupDiv>
         <ButtonDiv>
-          <Btn str={'목록으로'} c={'lightgray'} fc={'black'} h={'40'} w={'120'} f={handleNaviList} />
+          {isAdmin ? (
+            <Btn str={'목록으로'} c={'lightgray'} fc={'black'} h={'40'} w={'120'} f={handleNaviAdminList} />
+          ) : (
+            <Btn str={'목록으로'} c={'lightgray'} fc={'black'} h={'40'} w={'120'} f={handleNaviList} />
+          )}
         </ButtonDiv>
         <CommentWriteDiv>
           <CommentTextArea>
@@ -821,7 +847,7 @@ const ReviewDetail = () => {
             return (
               <>
                 <SamhangDiv>
-                  {vo.memberNo == userNo ? (
+                  {vo.memberNo == userNo || isAdmin ? (
                     <>
                       <StyledSpan commentNo={vo.no} onClick={handleFetchDeleteComment}>
                         삭제하기

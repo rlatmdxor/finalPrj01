@@ -12,6 +12,8 @@ import Modal from '../../../util/Modal';
 import InputTag from '../../../util/Input';
 import { close, open } from '../../../../redux/modalSlice';
 import Swal from 'sweetalert2';
+import { isTokenExpired, getRoleFromToken } from '../../../util/JwtUtil';
+import { useNavigate } from 'react-router-dom';
 
 const NaviContainer = styled.div`
   display: grid;
@@ -168,9 +170,24 @@ const ModalContainer = styled.div`
 `;
 
 const InsulinPoint = () => {
+  const navi = useNavigate();
   const token = localStorage.getItem('token');
-  const url = 'http://127.0.0.1:80/api/insulin/list';
+  useEffect(() => {
+    if (!token || isTokenExpired(token) || getRoleFromToken(token) == 'ROLE_ADMIN') {
+      window.localStorage.removeItem('token');
+      navi('/login');
+      Swal.fire({
+        icon: 'warning',
+        title: '로그인이 필요합니다',
+        text: '로그인 후 이용해주세요',
+        confirmButtonText: '확인',
+      });
+    } else {
+      setIsAuthorized(true);
+    }
+  }, [navi, token]);
 
+  const url = 'http://127.0.0.1:80/api/insulin/list';
   const options = {
     method: 'GET',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
@@ -191,6 +208,7 @@ const InsulinPoint = () => {
   const boardLimit = useSelector((state) => state.paging[boardType]?.boardLimit || 12);
   const [disablePoint, setDisablePoint] = useState([]);
   const offset = (currentPage - 1) * boardLimit;
+  const [isAuthorized, setIsAuthorized] = useState(false);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -198,6 +216,9 @@ const InsulinPoint = () => {
   }, []);
 
   useEffect(() => {
+    if (!isAuthorized) {
+      return;
+    }
     fetch(url, options)
       .then((resp) => resp.json())
       .then((model) => {

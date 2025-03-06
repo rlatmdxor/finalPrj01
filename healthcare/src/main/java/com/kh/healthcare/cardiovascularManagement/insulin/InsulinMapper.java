@@ -96,17 +96,4 @@ public interface InsulinMapper {
             """)
     int checkTodayInsulin(String userNo);
 
-
-
-//    @Update("""
-//            UPDATE INSULIN
-//            SET
-//                ENROLL_DATE = #{enrollDate}
-//                , ABLE_DATE = #{ableDate}
-//                , POINT = #{point}
-//                , NOTE = #{note}
-//            WHERE MEMBER_NO = #{memberNo}
-//            AND NO = #{no}
-//            """)
-//    void insulinEdit(InsulinVo vo);
 }
