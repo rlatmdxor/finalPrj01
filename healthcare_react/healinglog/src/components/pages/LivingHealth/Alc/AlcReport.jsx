@@ -74,6 +74,11 @@ const Input = styled.input`
   padding: 0px 4px;
 `;
 
+const BottomDiv = styled.div`
+  margin-top: 25px;
+  margin-bottom: 35px;
+`;
+
 const AlcReport = () => {
   const dispatch = useDispatch();
 
@@ -856,9 +861,9 @@ const AlcReport = () => {
             })}
           </tbody>
         </Table>
-        <div>
-          <Pagination boardType={boardType} />
-        </div>
+        <BottomDiv>
+          <Pagination boardType={boardType}></Pagination>
+        </BottomDiv>
 
         <div></div>
       </ContentLayout>

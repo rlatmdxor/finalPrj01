@@ -40,6 +40,11 @@ const SelectBox = styled.select`
   }
 `;
 
+const BottomDiv = styled.div`
+  margin-top: 25px;
+  margin-bottom: 35px;
+`;
+
 const PublicHealthCenter = () => {
   const dispatch = useDispatch();
   const boardType = 'phc';
@@ -231,7 +236,9 @@ const PublicHealthCenter = () => {
           </tbody>
         </Table>
 
-        <Pagination boardType={boardType} />
+        <BottomDiv>
+          <Pagination boardType={boardType}></Pagination>
+        </BottomDiv>
       </ContentLayout>
     </>
   );

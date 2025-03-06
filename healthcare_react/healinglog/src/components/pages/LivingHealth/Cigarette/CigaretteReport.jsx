@@ -61,6 +61,11 @@ const Input = styled.input`
   padding: 0px 4px;
 `;
 
+const BottomDiv = styled.div`
+  margin-top: 25px;
+  margin-bottom: 35px;
+`;
+
 const CigaretteReport = () => {
   const dispatch = useDispatch();
   const [fullData, setFullData] = useState([]); // 전체 데이터 저장
@@ -741,9 +746,9 @@ const CigaretteReport = () => {
           </tbody>
         </Table>
         <div></div>
-        <div>
-          <Pagination boardType={boardType} />
-        </div>
+        <BottomDiv>
+          <Pagination boardType={boardType}></Pagination>
+        </BottomDiv>
         <div></div>
       </ContentLayout>
     </>

@@ -41,6 +41,11 @@ const SelectBox = styled.select`
   }
 `;
 
+const BottomDiv = styled.div`
+  margin-top: 25px;
+  margin-bottom: 35px;
+`;
+
 const Pharmacy = () => {
   const dispatch = useDispatch();
   const boardType = 'pharmacy';
@@ -249,8 +254,9 @@ const Pharmacy = () => {
             ))}
           </tbody>
         </Table>
-
-        <Pagination boardType={boardType} />
+        <BottomDiv>
+          <Pagination boardType={boardType}></Pagination>
+        </BottomDiv>
       </ContentLayout>
     </>
   );

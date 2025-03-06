@@ -45,6 +45,11 @@ const SelectBox = styled.select`
   }
 `;
 
+const BottomDiv = styled.div`
+  margin-top: 25px;
+  margin-bottom: 35px;
+`;
+
 const AdminUserManage = () => {
   const dispatch = useDispatch();
   const boardType = 'userManage';
@@ -264,7 +269,9 @@ const AdminUserManage = () => {
             ))}
           </tbody>
         </Table>
-        <Pagination boardType={boardType} />
+        <BottomDiv>
+          <Pagination boardType={boardType}></Pagination>
+        </BottomDiv>
       </ContentLayout>
     </>
   );
