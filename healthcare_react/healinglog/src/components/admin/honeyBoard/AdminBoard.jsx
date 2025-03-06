@@ -22,8 +22,8 @@ const AdminBoard = () => {
       <Title>꿀팁 게시판</Title>
       <NaviContainer>
         <Navi target="admin/board" tag={'게시글 목록'}></Navi>
-        <Navi target="reported/honeytip" tag={'게시글 신고현황'}></Navi>
-        <Navi target="reported/honeytip/comment" tag={'댓글 신고현황'}></Navi>
+        <Navi target="admin/reported/honeytip" tag={'게시글 신고현황'}></Navi>
+        <Navi target="admin/reported/honeytip/comment" tag={'댓글 신고현황'}></Navi>
       </NaviContainer>
       <ContentLayout>
         <LayDiv />

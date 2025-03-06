@@ -244,7 +244,7 @@ const InsulinPoint = () => {
         }
       })
       .catch((error) => console.error('데이터 불러오기 실패:', error));
-  }, [num]);
+  }, [num, isAuthorized, token]);
 
   // 인풋 입력값 받아오기
   const handleChange = (e) => {

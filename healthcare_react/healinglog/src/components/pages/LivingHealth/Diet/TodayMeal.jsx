@@ -218,6 +218,7 @@ const TodayMeal = ({ token }) => {
   const handleAddFood = (e) => {
     if (!foodInputData.label.trim()) {
       Swal.fire({
+        icon: 'warning',
         title: '음식명을 입력해주세요.',
         confirmButtonText: '확인',
       });
@@ -226,6 +227,7 @@ const TodayMeal = ({ token }) => {
 
     if (!foodInputData.unit.trim()) {
       Swal.fire({
+        icon: 'warning',
         title: '단위을 입력해주세요.',
         confirmButtonText: '확인',
       });
@@ -234,6 +236,7 @@ const TodayMeal = ({ token }) => {
 
     if (!foodInputData.amount || foodInputData.amount < 0) {
       Swal.fire({
+        icon: 'warning',
         title: '음식양을 0 이상 입력해주세요.',
         confirmButtonText: '확인',
       });
@@ -242,6 +245,7 @@ const TodayMeal = ({ token }) => {
 
     if (!foodInputData.kcal || foodInputData.kcal < 0) {
       Swal.fire({
+        icon: 'warning',
         title: '칼로리를을 0 이상 입력해주세요.',
         confirmButtonText: '확인',
       });
@@ -260,6 +264,7 @@ const TodayMeal = ({ token }) => {
   const handleEditFood = (e) => {
     if (!foodInputData.label.trim()) {
       Swal.fire({
+        icon: 'warning',
         title: '음식명을 입력해주세요.',
         confirmButtonText: '확인',
       });
@@ -268,6 +273,7 @@ const TodayMeal = ({ token }) => {
 
     if (!foodInputData.unit.trim()) {
       Swal.fire({
+        icon: 'warning',
         title: '단위을 입력해주세요.',
         confirmButtonText: '확인',
       });
@@ -276,6 +282,7 @@ const TodayMeal = ({ token }) => {
 
     if (!foodInputData.amount || foodInputData.amount < 0) {
       Swal.fire({
+        icon: 'warning',
         title: '음식양을 0 이상 입력해주세요.',
         confirmButtonText: '확인',
       });
@@ -284,6 +291,7 @@ const TodayMeal = ({ token }) => {
 
     if (!foodInputData.kcal || foodInputData.kcal < 0) {
       Swal.fire({
+        icon: 'warning',
         title: '칼로리를을 0 이상 입력해주세요.',
         confirmButtonText: '확인',
       });
@@ -358,6 +366,7 @@ const TodayMeal = ({ token }) => {
   const handleSubmit = () => {
     if (!inputData.foodList || inputData.foodList.length === 0) {
       Swal.fire({
+        icon: 'warning',
         title: '음식을 입력해주세요.',
         confirmButtonText: '확인',
       });
@@ -366,7 +375,10 @@ const TodayMeal = ({ token }) => {
 
     Swal.fire({
       title: '등록하시겠습니까?',
+      icon: 'question',
       showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
       confirmButtonText: '확인',
       cancelButtonText: '취소',
     }).then((result) => {
@@ -387,6 +399,7 @@ const TodayMeal = ({ token }) => {
         }).then((resp) => {
           if (resp.status == 200) {
             Swal.fire({
+              icon: 'success',
               title: '등록되었습니다.',
               confirmButtonText: '확인',
             });
@@ -423,6 +436,7 @@ const TodayMeal = ({ token }) => {
   const handleEdit = () => {
     if (!inputData.foodList || inputData.foodList.length === 0) {
       Swal.fire({
+        icon: 'warning',
         title: '음식을 입력해주세요.',
         confirmButtonText: '확인',
       });
@@ -430,7 +444,10 @@ const TodayMeal = ({ token }) => {
     }
     Swal.fire({
       title: '저장하시겠습니까?',
+      icon: 'question',
       showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
       confirmButtonText: '확인',
       cancelButtonText: '취소',
     }).then((result) => {
@@ -457,6 +474,7 @@ const TodayMeal = ({ token }) => {
         }).then((resp) => {
           if (resp.status == 200) {
             Swal.fire({
+              icon: 'success',
               title: '저장되었습니다.',
               confirmButtonText: '확인',
             });
@@ -477,7 +495,10 @@ const TodayMeal = ({ token }) => {
   const handleDelete = () => {
     Swal.fire({
       title: '삭제하시겠습니까?',
+      icon: 'question',
       showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
       confirmButtonText: '확인',
       cancelButtonText: '취소',
     }).then((result) => {
@@ -494,6 +515,7 @@ const TodayMeal = ({ token }) => {
         }).then((resp) => {
           if (resp.status == 200) {
             Swal.fire({
+              icon: 'success',
               title: '삭제되었습니다.',
               confirmButtonText: '확인',
             });

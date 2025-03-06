@@ -243,7 +243,7 @@ const BloodPressure = () => {
         }
       })
       .catch((error) => console.error('데이터 불러오기 실패:', error));
-  }, [num]);
+  }, [num, isAuthorized, token]);
 
   // 테이블 페이징 처리
   useEffect(() => {
