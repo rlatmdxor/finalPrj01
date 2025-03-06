@@ -138,6 +138,7 @@ public interface ReviewMapper {
             JOIN MEMBER M ON ( B.MEMBER_NO = M.NO )
             WHERE B.REVIEW_NO = #{bno}
             AND B.DEL_YN = 'N'
+            ORDER BY B.NO DESC
             """)
     List<ReviewCommentVo> commentList(String bno);
 
