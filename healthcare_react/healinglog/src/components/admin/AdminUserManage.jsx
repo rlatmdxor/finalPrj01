@@ -168,32 +168,32 @@ const AdminUserManage = () => {
 
   // 📌 유저 삭제 요청
   const handleDeleteUser = async (id) => {
-    if (!window.confirm('정말 삭제하시겠습니까?')) return;
-
-    try {
-      const response = await fetch(`http://127.0.0.1/api/admin/usermanage/delete`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ id: id }),
-      });
-
-      const result = await response.text(); // 서버에서 오는 응답 메시지 확인
-
-      if (!response.ok) {
-        throw new Error(result || `삭제 실패: ${response.status}`);
+    Swal.fire({
+      title: '삭제하시겠습니까?', // 제목
+      icon: 'warning', // 아이콘 유형 (warning, success, error 등)
+      showCancelButton: true, // 취소 버튼 표시
+      confirmButtonColor: '#3085d6', // 등록 버튼 색상
+      cancelButtonColor: '#d33', // 취소 버튼 색상
+      confirmButtonText: '삭제', // 등록 버튼 텍스트
+      cancelButtonText: '취소', // 취소 버튼 텍스트
+    }).then((result) => {
+      if (result.isConfirmed) {
+        //패치 넣기
+        fetch(`http://127.0.0.1/api/admin/usermanage/delete`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ id: id }),
+        });
+        Swal.fire({
+          icon: 'success',
+          title: '삭제 완료.',
+          confirmButtonText: '확인',
+        });
       }
-      alert(' 유저가 삭제되었습니다.');
-      handleSearch(); // 삭제 후 다시 검색
-    } catch (error) {
-      if (error.message.includes('이미 삭제된 유저')) {
-        alert('이미 삭제된 유저입니다.');
-      } else {
-        alert('삭제 실패');
-      }
-    }
+    });
   };
 
   return (

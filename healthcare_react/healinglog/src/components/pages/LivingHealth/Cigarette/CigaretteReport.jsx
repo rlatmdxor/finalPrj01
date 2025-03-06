@@ -373,7 +373,7 @@ const CigaretteReport = () => {
   const handleSubmit = (e) => {
     Swal.fire({
       title: '등록하시겠습니까?',
-      icon: 'warning', // 아이콘 유형 (success, warning, error 등)
+      icon: 'question', // 아이콘 유형 (success, warning, error 등)
       showCancelButton: true, // 취소 버튼 표시
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
@@ -426,7 +426,7 @@ const CigaretteReport = () => {
   const handleEditSubmit = (e) => {
     Swal.fire({
       title: '수정하시겠습니까?',
-      icon: 'warning', // 아이콘 유형
+      icon: 'question', // 아이콘 유형
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
