@@ -233,7 +233,9 @@ const HospitalReview = () => {
         <div>
           <Pagination boardType={boardType} />
         </div>
-        {isLogin ? (
+        {isAdmin ? (
+          <LayDiv></LayDiv>
+        ) : isLogin ? (
           <div>
             <Btn str={'등록'} mr={'0'} c={'#FF7F50'} fc={'#ffffff'} f={() => navigate('/review/write')} />
           </div>

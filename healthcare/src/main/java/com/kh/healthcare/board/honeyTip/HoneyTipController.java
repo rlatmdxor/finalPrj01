@@ -27,12 +27,12 @@ public class HoneyTipController {
 
     @PostMapping("list")
     public List<HoneyTipVo> list(@RequestBody SearchFilterVo filterVo) {
-        try{
+//        try{
             List<HoneyTipVo> HoneyTipVoList = service.list(filterVo);
             return HoneyTipVoList;
-        } catch (Exception e) {
-            throw new IllegalStateException("CODE [ BOARD / LIST ]");
-        }
+//        } catch (Exception e) {
+//            throw new IllegalStateException("CODE [ BOARD / LIST ]");
+//        }
 
     }
     @PostMapping("write")

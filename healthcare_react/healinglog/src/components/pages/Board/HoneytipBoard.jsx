@@ -241,7 +241,9 @@ const HoneytipBoard = () => {
         <div>
           <Pagination boardType={boardType} />
         </div>
-        {isLogin ? (
+        {isAdmin ? (
+          <LayDiv></LayDiv>
+        ) : isLogin ? (
           <div>
             <Btn str={'등록'} c={'#FF7F50'} fc={'#ffffff'} mr={'0'} f={() => navigate('/board/write')} />
           </div>
