@@ -214,9 +214,6 @@ const NoticeDetail = () => {
     if (getRoleFromToken(token) == 'ROLE_ADMIN') {
       setIsAdmin(true);
     }
-    if (!token || isTokenExpired(token)) {
-      setIsLogin(false);
-    }
   }, [navi, token]);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
@@ -248,7 +245,6 @@ const NoticeDetail = () => {
           const contentState = convertFromRaw(JSON.parse(data.detailVo.content));
           setEditorState(EditorState.createWithContent(contentState));
         }
-        setIsAdmin(data.isAdmin);
       } catch (error) {
         console.error('데이터 불러오기 오류:', error);
       }
@@ -269,7 +265,7 @@ const NoticeDetail = () => {
   };
 
   const handleNaviEditPage = () => {
-    navigate(`/notice/edit?bno=${bno}`);
+    navigate(`/admin/notice/edit?bno=${bno}`);
   };
 
   const handleNaviList = () => {
