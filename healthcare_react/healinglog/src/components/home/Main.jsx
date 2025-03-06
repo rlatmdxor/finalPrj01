@@ -283,7 +283,7 @@ const Main = () => {
                 <Card
                   key={vo.no}
                   onClick={() => {
-                    navi(`/notice?bno=${vo.no}`);
+                    navi(`/notice/detail?bno=${vo.no}`);
                   }}
                 >
                   <CardTitleTextDiv>{vo.title}</CardTitleTextDiv>
@@ -313,7 +313,7 @@ const Main = () => {
                 <Card
                   key={vo.no}
                   onClick={() => {
-                    navi(`/board?bno=${vo.no}`);
+                    navi(`/board/detail?bno=${vo.no}`);
                   }}
                 >
                   <CardTitleTextDiv>
@@ -336,7 +336,7 @@ const Main = () => {
             <h2>👍 이번주 Best 병원 리뷰</h2>
             <ViewMore
               onClick={() => {
-                navi('/hospitalreview');
+                navi('/review');
               }}
             >
               {'더보기 >'}
@@ -348,7 +348,7 @@ const Main = () => {
                 <ReviewCard
                   key={vo.no}
                   onClick={() => {
-                    navi(`/hospitalreview?bno=${vo.no}`);
+                    navi(`/review/detail?bno=${vo.no}`);
                   }}
                 >
                   <HospitalNameText>{vo.name}</HospitalNameText>
