@@ -241,7 +241,6 @@ const Challengers = () => {
     }
   }, [navi, token]);
 
-  const [challengerData, setChallengerData] = useState([]);
   const [num, setNum] = useState(0);
   const [inputData, setInputData] = useState({});
   const [titleData, setTitleData] = useState([]);
@@ -250,7 +249,6 @@ const Challengers = () => {
   const [boardData, setBoardData] = useState([]);
   const [joinList, setJoinList] = useState([]);
   const memberNo = { memberNo: 1 };
-  const memberNo2 = { memberNo: 2 };
   const initialInputData = {
     title: '',
     content: '',

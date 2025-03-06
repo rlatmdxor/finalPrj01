@@ -44,8 +44,8 @@ const ModalContainer = styled.div`
 `;
 
 const Sleep = () => {
-  const token = localStorage.getItem('token');
   const navi = useNavigate();
+  const token = localStorage.getItem('token');
   const [isAuthorized, setIsAuthorized] = useState(false); // 로그인 여부 체크
 
   useEffect(() => {

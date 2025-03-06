@@ -34,6 +34,7 @@ public class ChallengerVo {
     private String nick;
     private String url;
     private String challengerNo;
+    private String challengerName;
 
 
 }
