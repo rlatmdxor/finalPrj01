@@ -81,7 +81,7 @@ const ReportedHoneyBoardComment = () => {
         }
       })
       .catch((error) => console.error('데이터 불러오기 실패:', error));
-  }, [num]);
+  }, [num, token]);
   const handleCheckboxChange = (commentNo) => {
     setSelectedItems((prevSelected) =>
       prevSelected.includes(commentNo)
@@ -135,8 +135,8 @@ const ReportedHoneyBoardComment = () => {
       <Title>꿀팁 게시판</Title>
       <NaviContainer>
         <Navi target="admin/board" tag={'게시글 목록'}></Navi>
-        <Navi target="reported/honeytip" tag={'게시글 신고현황'}></Navi>
-        <Navi target="reported/honeytip/comment" tag={'댓글 신고현황'}></Navi>
+        <Navi target="admin/reported/honeytip" tag={'게시글 신고현황'}></Navi>
+        <Navi target="admin/reported/honeytip/comment" tag={'댓글 신고현황'}></Navi>
       </NaviContainer>
       <ContentLayout>
         <LayDiv />

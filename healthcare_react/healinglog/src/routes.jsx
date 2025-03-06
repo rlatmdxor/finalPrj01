@@ -25,7 +25,6 @@ import Join from './components/pages/Member/Join';
 import Join2 from './components/pages/Member/Join2';
 import LoginPage from './components/pages/Member/LoginPage';
 import Mypage from './components/pages/Member/Mypage';
-import NoticeList from './components/pages/Notice/NoticeList';
 import AnAerobicDetail from './components/pages/LivingHealth/Exercise/AnAerobicDetail';
 import AdminUserManage from './components/admin/AdminUserManage';
 import AlcReport from './components/pages/LivingHealth/Alc/AlcReport';
@@ -46,9 +45,11 @@ import AdminBanner from './components/admin/banner/AdminBanner';
 import BoardDetail from './components/pages/Board/BoardDetail';
 import BoardEdit from './components/pages/Board/BoardEdit';
 import { Navigate } from 'react-router-dom';
+import NoticeList from './components/pages/Notice/NoticeList';
 import NoticeWrite from './components/pages/Notice/NoticeWrite';
 import NoticeDetail from './components/pages/Notice/NoticeDetail';
 import NoticeEdit from './components/pages/Notice/NoticeEdit';
+
 import Review from './components/pages/Board/review/Review';
 import ReviewDetail from './components/pages/Board/review/ReviewDetail';
 import ReviewWrite from './components/pages/Board/review/ReviewWrite';
@@ -56,6 +57,10 @@ import ReviewEdit from './components/pages/Board/review/ReviewEdit';
 import AdminReview from './components/admin/review/AdminReview';
 import ReportedReview from './components/admin/review/ReportedReview';
 import ReportedReviewComment from './components/admin/review/ReportedReviewComment';
+import AdminNoticeEdit from './components/admin/notice/AdminNoticeEdit';
+import AdminNoticeDetail from './components/admin/notice/AdminNoticeDetail';
+import AdminNoticeWrite from './components/admin/notice/AdminNoticeWrite';
+import AdminNoticeList from './components/admin/notice/AdminNoticeList';
 
 export const routes = [
   { path: '/', component: <Main /> },
@@ -99,10 +104,10 @@ export const routes = [
   { path: '/admin/usermanage', component: <AdminUserManage /> },
   { path: '/alc', component: <AlcReport /> },
   { path: '/cigarette/', component: <CigaretteReport /> },
-  { path: '/reported/honeytip', component: <ReportedHoneyBoard /> },
-  { path: '/reported/honeytip/comment', component: <ReportedHoneyComment /> },
-  { path: '/reported/review', component: <ReportedReview /> },
-  { path: '/reported/review/comment', component: <ReportedReviewComment /> },
+  { path: '/admin/reported/honeytip', component: <ReportedHoneyBoard /> },
+  { path: '/admin/reported/honeytip/comment', component: <ReportedHoneyComment /> },
+  { path: '/admin/reported/review', component: <ReportedReview /> },
+  { path: '/admin/reported/review/comment', component: <ReportedReviewComment /> },
   { path: '/admin/board', component: <AdminBoard /> },
   { path: '/admin/review', component: <AdminReview /> },
   { path: '/challengers', component: <Challengers /> },
@@ -115,4 +120,8 @@ export const routes = [
   { path: '/notice/write', component: <NoticeWrite /> },
   { path: '/notice/detail', component: <NoticeDetail /> },
   { path: '/notice/edit', component: <NoticeEdit /> },
+  { path: '/admin/notice', component: <AdminNoticeList /> },
+  { path: '/admin/notice/write', component: <AdminNoticeWrite /> },
+  { path: '/admin/notice/detail', component: <AdminNoticeDetail /> },
+  { path: '/admin/notice/edit', component: <AdminNoticeEdit /> },
 ];

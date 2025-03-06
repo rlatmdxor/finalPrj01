@@ -41,6 +41,7 @@ const TodayWeight = ({ token }) => {
 
     if (isNaN(amountValue) || amountValue <= 0) {
       Swal.fire({
+        icon: 'warning',
         title: '0 이상 입력해주세요.',
         confirmButtonText: '확인',
       });
@@ -49,7 +50,10 @@ const TodayWeight = ({ token }) => {
 
     Swal.fire({
       title: '등록하시겠습니까?',
+      icon: 'question',
       showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
       confirmButtonText: '확인',
       cancelButtonText: '취소',
     }).then((result) => {
@@ -59,6 +63,7 @@ const TodayWeight = ({ token }) => {
             const result = await enrollTodayWeight(day, inputData, token);
             if (result == 200) {
               Swal.fire({
+                icon: 'success',
                 title: '등록되었습니다.',
                 confirmButtonText: '확인',
               });

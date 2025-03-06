@@ -249,6 +249,7 @@ const AdminBanner = () => {
   const handleSubmit = () => {
     if (!inputData.title || inputData.title.length === 0) {
       Swal.fire({
+        icon: 'warning',
         title: '배너명을 입력해주세요.',
         confirmButtonText: '확인',
       });
@@ -257,6 +258,7 @@ const AdminBanner = () => {
 
     if (!inputData.imageUrl || inputData.imageUrl.length === 0) {
       Swal.fire({
+        icon: 'warning',
         title: '배너사진을 선택해주세요.',
         confirmButtonText: '확인',
       });
@@ -265,7 +267,10 @@ const AdminBanner = () => {
 
     Swal.fire({
       title: '등록하시겠습니까?',
+      icon: 'question',
       showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
       confirmButtonText: '확인',
       cancelButtonText: '취소',
     }).then((result) => {
@@ -280,6 +285,7 @@ const AdminBanner = () => {
             const result = await enrollBanner(formData, token);
             if (result == 200) {
               Swal.fire({
+                icon: 'success',
                 title: '등록되었습니다.',
                 confirmButtonText: '확인',
               });
@@ -304,6 +310,7 @@ const AdminBanner = () => {
   const handleEdit = () => {
     if (!inputData.title || inputData.title.length === 0) {
       Swal.fire({
+        icon: 'warning',
         title: '배너명을 입력해주세요.',
         confirmButtonText: '확인',
       });
@@ -312,6 +319,7 @@ const AdminBanner = () => {
 
     if (!inputData.imageUrl || inputData.imageUrl.length === 0) {
       Swal.fire({
+        icon: 'warning',
         title: '배너사진을 선택해주세요.',
         confirmButtonText: '확인',
       });
@@ -320,7 +328,10 @@ const AdminBanner = () => {
 
     Swal.fire({
       title: '저장하시겠습니까?',
+      icon: 'question',
       showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
       confirmButtonText: '확인',
       cancelButtonText: '취소',
     }).then((result) => {
@@ -341,6 +352,7 @@ const AdminBanner = () => {
             const result = await editBanner(formData, token);
             if (result == 200) {
               Swal.fire({
+                icon: 'success',
                 title: '수정되었습니다.',
                 confirmButtonText: '확인',
               });
@@ -365,7 +377,10 @@ const AdminBanner = () => {
     console.log(inputData.no);
     Swal.fire({
       title: '삭제하시겠습니까?',
+      icon: 'question',
       showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
       confirmButtonText: '확인',
       cancelButtonText: '취소',
     }).then((result) => {
@@ -375,6 +390,7 @@ const AdminBanner = () => {
             const result = await deleteBanner(inputData.no, token);
             if (result == 200) {
               Swal.fire({
+                icon: 'success',
                 title: '삭제되었습니다.',
                 confirmButtonText: '확인',
               });
@@ -416,6 +432,7 @@ const AdminBanner = () => {
   const handleMultiDeleteClick = () => {
     if (!selectedNo || selectedNo?.length === 0) {
       Swal.fire({
+        icon: 'warning',
         title: '선택된 건이 없습니다.',
         confirmButtonText: '확인',
       });
@@ -424,7 +441,10 @@ const AdminBanner = () => {
 
     Swal.fire({
       title: '삭제하시겠습니까?',
+      icon: 'question',
       showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
       confirmButtonText: '확인',
       cancelButtonText: '취소',
     }).then((result) => {
@@ -434,6 +454,7 @@ const AdminBanner = () => {
             const result = await multiDeleteBanner(selectedNo, token);
             if (result == 200) {
               Swal.fire({
+                icon: 'success',
                 title: '삭제되었습니다.',
                 confirmButtonText: '확인',
               });

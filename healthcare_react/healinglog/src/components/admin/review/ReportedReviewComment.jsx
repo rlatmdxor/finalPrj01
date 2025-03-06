@@ -81,7 +81,7 @@ const ReportedReviewComment = () => {
         }
       })
       .catch((error) => console.error('데이터 불러오기 실패:', error));
-  }, [num]);
+  }, [num, token]);
 
   const handleCheckboxChange = (commentNo) => {
     setSelectedItems((prevSelected) =>
@@ -136,8 +136,8 @@ const ReportedReviewComment = () => {
       <Title>병원 리뷰</Title>
       <NaviContainer>
         <Navi target="admin/review" tag={'리뷰 목록'}></Navi>
-        <Navi target="reported/review" tag={'리뷰 신고현황'}></Navi>
-        <Navi target="reported/review/comment" tag={'댓글 신고현황'}></Navi>
+        <Navi target="admin/reported/review" tag={'리뷰 신고현황'}></Navi>
+        <Navi target="admin/reported/review/comment" tag={'댓글 신고현황'}></Navi>
       </NaviContainer>
       <ContentLayout>
         <LayDiv />

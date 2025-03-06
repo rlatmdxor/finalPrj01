@@ -253,6 +253,7 @@ const DashBoard = () => {
         const result = await editDashboardSetting(inputData, token);
         if (result == 200) {
           Swal.fire({
+            icon: 'success',
             title: '저장되었습니다.',
             confirmButtonText: '확인',
           });
