@@ -159,7 +159,7 @@ const AdminNoticeList = () => {
   };
   const handleNaviDetail = (e, no) => {
     const bno = no;
-    if (isLogin == false) {
+    if (isLogin === false) {
       navigate(`/admin/notice`);
       Swal.fire({
         icon: 'error',
@@ -168,6 +168,7 @@ const AdminNoticeList = () => {
       });
     } else if (isLogin === true) {
       navigate(`/admin/notice/detail?bno=${bno}`);
+      return;
     }
   };
 

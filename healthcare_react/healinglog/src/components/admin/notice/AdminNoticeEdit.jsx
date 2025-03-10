@@ -224,7 +224,7 @@ const AdminNoticeEdit = () => {
 
         if (data.detailVo.content) {
           const contentState = convertFromRaw(JSON.parse(data.detailVo.content));
-          setEditorState(EditorState.createWithContent(contentState));
+          setEditorState(EditorState.createWithContent(contentState));  
         }
       } catch (error) {
         console.error('데이터 불러오기 오류:', error);
