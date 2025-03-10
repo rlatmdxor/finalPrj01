@@ -72,5 +72,14 @@ public class SleepController {
         }
 
     }
+    @PostMapping("del")
+    public String del(@RequestHeader ("Authorization") String token, @RequestBody SleepVo vo){
+        try {
+            service.del(token, vo);
+            return "del ok ~~~";
+        }catch (Exception e){
+            throw new IllegalStateException("CODE [ CHALLENGER / DEL ]");
+        }
 
+    }
 }

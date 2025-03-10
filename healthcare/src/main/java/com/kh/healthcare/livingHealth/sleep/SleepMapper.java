@@ -1,6 +1,7 @@
 package com.kh.healthcare.livingHealth.sleep;
 
 
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
@@ -55,4 +56,11 @@ public interface SleepMapper {
             AND NO =#{vo.no}
             """)
     void edit(String userNo, SleepVo vo);
+
+    @Delete("""
+            DELETE SLEEP
+            WHERE MEMBER_NO = #{userNo}
+            AND NO =#{vo.no}
+            """)
+    void del(String userNo, SleepVo vo);
 }

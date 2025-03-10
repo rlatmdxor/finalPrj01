@@ -17,7 +17,7 @@ const StyledMiddle = styled.div`
 `;
 
 const ImgLayout = styled.img`
-  margin-left: 250px;
+  margin-left: 285px;
   width: 60%;
   height: 100%;
 `;
@@ -26,7 +26,7 @@ const InputTag = styled.input`
   width: 400px;
   height: 30px;
   margin-bottom: 20px;
-  margin-left: 220px;
+  margin-left: 290px;
   border-radius: 15px;
   border: 1px solid gray;
   padding: 10px;
@@ -75,7 +75,7 @@ const AdminLogin = () => {
 
   return (
     <>
-      <Title>어드민 로그인</Title>
+      <Title></Title>
       <div></div>
       <ContentLayout>
         <StyledMiddle>
@@ -88,7 +88,7 @@ const AdminLogin = () => {
               h={'60'}
               mt={'0'}
               mr={'0'}
-              ml={'220'}
+              ml={'290'}
               mb={'0'}
               fs={'30'}
               str={'로그인'}

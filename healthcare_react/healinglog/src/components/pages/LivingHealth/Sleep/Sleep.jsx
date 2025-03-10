@@ -269,6 +269,7 @@ const Sleep = () => {
         setChartVoList(data);
       });
   }, [num, isAuthorized, token]);
+
   chartVoList.sort((a, b) => new Date(b.day) - new Date(a.day));
 
   const getChartData = () => {
@@ -451,6 +452,38 @@ const Sleep = () => {
     setState(state + 1);
   };
 
+  const handleDel = (e) => {
+    if (!isAuthorized) {
+      return;
+    }
+
+    Swal.fire({
+      title: '삭제하시겠습니까?', // 제목
+      icon: 'question', // 아이콘 유형 (warning, success, error 등)
+      showCancelButton: true, // 취소 버튼 표시
+      confirmButtonColor: '#3085d6', // 등록 버튼 색상
+      cancelButtonColor: '#d33', // 취소 버튼 색상
+      confirmButtonText: '삭제', // 등록 버튼 텍스트
+      cancelButtonText: '취소', // 취소 버튼 텍스트
+    }).then((result) => {
+      if (result.isConfirmed) {
+        //패치 넣기
+
+        fetch(`${url}del`, options)
+          .then((resp) => resp.text())
+          .then((data) => {
+            setNum((prev) => prev + 1);
+            Swal.fire({
+              icon: 'success',
+              title: '삭제 완료.',
+              confirmButtonText: '확인',
+            });
+          });
+        dispatch(close(e.target.title));
+      }
+    });
+  };
+
   return (
     <>
       <Title>수면</Title>
@@ -544,7 +577,16 @@ const Sleep = () => {
               fc={'white'}
               str={'수정'}
             ></Btn>
-            <Btn mt={'10'} mb={'20'} mr={'-20'} c={'lightgray'} fc={'black'} str={'삭제'}></Btn>
+            <Btn
+              title={'수면 수정'}
+              mt={'10'}
+              mb={'20'}
+              mr={'-20'}
+              c={'lightgray'}
+              fc={'black'}
+              str={'삭제'}
+              f={handleDel}
+            ></Btn>
           </ModalContainer>
         </Modal>
         <YearContainer>

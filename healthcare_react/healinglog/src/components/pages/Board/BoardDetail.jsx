@@ -801,13 +801,13 @@ const BoardDetail = () => {
             </div>
           </div>
         </AttachDiv>
-        {boardVo.memberNo == userNo ? (
+        {isAdmin ? (
           <ButtonDiv>
-            <Btn str={'수정하기'} c={'#FF7F50'} fc={'#ffffff'} w={'100'} mr={'10'} f={handleNaviEditPage} />
             <Btn str={'삭제하기'} c={'#D9D9D9'} fc={'#3d4147'} w={'100'} f={handleDeleteHoneyTip} />
           </ButtonDiv>
-        ) : isAdmin ? (
+        ) : boardVo.memberNo == userNo ? (
           <ButtonDiv>
+            <Btn str={'수정하기'} c={'#FF7F50'} fc={'#ffffff'} w={'100'} mr={'10'} f={handleNaviEditPage} />
             <Btn str={'삭제하기'} c={'#D9D9D9'} fc={'#3d4147'} w={'100'} f={handleDeleteHoneyTip} />
           </ButtonDiv>
         ) : (

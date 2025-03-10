@@ -36,4 +36,9 @@ public class SleepService {
         String userNo = jwtUtil.getNo(token);
         mapper.edit(userNo, vo);
     }
+    public void del(String token, SleepVo vo) {
+        token = token.replace("Bearer ", "");
+        String userNo = jwtUtil.getNo(token);
+        mapper.del(userNo, vo);
+    }
 }
