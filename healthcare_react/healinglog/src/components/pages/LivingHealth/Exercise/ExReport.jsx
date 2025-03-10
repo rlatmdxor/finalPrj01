@@ -462,6 +462,30 @@ const ExReport = () => {
     }
   }, [isAuthorized, token]);
 
+  // label 에서 연도 제거
+  const formattedCaloriesLabels = (caloriesChartData?.labels || []).map((label) => {
+    const parts = label.split('-');
+    if (parts.length === 3) {
+      return `${parts[2]}`;
+    }
+    if (parts.length === 2) {
+      return `${parts[1]}`;
+    }
+    return label; //기존 label
+  });
+
+  // label 에서 연도 제거
+  const formattedDurationLabels = (durationChartData?.labels || []).map((label) => {
+    const parts = label.split('-');
+    if (parts.length === 3) {
+      return `${parts[2]}`;
+    }
+    if (parts.length === 2) {
+      return `${parts[1]}`;
+    }
+    return label; //기존 label
+  });
+
   return (
     <>
       <Title>운동</Title>
@@ -495,7 +519,8 @@ const ExReport = () => {
           <ChartPosition>
             <Chart
               chartType={selectedChartCalories}
-              labels={caloriesChartData?.labels || []}
+              // labels={caloriesChartData?.labels || []}
+              labels={formattedCaloriesLabels}
               dataset={caloriesChartData?.datasets || []}
               width={100}
               height={400}
@@ -526,7 +551,7 @@ const ExReport = () => {
           <ChartPosition>
             <Chart
               chartType={selectedChartDuration}
-              labels={durationChartData?.labels || []}
+              labels={formattedDurationLabels}
               dataset={durationChartData?.datasets || []}
               width={100}
               height={400}
