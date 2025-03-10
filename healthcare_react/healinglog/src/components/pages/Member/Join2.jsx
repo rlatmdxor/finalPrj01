@@ -170,7 +170,8 @@ const Join2 = () => {
     roadAddress &&
     detailAddress &&
     emailCheckMsg === '사용 가능한 이메일입니다.' &&
-    phoneCheckMsg === '사용 가능한 전화번호입니다.';
+    phoneCheckMsg === '사용 가능한 전화번호입니다.' &&
+    gender;
 
   const handleAddressComplete = (data) => {
     setZoneAddress(data.zoneAddress);
@@ -341,7 +342,7 @@ const Join2 = () => {
 
           <BlankSpace />
 
-          <InputTitle>성별 (선택)</InputTitle>
+          <InputTitle>성별</InputTitle>
           <SelectInput2
             className="gender"
             value={gender === 'm' ? '남성' : gender === 'f' ? '여성' : ''}
