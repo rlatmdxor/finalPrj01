@@ -16,9 +16,10 @@ import {
   setWeightAmount,
   setTotalKcal,
   setHeight,
+  setGender,
 } from '../../../../redux/dietSlice';
 import { useNavigate } from 'react-router-dom';
-import { getMealData, getMemberHeight, getTodayWater, getTodayWeight } from '../../../services/dietService';
+import { getMealData, getMemberInfo, getTodayWater, getTodayWeight } from '../../../services/dietService';
 import { getRoleFromToken, isTokenExpired } from '../../../util/JwtUtil';
 
 const NaviContainer = styled.div`
@@ -126,17 +127,18 @@ const Diet = () => {
       return;
     }
 
-    const fetchMemberHeight = async () => {
+    const fetchMemberInfo = async () => {
       try {
-        const fetchData = await getMemberHeight(token);
+        const fetchData = await getMemberInfo(token);
         if (fetchData) {
           dispatch(setHeight(fetchData.height));
+          dispatch(setGender(fetchData.gender));
         }
       } catch (error) {
         console.log(error);
       }
     };
-    fetchMemberHeight();
+    fetchMemberInfo();
   }, [isAuthorized, token, dispatch]);
 
   useEffect(() => {

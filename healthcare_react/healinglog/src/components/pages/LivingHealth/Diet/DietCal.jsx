@@ -3,12 +3,9 @@ import Title from '../../../util/Title';
 import styled from 'styled-components';
 import Navi from '../../../util/Navi';
 import ContentLayout from '../../../util/ContentLayout';
-import Calendar from '../../../util/Calendar';
-import { useDispatch, useSelector } from 'react-redux';
-import { close } from '../../../../redux/modalSlice';
 import { useNavigate } from 'react-router-dom';
-import { setDay } from '../../../../redux/dietSlice';
 import { getRoleFromToken, isTokenExpired } from '../../../util/JwtUtil';
+import DietCalendar from '../../../util/DietCalendar';
 
 const NaviContainer = styled.div`
   display: grid;
@@ -22,16 +19,10 @@ const NaviContainer = styled.div`
 const CalAreaDiv = styled.div`
   margin-top: 70px;
   margin-bottom: 75px;
-
-  & div div div div:not(:first-child) {
-    margin-top: 4px;
-    font-size: 14px;
-  }
 `;
 
 const DietCal = () => {
   const navi = useNavigate();
-  const dispatch = useDispatch();
   const Swal = require('sweetalert2');
 
   const token = localStorage.getItem('token');
@@ -54,20 +45,42 @@ const DietCal = () => {
 
   const [events, setEvents] = useState({});
 
+  const formatDate = (date) => {
+    const [year, month, day] = date.slice(0, 10).split('-');
+    return `${parseInt(year)}-${parseInt(month)}-${parseInt(day)}`;
+  };
+
   const formatData = (data) => {
-    return Object.fromEntries(
-      data.map((diet) => {
-        const [year, month, day] = diet.dietDay.split(' ')[0].split('-');
-        const dietDay = `${year}-${parseInt(month)}-${parseInt(day)}`;
-        const eventList = [];
+    const events = {};
+    console.log(data);
+    data.kcal.forEach((item) => {
+      const day = formatDate(item.dietDay);
 
-        eventList.push(`[칼로리] ${diet.sumKcal} Kcal`);
-        eventList.push(`[물섭취] ${diet.waterAmount} ml`);
-        eventList.push(`[체중] ${diet.weightAmount} kg`);
+      if (!events[day]) {
+        events[day] = [];
+      }
+      events[day].push(`칼로리 ${item.totalKcal} Kcal`);
+    });
 
-        return [dietDay, eventList];
-      })
-    );
+    data.water.forEach((item) => {
+      const day = formatDate(item.enrollDate);
+
+      if (!events[day]) {
+        events[day] = [];
+      }
+      events[day].push(`물섭취 ${item.amount} ml`);
+    });
+
+    data.weight.forEach((item) => {
+      const day = formatDate(item.enrollDate);
+
+      if (!events[day]) {
+        events[day] = [];
+      }
+      events[day].push(`체중 ${item.amount} kg`);
+    });
+
+    return events;
   };
 
   useEffect(() => {
@@ -86,26 +99,9 @@ const DietCal = () => {
       .then((data) => {
         const formattedData = formatData(data);
         setEvents(formattedData);
+        console.log(formattedData);
       });
   }, [isAuthorized, token]);
-
-  const modalState = useSelector((state) => state.modal.modals['캘린더 모달']);
-  const selectedDate = useSelector((state) => state.modal.selectedDate);
-
-  useEffect(() => {
-    if (!isAuthorized) {
-      return;
-    }
-
-    if (modalState === 'block' && selectedDate) {
-      dispatch(close('캘린더 모달'));
-      const [year, month, day] = selectedDate.split('-');
-      const formattedDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-
-      dispatch(setDay(formattedDate));
-      navi('/diet');
-    }
-  }, [isAuthorized, token, modalState, selectedDate]);
 
   return (
     <>
@@ -117,7 +113,7 @@ const DietCal = () => {
       </NaviContainer>
       <ContentLayout>
         <CalAreaDiv>
-          <Calendar modalTitle="캘린더 모달" vo={[]} events={events} width={1000} height={100} />
+          <DietCalendar modalTitle="캘린더 모달" vo={[]} events={events} width={970} height={100} />
         </CalAreaDiv>
       </ContentLayout>
     </>

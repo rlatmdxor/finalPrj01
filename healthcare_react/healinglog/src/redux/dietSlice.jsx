@@ -9,6 +9,7 @@ const dietSlice = createSlice({
   name: 'diet',
   initialState: {
     height: 0,
+    gender: '',
     day: todayDate,
     water: 0,
     weight: 0,
@@ -19,6 +20,9 @@ const dietSlice = createSlice({
   reducers: {
     setHeight: (state, action) => {
       state.height = action.payload;
+    },
+    setGender: (state, action) => {
+      state.gender = action.payload;
     },
     setDay: (state, action) => {
       state.day = action.payload;
@@ -54,7 +58,7 @@ export const {
   setWeightAmount,
   setTotalKcal,
   setHeight,
-  setMemberNo,
+  setGender,
   setMealDetailList,
   setMealKcalSum,
 } = dietSlice.actions;

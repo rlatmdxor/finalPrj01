@@ -19,11 +19,20 @@ public class DietService {
     private final DietMapper mapper;
     private final JwtUtil jwtUtil;
 
-    public List<DietCalVo> getDietCalData(String token) {
+    public DietReportVo getDietCalendarData(String token) {
         token = token.replace("Bearer ", "");
         String memberNo = jwtUtil.getNo(token);
 
-        return mapper.getDietCalData(memberNo);
+        List<WaterVo> waterVo = mapper.getWaterList(memberNo);
+        List<WeightVo> weightVo = mapper.getWeightList(memberNo);
+        List<TotalKcalVo> totalKcalVo = mapper.getKcalList(memberNo);
+
+        DietReportVo dietReportVo = new DietReportVo();
+        dietReportVo.setWater(waterVo);
+        dietReportVo.setWeight(weightVo);
+        dietReportVo.setKcal(totalKcalVo);
+
+        return dietReportVo;
     }
 
     public DietReportVo getDietDayReport(String month, String token) {
@@ -33,6 +42,22 @@ public class DietService {
         List<WaterVo> waterVo = mapper.getDayWater(memberNo, month);
         List<WeightVo> weightVo = mapper.getDayWeight(memberNo, month);
         List<TotalKcalVo> totalKcalVo = mapper.getDayKcal(memberNo, month);
+
+        DietReportVo dietReportVo = new DietReportVo();
+        dietReportVo.setWater(waterVo);
+        dietReportVo.setWeight(weightVo);
+        dietReportVo.setKcal(totalKcalVo);
+
+        return dietReportVo;
+    }
+
+    public DietReportVo getDietWeekReport(String year, String token) {
+        token = token.replace("Bearer ", "");
+        String memberNo = jwtUtil.getNo(token);
+
+        List<WaterVo> waterVo = mapper.getWeekWater(memberNo, year);
+        List<WeightVo> weightVo = mapper.getWeekWeight(memberNo, year);
+        List<TotalKcalVo> totalKcalVo = mapper.getWeekKcal(memberNo, year);
 
         DietReportVo dietReportVo = new DietReportVo();
         dietReportVo.setWater(waterVo);
@@ -58,19 +83,4 @@ public class DietService {
         return dietReportVo;
     }
 
-    public DietReportVo getDietYearReport(String token) {
-        token = token.replace("Bearer ", "");
-        String memberNo = jwtUtil.getNo(token);
-
-        List<WaterVo> waterVo = mapper.getYearWater(memberNo);
-        List<WeightVo> weightVo = mapper.getYearWeight(memberNo);
-        List<TotalKcalVo> totalKcalVo = mapper.getYearKcal(memberNo);
-
-        DietReportVo dietReportVo = new DietReportVo();
-        dietReportVo.setWater(waterVo);
-        dietReportVo.setWeight(weightVo);
-        dietReportVo.setKcal(totalKcalVo);
-
-        return dietReportVo;
-    }
 }
