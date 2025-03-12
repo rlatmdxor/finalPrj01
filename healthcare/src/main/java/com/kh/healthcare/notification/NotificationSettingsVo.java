@@ -3,7 +3,7 @@ package com.kh.healthcare.notification;
 import lombok.Data;
 
 @Data
-public class NotificationVo {
+public class NotificationSettingsVo {
 
     private String no;
     private String memberNo;
