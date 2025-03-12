@@ -4,6 +4,7 @@ import ContentLayout from '../../util/ContentLayout';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
+import { BASE_URL } from '../../services/config';
 
 const FindPwdPage = () => {
   const navi = useNavigate();
@@ -19,7 +20,7 @@ const FindPwdPage = () => {
     };
 
     try {
-      const response = await fetch('http://127.0.0.1:80/api/member/findPwd', {
+      const response = await fetch(`${BASE_URL}/api/member/findPwd`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(requestData),

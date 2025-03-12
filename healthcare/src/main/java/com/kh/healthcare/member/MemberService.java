@@ -62,6 +62,8 @@ public class MemberService {
     // 패스워드 암호화 후, DB에 저장
     public int memberJoin(MemberVo vo, String profileUrl) {
         String encodedPwd = encoder.encode(vo.getPwd());
+        vo.setId(vo.getId().toLowerCase());
+        vo.setEmail(vo.getEmail().toLowerCase());
         vo.setPwd(encodedPwd);
         int result = mapper.memberJoin(vo, profileUrl);
 

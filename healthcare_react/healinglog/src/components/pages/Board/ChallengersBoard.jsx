@@ -12,6 +12,7 @@ import Pagination from '../../util/Pagination';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
 import { isTokenExpired, getRoleFromToken } from '../../util/JwtUtil';
+import { BASE_URL } from '../../services/config';
 
 const BottomDiv = styled.div`
   margin-top: 10px;
@@ -193,7 +194,8 @@ const ChallengersBoard = () => {
     if (!isAuthorized) {
       return;
     }
-    fetch('http://127.0.0.1:/api/challenger/postList')
+
+    fetch(`${BASE_URL}/api/challenger/postList`)
       .then((resp) => resp.json())
       .then((data) => {
         if (data.length > 0) {
@@ -205,7 +207,8 @@ const ChallengersBoard = () => {
           setChallengerData([]); // 데이터가 없을 경우 초기화
         }
       });
-    fetch('http://127.0.0.1:/api/challenger/postTitleList', {
+
+    fetch(`${BASE_URL}/api/challenger/postTitleList`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -271,7 +274,7 @@ const ChallengersBoard = () => {
       cancelButtonText: '취소', // 취소 버튼 텍스트
     }).then((result) => {
       if (result.isConfirmed) {
-        fetch('http://127.0.0.1:80/api/challenger/postWrite', {
+        fetch(`${BASE_URL}/api/challenger/postWrite`, {
           method: 'POST',
           headers: {
             'content-type': 'application/json',

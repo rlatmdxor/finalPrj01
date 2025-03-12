@@ -11,6 +11,7 @@ import ContentLayout from '../../../util/ContentLayout';
 import Btn from '../../../util/Btn';
 import Swal from 'sweetalert2';
 import { isTokenExpired, getRoleFromToken } from '../../../util/JwtUtil';
+import { BASE_URL } from '../../../services/config';
 
 const AnAerobic = () => {
   const dispatch = useDispatch();
@@ -53,7 +54,7 @@ const AnAerobic = () => {
   //페이지 렌더링(데이터 가져오기)
   useEffect(() => {
     //일반 리스트
-    fetch('http://127.0.0.1:80/api/anaerobic/getList', {
+    fetch(`${BASE_URL}/api/anaerobic/getList`, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -68,7 +69,7 @@ const AnAerobic = () => {
       });
 
     //북마크 리스트
-    fetch('http://127.0.0.1:80/api/anaerobic/getBookmarkList', {
+    fetch(`${BASE_URL}/api/anaerobic/getBookmarkList`, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -85,7 +86,7 @@ const AnAerobic = () => {
 
   //북마크 해제
   const unmark = (no) => {
-    fetch('http://127.0.0.1:80/api/anaerobic/unmark', {
+    fetch(`${BASE_URL}/api/anaerobic/unmark`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -104,7 +105,7 @@ const AnAerobic = () => {
 
   //북마크 등록
   const mark = (no) => {
-    fetch('http://127.0.0.1:80/api/anaerobic/mark', {
+    fetch(`${BASE_URL}/api/anaerobic/mark`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -150,7 +151,7 @@ const AnAerobic = () => {
     };
 
     try {
-      const response = await fetch('http://127.0.0.1:80/api/anaerobic/record', {
+      const response = await fetch(`${BASE_URL}/api/anaerobic/record`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -31,54 +31,6 @@ import Table from '../../../util/Table';
 import Pagination from '../../../util/Pagination';
 import { FaStar } from 'react-icons/fa';
 
-// const ContentDiv = styled.div`
-//   margin: 0;
-//   padding-left: 5%;
-//   width: 95%;
-//   min-height: 2000px;
-//   display: grid;
-//   grid-template-rows: 40px 40px 1fr 40px 40px;
-//   /* border: 1px solid #ccc; */
-// `;
-// const InputDiv = styled.div`
-//   width: 95%;
-//   height: 40px;
-//   display: grid;
-//   grid-template-columns: 130px 150px 130px 1fr;
-
-//   & .form-label {
-//     display: flex;
-//     justify-content: center;
-//     align-items: center;
-//     background-color: #d3ebcf;
-//     color: #32383f;
-//     font-weight: 600;
-//     font-size: 14px;
-//     padding: 2px 0px;
-//     text-align: center;
-//     height: 35px;
-//   }
-//   & .form-input {
-//     display: flex;
-//     justify-content: start;
-//     align-items: center;
-//   }
-//   & select,
-//   input {
-//     box-sizing: border-box;
-//     width: 100%;
-//     height: 40px;
-//     font-size: 14px;
-//     border: 1px solid #ccc;
-//     padding: 0px 8px;
-//   }
-// `;
-// const ToolboxDiv = styled.div`
-//   height: 40px;
-//   width: 95%;
-//   margin-top: 1px;
-// `;
-
 const AttachDiv = styled.div`
   margin-top: 5px;
   height: 40px;
@@ -136,29 +88,6 @@ const AttachDiv = styled.div`
   }
 `;
 
-// const ButtonDiv = styled.div`
-//   display: flex;
-//   gap: 6px;
-//   justify-content: end;
-//   margin-top: 10px;
-//   margin-bottom: 40px;
-// `;
-
-// const EditorDiv = styled.div`
-//   box-sizing: border-box;
-//   width: 95%;
-//   font-size: 14px;
-//   border: 1px solid #ccc;
-//   overflow: auto;
-//   padding: 10px;
-// `;
-// const LayDiv = styled.div`
-//   height: 30px;
-// `;
-// const attachLayDiv = styled.div`
-//   display: grid;
-//   grid-template-columns: auto 1fr;
-// `;
 const ContentDiv = styled.div`
   margin: 0;
   padding-left: 5%;
@@ -241,63 +170,6 @@ const ToolboxDiv = styled.div`
   width: 95%;
   margin-top: 1px;
 `;
-
-// const AttachDiv = styled.div`
-//   margin-top: 5px;
-//   height: 40px;
-//   width: 95%;
-//   display: grid;
-//   grid-template-columns: 180px 1fr;
-//   & .form-label {
-//     display: flex;
-//     justify-content: center;
-//     align-items: center;
-//     background-color: #d3ebcf;
-//     color: #32383f;
-//     font-weight: 600;
-//     font-size: 14px;
-//     padding: 2px 0px;
-//     text-align: center;
-//     height: 40px;
-//   }
-//   & .form-input {
-//     display: grid;
-//     grid-template: 1fr / 110px 1fr;
-//     border: 1px solid #ccc;
-//     padding: 0px 8px;
-//   }
-//   & select,
-//   input {
-//     box-sizing: border-box;
-//     width: 95%;
-//     height: 100%;
-//     font-size: 14px;
-//   }
-//   .hidden-file-input {
-//     opacity: 0;
-//     width: 0;
-//     height: 0;
-//     position: absolute;
-//   }
-
-//   .custom-file-button {
-//     display: inline-block;
-//     padding: 8px 16px;
-//     background-color: #007bff;
-//     color: white;
-//     border-radius: 4px;
-//     cursor: pointer;
-//   }
-
-//   .custom-file-button:hover {
-//     background-color: #0056b3;
-//   }
-//   .buttonArea {
-//     display: flex;
-//     justify-content: start;
-//     align-items: center;
-//   }
-// `;
 
 const ButtonDiv = styled.div`
   display: flex;
@@ -444,6 +316,41 @@ const ReviewEdit = () => {
     });
     if (result.isConfirmed) {
       try {
+        if (inputData.rating == '' || inputData.rating == null || inputData.rating == '0') {
+          Swal.fire({
+            title: '별점을 입력해 주세요',
+            icon: 'error',
+          });
+          return;
+        }
+        if (inputData.hospitalNo == '' || inputData.hospitalNo == null) {
+          Swal.fire({
+            title: '병원을 선택해주세요',
+            icon: 'error',
+          });
+          return;
+        }
+        if (inputData.title == '' || inputData.title == null) {
+          Swal.fire({
+            title: '제목을 입력해주세요',
+            icon: 'error',
+          });
+          return;
+        }
+        if (editorState.getCurrentContent().hasText() == '' || editorState.getCurrentContent().hasText() == null) {
+          Swal.fire({
+            title: '내용을 입력해주세요',
+            icon: 'error',
+          });
+          return;
+        }
+        if (inputData.title.length > 40) {
+          Swal.fire({
+            title: '최대 제목 길이를 초과했습니다. (최대40자)',
+            icon: 'error',
+          });
+          return;
+        }
         const formData = new FormData();
         const jsonBlob = new Blob([JSON.stringify(inputData)], { type: 'application/json' });
         formData.append('data', jsonBlob);
@@ -799,56 +706,3 @@ const ReviewEdit = () => {
   );
 };
 export default ReviewEdit;
-
-//   /* <ContentDiv>
-// <InputDiv>
-//   <div className="form-label">카테고리</div>
-//   <div className="form-input">
-//     <select onChange={handleChangeInput} name="categoryNo" value={inputData.categoryNo}>
-//       <option value="0">-- 카테고리 선택 --</option>
-//       <option value="1">병원</option>
-//       <option value="2">약국</option>
-//       <option value="3">생활</option>
-//       <option value="4">보험</option>
-//     </select>
-//   </div>
-//   <div className="form-label">제목</div>
-//   <div className="form-input">
-//     <input
-//       type="text"
-//       name="title"
-//       onChange={handleChangeInput}
-//       placeholder="제목을 입력하세요."
-//       value={inputData.title}
-//     />
-//   </div>
-// </InputDiv>
-// <ToolboxDiv className="toolbar">
-//   <Toolbar className="toolbar">
-//     {(externalProps) => (
-//       <>
-//         <ItalicButton {...externalProps} />
-//         <BoldButton {...externalProps} />
-//         <UnderlineButton {...externalProps} />
-//         <textAlignmentPlugin.TextAlignment {...externalProps} />
-//         <HeadlineOneButton {...externalProps} />
-//         <HeadlineTwoButton {...externalProps} />
-//         <HeadlineThreeButton {...externalProps} />
-//         <UnorderedListButton {...externalProps} />
-//         <OrderedListButton {...externalProps} />
-//         <linkPlugin.LinkButton {...externalProps} />
-//       </>
-//     )}
-//   </Toolbar>
-// </ToolboxDiv>
-// <EditorDiv onClick={focus}>
-//   <Editor
-//     editorState={editorState}
-//     onChange={handleEditorChange}
-//     plugins={plugins}
-//     ref={editorRef}
-//     placeholder={isFocused ? '' : '내용을 입력해주세요.'}
-//     blockRendererFn={(block) => blockRendererFn(block, editorState.getCurrentContent())}
-//     value={inputData.content}
-//   />
-// </EditorDiv>

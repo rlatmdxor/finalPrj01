@@ -10,6 +10,7 @@ import Btn from '../../util/Btn';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { isTokenExpired, getRoleFromToken } from '../../util/JwtUtil';
+import { BASE_URL } from '../../services/config';
 
 const BottomDiv = styled.div`
   margin-top: 25px;
@@ -119,14 +120,17 @@ const TableWrapper = styled.div`
 `;
 
 const Exp = styled.input.attrs({ type: 'range' })`
-  width: 100%;
-  height: 12px;
-  background: ${(props) => `linear-gradient(90deg, #00aaff ${props.value}%, #ddd ${props.value}%)`};
+  -webkit-appearance: none;
+  width: 30%;
+  background: ${(props) =>
+    `linear-gradient(90deg, #00aaff ${(props.value / props.max) * 100}%, #ddd ${(props.value / props.max) * 100}%)`};
   border-radius: 6px;
   transition: 0.3s ease-in-out;
   outline: none;
   cursor: pointer;
-
+  align-self: center;
+  margin-top: 20px;
+  margin-bottom: 20px;
   &::-webkit-slider-runnable-track {
     background: none;
     height: 12px;
@@ -221,6 +225,15 @@ const TitleDiv = styled.div`
   margin-bottom: 10px;
 `;
 
+const Expdiv = styled.div`
+  display: flex;
+  width: 1000px;
+  gap: 30px;
+  font-size: 30px;
+  align-content: center;
+  align-items: center;
+`;
+
 const Challengers = () => {
   const navi = useNavigate();
   const token = localStorage.getItem('token');
@@ -244,7 +257,9 @@ const Challengers = () => {
   const [num, setNum] = useState(0);
   const [inputData, setInputData] = useState({});
   const [titleData, setTitleData] = useState([]);
-  const [exp, setExp] = useState(40); // 경험치 % (0~100)
+  const [exp, setExp] = useState(0); // 경험치 % (0~100)
+  const [level, setLevel] = useState(1); // 경험치 % (0~100)
+  const [requiredExp, setRequiredExp] = useState(''); // 경험치 % (0~100)
   const dispatch = useDispatch();
   const [boardData, setBoardData] = useState([]);
   const [joinList, setJoinList] = useState([]);
@@ -269,7 +284,8 @@ const Challengers = () => {
     if (!isAuthorized) {
       return;
     }
-    fetch('http://127.0.0.1:/api/challenger/postTitleList', {
+
+    fetch(`${BASE_URL}/api/challenger/postTitleList`, {
       method: 'post',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -285,7 +301,25 @@ const Challengers = () => {
     if (!isAuthorized) {
       return;
     }
-    fetch('http://127.0.0.1:/api/challenger/joinList', {
+    fetch(`${BASE_URL}/api/challenger/getLevel`, {
+      method: 'post',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((resp) => resp.json())
+      .then(({ level, exp, requiredExp }) => {
+        setExp(exp);
+        setLevel(level);
+        setRequiredExp(requiredExp);
+      });
+  }, [isAuthorized, token, num, level]);
+
+  useEffect(() => {
+    if (!isAuthorized) {
+      return;
+    }
+    fetch(`${BASE_URL}/api/challenger/joinList`, {
       method: 'post',
       headers: {
         'Content-type': 'application/json',
@@ -298,7 +332,7 @@ const Challengers = () => {
         setJoinList(data);
       });
 
-    fetch('http://127.0.0.1:/api/challenger/myAddList', {
+    fetch(`${BASE_URL}/api/challenger/myAddList`, {
       method: 'post',
       headers: {
         'content-type': 'application/json',
@@ -359,7 +393,7 @@ const Challengers = () => {
       if (result.isConfirmed) {
         //패치 넣기
 
-        fetch('http://127.0.0.1:80/api/challenger/postWrite', {
+        fetch(`${BASE_URL}/api/challenger/postWrite`, {
           method: 'POST',
           headers: {
             'content-type': 'application/json',
@@ -426,7 +460,7 @@ const Challengers = () => {
   };
 
   const handleEdit = (e) => {
-    fetch('http://127.0.0.1:/api/challenger/edit', {
+    fetch(`${BASE_URL}/api/challenger/edit`, {
       method: 'post',
       headers: {
         'content-type': 'application/json',
@@ -439,10 +473,46 @@ const Challengers = () => {
         if (data === '0') {
           Swal.fire({
             icon: 'warning',
-            title: '수정 실패.',
+            title: '수정 실패',
             confirmButtonText: '확인',
           });
+          return;
+        }
 
+        if (data === '3') {
+          Swal.fire({
+            icon: 'warning',
+            title: '수정 실패',
+            title: '모집 종료가 모집 시작보다 이전입니다!',
+            confirmButtonText: '확인',
+          });
+          return;
+        }
+        if (data === '4') {
+          Swal.fire({
+            icon: 'warning',
+            title: '수정 실패',
+            title: '수행 시작이 모집 종료보다 이전입니다!',
+            confirmButtonText: '확인',
+          });
+          return;
+        }
+        if (data === '2') {
+          Swal.fire({
+            icon: 'warning',
+            title: '수정 실패',
+            title: '수행 종료가 수행 시작보다 이전입니다!',
+            confirmButtonText: '확인',
+          });
+          return;
+        }
+        if (data === '5') {
+          Swal.fire({
+            icon: 'warning',
+            title: '수정 실패',
+            title: '신청한 인원이 있습니다!',
+            confirmButtonText: '확인',
+          });
           return;
         }
         if (data === '1') {
@@ -456,6 +526,28 @@ const Challengers = () => {
           dispatch(close(e.target.title));
         }
       });
+  };
+
+  useEffect(() => {
+    if (exp >= requiredExp) {
+      handleLevelUp();
+    }
+  }, [exp, requiredExp]);
+
+  const handleLevelUp = () => {
+    if (requiredExp <= exp) {
+      fetch(`${BASE_URL}/api/challenger/levelUp`, {
+        method: 'post',
+        headers: {
+          'content-type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      }).then(
+        setNum(() => {
+          return num + 1;
+        })
+      );
+    }
   };
 
   return (
@@ -475,6 +567,17 @@ const Challengers = () => {
               name="maxMembers"
               title="모집 인원"
               onChange={handleChange}
+            />
+          </div>
+          <div>
+            <ModalTitleDiv>남은인원</ModalTitleDiv>
+            <LayoutInput
+              type="number"
+              value={inputData.maxMembers - inputData.countMember}
+              name="maxMembers"
+              title="남은 인원"
+              onChange={handleChange}
+              readOnly
             />
           </div>
         </ModalDiv>
@@ -574,10 +677,11 @@ const Challengers = () => {
         <Navi target="challengersBoard" tag={'인증 게시글'}></Navi>
       </NaviContainer>
       <ContentLayout>
-        {/* <div style={{ width: '300px', textAlign: 'start' }}>
-          <p style={{ fontSize: '20px' }}>Lv. 1 {exp} / 100(%)</p>
-          <Exp value={exp} readOnly />
-        </div> */}
+        <div style={{ width: '300px', textAlign: 'start', fontSize: '30px' }}>Lv. {level}</div>
+        <Expdiv>
+          <Exp value={exp} max={Number(requiredExp)} readOnly />
+          {exp} / {requiredExp}
+        </Expdiv>
 
         <h2> 내가 신청한 챌린지</h2>
         <ContainerDiv></ContainerDiv>

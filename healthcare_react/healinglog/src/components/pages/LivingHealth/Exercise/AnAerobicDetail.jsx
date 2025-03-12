@@ -8,6 +8,7 @@ import Navi from '../../../util/Navi';
 import styled from 'styled-components';
 import Swal from 'sweetalert2';
 import { isTokenExpired, getRoleFromToken } from '../../../util/JwtUtil';
+import { BASE_URL } from '../../../services/config';
 
 const AnAerobicDetail = () => {
   const dispatch = useDispatch();
@@ -34,7 +35,7 @@ const AnAerobicDetail = () => {
   }, [navi, token]);
 
   useEffect(() => {
-    fetch(`http://127.0.0.1:80/api/anaerobic/getDetail?name=${encodeURIComponent(name)}`, {
+    fetch(`${BASE_URL}/api/anaerobic/getDetail?name=${encodeURIComponent(name)}`, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${token}`,

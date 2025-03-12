@@ -26,6 +26,7 @@ import { Switch } from '@mui/material';
 import Modal2 from '../../util/Modal2';
 import { isTokenExpired, getRoleFromToken } from '../../util/JwtUtil';
 import Swal from 'sweetalert2';
+import { BASE_URL } from '../../services/config';
 
 const Mypage = () => {
   const theme = useTheme();
@@ -98,7 +99,7 @@ const Mypage = () => {
     const formDataForCheck = new FormData();
     formDataForCheck.append('phone', newPhone);
 
-    fetch('http://127.0.0.1:80/api/member/checkPhoneForModal', {
+    fetch(`${BASE_URL}/api/member/checkPhoneForModal`, {
       method: 'POST',
       headers: {
         // 'content-type': 'application/json',
@@ -130,7 +131,7 @@ const Mypage = () => {
 
   //페이지 첫렌더링 시 데이터 가져오기
   useEffect(() => {
-    fetch('http://127.0.0.1:80/api/member/mypage', {
+    fetch(`${BASE_URL}/api/member/mypage`, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -294,7 +295,7 @@ const Mypage = () => {
               fs={'18'}
               f={async () => {
                 reset();
-                const response = await fetch('http://127.0.0.1:80/api/notification/getPushSettings', {
+                const response = await fetch(`${BASE_URL}/api/notification/getPushSettings`, {
                   method: 'GET',
                   headers: { Authorization: `Bearer ${token}` },
                 });
@@ -342,7 +343,7 @@ const Mypage = () => {
                 }).then((result) => {
                   if (result.isConfirmed) {
                     //패치 넣기
-                    fetch('http://127.0.0.1:80/api/member/withdrawal', {
+                    fetch(`${BASE_URL}/api/member/withdrawal`, {
                       method: 'POST',
                       headers: {
                         Authorization: `Bearer ${token}`,
@@ -420,7 +421,7 @@ const Mypage = () => {
                     formData.append('currentPwd', currentPwd);
                     formData.append('newPwd', newPwd);
 
-                    fetch('http://127.0.0.1:80/api/member/changePwd', {
+                    fetch(`${BASE_URL}/api/member/changePwd`, {
                       method: 'POST',
                       headers: {
                         Authorization: `Bearer ${token}`,
@@ -483,7 +484,7 @@ const Mypage = () => {
                     const formData = new FormData();
                     formData.append('nick', newNick);
 
-                    fetch('http://127.0.0.1:80/api/member/changeNick', {
+                    fetch(`${BASE_URL}/api/member/changeNick`, {
                       method: 'POST',
                       headers: {
                         Authorization: `Bearer ${token}`,
@@ -536,7 +537,7 @@ const Mypage = () => {
                     const formData = new FormData();
                     formData.append('address', newAddress);
 
-                    fetch('http://127.0.0.1:80/api/member/changeAddress', {
+                    fetch(`${BASE_URL}/api/member/changeAddress`, {
                       method: 'POST',
                       headers: {
                         Authorization: `Bearer ${token}`,
@@ -598,7 +599,7 @@ const Mypage = () => {
                     const formData = new FormData();
                     formData.append('phone', newPhone);
 
-                    fetch('http://127.0.0.1:80/api/member/changePhone', {
+                    fetch(`${BASE_URL}/api/member/changePhone`, {
                       method: 'POST',
                       headers: {
                         Authorization: `Bearer ${token}`,
@@ -674,7 +675,7 @@ const Mypage = () => {
                     formData.append('height', newHeight);
                     formData.append('weight', newWeight);
 
-                    fetch('http://127.0.0.1:80/api/member/changePhysical', {
+                    fetch(`${BASE_URL}/api/member/changePhysical`, {
                       method: 'POST',
                       headers: {
                         Authorization: `Bearer ${token}`,
@@ -826,7 +827,7 @@ const Mypage = () => {
                       insulinPush: settings.insulinPush ? 'Y' : 'N',
                     };
 
-                    const response = await fetch('http://127.0.0.1:80/api/notification/setPushSettings', {
+                    const response = await fetch(`${BASE_URL}/api/notification/setPushSettings`, {
                       method: 'POST',
                       headers: {
                         'Content-Type': 'application/json',

@@ -290,6 +290,41 @@ const ReviewWrite = () => {
 
     if (result.isConfirmed) {
       try {
+        if (inputData.rating == '' || inputData.rating == null || inputData.rating == '0') {
+          Swal.fire({
+            title: '별점을 입력해 주세요',
+            icon: 'error',
+          });
+          return;
+        }
+        if (inputData.hospitalNo == '' || inputData.hospitalNo == null) {
+          Swal.fire({
+            title: '병원을 선택해주세요',
+            icon: 'error',
+          });
+          return;
+        }
+        if (inputData.title == '' || inputData.title == null) {
+          Swal.fire({
+            title: '제목을 입력해주세요',
+            icon: 'error',
+          });
+          return;
+        }
+        if (editorState.getCurrentContent().hasText() == '' || editorState.getCurrentContent().hasText() == null) {
+          Swal.fire({
+            title: '내용을 입력해주세요',
+            icon: 'error',
+          });
+          return;
+        }
+        if (inputData.title.length > 40) {
+          Swal.fire({
+            title: '최대 제목 길이를 초과했습니다. (최대40자)',
+            icon: 'error',
+          });
+          return;
+        }
         const formData = new FormData();
 
         const jsonBlob = new Blob([JSON.stringify(inputData)], { type: 'application/json' });
@@ -497,7 +532,7 @@ const ReviewWrite = () => {
           <div className="form-input">
             <input type="text" name="department" onChange={handleChangeInput} placeholder="진료과를 입력하세요." />
           </div>
-          <div className="form-label">병원명</div>
+          <div className="form-label">* 병원명</div>
           <div className="form-input">
             <input
               type="text"
@@ -525,7 +560,7 @@ const ReviewWrite = () => {
           </div>
         </InputDiv>
         <InputDiv2>
-          <div className="form-label">별점</div>
+          <div className="form-label">* 별점</div>
           <div className="form-input">
             {[1, 2, 3, 4, 5].map((value) => (
               <FaStar
@@ -540,7 +575,7 @@ const ReviewWrite = () => {
               />
             ))}
           </div>
-          <div className="form-label">제목</div>
+          <div className="form-label">* 제목</div>
           <div className="form-input">
             <input type="text" name="title" onChange={handleChangeInput} placeholder="제목을 입력하세요." />
           </div>

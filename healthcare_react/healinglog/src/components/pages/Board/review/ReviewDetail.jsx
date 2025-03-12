@@ -454,7 +454,7 @@ const ReviewDetail = () => {
     navigate('/admin/review');
   };
 
-  const handleDeleteHoneyTip = () => {
+  const handleDeleteReview = () => {
     Swal.fire({
       title: '삭제하시겠습니까?',
       icon: 'question',
@@ -479,7 +479,12 @@ const ReviewDetail = () => {
                 icon: 'success',
                 draggable: true,
               });
-              navigate('/review');
+              if (isAdmin) {
+                navigate('/admin/review');
+              }
+              if (!isAdmin) {
+                navigate('/review');
+              }
             } else {
               Swal.fire({
                 icon: 'error',
@@ -805,12 +810,12 @@ const ReviewDetail = () => {
         </AttachDiv>
         {isAdmin ? (
           <ButtonDiv>
-            <Btn str={'삭제하기'} c={'#D9D9D9'} fc={'#3d4147'} w={'100'} f={handleDeleteHoneyTip} />
+            <Btn str={'삭제하기'} c={'#D9D9D9'} fc={'#3d4147'} w={'100'} f={handleDeleteReview} />
           </ButtonDiv>
         ) : boardVo.memberNo == userNo ? (
           <ButtonDiv>
             <Btn str={'수정하기'} c={'#FF7F50'} fc={'#ffffff'} w={'100'} mr={'10'} f={handleNaviEditPage} />
-            <Btn str={'삭제하기'} c={'#D9D9D9'} fc={'#3d4147'} w={'100'} f={handleDeleteHoneyTip} />
+            <Btn str={'삭제하기'} c={'#D9D9D9'} fc={'#3d4147'} w={'100'} f={handleDeleteReview} />
           </ButtonDiv>
         ) : (
           <ReportDiv

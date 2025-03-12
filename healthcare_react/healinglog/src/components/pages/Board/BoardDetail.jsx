@@ -29,14 +29,13 @@ const ContentDiv = styled.div`
   padding-left: 5%;
   width: 95%;
   display: grid;
-  grid-template-rows: 40px 40px 1fr 50px 60px 105px 100px 140px;
+  grid-template-rows: 40px 40px 1fr 50px 60px 55px 50px 100px 140px;
   /* border: 1px solid #ccc; */
 `;
 const InputDiv = styled.div`
   width: 95%;
-  height: 40px;
   display: grid;
-  grid-template-columns: 130px 150px 130px 1fr;
+  grid-template-columns: 155px 1fr;
   margin-top: 5px;
 
   & .form-label {
@@ -49,7 +48,7 @@ const InputDiv = styled.div`
     font-size: 14px;
     padding: 2px 0px;
     text-align: center;
-    height: 88%;
+    height: 100%;
   }
   & .form-input {
     display: flex;
@@ -61,7 +60,7 @@ const InputDiv = styled.div`
     font-size: 14px;
     border: 1px solid #ccc;
     padding: 0px 8px;
-    height: 96%;
+    height: 107%;
   }
 `;
 
@@ -235,6 +234,13 @@ const ReportDiv = styled.div`
 `;
 const LayDiv = styled.div`
   height: 30px;
+`;
+
+const LikeCountDiv = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: 8px;
 `;
 
 const staticToolbarPlugin = createToolbarPlugin();
@@ -490,7 +496,12 @@ const BoardDetail = () => {
                 icon: 'success',
                 draggable: true,
               });
-              navigate('/board');
+              if (isAdmin) {
+                navigate('/admin/board');
+              }
+              if (!isAdmin) {
+                navigate('/board');
+              }
             } else {
               Swal.fire({
                 icon: 'error',
@@ -761,8 +772,8 @@ const BoardDetail = () => {
           </ModalContainer>
         </Modal>
         <MinDiv>
-          <div className="form-label">추천수</div>
-          <div className="form-input">{boardVo.recommendCount}</div>
+          <div className="form-label">카테고리리</div>
+          <div className="form-input">{boardVo.categoryName}</div>
           <div className="form-label">조회수</div>
           <div className="form-input">{boardVo.hit}</div>
           <div className="form-label">작성자</div>
@@ -771,8 +782,6 @@ const BoardDetail = () => {
           <div className="form-input">{boardVo.enrollDate}</div>
         </MinDiv>
         <InputDiv>
-          <div className="form-label">카테고리</div>
-          <div className="form-input">{boardVo.categoryName}</div>
           <div className="form-label">제목</div>
           <div className="form-input">{boardVo.title}</div>
         </InputDiv>
@@ -820,6 +829,7 @@ const BoardDetail = () => {
             신고하기
           </ReportDiv>
         )}
+        <LikeCountDiv>{boardVo.recommendCount}</LikeCountDiv>
         <ThumbsupDiv>
           {isAdmin ? (
             <FaThumbsUp

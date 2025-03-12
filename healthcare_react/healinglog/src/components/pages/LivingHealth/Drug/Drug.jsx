@@ -13,6 +13,7 @@ import DrugSearch from './DrugSearch';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
 import { isTokenExpired, getRoleFromToken } from '../../../util/JwtUtil';
+import { BASE_URL } from '../../../services/config';
 
 const BottomDiv = styled.div`
   margin-top: 25px;
@@ -87,7 +88,6 @@ const Drug = () => {
   const [drugColor, setDrugColor] = useState([]);
   const [drugForm, setDrugForm] = useState([]);
   const [drugDel, setDrugDel] = useState([]);
-  const url = 'http://127.0.0.1:/api/drug';
   const options = {
     method: 'post',
     headers: {
@@ -109,14 +109,14 @@ const Drug = () => {
     if (!isAuthorized) {
       return;
     }
-    fetch(`${url}/color`)
+    fetch(`${BASE_URL}/api/drug/color`)
       .then((resp) => {
         return resp.json();
       })
       .then((data) => {
         setDrugColor(data);
       });
-    fetch(`${url}/form`)
+    fetch(`${BASE_URL}/api/drug/form`)
       .then((resp) => {
         return resp.json();
       })
@@ -129,7 +129,7 @@ const Drug = () => {
     if (!isAuthorized) {
       return;
     }
-    fetch(`${url}/list`, {
+    fetch(`${BASE_URL}/api/drug/list`, {
       method: 'post',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -168,7 +168,7 @@ const Drug = () => {
       return;
     }
 
-    fetch(`${url}/find`, options)
+    fetch(`${BASE_URL}/api/drug/find`, options)
       .then((resp) => resp.json())
       .then((data) => {
         setDrugSearchList(data);
@@ -196,7 +196,7 @@ const Drug = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         //패치 넣기
-        fetch(`${url}/write`, options2)
+        fetch(`${BASE_URL}/api/drug/write`, options2)
           .then((resp) => resp.json())
           .then((data) => {
             setNum(num + 1);
@@ -227,8 +227,7 @@ const Drug = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         //패치 넣기
-
-        fetch(`${url}/del`, {
+        fetch(`${BASE_URL}/api/drug/del`, {
           method: 'post',
           headers: {
             'content-type': 'application/json',

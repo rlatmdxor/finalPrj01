@@ -35,6 +35,9 @@ public class ChallengerVo {
     private String url;
     private String challengerNo;
     private String challengerName;
+    private String level;
+    private long exp;
+    private long requiredExp;
 
 
 }

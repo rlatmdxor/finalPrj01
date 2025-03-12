@@ -4,6 +4,7 @@ import Btn from '../../util/Btn';
 import styled, { useTheme } from 'styled-components';
 import { setProfile } from '../../../redux/JoinSlice';
 import Swal from 'sweetalert2';
+import { BASE_URL } from '../../services/config';
 
 const MyProfile = () => {
   const dispatch = useDispatch();
@@ -21,7 +22,7 @@ const MyProfile = () => {
     const formData = new FormData();
     formData.append('profileImage', selectedFile);
 
-    fetch('http://127.0.0.1:80/api/member/profileChange', {
+    fetch(`${BASE_URL}/api/member/profileChange`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -53,7 +54,7 @@ const MyProfile = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         //패치 넣기
-        fetch('http://127.0.0.1:80/api/member/profileDelete', {
+        fetch(`${BASE_URL}/api/member/profileDelete`, {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${token}`,

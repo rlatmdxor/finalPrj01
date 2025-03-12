@@ -62,7 +62,7 @@ public interface MemberMapper {
             FROM
                 MEMBER
             WHERE
-                ID = #{id}
+                LOWER(ID) = LOWER(#{id})
                 AND DEL_YN = 'N'
             """)
     MemberVo findUserById(String id);
