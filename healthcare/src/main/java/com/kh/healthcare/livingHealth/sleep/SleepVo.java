@@ -10,6 +10,7 @@ public class SleepVo {
         private String sleepStart;
         private String sleepEnd;
         private String sleepDuration;
+        private String sleepDurationHour;
         private String recordDate;
         private String day;
         private String startTime;

@@ -27,9 +27,18 @@ public class SleepController {
             LocalTime sleepStart = LocalTime.parse(vo.getSleepStart(), formatter);
             LocalTime sleepEnd = LocalTime.parse(vo.getSleepEnd(), formatter);
             long betweenTime = ChronoUnit.MINUTES.between(sleepStart, sleepEnd);
+
             if(betweenTime < 0 ){
                 betweenTime = betweenTime+1440;
             }
+
+            long betwennHours = betweenTime / 60; // 몫 = 시간
+            long betwennMinutes = betweenTime % 60; // 나머지 = 분
+
+            // "X시간 Y분" 형식으로 변환
+            String sleepDurationHours = String.format("%d시간 %d분", betwennHours, betwennMinutes);
+            vo.setSleepDurationHour(sleepDurationHours);
+
             String sleepMinutes = String.valueOf(betweenTime);
             vo.setSleepDuration(sleepMinutes);
             service.write(token, vo);

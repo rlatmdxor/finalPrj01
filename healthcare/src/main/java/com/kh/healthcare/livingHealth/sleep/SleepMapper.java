@@ -17,6 +17,7 @@ public interface SleepMapper {
              SLEEP_START,
              SLEEP_END,
              SLEEP_DURATION,
+             SLEEP_DURATION_HOUR,
              RECORD_DATE
              )
              VALUES
@@ -26,9 +27,9 @@ public interface SleepMapper {
              , TO_DATE((TO_DATE(#{vo.recordDate}) || #{vo.sleepStart} ), 'YYYY-MM-DD HH24:MI')
              , TO_DATE((TO_DATE(#{vo.recordDate}) || #{vo.sleepEnd} ), 'YYYY-MM-DD HH24:MI')
              , #{vo.sleepDuration}
+             , #{vo.sleepDurationHour}
              , TO_DATE(#{vo.recordDate})
              )
-            
             """)
     void write(String userNo, SleepVo vo);
 
@@ -38,6 +39,7 @@ public interface SleepMapper {
             , TO_CHAR(SLEEP_START , 'HH24:MI') AS STARTTIME
             , TO_CHAR(SLEEP_END , 'HH24:MI') AS ENDTIME
             , SLEEP_DURATION
+            , SLEEP_DURATION_HOUR
             , TO_CHAR(RECORD_DATE , 'YYYY-MM-DD') AS DAY
             FROM SLEEP
             WHERE MEMBER_NO = #{userNo}

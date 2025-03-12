@@ -171,7 +171,12 @@ public interface ChallengerMapper {
     ChallengerVo checkOpenAndCheckPost(String userNo, ChallengerVo vo);
 
     @Select("""
-            SELECT * FROM CHALLENGER WHERE WRITER = #{userNo}
+            SELECT
+            C.*
+            , (SELECT COUNT(*)
+               FROM CHALLENGER_MEMBER M
+               WHERE M.CHALLENGER_NO = C.NO) AS countMember
+            FROM CHALLENGER C WHERE WRITER = #{userNo}
             """)
     List<ChallengerVo> myAddList(String userNo);
 
@@ -191,4 +196,31 @@ public interface ChallengerMapper {
             """)
     int edit(String userNo, ChallengerVo vo);
 
+    @Select("""
+            SELECT M."LEVEL"
+            , M.EXP
+            , (SELECT REQUIRED_EXP
+                    FROM "LEVEL"
+                    WHERE "LEVEL"= M."LEVEL"+1) AS REQUIRED_EXP
+            FROM MEMBER M
+            JOIN "LEVEL" L ON (M."LEVEL" = L."LEVEL")
+            WHERE NO = #{userNo}
+            """)
+    ChallengerVo getLevel(String userNo);
+
+    @Update("""
+            UPDATE MEMBER
+                SET EXP = EXP+10
+            WHERE NO = #{userNo}
+            """)
+    void countExp(String userNo);
+
+    @Update("""
+            UPDATE MEMBER
+                SET 
+                    "LEVEL" = "LEVEL"+1,
+                    EXP = 0 
+            WHERE NO = #{userNo}
+            """)
+    void levelUp(String userNo);
 }

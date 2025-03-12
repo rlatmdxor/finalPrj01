@@ -12,6 +12,7 @@ import Pagination from '../../util/Pagination';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { isTokenExpired, getRoleFromToken } from '../../util/JwtUtil';
+import { BASE_URL } from '../../services/config';
 
 const BottomDiv = styled.div`
   margin-top: 25px;
@@ -222,7 +223,8 @@ const ChallengersList = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         //패치 넣기
-        fetch('http://127.0.0.1:80/api/challenger/write', {
+
+        fetch(`${BASE_URL}/api/challenger/write`, {
           method: 'POST',
           headers: {
             'content-type': 'application/json',
@@ -317,7 +319,8 @@ const ChallengersList = () => {
     if (!isAuthorized) {
       return;
     }
-    fetch('http://127.0.0.1:/api/challenger/list')
+
+    fetch(`${BASE_URL}/api/challenger/list`)
       .then((resp) => resp.json())
       .then((data) => {
         if (data.length > 0) {
@@ -379,7 +382,7 @@ const ChallengersList = () => {
         if (result.isConfirmed) {
           //패치 넣기
 
-          fetch('http://127.0.0.1:/api/challenger/join', {
+          fetch(`${BASE_URL}/api/challenger/join`, {
             method: 'post',
             headers: {
               'content-type': 'application/json',

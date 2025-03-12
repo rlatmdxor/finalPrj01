@@ -43,6 +43,11 @@ public class ChallengerService {
             if(vo.getMaxMembers() == null){
                 vo.setMaxMembers(1);
                 result = mapper.write(userNo, vo);
+
+            }
+            else{
+                result = mapper.write(userNo, vo);
+
             }
         }
         return result;
@@ -89,6 +94,7 @@ public class ChallengerService {
         if(check == null) {
             mapper.postWrite(userNo, vo);
             mapper.countPost(userNo, vo);
+            mapper.countExp(userNo);
            result = 1;
         }
         if(check != null){
@@ -97,6 +103,7 @@ public class ChallengerService {
             if (!checkDate.equals(today)) {  // LocalDate 끼리 비교
                 mapper.postWrite(userNo, vo);
                 mapper.countPost(userNo, vo);
+                mapper.countExp(userNo);
                 result = 1;
             }
             if(checkDate.equals(today)){
@@ -124,9 +131,49 @@ public class ChallengerService {
     public int edit(String token, ChallengerVo vo) {
         token = token.replace("Bearer ", "");
         String userNo = jwtUtil.getNo(token);
-        int result = mapper.edit(userNo, vo);
+        int result = 0;
 
+        if(vo.getCountMember() != null || vo.getCountMember() != ""){
+            return  result = 5;
+        }
+
+        if (vo.getPerformanceEnd().isBefore(vo.getPerformanceStart())) {
+            return result = 2;
+        } else if (vo.getRecruitmentEnd().isBefore(vo.getRecruitmentStart())) {
+            return result = 3;
+        } else if (vo.getPerformanceStart().isBefore(vo.getRecruitmentEnd())) {
+            return result = 4;
+        } else {
+            if(vo.getMaxMembers() == null){
+                vo.setMaxMembers(1);
+                result = mapper.edit(userNo, vo);
+            }
+            else {
+                result = mapper.edit(userNo, vo);
+            }
+        }
         return result;
+
+
+    }
+
+    public ChallengerVo getLevel(String token) {
+        token = token.replace("Bearer ", "");
+        String userNo = jwtUtil.getNo(token);
+        return mapper.getLevel(userNo);
+    }
+
+    public void levelUp(String token) {
+        token = token.replace("Bearer ", "");
+        String userNo = jwtUtil.getNo(token);
+        ChallengerVo challengerVo = mapper.getLevel(userNo);
+
+        if(challengerVo.getExp() == challengerVo.getRequiredExp() || challengerVo.getExp() > challengerVo.getRequiredExp()){
+            mapper.levelUp(userNo);
+
+        }
+
+
     }
 }
 
