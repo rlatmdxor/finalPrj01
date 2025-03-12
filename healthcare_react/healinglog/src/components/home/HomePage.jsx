@@ -8,6 +8,7 @@ import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { routes } from '../../routes';
 import ScrollToTop from '../util/ScrollToTop';
 import AdminHeader from './AdminHeader';
+import Chatbot from '../pages/Chatbot/Chatbot';
 
 const Layout = styled.div`
   display: grid;
@@ -42,6 +43,7 @@ const HomePage = () => {
         <Footer></Footer>
       </MainContainer>
       <Sider2></Sider2>
+      <Chatbot />
     </Layout>
   );
 };
