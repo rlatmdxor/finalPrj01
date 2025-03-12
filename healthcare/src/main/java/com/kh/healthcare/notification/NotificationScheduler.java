@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class NotificationScheduler {
 
+    private final NotificationService notificationService;
     private final ExerciseService exerciseService;
     private final MealService dietService;
     private final HoneyTipService honeyTipService;
@@ -35,12 +36,13 @@ public class NotificationScheduler {
             String message = exerciseService.checkTodayExercise(userNo);
             if(message.equals("오늘 등록된 운동내역이 없습니다. 운동 내역을 등록해주세요!")){
                 messagingTemplate.convertAndSend("/topic/notifications", message);
+                notificationService.saveNewPush(userNo,message);
             }
         });
     }
 
-    //1분마다 새로운 댓글이 있는지 확인
-    @Scheduled(fixedRate = 60000)
+    //30초마다 새로운 댓글이 있는지 확인
+    @Scheduled(fixedRate = 30000)
     public void sendCommentNotification() {
         // 각 사용자에게 알림 메시지 전송
         StompChannelInterceptor.getAllUserSessions().forEach(userInfo -> {
@@ -48,6 +50,9 @@ public class NotificationScheduler {
             String message = honeyTipService.checkNewComment(userNo);
             if(message.equals("회원님의 게시글에 새로운 댓글이 있습니다.")){
                 messagingTemplate.convertAndSend("/topic/notifications", message);
+                notificationService.saveNewPush(userNo,message);
+                // 알림을 보낸 댓글에 대해 NOTIFIED_YN을 'Y'로 업데이트하는 로직 추가
+                honeyTipService.markCommentsAsNotified(userNo);
             }
         });
     }
@@ -61,6 +66,7 @@ public class NotificationScheduler {
             String message = dietService.checkTodayDiet(userNo);
             if(message.equals("오늘 등록된 식단내역이 없습니다. 식단 내역을 등록해주세요!")){
                 messagingTemplate.convertAndSend("/topic/notifications", message);
+                notificationService.saveNewPush(userNo,message);
             }
         });
     }
@@ -73,8 +79,10 @@ public class NotificationScheduler {
             String message = insulinService.checkTodayInsulin(userNo);
             if(message.equals("오늘 등록된 투약 내역이 없습니다. 인슐린 투약 내역을 등록해주세요!")){
                 messagingTemplate.convertAndSend("/topic/notifications", message);
+                notificationService.saveNewPush(userNo,message);
             } else if(message.equals("오늘 투약할 인슐린이 남아 있습니다. 인슐린 투약 내역을 등록해주세요!")){
                 messagingTemplate.convertAndSend("/topic/notifications", message);
+                notificationService.saveNewPush(userNo,message);
             }
         });
     }
@@ -87,6 +95,7 @@ public class NotificationScheduler {
             String message = bloodPressureService.checkTodayBloodPressure(userNo);
             if(message.equals("오늘 혈압 측정 내역이 없습니다. 혈압 측정 내역을 기록해주세요!")){
                 messagingTemplate.convertAndSend("/topic/notifications", message);
+                notificationService.saveNewPush(userNo,message);
             }
         });
     }
@@ -99,6 +108,7 @@ public class NotificationScheduler {
             String message = bloodSugarService.checkTodayBloodSugar(userNo);
             if(message.equals("오늘 혈당 측정 내역이 없습니다. 혈당 측정 내역을 기록해주세요!")){
               messagingTemplate.convertAndSend("/topic/notifications", message);
+              notificationService.saveNewPush(userNo,message);
             }
         });
     }
@@ -112,6 +122,7 @@ public class NotificationScheduler {
             String message = waterService.checkTodayWater(userNo);
             if(message.equals("오늘 물을 마시지 않았어요. 건강을 위해 충분한 물을 섭취해주세요!")){
                 messagingTemplate.convertAndSend("/topic/notifications", message);
+                notificationService.saveNewPush(userNo,message);
             }
         });
     }

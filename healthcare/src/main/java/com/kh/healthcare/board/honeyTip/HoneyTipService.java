@@ -258,6 +258,10 @@ public class HoneyTipService {
         }
         return result;
     }
+
+    public void markCommentsAsNotified(String userNo) {
+        mapper.markCommentsAsNotified(userNo);
+    }
 }
 
 

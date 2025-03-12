@@ -41,7 +41,7 @@ const ContainerDiv = styled.div`
   top: 50px;
   right: 30px;
 
-  width: ${(props) => (props.width ? props.width + 'px' : '350px')};
+  width: ${(props) => (props.width ? props.width + 'px' : '380px')};
 
   /* 디자인 */
   background-color: #fff;
@@ -52,8 +52,7 @@ const ContainerDiv = styled.div`
   /* Redux로 제어되는 display 속성 */
   display: ${(props) => props.display};
 
-  /* 스크롤바 제거(내용이 넘치면 잘리거나 늘어나지 않도록) */
-  overflow: hidden;
+  z-index: 1000;
 `;
 
 /* 헤더(상단 영역) */
@@ -73,4 +72,7 @@ const Title = styled.div`
 const ContentDiv = styled.div`
   background-color: #ebebeb;
   padding: 16px;
+
+  max-height: 700px;
+  overflow-y: auto;
 `;
