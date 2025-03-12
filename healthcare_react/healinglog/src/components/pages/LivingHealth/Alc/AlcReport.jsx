@@ -19,6 +19,7 @@ import DateBtn from '../../../util/DateBtn';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
 import { getRoleFromToken, isTokenExpired } from '../../../util/JwtUtil';
+import { BASE_URL } from '../../../services/config';
 
 //모달 밖의 버튼 컨테이너
 const BtnContainer = styled.div`
@@ -125,7 +126,7 @@ const AlcReport = () => {
     }
   }, [navi, token]);
 
-  const url = 'http://127.0.0.1/api/alc/report/list';
+  const url = `${BASE_URL}/api/alc/report/list`;
   const options = {
     method: 'GET',
     headers: {
@@ -233,7 +234,7 @@ const AlcReport = () => {
     const token = localStorage.getItem('token');
 
     try {
-      const response = await fetch('http://127.0.0.1/api/alc/report/list', {
+      const response = await fetch(`${BASE_URL}/api/alc/report/list`, {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -394,7 +395,7 @@ const AlcReport = () => {
       cancelButtonText: '취소',
     }).then((result) => {
       if (result.isConfirmed) {
-        fetch('http://127.0.0.1:80/api/alc/report/write', {
+        fetch(`${BASE_URL}/api/alc/report/write`, {
           method: 'POST',
           headers: {
             'content-type': 'application/json',
@@ -447,7 +448,7 @@ const AlcReport = () => {
       cancelButtonText: '취소',
     }).then((result) => {
       if (result.isConfirmed) {
-        fetch('http://127.0.0.1:80/api/alc/report/update', {
+        fetch(`${BASE_URL}/api/alc/report/update`, {
           method: 'POST',
           headers: {
             'content-type': 'application/json',
@@ -503,7 +504,7 @@ const AlcReport = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         // 삭제 fetch 호출
-        fetch('http://127.0.0.1/api/alc/report/delete', {
+        fetch(`${BASE_URL}/api/alc/report/delete`, {
           method: 'DELETE',
           headers: {
             'content-type': 'application/json',

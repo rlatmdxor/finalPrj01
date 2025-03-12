@@ -11,6 +11,8 @@ import { login } from '../../../src/redux/AdminSlice';
 import { useNavigate } from 'react-router-dom';
 import { setNick } from '../../redux/JoinSlice';
 
+import { BASE_URL } from '../services/config';
+
 const StyledMiddle = styled.div`
   display: grid;
   grid-template: 1fr 1fr / 0.5fr;
@@ -42,7 +44,7 @@ const AdminLogin = () => {
   };
 
   const submitCallBack = (formData) => {
-    const url = 'http://127.0.0.1:80/api/admin/login';
+    const url = `${BASE_URL}/api/admin/login`;
     const option = {
       method: 'POST',
       headers: {

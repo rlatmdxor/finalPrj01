@@ -13,7 +13,7 @@ import { getPayload, getRoleFromToken, isTokenExpired } from '../util/JwtUtil';
 
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
-
+import { BASE_URL } from '../services/config';
 const NaviContainer = styled.div`
   display: grid;
   position: relative;
@@ -84,13 +84,6 @@ const AdminUserManage = () => {
     }
   }, [navi, token]);
 
-  const url = 'http://127.0.0.1/api/admin/usermanage/search';
-
-  const option = {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-  };
-
   useEffect(() => {
     dispatch(resetPaging({ boardType }));
   }, []);
@@ -138,7 +131,7 @@ const AdminUserManage = () => {
     }
 
     try {
-      const requestUrl = `http://127.0.0.1/api/admin/usermanage/search?delYn=${delYn}&searchType=${finalSearchType}&keyword=${encodeURIComponent(
+      const requestUrl = `${BASE_URL}/api/admin/usermanage/search?delYn=${delYn}&searchType=${finalSearchType}&keyword=${encodeURIComponent(
         finalKeyword
       )}&page=${currentPage}&size=${boardLimit}`;
 
@@ -179,7 +172,7 @@ const AdminUserManage = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         //패치 넣기
-        fetch(`http://127.0.0.1/api/admin/usermanage/delete`, {
+        fetch(`${BASE_URL}/api/admin/usermanage/delete`, {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',
