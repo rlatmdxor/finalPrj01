@@ -312,6 +312,12 @@ public interface HoneyTipMapper {
             WHERE COMMENT_NO = #{no}
             """)
     void deleteReportedHoneyTipComment(HoneyTipCommentVo vo);
+
+    @Delete("""
+            DELETE REPORTED_BOARD_COMMENT
+            WHERE BOARD_NO = #{no}
+            """)
+    void deleteReportedHoneyTipCommentByHoneyTipNo(HoneyTipVo vo);
 }
 
 

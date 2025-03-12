@@ -11,6 +11,7 @@ import Title from '../../util/Title';
 import ContentLayout from '../../util/ContentLayout';
 import { isTokenExpired, getRoleFromToken } from '../../util/JwtUtil';
 import Swal from 'sweetalert2';
+import BoardTable from '../../util/BoardTable';
 
 const SearchDiv = styled.div`
   display: flex;
@@ -41,6 +42,23 @@ const BottomDiv = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+`;
+const TitleWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
+`;
+
+const TitleText = styled.span`
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 95%;
 `;
 
 const NoticeList = () => {
@@ -193,7 +211,7 @@ const NoticeList = () => {
           </SelectBox>
           <SearchBar handleClick={handleClick} handleChange={handleChange} handleClearClick={handleClearClick} />
         </SearchDiv>
-        <Table>
+        <BoardTable columnWidths={['80px', '110px', '500px', '80px', '100px', '120px']}>
           <thead>
             <tr>
               <th>번호</th>
@@ -210,7 +228,11 @@ const NoticeList = () => {
                 <tr key={vo.no} value={vo.no} onClick={(e) => handleNaviDetail(e, vo.no)}>
                   <td>{vo.no}</td>
                   <td>공지</td>
-                  <td>{vo.title}</td>
+                  <td>
+                    <TitleWrapper>
+                      <TitleText>{vo.title}</TitleText>
+                    </TitleWrapper>
+                  </td>
                   <td>{vo.hit}</td>
                   <td>{vo.nick}</td>
                   <td>{vo.enrollDate}</td>
@@ -218,7 +240,7 @@ const NoticeList = () => {
               );
             })}
           </tbody>
-        </Table>
+        </BoardTable>
         <BottomDiv>
           <div></div>
           <div>

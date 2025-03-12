@@ -131,7 +131,11 @@ public class HoneyTipService {
         token = token.replace("Bearer ", "");
         String memberNo = jwtUtil.getNo(token);
         vo.setMemberNo(memberNo);
-
+        mapper.deleteReportedHoneyTip(vo);
+        List<HoneyTipCommentVo> commentVoList = mapper.commentList(vo.getNo());
+        for (HoneyTipCommentVo honeyTipCommentVo : commentVoList) {
+            mapper.deleteReportedHoneyTipComment(honeyTipCommentVo);
+        }
         int result = mapper.deleteHoneyTip(vo);
         if (result != 1){
             throw new IllegalStateException("CODE [BOARD / DELETE / SERVICE]");

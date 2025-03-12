@@ -23,7 +23,7 @@ public class ReviewService {
     private final ReviewMapper mapper;
     private final JwtUtil jwtUtil;
 
-    public List<ReviewVo> list(SearchFilterVo filterVo) {
+    public List<ReviewVo> reviewList(SearchFilterVo filterVo) {
         return mapper.list(filterVo);
     }
 
@@ -92,6 +92,10 @@ public class ReviewService {
         token = token.replace("Bearer ", "");
         String memberNo = jwtUtil.getNo(token);
         vo.setMemberNo(memberNo);
+        List<ReviewCommentVo> commentVoList = mapper.commentList(vo.getNo());
+        for (ReviewCommentVo reviewCommentVo : commentVoList) {
+            mapper.deleteReportedReviewComment(reviewCommentVo);
+        }
 
         int result = mapper.deleteReview(vo);
         if (result != 1){
