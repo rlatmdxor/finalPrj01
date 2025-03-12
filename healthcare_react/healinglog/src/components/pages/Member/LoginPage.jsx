@@ -9,6 +9,7 @@ import { getPayload } from '../../util/JwtUtil';
 import { login } from '../../../redux/MemberSlice';
 import { setNick } from '../../../redux/JoinSlice';
 import Swal from 'sweetalert2';
+import { BASE_URL } from '../../services/config';
 
 const LoginPage = () => {
   const navi = useNavigate();
@@ -20,7 +21,7 @@ const LoginPage = () => {
   };
 
   const submitCallBack = (formData) => {
-    const url = 'http://127.0.0.1:80/api/member/login';
+    const url = `${BASE_URL}/api/member/login`;
     const option = {
       method: 'POST',
       headers: {

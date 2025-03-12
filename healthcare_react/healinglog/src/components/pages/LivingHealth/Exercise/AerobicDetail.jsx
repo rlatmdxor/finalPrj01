@@ -9,6 +9,7 @@ import Navi from '../../../util/Navi';
 import Swal from 'sweetalert2';
 import { isTokenExpired, getRoleFromToken } from '../../../util/JwtUtil';
 import { useNavigate } from 'react-router-dom';
+import { BASE_URL } from '../../../services/config';
 
 const AerobicDetail = () => {
   const dispatch = useDispatch();
@@ -35,7 +36,7 @@ const AerobicDetail = () => {
   }, [navi, token]);
 
   useEffect(() => {
-    fetch(`http://127.0.0.1:80/api/aerobic/getDetail?name=${encodeURIComponent(name)}`, {
+    fetch(`${BASE_URL}/api/aerobic/getDetail?name=${encodeURIComponent(name)}`, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${token}`,

@@ -23,6 +23,7 @@ import ContentLayout from '../../util/ContentLayout';
 import PostCode from '../../util/PostCode';
 import Profile from './Profile';
 import Swal from 'sweetalert2';
+import { BASE_URL } from '../../services/config';
 
 const Join2 = () => {
   const theme = useTheme();
@@ -73,7 +74,7 @@ const Join2 = () => {
       return;
     }
 
-    fetch('http://127.0.0.1:80/api/member/checkId', {
+    fetch(`${BASE_URL}/api/member/checkId`, {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
@@ -128,7 +129,7 @@ const Join2 = () => {
       return;
     }
 
-    fetch('http://127.0.0.1:80/api/member/checkEmail', {
+    fetch(`${BASE_URL}/api/member/checkEmail`, {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
@@ -146,7 +147,7 @@ const Join2 = () => {
       return;
     }
 
-    fetch('http://127.0.0.1:80/api/member/checkPhone', {
+    fetch(`${BASE_URL}/api/member/checkPhone`, {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
@@ -225,7 +226,7 @@ const Join2 = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         //패치 넣기
-        fetch('http://127.0.0.1:80/api/member/join', {
+        fetch(`${BASE_URL}/api/member/join`, {
           method: 'POST',
           headers: {
             // 'Content-Type': 'application/json',

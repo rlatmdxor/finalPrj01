@@ -12,6 +12,7 @@ import Btn from '../../../util/Btn';
 import Swal from 'sweetalert2';
 import { isTokenExpired, getRoleFromToken } from '../../../util/JwtUtil';
 import { useNavigate } from 'react-router-dom';
+import { BASE_URL } from '../../../services/config';
 
 const ExHistory = () => {
   const dispatch = useDispatch();
@@ -100,7 +101,7 @@ const ExHistory = () => {
     };
 
     try {
-      const response = await fetch(`http://127.0.0.1:80/api/aerobic/updateAerobic`, {
+      const response = await fetch(`${BASE_URL}/api/aerobic/updateAerobic`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -151,7 +152,7 @@ const ExHistory = () => {
     };
 
     try {
-      const response = await fetch(`http://127.0.0.1:80/api/anaerobic/updateAnAerobic`, {
+      const response = await fetch(`${BASE_URL}/api/anaerobic/updateAnAerobic`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -186,7 +187,7 @@ const ExHistory = () => {
       no: historyNo,
     };
     try {
-      const response = await fetch(`http://127.0.0.1:80/api/aerobic/deleteAerobic`, {
+      const response = await fetch(`${BASE_URL}/api/aerobic/deleteAerobic`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -220,7 +221,7 @@ const ExHistory = () => {
       no: historyNo,
     };
     try {
-      const response = await fetch(`http://127.0.0.1:80/api/anaerobic/deleteAnAerobic`, {
+      const response = await fetch(`${BASE_URL}/api/anaerobic/deleteAnAerobic`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -251,7 +252,7 @@ const ExHistory = () => {
 
   const fetchEvents = async () => {
     try {
-      const response = await fetch(`http://127.0.0.1:80/api/exercise/getHistory?type=${exerciseType}`, {
+      const response = await fetch(`${BASE_URL}/api/exercise/getHistory?type=${exerciseType}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
