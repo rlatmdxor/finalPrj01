@@ -11,6 +11,7 @@ import { useNavigate } from 'react-router-dom';
 import Avatar from '@mui/material/Avatar';
 import { getBannerList, getNoticeList, getBoardList, getReviewList } from '../services/mainService';
 import { getRoleFromToken } from '../util/JwtUtil';
+import Chatbot from '../pages/Chatbot/Chatbot';
 
 const LayoutDiv = styled.div`
   display: flex;
