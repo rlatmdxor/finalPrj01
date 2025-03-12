@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import { FaStar } from 'react-icons/fa';
 import { isTokenExpired, getRoleFromToken } from '../../../util/JwtUtil';
 import Swal from 'sweetalert2';
+import BoardTable from '../../../util/BoardTable';
 
 const SearchDiv = styled.div`
   display: flex;
@@ -40,6 +41,31 @@ const BottomDiv = styled.div`
 `;
 const LayDiv = styled.div`
   height: 40px;
+`;
+const TitleWrapper = styled.div`
+  display: flex; /* ✅ 제목과 댓글 개수를 가로로 배치 */
+  align-items: center;
+  justify-content: space-between;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
+`;
+
+const TitleText = styled.span`
+  display: inline-block; /* ✅ 제목만 ellipsis 적용 */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 90%; /* ✅ 제목이 너무 길어지지 않도록 제한 */
+`;
+
+const CommentSpan = styled.span`
+  display: inline-block;
+  margin-left: 5px;
+  color: red;
+  font-size: 12px;
+  white-space: nowrap;
 `;
 
 const HospitalReview = () => {
@@ -189,7 +215,7 @@ const HospitalReview = () => {
         </SelectBox>
         <SearchBar handleClick={handleClick} handleChange={handleChange} handleClearClick={handleClearClick} />
       </SearchDiv>
-      <Table>
+      <BoardTable columnWidths={['150px', '420px', '180px', '100px', '120px']}>
         <thead>
           <tr>
             <th>병원명</th>
@@ -205,7 +231,10 @@ const HospitalReview = () => {
               <tr key={vo.no} value={vo.no} onClick={(e) => handleNaviDetail(e, vo.no)}>
                 <td>{vo.name}</td>
                 <td>
-                  {vo.title}({vo.commentCount})
+                  <TitleWrapper>
+                    <TitleText>{vo.title}</TitleText>
+                    <CommentSpan>[{vo.commentCount}]</CommentSpan>
+                  </TitleWrapper>
                 </td>
 
                 <td>
@@ -227,7 +256,7 @@ const HospitalReview = () => {
             );
           })}
         </tbody>
-      </Table>
+      </BoardTable>
       <BottomDiv>
         <div></div>
         <div>

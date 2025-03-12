@@ -220,6 +220,35 @@ const BoardWrite = () => {
 
     if (result.isConfirmed) {
       try {
+        if (inputData.categoryNo == '' || inputData.categoryNo == null || inputData.categoryNo == '0') {
+          Swal.fire({
+            title: '카테고리를 선택해주세요',
+            icon: 'error',
+          });
+          return;
+        }
+        if (inputData.title == '' || inputData.title == null) {
+          Swal.fire({
+            title: '제목을 입력해주세요',
+            icon: 'error',
+          });
+          return;
+        }
+        if (editorState.getCurrentContent().hasText() == '' || editorState.getCurrentContent().hasText() == null) {
+          Swal.fire({
+            title: '내용을 입력해주세요',
+            icon: 'error',
+          });
+          return;
+        }
+        if (inputData.title.length > 40) {
+          Swal.fire({
+            title: '최대 제목 길이를 초과했습니다. (최대40자)',
+            icon: 'error',
+          });
+          return;
+        }
+
         const formData = new FormData();
 
         const jsonBlob = new Blob([JSON.stringify(inputData)], { type: 'application/json' });

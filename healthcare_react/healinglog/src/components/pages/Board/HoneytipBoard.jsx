@@ -5,10 +5,10 @@ import Pagination from '../../util/Pagination';
 import { useSelector, useDispatch } from 'react-redux';
 import { setTotalCount, resetPaging } from '../../../redux/pagingSlice';
 import SearchBar from '../../util/SearchBar';
-import Table from '../../util/Table';
 import { useNavigate } from 'react-router-dom';
 import { isTokenExpired, getRoleFromToken } from '../../util/JwtUtil';
 import Swal from 'sweetalert2';
+import BoardTable from '../../util/BoardTable';
 
 const SearchDiv = styled.div`
   display: flex;
@@ -40,6 +40,32 @@ const BottomDiv = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+`;
+
+const TitleWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
+`;
+
+const TitleText = styled.span`
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 90%;
+`;
+
+const CommentSpan = styled.span`
+  display: inline-block;
+  margin-left: 5px;
+  color: red;
+  font-size: 12px;
+  white-space: nowrap;
 `;
 
 const HoneytipBoard = () => {
@@ -206,7 +232,7 @@ const HoneytipBoard = () => {
         </SelectBox>
         <SearchBar handleClick={handleClick} handleChange={handleChange} handleClearClick={handleClearClick} />
       </SearchDiv>
-      <Table>
+      <BoardTable columnWidths={['80px', '110px', '420px', '80px', '80px', '100px', '120px']}>
         <thead>
           <tr>
             <th>번호</th>
@@ -225,7 +251,10 @@ const HoneytipBoard = () => {
                 <td>{vo.no}</td>
                 <td>{vo.categoryName}</td>
                 <td>
-                  {vo.title}({vo.commentCount})
+                  <TitleWrapper>
+                    <TitleText>{vo.title}</TitleText>
+                    <CommentSpan>[{vo.commentCount}]</CommentSpan>
+                  </TitleWrapper>
                 </td>
                 <td>{vo.recommendCount}</td>
                 <td>{vo.hit}</td>
@@ -235,7 +264,7 @@ const HoneytipBoard = () => {
             );
           })}
         </tbody>
-      </Table>
+      </BoardTable>
       <BottomDiv>
         <div></div>
         <div>

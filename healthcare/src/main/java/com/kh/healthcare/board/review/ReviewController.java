@@ -32,7 +32,7 @@ public class ReviewController {
 
 
         try {
-            List<ReviewVo> ReviewVoList = service.list(filterVo);
+            List<ReviewVo> ReviewVoList = service.reviewList(filterVo);
             return ReviewVoList;
         } catch (Exception e) {
             throw new IllegalStateException("CODE [ REVIEW / LIST ]");
