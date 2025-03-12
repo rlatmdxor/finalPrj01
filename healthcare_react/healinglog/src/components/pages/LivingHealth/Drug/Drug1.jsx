@@ -8,6 +8,7 @@ import Btn from '../../../util/Btn';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
 import { isTokenExpired, getRoleFromToken } from '../../../util/JwtUtil';
+import { BASE_URL } from '../../../services/config';
 
 const BottomDiv = styled.div`
   margin-top: 25px;
@@ -62,13 +63,13 @@ const Drug1 = () => {
   const [drugVoList, setDrugVoList] = useState([]);
   const [num, setNum] = useState(0);
   const [drugDel, setDrugDel] = useState([]);
-  const url = 'http://127.0.0.1:/api/drug';
 
   useEffect(() => {
     if (!isAuthorized) {
       return;
     }
-    fetch(`${url}/delList`, {
+
+    fetch(`${BASE_URL}/api/drug/delList`, {
       method: 'post',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -96,7 +97,7 @@ const Drug1 = () => {
       if (result.isConfirmed) {
         //패치 넣기
 
-        fetch(`${url}/removeDrug`, {
+        fetch(`${BASE_URL}/api/drug/removeDrug`, {
           method: 'post',
           headers: {
             'Content-Type': 'application/json',

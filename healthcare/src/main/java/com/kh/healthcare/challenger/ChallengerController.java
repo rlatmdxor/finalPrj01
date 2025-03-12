@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.lang.model.SourceVersion;
 import java.time.LocalDate;
 import java.time.chrono.ChronoLocalDate;
 import java.time.temporal.ChronoUnit;
@@ -169,7 +170,30 @@ public class ChallengerController {
         }
 
     }
+    @PostMapping("getLevel")
+    public ChallengerVo getLevel(@RequestHeader ("Authorization") String token){
+        try{
 
+            return service.getLevel(token);
+        }
+        catch(Exception e){
+            e.printStackTrace();
+            throw new IllegalStateException("CODE [ CHALLENGER / GETLEVEL ]");
+        }
+
+    }
+
+    @PostMapping("levelUp")
+    public void levelUp(@RequestHeader ("Authorization") String token){
+        try{
+             service.levelUp(token);
+        }
+        catch(Exception e){
+            e.printStackTrace();
+            throw new IllegalStateException("CODE [ CHALLENGER / levelUp ]");
+        }
+
+    }
 
 
 }

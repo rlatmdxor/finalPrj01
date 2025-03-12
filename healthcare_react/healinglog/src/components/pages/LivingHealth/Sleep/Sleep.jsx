@@ -16,6 +16,7 @@ import { addDays, addMonths, endOfMonth, startOfDay, startOfMonth, startOfYear, 
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
 import { isTokenExpired, getRoleFromToken } from '../../../util/JwtUtil';
+import { BASE_URL } from '../../../services/config';
 
 const BottomDiv = styled.div`
   margin-top: 25px;
@@ -74,7 +75,6 @@ const Sleep = () => {
   const [selectChart, setSelectChart] = useState('Bar');
   const initialInputData = { no: '', recordDate: '', sleepStart: '', sleepEnd: '' };
   const [inputData, setInputData] = useState(initialInputData);
-  const url = 'http://127.0.0.1:80/api/sleep/';
   const options = {
     method: 'post',
     headers: {
@@ -128,8 +128,9 @@ const Sleep = () => {
       }
 
       while (currentDay < vo.day) {
+        const hours = Math.floor(daySleepDuration / matchedDay / 60); // 정수 시간
         // 현재 날짜에 해당하는 데이터가 없으면 0 추가
-        TempDayList.push(matchedDay > 0 ? daySleepDuration / matchedDay : 0);
+        TempDayList.push(matchedDay > 0 ? hours : 0);
         matchedDay = 0;
         daySleepDuration = 0;
         startDay = addDays(startDay, 1);
@@ -155,7 +156,9 @@ const Sleep = () => {
 
     // 마지막 데이터 추가
     if (matchedDay > 0) {
-      TempDayList.push(daySleepDuration / matchedDay);
+      const hours = Math.floor(daySleepDuration / matchedDay / 60); // 정수 시간
+      const minutes = Math.round((daySleepDuration / matchedDay) % 60); // 정수 분
+      TempDayList.push(hours + '시간' + minutes + '분');
     }
     // 최종 리스트 저장
     setDayList(TempDayList);
@@ -168,7 +171,7 @@ const Sleep = () => {
 
     // 월별 날짜 리스트 만들기
     while (MonthStartDay <= MonthEndDay) {
-      TempDayLabels.push(MonthStartDay.toISOString().split('T')[0]);
+      TempDayLabels.push(MonthStartDay.toISOString().split('T')[0].slice(5, 10));
       MonthStartDay = addDays(startOfDay(MonthStartDay), 1); // 하루씩 증가
     }
     if (TempDayLabels.length > 0) {
@@ -202,7 +205,7 @@ const Sleep = () => {
 
       // 평균 계산: monthCount[i]가 0이 아닌 경우에만 평균 계산
       if (monthCount[i] > 0) {
-        monthList.push(x / monthCount[i]); // 월별 평균
+        monthList.push(Math.floor(x / monthCount[i] / 60)); // 월별 평균
       } else {
         monthList.push(0); // 데이터가 없으면 0
       }
@@ -231,7 +234,7 @@ const Sleep = () => {
       // 7일(1주)마다 데이터를 저장하고 초기화
       if (dayCounter === 7) {
         removeDate[weekCounter] = uniqueDaysInWeek.size; // 주별 입력된 고유 날짜 개수 저장
-        TempWeekList.push(weekSleepDuration / removeDate[weekCounter]);
+        TempWeekList.push(Math.floor(weekSleepDuration / removeDate[weekCounter] / 60));
         TempWeekLables.push(weekCounter + 1 + '주'); // 주 레이블 추가
         weekCounter++;
         weekSleepDuration = 0;
@@ -256,7 +259,7 @@ const Sleep = () => {
     if (!isAuthorized) {
       return;
     }
-    fetch(`${url}list`, options)
+    fetch(`${BASE_URL}/api/sleep/list`, options)
       .then((resp) => resp.json())
       .then((data) => {
         if (data.length > 0) {
@@ -401,7 +404,7 @@ const Sleep = () => {
       cancelButtonText: '취소', // 취소 버튼 텍스트
     }).then((result) => {
       if (result.isConfirmed) {
-        fetch(`${url}write`, options)
+        fetch(`${BASE_URL}/api/sleep/write`, options)
           .then((resp) => resp.text())
           .then((data) => {
             setNum((prev) => prev + 1);
@@ -429,7 +432,7 @@ const Sleep = () => {
       if (result.isConfirmed) {
         //패치 넣기
 
-        fetch(`${url}edit`, options)
+        fetch(`${BASE_URL}/api/sleep/edit`, options)
           .then((resp) => resp.text())
           .then((data) => {
             setNum((prev) => prev + 1);
@@ -469,7 +472,7 @@ const Sleep = () => {
       if (result.isConfirmed) {
         //패치 넣기
 
-        fetch(`${url}del`, options)
+        fetch(`${BASE_URL}/api/sleep/del`, options)
           .then((resp) => resp.text())
           .then((data) => {
             setNum((prev) => prev + 1);
@@ -615,6 +618,8 @@ const Sleep = () => {
           height={400}
           xAxisColor="rgba(75, 192, 192, 1)"
           yAxisColor="rgba(255, 99, 132, 1)"
+          yMax={24}
+          yMin={0}
         />
         <BtnContainer>
           <div
@@ -653,7 +658,7 @@ const Sleep = () => {
                   <td>{vo.day}</td>
                   <td>{vo.startTime}</td>
                   <td>{vo.endTime}</td>
-                  <td>{vo.sleepDuration}</td>
+                  <td>{vo.sleepDurationHour}</td>
                 </tr>
               );
             })}
