@@ -254,10 +254,11 @@ public interface HoneyTipMapper {
                 FROM BOARD
                 WHERE MEMBER_NO = #{userNo}
             )
-            AND ENROLL_DATE > SYSDATE - INTERVAL '1' MINUTE
             AND DEL_YN = 'N'
+            AND NOTIFIED_YN = 'N'
             """)
     int checkNewComment(String userNo);
+//            AND ENROLL_DATE > SYSDATE - INTERVAL '1' MINUTE
 
     @Select("""
             SELECT
@@ -318,6 +319,15 @@ public interface HoneyTipMapper {
             WHERE BOARD_NO = #{no}
             """)
     void deleteReportedHoneyTipCommentByHoneyTipNo(HoneyTipVo vo);
+
+    @Update("""
+            UPDATE BOARD_COMMENT
+            SET
+                NOTIFIED_YN = 'Y'
+            WHERE
+                MEMBER_NO = #{userNo}
+            """)
+    void markCommentsAsNotified(String userNo);
 }
 
 
