@@ -3,6 +3,7 @@ import Title from '../../util/Title';
 import ContentLayout from '../../util/ContentLayout';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
+import { BASE_URL } from '../../services/config';
 
 const FindIdPage = () => {
   const navi = useNavigate();
@@ -19,7 +20,7 @@ const FindIdPage = () => {
     };
 
     try {
-      const response = await fetch('http://127.0.0.1:80/api/member/findId', {
+      const response = await fetch(`${BASE_URL}/api/member/findId`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(requestData),

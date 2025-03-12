@@ -11,6 +11,7 @@ import DateBtn2 from '../../../util/DateBtn2';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
 import { isTokenExpired, getRoleFromToken } from '../../../util/JwtUtil';
+import { BASE_URL } from '../../../services/config';
 
 const ExReport = () => {
   const dispatch = useDispatch();
@@ -150,7 +151,7 @@ const ExReport = () => {
   //월별 칼로리 소모량 fetch
   const fetchCaloriesData = async () => {
     try {
-      let url = `http://127.0.0.1:80/api/exercise/getCalories?rangeType=${selectedRangeCalories}&year=${selectedYearCalories}`;
+      let url = `${BASE_URL}/api/exercise/getCalories?rangeType=${selectedRangeCalories}&year=${selectedYearCalories}`;
       if (selectedRangeCalories === '일') url += `&month=${selectedMonthCalories}`;
 
       const response = await fetch(url, {
@@ -195,7 +196,7 @@ const ExReport = () => {
   //운동시간 fetch
   const fetchDurationData = async () => {
     try {
-      let url = `http://127.0.0.1:80/api/exercise/getDuration?rangeType=${selectedRangeDuration}&year=${selectedYearDuration}`;
+      let url = `${BASE_URL}/api/exercise/getDuration?rangeType=${selectedRangeDuration}&year=${selectedYearDuration}`;
       if (selectedRangeDuration === '일') url += `&month=${selectedMonthDuration}`;
 
       const response = await fetch(url, {
@@ -242,7 +243,7 @@ const ExReport = () => {
   //최대중량 fetch
   const fetchMaxWeightData = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:80/api/exercise/getMonthlyMaxWeight', {
+      const response = await fetch(`${BASE_URL}/api/exercise/getMonthlyMaxWeight`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -282,7 +283,7 @@ const ExReport = () => {
   // 유형별 운동 횟수 fetch
   const fetchTypeCountData = async () => {
     try {
-      let url = `http://127.0.0.1:80/api/exercise/getTypeCount?rangeType=${selectedRangeTypeCount}&year=${selectedYearTypeCount}`;
+      let url = `${BASE_URL}/api/exercise/getTypeCount?rangeType=${selectedRangeTypeCount}&year=${selectedYearTypeCount}`;
       if (selectedRangeTypeCount === '월') url += `&month=${selectedMonthTypeCount}`;
 
       const response = await fetch(url, {
@@ -411,7 +412,7 @@ const ExReport = () => {
   // 종류별 운동 횟수 fetch
   const fetchCategoryCountData = async () => {
     try {
-      let url = `http://127.0.0.1:80/api/exercise/getCategoryCount?rangeType=${selectedRangeCategoryCount}&year=${selectedYearCategoryCount}`;
+      let url = `${BASE_URL}/api/exercise/getCategoryCount?rangeType=${selectedRangeCategoryCount}&year=${selectedYearCategoryCount}`;
       if (selectedRangeCategoryCount === '월') url += `&month=${selectedMonthCategoryCount}`;
 
       const response = await fetch(url, {
