@@ -47,10 +47,12 @@ const ButtonAreaDiv = styled.div`
 const TableAreaDiv = styled.div``;
 
 const TitleTd = styled.td`
-  max-width: 450px;
+  width: 430px;
+  max-width: 430px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  text-align: left;
 `;
 
 const BottomAreaDiv = styled.div`
@@ -68,8 +70,8 @@ const ModalContainer = styled.div`
 `;
 
 const ModalContentText = styled.div`
-  margin-top: 19px;
-  margin-bottom: 5px;
+  margin-top: 20px;
+  margin-bottom: 6px;
 `;
 
 const ModalContentSmallText = styled.div`
@@ -110,6 +112,10 @@ const DeleteImgBtn = styled.button`
   border: none;
   color: #363636;
   cursor: pointer;
+`;
+
+const RequiredMark = styled.span`
+  color: red;
 `;
 
 const AdminBanner = () => {
@@ -269,8 +275,6 @@ const AdminBanner = () => {
       title: '등록하시겠습니까?',
       icon: 'question',
       showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
       confirmButtonText: '확인',
       cancelButtonText: '취소',
     }).then((result) => {
@@ -330,8 +334,6 @@ const AdminBanner = () => {
       title: '저장하시겠습니까?',
       icon: 'question',
       showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
       confirmButtonText: '확인',
       cancelButtonText: '취소',
     }).then((result) => {
@@ -379,8 +381,6 @@ const AdminBanner = () => {
       title: '삭제하시겠습니까?',
       icon: 'question',
       showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
       confirmButtonText: '확인',
       cancelButtonText: '취소',
     }).then((result) => {
@@ -443,8 +443,6 @@ const AdminBanner = () => {
       title: '삭제하시겠습니까?',
       icon: 'question',
       showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
       confirmButtonText: '확인',
       cancelButtonText: '취소',
     }).then((result) => {
@@ -512,7 +510,7 @@ const AdminBanner = () => {
     getFetch('노출여부 전체', '');
   };
 
-  const handleClick = (showYn, searchValue) => {
+  const handleClick = (e, showYn, searchValue) => {
     dispatch(resetPaging({ boardType }));
     getFetch(showYn, searchValue);
   };
@@ -540,7 +538,7 @@ const AdminBanner = () => {
             handleChange={handleChange}
             handleClearClick={handleClearClick}
             handleClick={(e) => {
-              handleClick(searchInput.showYn, searchInput.searchValue);
+              handleClick(e, searchInput.showYn, searchInput.searchValue);
             }}
           />
         </SearchDiv>
@@ -592,6 +590,7 @@ const AdminBanner = () => {
         </BottomAreaDiv>
 
         <Modal title="배너 등록">
+          <RequiredMark>* </RequiredMark>
           <Input
             type="text"
             name="title"
@@ -603,7 +602,9 @@ const AdminBanner = () => {
             min={0}
             f={handleInputChange}
           />
-          <ModalContentText>노출여부</ModalContentText>
+          <ModalContentText>
+            <RequiredMark>* </RequiredMark>노출여부
+          </ModalContentText>
           <ModalRadioBtnDiv>
             <input
               type="radio"
@@ -622,7 +623,9 @@ const AdminBanner = () => {
             />
             N
           </ModalRadioBtnDiv>
-          <ModalContentText>배너사진</ModalContentText>
+          <ModalContentText>
+            <RequiredMark>* </RequiredMark>배너사진
+          </ModalContentText>
           <ModalContentSmallText>적정 사이즈 : 1380 * 500 px</ModalContentSmallText>
           <FileInput type="file" accept="image/*" onChange={() => handleImageChange(enrollImgRef)} ref={enrollImgRef} />
           <PreviewDiv>
@@ -650,6 +653,7 @@ const AdminBanner = () => {
         </Modal>
 
         <Modal title="배너 수정">
+          <RequiredMark>* </RequiredMark>
           <Input
             type="text"
             name="title"
@@ -661,7 +665,9 @@ const AdminBanner = () => {
             min={0}
             f={handleInputChange}
           />
-          <ModalContentText>노출여부</ModalContentText>
+          <ModalContentText>
+            <RequiredMark>* </RequiredMark>노출여부
+          </ModalContentText>
           <ModalRadioBtnDiv>
             <input
               type="radio"
@@ -680,7 +686,9 @@ const AdminBanner = () => {
             />
             N
           </ModalRadioBtnDiv>
-          <ModalContentText>배너사진</ModalContentText>
+          <ModalContentText>
+            <RequiredMark>* </RequiredMark>배너사진
+          </ModalContentText>
           <ModalContentSmallText>적정 사이즈 : 1380 * 500 px</ModalContentSmallText>
           <FileInput type="file" accept="image/*" onChange={() => handleImageChange(editImgRef)} ref={editImgRef} />
           <PreviewDiv>

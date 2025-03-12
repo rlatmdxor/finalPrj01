@@ -4,11 +4,9 @@ import com.kh.healthcare.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDate;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
 
 @Service
 @RequiredArgsConstructor
@@ -88,6 +86,12 @@ public class DashboardService {
         int hours = diff / 60;
         int minutes = diff % 60;
 
+        if(minutes < 0) {
+            minutes *= -1;
+        }
+
+        System.out.println("minutes = " + minutes);
+        System.out.println("hours = " + hours);
         if (hours == 0) {
             return String.format("%+d분", minutes);
         } else if (minutes == 0) {
@@ -95,6 +99,7 @@ public class DashboardService {
         } else {
             return String.format("%+d시간 %02d분", hours, minutes);
         }
+
     }
 
     public List<SettingVo> getDashboardSetting(String token) {

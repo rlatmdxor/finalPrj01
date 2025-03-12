@@ -33,7 +33,7 @@ const BigCardInnerMidDiv = styled.div`
 
 const SmallTextDiv = styled.div`
   font-size: 14px;
-  color: #252525;
+  color: #2c2c2c;
   margin-top: 2px;
 `;
 
@@ -47,10 +47,11 @@ const MyBmi = () => {
   const weight = useSelector((state) => state.diet.weight);
   const memberHeight = useSelector((state) => state.diet.height);
   const height = memberHeight * 0.01;
+  const gender = useSelector((state) => state.diet.gender);
 
   useEffect(() => {
     const calculatedBmi = weight / (height * height);
-    setBmi(calculatedBmi.toFixed(1));
+    setBmi(Math.round(calculatedBmi * 10) / 10);
 
     let state;
     if (calculatedBmi < 18.5) {
@@ -64,14 +65,19 @@ const MyBmi = () => {
     }
     setBmiState(state);
 
-    const calculatedStandardWeight = height * height * 22;
-    setStandardWeight(calculatedStandardWeight.toFixed(1));
+    let calculatedStandardWeight;
+    if (gender === 'M') {
+      calculatedStandardWeight = height * height * 22;
+    } else if (gender === 'F') {
+      calculatedStandardWeight = height * height * 21;
+    }
+    setStandardWeight(Math.round(calculatedStandardWeight * 10) / 10);
 
     const calculatedKcal = weight * 32;
-    setRecommendedKcal(calculatedKcal.toFixed(0));
+    setRecommendedKcal(Math.round(calculatedKcal));
 
     const calculatedWater = weight * 30;
-    setRecommendedWater(calculatedWater.toFixed(0));
+    setRecommendedWater(Math.round(calculatedWater));
   }, [weight, height]);
 
   return (

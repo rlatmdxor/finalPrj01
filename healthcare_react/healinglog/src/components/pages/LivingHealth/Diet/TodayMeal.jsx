@@ -29,7 +29,6 @@ const Container = styled.div`
 `;
 
 const SmallTitleDiv = styled.div`
-  color: #4caf50;
   font-weight: 900;
 `;
 
@@ -76,6 +75,10 @@ const DeleteImgBtn = styled.button`
   border: none;
   color: #363636;
   cursor: pointer;
+`;
+
+const RequiredMark = styled.span`
+  color: red;
 `;
 
 const TodayMeal = ({ token }) => {
@@ -166,6 +169,9 @@ const TodayMeal = ({ token }) => {
       ...prev,
       mealCode: mealCode,
     }));
+    if (enrollImgRef.current) {
+      enrollImgRef.current.value = '';
+    }
     dispatch(open({ title: '식단 등록', value: 'block' }));
   };
 
@@ -367,7 +373,7 @@ const TodayMeal = ({ token }) => {
     if (!inputData.foodList || inputData.foodList.length === 0) {
       Swal.fire({
         icon: 'warning',
-        title: '음식을 입력해주세요.',
+        title: '음식을 추가해주세요.',
         confirmButtonText: '확인',
       });
       return;
@@ -377,8 +383,6 @@ const TodayMeal = ({ token }) => {
       title: '등록하시겠습니까?',
       icon: 'question',
       showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
       confirmButtonText: '확인',
       cancelButtonText: '취소',
     }).then((result) => {
@@ -437,7 +441,7 @@ const TodayMeal = ({ token }) => {
     if (!inputData.foodList || inputData.foodList.length === 0) {
       Swal.fire({
         icon: 'warning',
-        title: '음식을 입력해주세요.',
+        title: '음식을 추가해주세요.',
         confirmButtonText: '확인',
       });
       return;
@@ -446,8 +450,6 @@ const TodayMeal = ({ token }) => {
       title: '저장하시겠습니까?',
       icon: 'question',
       showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
       confirmButtonText: '확인',
       cancelButtonText: '취소',
     }).then((result) => {
@@ -497,8 +499,6 @@ const TodayMeal = ({ token }) => {
       title: '삭제하시겠습니까?',
       icon: 'question',
       showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
       confirmButtonText: '확인',
       cancelButtonText: '취소',
     }).then((result) => {
@@ -579,7 +579,10 @@ const TodayMeal = ({ token }) => {
       </ContentAreaDiv>
 
       <Modal title="식단 등록">
-        <SmallTitleDiv>{options.find((option) => option.id === inputData.mealCode)?.label || ''}</SmallTitleDiv>
+        <SmallTitleDiv>
+          <RequiredMark>* </RequiredMark>
+          {options.find((option) => option.id === inputData.mealCode)?.label || ''}
+        </SmallTitleDiv>
         <Container>
           <Autocomplete
             disablePortal
@@ -714,7 +717,10 @@ const TodayMeal = ({ token }) => {
       </Modal>
 
       <Modal title="식단 상세">
-        <SmallTitleDiv>{options.find((option) => option.id === inputData.mealCode)?.label || ''}</SmallTitleDiv>
+        <SmallTitleDiv>
+          <RequiredMark>* </RequiredMark>
+          {options.find((option) => option.id === inputData.mealCode)?.label || ''}
+        </SmallTitleDiv>
         <Container>
           <Autocomplete
             disablePortal
@@ -850,6 +856,7 @@ const TodayMeal = ({ token }) => {
       </Modal>
 
       <Modal title="음식 직접추가">
+        <RequiredMark>* </RequiredMark>
         <Input
           type="text"
           name="label"
@@ -861,6 +868,7 @@ const TodayMeal = ({ token }) => {
           mt={'8'}
           value={foodInputData.label}
         />
+        <RequiredMark>* </RequiredMark>
         <Input
           type="text"
           name="unit"
@@ -872,6 +880,7 @@ const TodayMeal = ({ token }) => {
           mt={'8'}
           value={foodInputData.unit}
         />
+        <RequiredMark>* </RequiredMark>
         <Input
           type="number"
           name="amount"
@@ -883,6 +892,7 @@ const TodayMeal = ({ token }) => {
           mt={'8'}
           value={foodInputData.amount}
         />
+        <RequiredMark>* </RequiredMark>
         <Input
           type="number"
           name="kcal"
@@ -909,6 +919,7 @@ const TodayMeal = ({ token }) => {
       </Modal>
 
       <Modal title="음식 수정">
+        <RequiredMark>* </RequiredMark>
         <Input
           type="text"
           name="label"
@@ -920,6 +931,7 @@ const TodayMeal = ({ token }) => {
           mt={'8'}
           value={foodInputData.label}
         />
+        <RequiredMark>* </RequiredMark>
         <Input
           type="text"
           name="unit"
@@ -931,6 +943,7 @@ const TodayMeal = ({ token }) => {
           mt={'8'}
           value={foodInputData.unit}
         />
+        <RequiredMark>* </RequiredMark>
         <Input
           type="number"
           name="amount"
@@ -942,6 +955,7 @@ const TodayMeal = ({ token }) => {
           mt={'8'}
           value={foodInputData.amount}
         />
+        <RequiredMark>* </RequiredMark>
         <Input
           type="number"
           name="kcal"

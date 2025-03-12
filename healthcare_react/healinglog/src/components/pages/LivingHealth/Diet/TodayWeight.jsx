@@ -10,6 +10,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import SmallCard from '../../../util/SmallCard';
 import { enrollTodayWeight } from '../../../services/dietService';
 import { setWeightAmount } from '../../../../redux/dietSlice';
+import styled from 'styled-components';
+
+const RequiredMark = styled.span`
+  color: red;
+`;
 
 const TodayWeight = ({ token }) => {
   const dispatch = useDispatch();
@@ -52,8 +57,6 @@ const TodayWeight = ({ token }) => {
       title: '등록하시겠습니까?',
       icon: 'question',
       showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
       confirmButtonText: '확인',
       cancelButtonText: '취소',
     }).then((result) => {
@@ -107,6 +110,7 @@ const TodayWeight = ({ token }) => {
       </SmallCard>
 
       <Modal title="체중 등록">
+        <RequiredMark>* </RequiredMark>
         <Input
           type="number"
           name="amount"

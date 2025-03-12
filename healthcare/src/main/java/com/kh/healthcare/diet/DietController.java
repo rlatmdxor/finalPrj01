@@ -12,9 +12,9 @@ public class DietController {
     private final DietService service;
 
     @GetMapping("cal")
-    public List<DietCalVo> getDietCalData(@RequestHeader("Authorization") String token){
+    public DietReportVo getDietCalendarData(@RequestHeader("Authorization") String token){
         try {
-            List<DietCalVo> voList = service.getDietCalData(token);
+            DietReportVo voList = service.getDietCalendarData(token);
             return voList;
         }
         catch (Exception e){
@@ -35,6 +35,18 @@ public class DietController {
         }
     }
 
+    @GetMapping("report/week")
+    public DietReportVo getDietYearReport(@RequestParam String year, @RequestHeader("Authorization") String token){
+        try {
+            DietReportVo voList = service.getDietWeekReport(year, token);
+            return voList;
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            throw new IllegalStateException("[ERROR] DIET WEEK REPORT FAIL..");
+        }
+    }
+
     @GetMapping("report/month")
     public DietReportVo getDietMonthReport(@RequestParam String year, @RequestHeader("Authorization") String token){
         try {
@@ -47,15 +59,4 @@ public class DietController {
         }
     }
 
-    @GetMapping("report/year")
-    public DietReportVo getDietYearReport(@RequestHeader("Authorization") String token){
-        try {
-            DietReportVo voList = service.getDietYearReport(token);
-            return voList;
-        }
-        catch (Exception e){
-            e.printStackTrace();
-            throw new IllegalStateException("[ERROR] DIET YEAR REPORT FAIL..");
-        }
-    }
 }
