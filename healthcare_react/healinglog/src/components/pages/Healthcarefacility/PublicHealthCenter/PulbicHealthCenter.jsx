@@ -224,12 +224,12 @@ const PublicHealthCenter = ({}) => {
   };
 
   useEffect(() => {
-    console.log('모달 상태 변경:', isOpen);
     if (isOpen && selectedNo) {
       fetchPhcs(selectedNo);
     }
   }, [isOpen, selectedNo]);
 
+  // 네이버 지도 API 로드
   useEffect(() => {
     if (!window.naver) {
       const script = document.createElement('script');
@@ -244,7 +244,13 @@ const PublicHealthCenter = ({}) => {
     }
   }, []);
 
+  // ✅ 네이버 지도 생성 (phcM 값이 있을 때 실행)
   useEffect(() => {
+    if (!phcM || !phcM.locationX || !phcM.locationY) {
+      console.warn('🚨 위치 정보가 올바르지 않음:', phcM);
+      return;
+    }
+
     if (isMapLoaded && window.naver && mapRef.current) {
       const location = new window.naver.maps.LatLng(phcM.locationY, phcM.locationX);
 
@@ -259,6 +265,7 @@ const PublicHealthCenter = ({}) => {
       });
     }
   }, [phcM, isMapLoaded]);
+
   return (
     <>
       <Title>의료기관 찾기</Title>
