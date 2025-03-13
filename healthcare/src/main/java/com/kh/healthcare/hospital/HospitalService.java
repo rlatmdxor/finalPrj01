@@ -43,4 +43,8 @@ public class HospitalService {
         response.put("hospitals", hospitals);
         return response;
     }
+
+    public HospitalVo getService(String no) {
+        return mapper.findByNo(no);
+    }
 }

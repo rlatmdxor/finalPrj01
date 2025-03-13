@@ -10,4 +10,7 @@ public class HospitalVo {
     private String address;
     private String hospitalType;
     private int totalCount;
+
+
+    private int rating;
 }

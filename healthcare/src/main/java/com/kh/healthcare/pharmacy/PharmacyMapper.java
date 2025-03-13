@@ -12,7 +12,7 @@ public interface PharmacyMapper {
 
     @Select("""
         <script>
-            SELECT NAME, TELL_NUM, POST_NUM, ADDRESS
+            SELECT NAME, TELL_NUM, POST_NUM, ADDRESS, NO , LOCATION_X , LOCATION_Y
             FROM (
                 SELECT PH.*, ROW_NUMBER() OVER (ORDER BY NAME ASC) AS RN
                 FROM PHARMACY PH
@@ -86,4 +86,21 @@ public interface PharmacyMapper {
             @Param("searchType") String searchType,
             @Param("keyword") String keyword
     );
+
+    @Select("""
+            SELECT
+            NO
+            ,NAME
+            ,CITY
+            ,DISTRICT
+            ,DONG
+            ,ADDRESS
+            ,TELL_NUM
+            ,POST_NUM
+            ,LOCATION_X
+            ,LOCATION_Y
+            FROM PHARMACY
+            WHERE NO = #{no}
+            """)
+    PharmacyVo findByNo(String no);
 }

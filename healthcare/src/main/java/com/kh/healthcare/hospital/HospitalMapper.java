@@ -8,12 +8,9 @@ import java.util.List;
 @Mapper
 public interface HospitalMapper {
 
-
-
-
     @Select("""
         <script>
-            SELECT NAME, TELL_NUM, POST_NUM, ADDRESS, HOSPITAL_TYPE
+            SELECT NAME, TELL_NUM, POST_NUM, ADDRESS, HOSPITAL_TYPE , NO , LOCATION_X , LOCATION_Y
             FROM (
                 SELECT H.*, ROW_NUMBER() OVER (ORDER BY NAME ASC) AS RN
                 FROM HOSPITAL H
@@ -54,7 +51,7 @@ public interface HospitalMapper {
                         </choose>
                     )
                 </if>
-            ) 
+            )
             WHERE RN BETWEEN #{offset} + 1 AND #{offset} + #{size}
         </script>
     """)
@@ -75,7 +72,7 @@ public interface HospitalMapper {
         FROM HOSPITAL H
         WHERE 1=1
 
-        <!-- ✅ 지역 필터 유지 -->
+        <!-- 지역 필터 유지 -->
         <if test='city != null and city != ""'>
             AND H.CITY = #{city}
         </if>
@@ -121,4 +118,20 @@ public interface HospitalMapper {
             @Param("keyword") String keyword
     );
 
+    @Select("""
+             SELECT
+            NO
+            ,NAME
+            ,CITY
+            ,DISTRICT
+            ,DONG
+            ,ADDRESS
+            ,TELL_NUM
+            ,POST_NUM
+            ,LOCATION_X
+            ,LOCATION_Y
+            FROM HOSPITAL
+            WHERE NO = #{no}
+            """)
+    HospitalVo findByNo(String no);
 }
