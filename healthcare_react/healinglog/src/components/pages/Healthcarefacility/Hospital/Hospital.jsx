@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import SearchBar from '../../../util/SearchBar';
 import Pagination from '../../../util/Pagination';
 import { resetPaging, setTotalCount } from '../../../../redux/pagingSlice';
+import { BASE_URL } from '../../../services/config';
 
 const NaviContainer = styled.div`
   display: grid;
@@ -79,7 +80,7 @@ const Hospital = () => {
 
   // 시 데이터 가져오기
   useEffect(() => {
-    fetch('http://127.0.0.1/api/location/cities')
+    fetch(`${BASE_URL}/api/location/cities`)
       .then((res) => res.json())
       .then((data) => setCities(data))
       .catch((error) => console.error('시 데이터 로드 실패:', error));
@@ -88,7 +89,7 @@ const Hospital = () => {
   // 군/구 데이터 가져오기
   useEffect(() => {
     if (selectedCity) {
-      fetch(`http://127.0.0.1/api/location/districts/${selectedCity}`)
+      fetch(`${BASE_URL}/api/location/districts/${selectedCity}`)
         .then((res) => res.json())
         .then((data) => setDistricts(data))
         .catch((error) => console.error('구 데이터 로드 실패:', error));
@@ -100,7 +101,7 @@ const Hospital = () => {
   // 동 데이터 가져오기
   useEffect(() => {
     if (selectedDistrict) {
-      fetch(`http://127.0.0.1/api/location/dongs/${selectedDistrict}`)
+      fetch(`${BASE_URL}/api/location/dongs/${selectedDistrict}`)
         .then((res) => res.json())
         .then((data) => setDongs(data))
         .catch((error) => console.error('동 데이터 로드 실패:', error));
@@ -138,7 +139,7 @@ const Hospital = () => {
       }
 
       // API 요청 URL
-      const requestUrl = `http://127.0.0.1/api/hospital/search?hospitalType=${encodeURIComponent(
+      const requestUrl = `${BASE_URL}/api/hospital/search?hospitalType=${encodeURIComponent(
         finalHospitalType
       )}&searchType=${finalSearchType}&keyword=${encodeURIComponent(
         searchKeyword

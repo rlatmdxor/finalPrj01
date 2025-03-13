@@ -11,7 +11,7 @@ public interface PublicHealthCenterMapper {
 
     @Select("""
     <script>
-        SELECT NAME, TELL_NUM, POST_NUM, ADDRESS
+        SELECT NAME, TELL_NUM, POST_NUM, ADDRESS , NO , LOCATION_X , LOCATION_Y
         FROM (
             SELECT PH.*, ROW_NUMBER() OVER (ORDER BY NAME ASC) AS RN
             FROM PUBLIC_HEALTH_CENTER PH
@@ -120,4 +120,22 @@ public interface PublicHealthCenterMapper {
             @Param("keyword") String keyword
     );
 
+
+
+    @Select("""
+            SELECT
+            NO
+            ,NAME
+            ,CITY
+            ,DISTRICT
+            ,DONG
+            ,ADDRESS
+            ,TELL_NUM
+            ,POST_NUM
+            ,LOCATION_X
+            ,LOCATION_Y
+            FROM PUBLIC_HEALTH_CENTER
+            WHERE NO = #{no}
+            """)
+    PublicHealthCenterVo findByNo(String no);
 }

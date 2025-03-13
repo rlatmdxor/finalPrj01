@@ -39,4 +39,8 @@ public class PublicHealthCenterService {
         response.put("phcs", phcs); // 보건소 리스트
         return response;
     }
+
+    public PublicHealthCenterVo getService(String no) {
+        return mapper.findByNo(no);
+    }
 }

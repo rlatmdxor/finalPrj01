@@ -1,13 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Title from '../../../util/Title';
 import styled from 'styled-components';
 import Navi from '../../../util/Navi';
 import ContentLayout from '../../../util/ContentLayout';
 import Table from '../../../util/Table';
+import InputTag from '../../../util/Input';
 import { useDispatch, useSelector } from 'react-redux';
 import SearchBar from '../../../util/SearchBar';
 import Pagination from '../../../util/Pagination';
 import { resetPaging, setTotalCount } from '../../../../redux/pagingSlice';
+import { close, open } from '../../../../redux/modalSlice';
+import Modal from '../../../util/Modal';
+
+import { BASE_URL } from '../../../services/config';
 
 const NaviContainer = styled.div`
   display: grid;
@@ -45,7 +50,16 @@ const BottomDiv = styled.div`
   margin-bottom: 35px;
 `;
 
-const PublicHealthCenter = () => {
+const HiddenTitle = styled.div`
+  display: none;
+`;
+
+const ModalTt = styled.div`
+  margin-left: -120px;
+  margin-top: -100px;
+`;
+
+const PublicHealthCenter = ({}) => {
   const dispatch = useDispatch();
   const boardType = 'phc';
 
@@ -61,6 +75,12 @@ const PublicHealthCenter = () => {
   const [phcs, setPhcs] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  const [isOpen, setIsOpen] = useState(false); // ✅ 모달 상태 추가
+  //지도
+  const [phcM, setPhcM] = useState(null);
+  const [isMapLoaded, setIsMapLoaded] = useState(false);
+  const [selectedNo, setSelectedNo] = useState(null);
+
   const currentPage = useSelector((state) => state.paging[boardType]?.currentPage || 1);
   const boardLimit = useSelector((state) => state.paging[boardType]?.boardLimit || 12);
   const totalCount = useSelector((state) => state.paging[boardType]?.totalCount || 0);
@@ -75,7 +95,7 @@ const PublicHealthCenter = () => {
 
   // 📌 시 데이터 가져오기
   useEffect(() => {
-    fetch('http://127.0.0.1/api/location/cities')
+    fetch(`${BASE_URL}/api/location/cities`)
       .then((res) => res.json())
       .then((data) => setCities(data))
       .catch((error) => console.error('시 데이터 로드 실패:', error));
@@ -84,7 +104,7 @@ const PublicHealthCenter = () => {
   // 📌 군/구 데이터 가져오기
   useEffect(() => {
     if (selectedCity) {
-      fetch(`http://127.0.0.1/api/location/districts/${selectedCity}`)
+      fetch(`${BASE_URL}/api/location/districts/${selectedCity}`)
         .then((res) => res.json())
         .then((data) => setDistricts(data))
         .catch((error) => console.error('구 데이터 로드 실패:', error));
@@ -96,7 +116,7 @@ const PublicHealthCenter = () => {
   // 📌 동 데이터 가져오기
   useEffect(() => {
     if (selectedDistrict) {
-      fetch(`http://127.0.0.1/api/location/dongs/${selectedDistrict}`)
+      fetch(`${BASE_URL}/api/location/dongs/${selectedDistrict}`)
         .then((res) => res.json())
         .then((data) => setDongs(data))
         .catch((error) => console.error('동 데이터 로드 실패:', error));
@@ -131,7 +151,7 @@ const PublicHealthCenter = () => {
         finalSearchType = ''; // 검색 타입도 비움
       }
 
-      const requestUrl = `http://localhost/api/phc/search?searchType=${finalSearchType}&keyword=${encodeURIComponent(
+      const requestUrl = `${BASE_URL}/api/phc/search?searchType=${finalSearchType}&keyword=${encodeURIComponent(
         searchKeyword
       )}&page=${currentPage}&size=${boardLimit}`;
 
@@ -146,18 +166,18 @@ const PublicHealthCenter = () => {
 
       setPhcs(data.phcs || []);
     } catch (error) {
-      console.error('❌ 검색 오류:', error);
+      console.error('검색 오류:', error);
       setPhcs([]);
     }
     setLoading(false);
   };
 
-  // 📌 검색어 업데이트 핸들러
+  // 검색어 업데이트 핸들러
   const handleKeywordChange = (e) => {
     setKeyword(e.target.value);
   };
 
-  // 📌 검색어 초기화 핸들러
+  // 검색어 초기화 핸들러
   const handleClearKeyword = () => {
     setKeyword('');
   };
@@ -168,6 +188,83 @@ const PublicHealthCenter = () => {
       handleSearch();
     }
   }, [selectedCity, selectedDistrict]);
+
+  // 인풋 입력값 받아오기
+  const handleChange = (e) => {
+    setInputData((props) => {
+      return {
+        ...props,
+        [e.target.name]: e.target.value,
+      };
+    });
+  };
+  const initialInputData = {
+    no: '',
+    name: '',
+    address: '',
+    tell_num: '',
+    post_num: '',
+    location_x: '',
+    location_y: '',
+  };
+  const [inputData, setInputData] = useState(initialInputData);
+  const mapRef = useRef(null);
+  const [position, setPosition] = useState({ x: 15, y: 0 });
+  const fetchPhcs = async (no) => {
+    try {
+      const response = await fetch(`${BASE_URL}/api/phc/search/${no}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      const data = await response.json();
+      if (data) setPhcM(data); // 보건소 정보 저장
+    } catch (error) {
+      console.error('보건소 데이터 불러오기 오류:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (isOpen && selectedNo) {
+      fetchPhcs(selectedNo);
+    }
+  }, [isOpen, selectedNo]);
+
+  // 네이버 지도 API 로드
+  useEffect(() => {
+    if (!window.naver) {
+      const script = document.createElement('script');
+      script.src = `https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${process.env.REACT_APP_NAVER_MAP_API_ID}`;
+      script.async = true;
+      script.onload = () => {
+        setIsMapLoaded(true);
+      };
+      document.head.appendChild(script);
+    } else {
+      setIsMapLoaded(true);
+    }
+  }, []);
+
+  // ✅ 네이버 지도 생성 (phcM 값이 있을 때 실행)
+  useEffect(() => {
+    if (!phcM || !phcM.locationX || !phcM.locationY) {
+      console.warn('🚨 위치 정보가 올바르지 않음:', phcM);
+      return;
+    }
+
+    if (isMapLoaded && window.naver && mapRef.current) {
+      const location = new window.naver.maps.LatLng(phcM.locationY, phcM.locationX);
+
+      const map = new window.naver.maps.Map(mapRef.current, {
+        center: location,
+        zoom: 15,
+      });
+
+      new window.naver.maps.Marker({
+        position: location,
+        map,
+      });
+    }
+  }, [phcM, isMapLoaded]);
 
   return (
     <>
@@ -215,10 +312,38 @@ const PublicHealthCenter = () => {
             h={40}
           />
         </SearchDiv>
+        {/* // styled.div새로 만들어서 마진주기 */}
+        <ModalTt>
+          <>
+            <Modal title="보건소" width={700} ml={660}>
+              {phcM ? (
+                <>
+                  <h4>보건소명: {phcM.name} </h4>
+                  <h4>주소: {phcM.address}</h4>
+                  <h4>
+                    전화번호: {phcM.tellNum} | 우편번호: {phcM.postNum}
+                  </h4>
+                </>
+              ) : (
+                <p>보건소 정보를 불러오는 중...</p>
+              )}
+              <div
+                ref={mapRef}
+                style={{
+                  width: '600px',
+                  height: '400px',
+                  marginBottom: '30px',
+                  marginLeft: '15px',
+                  background: '#eee',
+                }}
+              ></div>
+            </Modal>
+          </>
+        </ModalTt>
         <Table>
           <thead>
             <tr>
-              <th>약국명</th>
+              <th>보건소명</th>
               <th>전화번호</th>
               <th>우편번호</th>
               <th>주소</th>
@@ -226,7 +351,25 @@ const PublicHealthCenter = () => {
           </thead>
           <tbody>
             {phcs.map((phc, idx) => (
-              <tr key={idx}>
+              <tr
+                key={idx}
+                onClick={() => {
+                  setSelectedNo(phc.no);
+                  setInputData({
+                    no: phc.no,
+                    name: phc.name,
+                    address: phc.address,
+                    tell_num: phc.tell_num,
+                    post_num: phc.post_num,
+                    location_x: phc.location_x,
+                    location_y: phc.location_y,
+                  });
+                  console.log(phc.no);
+                  fetchPhcs(phc.no);
+                  setIsOpen(true);
+                  dispatch(open({ title: '보건소', value: 'block' }));
+                }}
+              >
                 <td width="160px">{phc.name}</td>
                 <td width="110px">{phc.tellNum}</td>
                 <td width="60px">{phc.postNum}</td>
@@ -235,7 +378,6 @@ const PublicHealthCenter = () => {
             ))}
           </tbody>
         </Table>
-
         <BottomDiv>
           <Pagination boardType={boardType}></Pagination>
         </BottomDiv>

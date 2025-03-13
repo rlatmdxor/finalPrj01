@@ -20,6 +20,7 @@ import DateBtn from '../../../util/DateBtn';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
 import { getRoleFromToken, isTokenExpired } from '../../../util/JwtUtil';
+import { BASE_URL } from '../../../services/config';
 
 const NaviContainer = styled.div`
   display: grid;
@@ -116,7 +117,7 @@ const CigaretteReport = () => {
     }
   }, [navi, token]);
 
-  const url = 'http://127.0.0.1/api/cigarette/report/list';
+  const url = `${BASE_URL}/api/cigarette/report/list`;
   const options = {
     method: 'GET',
     headers: {
@@ -224,7 +225,7 @@ const CigaretteReport = () => {
     const token = localStorage.getItem('token');
 
     try {
-      const response = await fetch('http://127.0.0.1/api/cigarette/report/list', {
+      const response = await fetch(`${BASE_URL}/api/cigarette/report/list`, {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -381,7 +382,7 @@ const CigaretteReport = () => {
       cancelButtonText: '취소',
     }).then((result) => {
       if (result.isConfirmed) {
-        fetch('http://127.0.0.1:80/api/cigarette/report/write', {
+        fetch(`${BASE_URL}/api/cigarette/report/write`, {
           method: 'POST',
           headers: {
             'content-type': 'application/json',
@@ -434,7 +435,7 @@ const CigaretteReport = () => {
       cancelButtonText: '취소',
     }).then((result) => {
       if (result.isConfirmed) {
-        fetch('http://127.0.0.1:80/api/cigarette/report/update', {
+        fetch(`${BASE_URL}/api/cigarette/report/update`, {
           method: 'POST',
           headers: {
             'content-type': 'application/json',
@@ -488,7 +489,7 @@ const CigaretteReport = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         // 삭제 fetch 호출
-        fetch('http://127.0.0.1/api/cigarette/report/delete', {
+        fetch(`${BASE_URL}/api/cigarette/report/delete`, {
           method: 'DELETE',
           headers: {
             'content-type': 'application/json',
