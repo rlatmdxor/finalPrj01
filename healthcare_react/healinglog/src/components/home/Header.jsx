@@ -18,7 +18,7 @@ const Header = () => {
   const dispatch = useDispatch();
   const [isOpen, setIsOpen] = useState(false);
   const [hasNewNotification, setHasNewNotification] = useState();
-  const [pushData, setPushData] = useState({});
+  const [pushData, setPushData] = useState([]);
   const [boardNo, setBoardNo] = useState();
   const [num, setNum] = useState(0);
 
@@ -27,6 +27,9 @@ const Header = () => {
 
   // 새로운 알림이 있으면 아이콘 변경
   useEffect(() => {
+    if (!token || token === 'null' || token === 'undefined' || token.trim() === '') {
+      return;
+    }
     getPushList();
     if (messages.length > 0) {
       setHasNewNotification(true);
@@ -37,11 +40,18 @@ const Header = () => {
 
   // 푸시 리스트 리렌더링
   useEffect(() => {
+    if (!token || token === 'null' || token === 'undefined' || token.trim() === '') {
+      return;
+    }
     getPushList();
   }, [num]);
 
   //푸시 리스트 받아오기 함수
   const getPushList = async () => {
+    if (!token || token === 'null' || token === 'undefined' || token.trim() === '') {
+      return;
+    }
+
     const response = await fetch(`${BASE_URL}/api/notification/getPushList`, {
       method: 'GET',
       headers: { Authorization: `Bearer ${token}` },
