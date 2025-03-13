@@ -7,54 +7,59 @@ import java.util.List;
 
 @Mapper
 public interface HospitalMapper {
-
     @Select("""
-        <script>
-            SELECT NAME, TELL_NUM, POST_NUM, ADDRESS, HOSPITAL_TYPE , NO , LOCATION_X , LOCATION_Y
-            FROM (
-                SELECT H.*, ROW_NUMBER() OVER (ORDER BY NAME ASC) AS RN
-                FROM HOSPITAL H
-                WHERE 1=1
+    <script>
+        SELECT NAME, TELL_NUM, POST_NUM, ADDRESS, HOSPITAL_TYPE, NO, LOCATION_X, LOCATION_Y, RATING
+        FROM (
+            SELECT H.NO, H.NAME, H.HOSPITAL_TYPE, H.CITY, H.DISTRICT, H.DONG, H.ADDRESS, 
+                   H.TELL_NUM, H.POST_NUM, H.LOCATION_X, H.LOCATION_Y, 
+                   NVL(AVG(RB.RATING), 0) AS RATING,  -- 병원별 평균 평점 (없으면 0)
+                   ROW_NUMBER() OVER (ORDER BY H.NAME ASC) AS RN
+            FROM HOSPITAL H
+            LEFT JOIN REVIEW_BOARD RB ON H.NO = RB.HOSPITAL_NO
+            WHERE 1=1
+            
+            <!-- ✅ 지역 필터 유지 -->
+            <if test='city != null and city != ""'>
+                AND H.CITY = #{city}
+            </if>
+            <if test='district != null and district != ""'>
+                AND H.DISTRICT = #{district}
+            </if>
+            <if test='dong != null and dong != ""'>
+                AND H.DONG = #{dong}
+            </if>
 
-                <!-- ✅ 지역 필터 유지 -->
-                <if test='city != null and city != ""'>
-                    AND CITY = #{city}
-                </if>
-                <if test='district != null and district != ""'>
-                    AND DISTRICT = #{district}
-                </if>
-                <if test='dong != null and dong != ""'>
-                    AND DONG = #{dong}
-                </if>
+            <!-- ✅ 병원 유형 필터링 -->
+            <if test='hospitalType != null and hospitalType != ""'>
+                AND H.HOSPITAL_TYPE = #{hospitalType}
+            </if>
 
-                <!-- ✅ 병원 유형 필터링 (과가 선택되지 않으면 필터링 X) -->
-                <if test='hospitalType != null and hospitalType != ""'>
-                    AND HOSPITAL_TYPE = #{hospitalType}
-                </if>
-
-                <!-- ✅ 검색 조건 적용 -->
-                <if test='searchType != null and searchType != "" and keyword != null and keyword != ""'>
-                    AND (
-                        <choose>
-                            <when test='searchType == "name"'>
-                                NAME LIKE '%' || #{keyword} || '%'
-                            </when>
-                            <when test='searchType == "address"'>
-                                ADDRESS LIKE '%' || #{keyword} || '%'
-                            </when>
-                            <when test='searchType == "tellNum"'>
-                                TELL_NUM LIKE '%' || #{keyword} || '%'
-                            </when>
-                            <when test='searchType == "postNum"'>
-                                POST_NUM LIKE '%' || #{keyword} || '%'
-                            </when>
-                        </choose>
-                    )
-                </if>
-            )
-            WHERE RN BETWEEN #{offset} + 1 AND #{offset} + #{size}
-        </script>
-    """)
+            <!-- ✅ 검색 조건 적용 -->
+            <if test='searchType != null and searchType != "" and keyword != null and keyword != ""'>
+                AND (
+                    <choose>
+                        <when test='searchType == "name"' >
+                            H.NAME LIKE '%' || #{keyword} || '%'
+                        </when>
+                        <when test='searchType == "address"' >
+                            H.ADDRESS LIKE '%' || #{keyword} || '%'
+                        </when>
+                        <when test='searchType == "tellNum"' >
+                            H.TELL_NUM LIKE '%' || #{keyword} || '%'
+                        </when>
+                        <when test='searchType == "postNum"' >
+                            H.POST_NUM LIKE '%' || #{keyword} || '%'
+                        </when>
+                    </choose>
+                )
+            </if>
+            GROUP BY H.NO, H.NAME, H.HOSPITAL_TYPE, H.CITY, H.DISTRICT, H.DONG, H.ADDRESS, 
+                     H.TELL_NUM, H.POST_NUM, H.LOCATION_X, H.LOCATION_Y
+        )
+        WHERE RN BETWEEN #{offset} + 1 AND #{offset} + #{size}
+    </script>
+""")
     List<HospitalVo> searchHospitals(
             @Param("city") String city,
             @Param("district") String district,
@@ -66,13 +71,15 @@ public interface HospitalMapper {
             @Param("offset") int offset
     );
 
+
     @Select("""
     <script>
-        SELECT COUNT(*)
+        SELECT COUNT(DISTINCT H.NO)  -- DISTINCT 추가하여 중복 카운트 방지
         FROM HOSPITAL H
+        LEFT JOIN REVIEW_BOARD RB ON H.NO = RB.HOSPITAL_NO
         WHERE 1=1
 
-        <!-- 지역 필터 유지 -->
+        <!-- ✅ 지역 필터 유지 -->
         <if test='city != null and city != ""'>
             AND H.CITY = #{city}
         </if>
@@ -83,7 +90,7 @@ public interface HospitalMapper {
             AND H.DONG = #{dong}
         </if>
 
-        <!-- ✅ 병원 유형 필터링 (과가 선택되지 않으면 필터링 X) -->
+        <!-- ✅ 병원 유형 필터링 -->
         <if test='hospitalType != null and hospitalType != ""'>
             AND H.HOSPITAL_TYPE = #{hospitalType}
         </if>
@@ -92,16 +99,16 @@ public interface HospitalMapper {
         <if test='searchType != null and searchType != "" and keyword != null and keyword != ""'>
             AND (
                 <choose>
-                    <when test='searchType == "name"'>
+                    <when test='searchType == "name"' >
                         H.NAME LIKE '%' || #{keyword} || '%'
                     </when>
-                    <when test='searchType == "address"'>
+                    <when test='searchType == "address"' >
                         H.ADDRESS LIKE '%' || #{keyword} || '%'
                     </when>
-                    <when test='searchType == "tellNum"'>
+                    <when test='searchType == "tellNum"' >
                         H.TELL_NUM LIKE '%' || #{keyword} || '%'
                     </when>
-                    <when test='searchType == "postNum"'>
+                    <when test='searchType == "postNum"' >
                         H.POST_NUM LIKE '%' || #{keyword} || '%'
                     </when>
                 </choose>
@@ -118,20 +125,17 @@ public interface HospitalMapper {
             @Param("keyword") String keyword
     );
 
+
+
     @Select("""
-             SELECT
-            NO
-            ,NAME
-            ,CITY
-            ,DISTRICT
-            ,DONG
-            ,ADDRESS
-            ,TELL_NUM
-            ,POST_NUM
-            ,LOCATION_X
-            ,LOCATION_Y
-            FROM HOSPITAL
-            WHERE NO = #{no}
-            """)
+    SELECT H.NO, H.NAME, H.CITY, H.DISTRICT, H.DONG, H.ADDRESS, 
+           H.TELL_NUM, H.POST_NUM, H.LOCATION_X, H.LOCATION_Y,
+           ROUND(NVL(AVG(RB.RATING), 0), 2) AS RATING  -- 병원별 평균 별점 (없으면 0)
+    FROM HOSPITAL H
+    LEFT JOIN REVIEW_BOARD RB ON H.NO = RB.HOSPITAL_NO
+    WHERE H.NO = #{no}
+    GROUP BY H.NO, H.NAME, H.CITY, H.DISTRICT, H.DONG, H.ADDRESS, 
+             H.TELL_NUM, H.POST_NUM, H.LOCATION_X, H.LOCATION_Y
+""")
     HospitalVo findByNo(String no);
 }

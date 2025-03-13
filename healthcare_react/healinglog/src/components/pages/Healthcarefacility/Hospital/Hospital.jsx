@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Title from '../../../util/Title';
 import { setSelection } from '../../../../redux/selectSlice';
 import styled from 'styled-components';
@@ -10,6 +10,9 @@ import SearchBar from '../../../util/SearchBar';
 import Pagination from '../../../util/Pagination';
 import { resetPaging, setTotalCount } from '../../../../redux/pagingSlice';
 import { BASE_URL } from '../../../services/config';
+import { FaStar, FaStarHalfAlt } from 'react-icons/fa';
+import Modal from '../../../util/Modal';
+import { close, open } from '../../../../redux/modalSlice';
 
 const NaviContainer = styled.div`
   display: grid;
@@ -47,6 +50,12 @@ const BottomDiv = styled.div`
   margin-bottom: 35px;
 `;
 
+//모달 위치 조절용
+const ModalTt = styled.div`
+  margin-left: -120px;
+  margin-top: -100px;
+`;
+
 const Hospital = () => {
   const dispatch = useDispatch();
   const boardType = 'hospital';
@@ -68,6 +77,13 @@ const Hospital = () => {
 
   const currentPage = useSelector((state) => state.paging[boardType]?.currentPage || 1);
   const boardLimit = useSelector((state) => state.paging[boardType]?.boardLimit || 12);
+
+  //지도
+  const [isOpen, setIsOpen] = useState(false); // ✅ 모달 상태 추가
+  //지도
+  const [hospitalM, setHospitalM] = useState(null);
+  const [isMapLoaded, setIsMapLoaded] = useState(false);
+  const [selectedNo, setSelectedNo] = useState(null);
 
   // 초기 페이징 상태 리셋
   useEffect(() => {
@@ -178,6 +194,82 @@ const Hospital = () => {
     }
   }, [selectedCity, selectedDistrict, selectedDong, hospitalType]);
 
+  const handleChange = (e) => {
+    setInputData((props) => {
+      return {
+        ...props,
+        [e.target.name]: e.target.value,
+      };
+    });
+  };
+  const initialInputData = {
+    no: '',
+    name: '',
+    address: '',
+    tell_num: '',
+    post_num: '',
+    location_x: '',
+    location_y: '',
+  };
+
+  const [inputData, setInputData] = useState(initialInputData);
+  const mapRef = useRef(null);
+  const fetchHospitals = async (no) => {
+    try {
+      const response = await fetch(`${BASE_URL}/api/hospital/search/${no}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      const data = await response.json();
+      if (data) setHospitalM(data); // 약국 정보 저장
+    } catch (error) {
+      console.error('약국 데이터 불러오기 오류:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (isOpen && selectedNo) {
+      fetchHospitals(selectedNo);
+    }
+  }, [isOpen, selectedNo]);
+
+  // 네이버 지도 API 로드
+  useEffect(() => {
+    if (!window.naver) {
+      const script = document.createElement('script');
+      script.src = `https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${process.env.REACT_APP_NAVER_MAP_API_ID}`;
+      script.async = true;
+      script.onload = () => {
+        setIsMapLoaded(true);
+      };
+      document.head.appendChild(script);
+    } else {
+      setIsMapLoaded(true);
+    }
+  }, []);
+
+  //  네이버 지도 생성 (hospitalM 값이 있을 때 실행)
+  useEffect(() => {
+    if (!hospitalM || !hospitalM.locationX || !hospitalM.locationY) {
+      console.warn('위치 정보가 올바르지 않음:', hospitalM);
+      return;
+    }
+
+    if (isMapLoaded && window.naver && mapRef.current) {
+      const location = new window.naver.maps.LatLng(hospitalM.locationY, hospitalM.locationX);
+
+      const map = new window.naver.maps.Map(mapRef.current, {
+        center: location,
+        zoom: 15,
+      });
+
+      new window.naver.maps.Marker({
+        position: location,
+        map,
+      });
+    }
+  }, [hospitalM, isMapLoaded]);
+
   return (
     <>
       <Title>의료기관 찾기</Title>
@@ -188,6 +280,35 @@ const Hospital = () => {
       </NaviContainer>
 
       <ContentLayout>
+        <ModalTt>
+          <>
+            <Modal title="병원" width={700} ml={660}>
+              {hospitalM ? (
+                <>
+                  <h4>
+                    {hospitalM.name} | 별점 : {hospitalM.rating}
+                  </h4>
+                  <h4>{hospitalM.address}</h4>
+                  <h4>
+                    전화번호: {hospitalM.tellNum} | 우편번호: {hospitalM.postNum}
+                  </h4>
+                </>
+              ) : (
+                <p>병원 정보를 불러오는 중...</p>
+              )}
+              <div
+                ref={mapRef}
+                style={{
+                  width: '600px',
+                  height: '400px',
+                  marginBottom: '30px',
+                  marginLeft: '15px',
+                  background: '#eee',
+                }}
+              ></div>
+            </Modal>
+          </>
+        </ModalTt>
         <SearchDiv>
           <SelectBox width="120px" onChange={(e) => setSelectedCity(parseInt(e.target.value, 10))}>
             <option value="">도시 선택</option>
@@ -264,21 +385,51 @@ const Hospital = () => {
           <thead>
             <tr>
               <th>병원명</th>
-              <th>전화번호</th>
-              {/* <th>우편번호</th> */}
               <th>주소</th>
               {/* <th>진단과</th> */}
+              <th>별점</th>
             </tr>
           </thead>
 
           <tbody style={{ fontSize: '10px', color: '#ffffff' }}>
             {hospitals.map((hospital, idx) => (
-              <tr key={idx}>
+              <tr
+                key={idx}
+                onClick={() => {
+                  setSelectedNo(hospital.no);
+                  setInputData({
+                    no: hospital.no,
+                    name: hospital.name,
+                    address: hospital.address,
+                    tell_num: hospital.tell_num,
+                    post_num: hospital.post_num,
+                    location_x: hospital.location_x,
+                    location_y: hospital.location_y,
+                    rating: hospital.rating,
+                  });
+                  console.log(hospital.no);
+                  fetchHospitals(hospital.no);
+                  setIsOpen(true);
+                  dispatch(open({ title: '병원', value: 'block' }));
+                }}
+              >
                 <td width="195px">{hospital.name}</td>
-                <td width="110px">{hospital.tellNum}</td>
-                {/* <td width="110px">{hospital.postNum}</td> */}
                 <td>{hospital.address}</td>
-                {/* <td width="90px">{hospital.hospitalType}</td> */}
+                {/* <td width="30px">{hospital.rating}</td> */}
+                <td width="180px">
+                  {[1, 2, 3, 4, 5].map((value) => {
+                    const fullStar = hospital.rating >= value;
+                    const halfStar = hospital.rating >= value - 0.5 && hospital.rating < value;
+
+                    return fullStar ? (
+                      <FaStar key={value} style={{ color: 'gold', fontSize: '24px', marginRight: '4px' }} />
+                    ) : halfStar ? (
+                      <FaStarHalfAlt key={value} style={{ color: 'gold', fontSize: '24px', marginRight: '4px' }} />
+                    ) : (
+                      <FaStar key={value} style={{ color: 'grey', fontSize: '24px', marginRight: '4px' }} />
+                    );
+                  })}
+                </td>
               </tr>
             ))}
           </tbody>
