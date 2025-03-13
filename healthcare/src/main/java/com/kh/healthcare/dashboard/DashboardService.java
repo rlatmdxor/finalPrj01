@@ -90,8 +90,6 @@ public class DashboardService {
             minutes *= -1;
         }
 
-        System.out.println("minutes = " + minutes);
-        System.out.println("hours = " + hours);
         if (hours == 0) {
             return String.format("%+d분", minutes);
         } else if (minutes == 0) {

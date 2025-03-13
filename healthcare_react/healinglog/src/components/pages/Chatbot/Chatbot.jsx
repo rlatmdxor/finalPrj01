@@ -95,12 +95,17 @@ const ChatInput = styled.input`
 const ChatAreaDiv = styled.div`
   display: flex;
   flex-direction: column;
+
+  & > div {
+    display: flex;
+    flex-direction: column;
+  }
 `;
 
 const NickTextDiv = styled.div`
   font-size: 13px;
   align-self: ${(props) => {
-    return props.isuser ? 'flex-end' : 'flex-start';
+    return props.$isuser ? 'flex-end' : 'flex-start';
   }};
 `;
 
@@ -114,10 +119,10 @@ const ChatTextDiv = styled.div`
   font-size: 14px;
   border-radius: 15px;
   background-color: ${(props) => {
-    return props.isuser ? '#fff2e6' : 'aliceblue';
+    return props.$isuser ? '#fff2e6' : 'aliceblue';
   }};
   align-self: ${(props) => {
-    return props.isuser ? 'flex-end' : 'flex-start';
+    return props.$isuser ? 'flex-end' : 'flex-start';
   }};
 `;
 
@@ -171,6 +176,21 @@ const BottomContainer = styled.div`
   padding-right: 20px;
 `;
 
+const SelectAreaDiv = styled.div`
+  font-size: 13px;
+  margin-left: 5px;
+`;
+
+const StyledSelect = styled.div`
+  width: fit-content;
+  padding: 7px 12px;
+  border: 1px solid skyblue;
+  border-radius: 15px;
+  margin-bottom: 5px;
+  color: #000000;
+  cursor: pointer;
+`;
+
 const Chatbot = () => {
   const dispatch = useDispatch();
   const contentRef = useRef(null);
@@ -219,7 +239,41 @@ const Chatbot = () => {
     }
   };
 
-  const handleSubmit = () => {
+  const getUserHealthData = async () => {
+    const response = await fetch('http://127.0.0.1:80/api/chat', {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`서버 오류: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data;
+  };
+
+  const chatbotResponse = async (chatbotRequest) => {
+    const response = await fetch('http://127.0.0.1:80/api/chat', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(chatbotRequest),
+    });
+
+    if (!response.ok) {
+      throw new Error(`서버 오류: ${response.status}`);
+    }
+
+    const data = await response.text();
+    return data;
+  };
+
+  const handleSubmit = async () => {
     if (!inputData.content.trim()) {
       return;
     }
@@ -227,22 +281,26 @@ const Chatbot = () => {
     setChatHistory((prev) => [...prev, { message: inputData.content, isUser: true }]);
     setInputData({ content: '' });
 
-    fetch('http://127.0.0.1:80/api/chat', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(inputData),
-    })
-      .then((resp) => resp.text())
-      .then((data) => {
-        console.log(data);
-        setChatHistory((prev) => [...prev, { message: data, isUser: false }]);
-      });
+    const responseData = await chatbotResponse(inputData);
+    setChatHistory((prev) => [...prev, { message: responseData, isUser: false }]);
   };
 
-  const handleSleepPatternClick = () => {
+  const filterSleepData = (data) => {
+    return data.map(({ sleepStart, sleepEnd }) => ({
+      sleepStartTime: sleepStart,
+      sleepEndTime: sleepEnd,
+    }));
+  };
+
+  const filterAlcoholData = (data) => {
+    return data.map(({ alcType, abv, cc }) => ({
+      alcoholName: alcType,
+      alcoholByVolume: abv,
+      ml: cc,
+    }));
+  };
+
+  const handleSleepPatternClick = async () => {
     if (!token) {
       setChatHistory((prev) => [
         ...prev,
@@ -250,15 +308,65 @@ const Chatbot = () => {
         { message: '로그인 후 이용할 수 있습니다.', isUser: false },
       ]);
     }
+
+    try {
+      const data = await getUserHealthData();
+      const sleepData = filterSleepData(data.sleep);
+
+      setChatHistory((prev) => [
+        ...prev,
+        { message: '나의 수면패턴 분석', isUser: true },
+        { message: '최근 30일 간 회원님의 수면 패턴을 분석합니다.', isUser: false },
+      ]);
+
+      const chatbotRequest = {
+        content: `최근 30일 간의 사용자의 수면 기록: ${JSON.stringify(sleepData)}.
+        이 데이터를 기반으로 사용자의 수면 습관, 평균 수면시간 등에 대해서 분석하고 간단하게 조언해줘.
+        수면을 분석하기에 데이터가 부족하면 수면 데이터가 부족하다는 답변을 해줘.
+        응답에 마크다운 기호(**, *, -, # 등)는 사용하지 말고, 평범한 문장으로만 답변해줘.
+        한글 기준 600자 이내로 대답해줘.`,
+      };
+
+      const responseData = await chatbotResponse(chatbotRequest);
+
+      setChatHistory((prev) => [...prev, { message: responseData, isUser: false }]);
+    } catch (error) {
+      console.error('API 요청 실패:', error);
+    }
   };
 
-  const handleDrinkPatternClick = () => {
+  const handleDrinkPatternClick = async () => {
     if (!token) {
       setChatHistory((prev) => [
         ...prev,
-        { message: '나의 음주패턴 분석', isUser: true },
+        { message: '나의 음주습관 분석', isUser: true },
         { message: '로그인 후 이용할 수 있습니다.', isUser: false },
       ]);
+    }
+
+    try {
+      const data = await getUserHealthData();
+      const alcData = filterAlcoholData(data.alcohol);
+
+      setChatHistory((prev) => [
+        ...prev,
+        { message: '나의 음주습관 분석', isUser: true },
+        { message: '최근 30일 간 회원님의 음주 습관을 분석합니다.', isUser: false },
+      ]);
+
+      const chatbotRequest = {
+        content: `최근 30일 간의 사용자의 음주 기록: ${JSON.stringify(alcData)}.
+        이 데이터를 기반으로 사용자의 음주 습관, 평균 음주량 등에 대해서 분석하고 간한하게 조언해줘.
+        음주습관을 분석하기에 데이터가 부족하면 음주 데이터가 부족하다는 답변을 해줘.
+        응답에 마크다운 기호(**, *, -, # 등)는 사용하지 말고, 평범한 문장으로만 답변해줘.
+        한글 기준 600자 이내로 대답해줘.`,
+      };
+
+      const responseData = await chatbotResponse(chatbotRequest);
+
+      setChatHistory((prev) => [...prev, { message: responseData, isUser: false }]);
+    } catch (error) {
+      console.error('API 요청 실패:', error);
     }
   };
 
@@ -269,6 +377,36 @@ const Chatbot = () => {
         { message: '식단 추천받기', isUser: true },
         { message: '로그인 후 이용할 수 있습니다.', isUser: false },
       ]);
+    }
+
+    setChatHistory((prev) => [
+      ...prev,
+      { message: '식단 추천받기', isUser: true },
+      {
+        message: '어떤 식단을 추천받고 싶나요? 아래에서 선택해주세요!',
+        isUser: false,
+        options: ['비건', '다이어트', '저혈당 식단', '저속노화 식단', '고혈압에 좋은 식단'],
+      },
+    ]);
+  };
+
+  const handleDietOptionClick = async (option) => {
+    try {
+      setChatHistory((prev) => [...prev, { message: option, isUser: true }]);
+
+      const chatbotRequest = {
+        content: `사용자가 '${option}' 식단 추천을 요청했습니다.
+      이와 관련하여 하루 식단을 간단히 추천해줘. 한국인이 주로 먹는 음식으로 구성해줘.
+      아침, 점심, 저녁으로 나눠서 구조적으로 대답해줘. 
+      응답에 마크다운 기호(**, *, -, # 등)는 사용하지 말고, 평범한 문장으로만 답변해줘. 
+      한글 기준 600자 이내로 대답해줘.`,
+      };
+
+      const responseData = await chatbotResponse(chatbotRequest);
+
+      setChatHistory((prev) => [...prev, { message: responseData, isUser: false }]);
+    } catch (error) {
+      console.error('API 요청 실패:', error);
     }
   };
 
@@ -290,19 +428,26 @@ const Chatbot = () => {
             <ChatTextDiv>안녕하세요 힐링로그 챗봇입니다. 무엇을 도와드릴까요?</ChatTextDiv>
             {chatHistory.map((vo, index) => {
               return (
-                <>
-                  <NickTextDiv isuser={vo.isUser}>{vo.isUser ? '사용자' : '힐링챗봇'}</NickTextDiv>
-                  <ChatTextDiv key={index} isuser={vo.isUser}>
-                    {vo.message}
-                  </ChatTextDiv>
-                </>
+                <div key={index}>
+                  <NickTextDiv $isuser={vo.isUser}>{vo.isUser ? '사용자' : '힐링챗봇'}</NickTextDiv>
+                  <ChatTextDiv $isuser={vo.isUser}>{vo.message}</ChatTextDiv>
+                  {vo.options && (
+                    <SelectAreaDiv style={{}}>
+                      {vo.options.map((option, idx) => (
+                        <StyledSelect key={idx} onClick={() => handleDietOptionClick(option)}>
+                          {option}
+                        </StyledSelect>
+                      ))}
+                    </SelectAreaDiv>
+                  )}
+                </div>
               );
             })}
           </ChatAreaDiv>
         </ContentDiv>
         <SuggestedQuestionsArea>
           <SuggestedQuestion onClick={handleSleepPatternClick}>나의 수면패턴 분석</SuggestedQuestion>
-          <SuggestedQuestion onClick={handleDrinkPatternClick}>나의 음주패턴 분석</SuggestedQuestion>
+          <SuggestedQuestion onClick={handleDrinkPatternClick}>나의 음주습관 분석</SuggestedQuestion>
           <SuggestedQuestion onClick={handleDietRecommendClick}>식단 추천받기</SuggestedQuestion>
         </SuggestedQuestionsArea>
         <BottomContainer>
