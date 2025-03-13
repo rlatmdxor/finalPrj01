@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { isTokenExpired, getRoleFromToken } from '../../util/JwtUtil';
 import Swal from 'sweetalert2';
 import BoardTable from '../../util/BoardTable';
+import { BASE_URL } from '../../services/config';
 
 const SearchDiv = styled.div`
   display: flex;
@@ -102,7 +103,7 @@ const HoneytipBoard = () => {
   const [num, setNum] = useState(0);
   const offset = (currentPage - 1) * boardLimit;
 
-  const url = `http://127.0.0.1:80/api/board/honeytip/list`;
+  const url = `${BASE_URL}/api/board/honeytip/list`;
   const options = {
     method: 'POST',
     headers: {
@@ -230,7 +231,12 @@ const HoneytipBoard = () => {
             </option>
           ))}
         </SelectBox>
-        <SearchBar handleClick={handleClick} handleChange={handleChange} handleClearClick={handleClearClick} />
+        <SearchBar
+          value={searchInput.searchValue}
+          handleClick={handleClick}
+          handleChange={handleChange}
+          handleClearClick={handleClearClick}
+        />
       </SearchDiv>
       <BoardTable columnWidths={['80px', '110px', '420px', '80px', '80px', '100px', '120px']}>
         <thead>

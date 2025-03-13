@@ -12,6 +12,7 @@ import SearchBar from '../../util/SearchBar';
 import Table from '../../util/Table';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
+import { BASE_URL } from '../../services/config';
 
 const NaviContainer = styled.div`
   display: grid;
@@ -51,7 +52,7 @@ const ReportedHoneyBoard = () => {
   const [num, setNum] = useState(0);
   const offset = (currentPage - 1) * boardLimit;
 
-  const url = `http://127.0.0.1:80/api/board/honeytip/reported/list`;
+  const url = `${BASE_URL}/api/board/honeytip/reported/list`;
   const options = {
     method: 'POST',
     headers: {
@@ -106,7 +107,7 @@ const ReportedHoneyBoard = () => {
       cancelButtonText: '취소',
     }).then((result) => {
       if (result.isConfirmed) {
-        fetch('http://127.0.0.1:80/api/board/honeytip/reported/delete', {
+        fetch(`${BASE_URL}/api/board/honeytip/reported/delete`, {
           method: 'POST',
           headers: {
             'content-type': 'application/json',

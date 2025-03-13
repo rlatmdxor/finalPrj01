@@ -10,9 +10,7 @@
         (
             NO
             , MEMBER_NO
-            <if test="enrollDate != null and enrollDate != ''">
             , ENROLL_DATE
-            </if>
             <if test="note != null and note != ''">
             , NOTE
             </if>
@@ -24,9 +22,7 @@
         (
             SEQ_BLOOD_PRESSURE.NEXTVAL
             , #{memberNo}
-            <if test="enrollDate != null and enrollDate != ''">
             , TO_DATE(REPLACE(#{enrollDate}, 'T', ' '), 'YYYY-MM-DD HH24:MI')
-            </if>
             <if test="note != null and note != ''">
             , #{note}
             </if>

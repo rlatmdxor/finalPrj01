@@ -30,6 +30,7 @@ import SearchBar from '../../../util/SearchBar';
 import Table from '../../../util/Table';
 import Pagination from '../../../util/Pagination';
 import { FaStar } from 'react-icons/fa';
+import { BASE_URL } from '../../../services/config';
 
 const AttachDiv = styled.div`
   margin-top: 5px;
@@ -249,7 +250,7 @@ const ReviewEdit = () => {
   const [dataVoList, setVoList] = useState([]);
   const [pagedData, setPagedData] = useState([]);
   const dispatch = useDispatch();
-  const [searchInput, setSearchInput] = useState({});
+  const [searchInput, setSearchInput] = useState({ searchValue: '' });
 
   const boardType = 'reviewEditHospital';
   const currentPage = useSelector((state) => state.paging[boardType]?.currentPage || 1);
@@ -267,7 +268,7 @@ const ReviewEdit = () => {
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const response = await fetch(`http://127.0.0.1:80/api/review/detail?bno=${bno}`, {
+        const response = await fetch(`${BASE_URL}/api/review/detail?bno=${bno}`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         });
@@ -361,7 +362,7 @@ const ReviewEdit = () => {
 
         formData.append('deleteFiles', deleteFilesBlob);
 
-        const response = await fetch('http://127.0.0.1:80/api/review/edit', {
+        const response = await fetch(`${BASE_URL}/api/review/edit`, {
           method: 'POST',
           headers: { Authorization: `Bearer ${token}` },
           body: formData,
@@ -423,10 +424,10 @@ const ReviewEdit = () => {
   };
 
   const handleChange = (e) => {
-    setSearchInput((prev) => {
-      const ssr = { ...prev, searchValue: e.target.value };
-      return ssr;
-    });
+    setSearchInput((prev) => ({
+      ...prev,
+      searchValue: e.target.value,
+    }));
     setNum((prev) => prev + 1);
   };
 
@@ -470,7 +471,7 @@ const ReviewEdit = () => {
   };
 
   useEffect(() => {
-    fetch(`http://127.0.0.1:80/api/review/hospital/list`, {
+    fetch(`${BASE_URL}/api/review/hospital/list`, {
       method: 'POST',
       headers: {
         'content-type': 'application/json',

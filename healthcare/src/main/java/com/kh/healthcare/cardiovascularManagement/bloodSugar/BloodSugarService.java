@@ -31,6 +31,10 @@ public class BloodSugarService {
         token = token.replace("Bearer ", "");
         String memberNo = jwtUtil.getNo(token);
         vo.setMemberNo(memberNo);
+        String day = vo.getDay();
+        String time = vo.getTime();
+        vo.setEnrollDate(day+time);
+
         if(vo.getSugar() == ""){
             throw new IllegalStateException("CODE [BLOODSUGAR / WRITE / NULL SUGAR]");
         }
@@ -47,6 +51,9 @@ public class BloodSugarService {
         token = token.replace("Bearer ", "");
         String memberNo = jwtUtil.getNo(token);
         vo.setMemberNo(memberNo);
+        String day = vo.getDay();
+        String time = vo.getTime();
+        vo.setEnrollDate(day+time);
         if(vo.getSugar() == ""){
             throw new IllegalStateException("CODE [BLOODSUGAR / EDIT / NULL SUGAR]");
         }

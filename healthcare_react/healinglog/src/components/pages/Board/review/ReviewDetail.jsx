@@ -17,6 +17,7 @@ import Modal from '../../../util/Modal';
 import { useDispatch } from 'react-redux';
 import { close, open } from '../../../../redux/modalSlice';
 import { isTokenExpired, getRoleFromToken } from '../../../util/JwtUtil';
+import { BASE_URL } from '../../../services/config';
 
 const ModalContainer = styled.div`
   display: flex;
@@ -341,7 +342,7 @@ const ReviewDetail = () => {
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const response = await fetch(`http://127.0.0.1:80/api/review/detail?bno=${bno}`, {
+        const response = await fetch(`${BASE_URL}/api/review/detail?bno=${bno}`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         });
@@ -410,7 +411,7 @@ const ReviewDetail = () => {
       cancelButtonText: '취소',
     }).then((result) => {
       if (result.isConfirmed) {
-        fetch('http://127.0.0.1:80/api/review/report', {
+        fetch(`${BASE_URL}/api/review/report`, {
           method: 'POST',
           headers: {
             'content-type': 'application/json',
@@ -463,7 +464,7 @@ const ReviewDetail = () => {
       cancelButtonText: '취소',
     }).then((result) => {
       if (result.isConfirmed) {
-        fetch('http://127.0.0.1:80/api/review/delete', {
+        fetch(`${BASE_URL}/api/review/delete`, {
           method: 'POST',
           headers: {
             'content-type': 'application/json',
@@ -506,7 +507,7 @@ const ReviewDetail = () => {
       cancelButtonText: '취소',
     }).then((result) => {
       if (result.isConfirmed) {
-        fetch('http://127.0.0.1:80/api/review/comment/write', {
+        fetch(`${BASE_URL}/api/review/comment/write`, {
           method: 'POST',
           headers: {
             'content-type': 'application/json',
@@ -566,7 +567,7 @@ const ReviewDetail = () => {
       cancelButtonText: '취소',
     }).then((result) => {
       if (result.isConfirmed) {
-        fetch('http://127.0.0.1:80/api/review/comment/delete', {
+        fetch(`${BASE_URL}/api/review/comment/delete`, {
           method: 'POST',
           headers: {
             'content-type': 'application/json',
@@ -618,7 +619,7 @@ const ReviewDetail = () => {
       cancelButtonText: '취소',
     }).then((result) => {
       if (result.isConfirmed) {
-        fetch('http://127.0.0.1:80/api/review/comment/report', {
+        fetch(`${BASE_URL}/api/review/comment/report`, {
           method: 'POST',
           headers: {
             'content-type': 'application/json',
@@ -649,7 +650,7 @@ const ReviewDetail = () => {
   };
 
   useEffect(() => {
-    fetch(`http://127.0.0.1:80/api/review/comment/list?bno=${bno}`, {
+    fetch(`${BASE_URL}/api/review/comment/list?bno=${bno}`, {
       method: 'GET',
       headers: {
         'content-type': 'application/json',

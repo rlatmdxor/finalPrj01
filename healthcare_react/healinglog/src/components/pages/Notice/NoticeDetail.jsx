@@ -14,6 +14,7 @@ import '@draft-js-plugins/text-alignment/lib/plugin.css';
 import Swal from 'sweetalert2';
 import { useDispatch } from 'react-redux';
 import { isTokenExpired, getRoleFromToken } from '../../util/JwtUtil';
+import { BASE_URL } from '../../services/config';
 
 //모달 안의 버튼 컨테이너
 
@@ -230,7 +231,7 @@ const NoticeDetail = () => {
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const response = await fetch(`http://127.0.0.1:80/api/notice/detail?bno=${bno}`, {
+        const response = await fetch(`${BASE_URL}/api/notice/detail?bno=${bno}`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         });
@@ -281,7 +282,7 @@ const NoticeDetail = () => {
       cancelButtonText: '취소',
     }).then((result) => {
       if (result.isConfirmed) {
-        fetch('http://127.0.0.1:80/api/notice/delete', {
+        fetch(`${BASE_URL}/api/notice/delete`, {
           method: 'POST',
           headers: {
             'content-type': 'application/json',
