@@ -13,4 +13,5 @@ public class AnAerobicHistoryVo {
     private String weight;
     private String reps;
 
+    private String enrollDate;
 }

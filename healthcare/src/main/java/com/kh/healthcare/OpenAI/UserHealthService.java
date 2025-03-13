@@ -5,6 +5,8 @@ import com.kh.healthcare.diet.DietReportVo;
 import com.kh.healthcare.diet.meal.TotalKcalVo;
 import com.kh.healthcare.diet.water.WaterVo;
 import com.kh.healthcare.diet.weight.WeightVo;
+import com.kh.healthcare.exercise.aerobic.AerobicHistoryVo;
+import com.kh.healthcare.exercise.anAerobic.AnAerobicHistoryVo;
 import com.kh.healthcare.jwt.JwtUtil;
 import com.kh.healthcare.livingHealth.sleep.SleepVo;
 import lombok.RequiredArgsConstructor;
@@ -41,10 +43,15 @@ public class UserHealthService {
         
         List<SleepVo> sleepList = mapper.getSleepList(memberNo, startDate, endDate);
         List<AlcReportVo> alcoholList = mapper.getAlcList(memberNo, startDate, endDate);
+        List<AerobicHistoryVo> AerobicHistoryList = mapper.getAerobicHistoryList(memberNo, startDate, endDate);
+        List<AnAerobicHistoryVo> AnAerobicHistoryList = mapper.getAnAerobicHistoryList(memberNo, startDate, endDate);
+
 
         UserHealthVo userHealthVo = new UserHealthVo();
         userHealthVo.setSleep(sleepList);
         userHealthVo.setAlcohol(alcoholList);
+        userHealthVo.setAerobicHistory(AerobicHistoryList);
+        userHealthVo.setAnAerobicHistory(AnAerobicHistoryList);
 
         return userHealthVo;
     }
