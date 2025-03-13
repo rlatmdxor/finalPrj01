@@ -40,6 +40,21 @@ const ExCalendar = ({ modalTitle, vo, events, width, height, setSelectedDate }) 
     setDate(new Date(date.getFullYear(), date.getMonth() + 1, 1));
   };
 
+  // 분 -> 시간/분
+  const formatTime = (timeString) => {
+    if (timeString.includes('분')) {
+      const minutesNumber = parseInt(timeString.replace(/[^\d]/g, ''), 10);
+      const hours = Math.floor(minutesNumber / 60);
+      const minutes = minutesNumber % 60;
+      if (hours > 0) {
+        return `${hours}시간 ${minutes}분`;
+      }
+      return `${minutes}분`;
+    }
+    // "분"이 없는 경우 원래 문자열 반환(무산소)
+    return timeString;
+  };
+
   const days = getCalendarDays();
 
   return (
@@ -85,7 +100,7 @@ const ExCalendar = ({ modalTitle, vo, events, width, height, setSelectedDate }) 
                         {item[0]}
                       </div>
                       <ExDiv key={idx}>{item[2]}</ExDiv>
-                      <TimeDiv key={idx}>{item[1]}</TimeDiv>
+                      <TimeDiv key={idx}>{formatTime(item[1])}</TimeDiv>
                     </>
                   ))}
                   {eventData.length > 1 && (
