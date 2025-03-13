@@ -1,5 +1,6 @@
 package com.kh.healthcare.notification;
 
+import com.kh.healthcare.board.honeyTip.HoneyTipCommentVo;
 import com.kh.healthcare.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -69,5 +70,12 @@ public class NotificationService {
         token = token.replace("Bearer ", "");
         String userNo = jwtUtil.getNo(token);
         mapper.deletePushAll(userNo);
+    }
+
+    //댓글 푸시 게시글 번호 가져오기
+    public HoneyTipCommentVo getBoardNo(String token, String enrollDate) {
+        token = token.replace("Bearer ", "");
+        String userNo = jwtUtil.getNo(token);
+        return mapper.getBoardNo(userNo, enrollDate);
     }
 }

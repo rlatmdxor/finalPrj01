@@ -1,5 +1,6 @@
 package com.kh.healthcare.notification;
 
+import com.kh.healthcare.board.honeyTip.HoneyTipCommentVo;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -92,4 +93,17 @@ public interface NotificationMapper {
                 MEMBER_NO = #{userNo}
             """)
     void deletePushAll(String userNo);
+
+    @Select("""
+            SELECT BOARD_NO FROM (
+              SELECT BOARD_NO
+              FROM BOARD_COMMENT
+              WHERE
+                  MEMBER_NO = #{userNo}
+                  AND ENROLL_DATE >= TO_DATE(#{enrollDate}, 'YYYY-MM-DD HH24:MI:SS') - INTERVAL '30' SECOND
+              ORDER BY ENROLL_DATE ASC
+            )
+            WHERE ROWNUM = 1
+            """)
+    HoneyTipCommentVo getBoardNo(String userNo, String enrollDate);
 }

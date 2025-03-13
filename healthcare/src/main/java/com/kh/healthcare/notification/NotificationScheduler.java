@@ -51,7 +51,6 @@ public class NotificationScheduler {
             if(message.equals("회원님의 게시글에 새로운 댓글이 있습니다.")){
                 messagingTemplate.convertAndSend("/topic/notifications", message);
                 notificationService.saveNewPush(userNo,message);
-                // 알림을 보낸 댓글에 대해 NOTIFIED_YN을 'Y'로 업데이트하는 로직 추가
                 honeyTipService.markCommentsAsNotified(userNo);
             }
         });
