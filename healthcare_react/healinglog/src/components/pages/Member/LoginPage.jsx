@@ -57,6 +57,7 @@ const LoginPage = () => {
         });
 
         navi('/dashboard');
+        window.location.reload();
       })
       .catch((error) => console.error('fetch 에러 발생:', error));
   };
