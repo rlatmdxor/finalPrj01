@@ -19,6 +19,7 @@ const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [hasNewNotification, setHasNewNotification] = useState();
   const [pushData, setPushData] = useState({});
+  const [boardNo, setBoardNo] = useState();
   const [num, setNum] = useState(0);
 
   // NotificationProvider에서 전달한 메시지 배열을 사용
@@ -142,6 +143,22 @@ const Header = () => {
     });
   };
 
+  //게시판 번호 받아오기 함수
+  const getBoardNo = async (enrollDate) => {
+    const response = await fetch(
+      `${BASE_URL}/api/notification/getBoardNo?enrollDate=${encodeURIComponent(enrollDate)}`,
+      {
+        method: 'GET',
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    if (!response.ok) {
+      throw new Error('서버 응답 오류');
+    }
+    const data = await response.json();
+    setBoardNo(data.boardNo);
+  };
+
   return (
     <>
       <LogoAreaDiv>
@@ -217,42 +234,31 @@ const Header = () => {
               <PushCard
                 key={push.id || index}
                 checkPush={push.checkYn}
-                onClick={() => {
+                onClick={async () => {
                   if (replacedContent.includes('식단')) {
                     navi('/diet');
-                    // dispatch(close('알림 내역'));
-                    // setIsOpen(false);
                     checkPushCard(push.no);
                   } else if (replacedContent.includes('물')) {
                     navi('/diet');
-                    // dispatch(close('알림 내역'));
-                    // setIsOpen(false);
                     checkPushCard(push.no);
                   } else if (replacedContent.includes('운동')) {
                     navi('/aerobic');
-                    // dispatch(close('알림 내역'));
-                    // setIsOpen(false);
                     checkPushCard(push.no);
                   } else if (replacedContent.includes('혈압')) {
                     navi('/bloodpressure');
-                    // dispatch(close('알림 내역'));
-                    // setIsOpen(false);
                     checkPushCard(push.no);
                   } else if (replacedContent.includes('혈당')) {
                     navi('/bloodsugar');
-                    // dispatch(close('알림 내역'));
-                    // setIsOpen(false);
                     checkPushCard(push.no);
                   } else if (replacedContent.includes('인슐린')) {
                     navi('/insulin');
-                    // dispatch(close('알림 내역'));
-                    // setIsOpen(false);
                     checkPushCard(push.no);
                   } else if (replacedContent.includes('댓글')) {
-                    navi('/board');
                     // dispatch(close('알림 내역'));
                     // setIsOpen(false);
                     checkPushCard(push.no);
+                    getBoardNo(push.enrollDate);
+                    navi(`/board/detail?bno=${boardNo}`);
                   }
                 }}
               >

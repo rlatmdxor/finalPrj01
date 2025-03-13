@@ -1,5 +1,6 @@
 package com.kh.healthcare.notification;
 
+import com.kh.healthcare.board.honeyTip.HoneyTipCommentVo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -84,6 +85,17 @@ public class NotificationController {
             service.deletePushAll(token);
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    //댓글 푸시 게시글 번호 가져오기
+    @GetMapping("getBoardNo")
+    public HoneyTipCommentVo getBoardNo(@RequestHeader("Authorization") String token, @RequestParam("enrollDate")String enrollDate){
+        try{
+            return service.getBoardNo(token, enrollDate);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
     }
 }
