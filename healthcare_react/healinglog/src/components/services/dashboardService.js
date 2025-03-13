@@ -1,13 +1,12 @@
+import { BASE_URL } from './config';
+
 const getDashboardData = async (currentMonday, currentSunday, token) => {
-  const resp = await fetch(
-    `http://127.0.0.1:80/api/dashboard?currentMonday=${currentMonday}&currentSunday=${currentSunday}`,
-    {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
+  const resp = await fetch(`${BASE_URL}/api/dashboard?currentMonday=${currentMonday}&currentSunday=${currentSunday}`, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
   if (!resp.ok) {
     throw new Error(`HTTP ERROR !!! ${resp.status}`);
   }
@@ -16,7 +15,7 @@ const getDashboardData = async (currentMonday, currentSunday, token) => {
 };
 
 const getDashboardSetting = async (token) => {
-  const resp = await fetch(`http://127.0.0.1:80/api/dashboard/setting`, {
+  const resp = await fetch(`${BASE_URL}/api/dashboard/setting`, {
     method: 'GET',
     headers: {
       Authorization: `Bearer ${token}`,
@@ -30,7 +29,7 @@ const getDashboardSetting = async (token) => {
 };
 
 const editDashboardSetting = async (settings, token) => {
-  const resp = await fetch(`http://127.0.0.1:80/api/dashboard/setting`, {
+  const resp = await fetch(`${BASE_URL}/api/dashboard/setting`, {
     method: 'POST',
     headers: {
       'content-type': 'application/json',

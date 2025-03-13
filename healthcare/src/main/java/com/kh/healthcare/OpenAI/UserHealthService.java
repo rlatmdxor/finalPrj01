@@ -36,10 +36,6 @@ public class UserHealthService {
         String endDate = simpleDateFormat.format(calendar.getTime());  // 오늘 날짜
         calendar.add(calendar.DATE, -30);
         String startDate = simpleDateFormat.format(calendar.getTime());  // 30일 전 날짜
-
-        System.out.println("memberNo = " + memberNo);
-        System.out.println("startDate = " + startDate);
-        System.out.println("endDate = " + endDate);
         
         List<SleepVo> sleepList = mapper.getSleepList(memberNo, startDate, endDate);
         List<AlcReportVo> alcoholList = mapper.getAlcList(memberNo, startDate, endDate);

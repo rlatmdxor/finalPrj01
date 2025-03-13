@@ -15,7 +15,7 @@ const getBannerList = async (token) => {
 };
 
 const getNoticeList = async (token) => {
-  const resp = await fetch(`http://127.0.0.1:80/api/main/notice`, {
+  const resp = await fetch(`${BASE_URL}/api/main/notice`, {
     method: 'GET',
     headers: {
       Authorization: `Bearer ${token}`,
@@ -29,7 +29,7 @@ const getNoticeList = async (token) => {
 };
 
 const getBoardList = async (token) => {
-  const resp = await fetch(`http://127.0.0.1:80/api/main/board`, {
+  const resp = await fetch(`${BASE_URL}/api/main/board`, {
     method: 'GET',
     headers: {
       Authorization: `Bearer ${token}`,
@@ -43,7 +43,7 @@ const getBoardList = async (token) => {
 };
 
 const getReviewList = async (token) => {
-  const resp = await fetch(`http://127.0.0.1:80/api/main/review`, {
+  const resp = await fetch(`${BASE_URL}/api/main/review`, {
     method: 'GET',
     headers: {
       Authorization: `Bearer ${token}`,

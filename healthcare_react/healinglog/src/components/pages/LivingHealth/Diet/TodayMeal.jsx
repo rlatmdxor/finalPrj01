@@ -1,3 +1,4 @@
+import { BASE_URL } from '../../../services/config';
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import Modal from '../../../util/Modal';
@@ -114,7 +115,7 @@ const TodayMeal = ({ token }) => {
   }, [day]);
 
   useEffect(() => {
-    fetch('http://127.0.0.1:80/api/diet/food', {
+    fetch(`${BASE_URL}/api/diet/food`, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -394,7 +395,7 @@ const TodayMeal = ({ token }) => {
         formData.append('memo', inputData.memo);
         formData.append('f', inputData.image);
 
-        fetch('http://127.0.0.1:80/api/diet/enroll', {
+        fetch(`${BASE_URL}/api/diet/enroll`, {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${token}`,
@@ -467,7 +468,7 @@ const TodayMeal = ({ token }) => {
           formData.append('f', inputData.image); // 새 이미지 업로드
         }
 
-        fetch('http://127.0.0.1:80/api/diet/edit', {
+        fetch(`${BASE_URL}/api/diet/edit`, {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${token}`,
@@ -503,7 +504,7 @@ const TodayMeal = ({ token }) => {
       cancelButtonText: '취소',
     }).then((result) => {
       if (result.isConfirmed) {
-        fetch('http://127.0.0.1:80/api/diet/delete', {
+        fetch(`${BASE_URL}/api/diet/delete`, {
           method: 'POST',
           headers: {
             'content-type': 'application/json',

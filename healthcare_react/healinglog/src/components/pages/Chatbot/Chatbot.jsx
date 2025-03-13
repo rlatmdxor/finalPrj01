@@ -1,5 +1,7 @@
+import { BASE_URL } from '../../services/config';
+
 import React, { useEffect, useState } from 'react';
-import { Avatar, CircularProgress } from '@mui/material';
+import { CircularProgress } from '@mui/material';
 import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
 import { close, open } from '../../../redux/modalSlice';
@@ -207,6 +209,7 @@ const Chatbot = () => {
   const [inputData, setInputData] = useState({ content: '' });
   const [chatHistory, setChatHistory] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const isAdminPage = window.location.pathname.includes('/admin');
 
   useEffect(() => {
     if (contentRef.current) {
@@ -243,7 +246,7 @@ const Chatbot = () => {
   };
 
   const getUserHealthData = async () => {
-    const response = await fetch('http://127.0.0.1:80/api/chat', {
+    const response = await fetch(`${BASE_URL}/api/chat`, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -259,7 +262,7 @@ const Chatbot = () => {
   };
 
   const chatbotResponse = async (chatbotRequest) => {
-    const response = await fetch('http://127.0.0.1:80/api/chat', {
+    const response = await fetch(`${BASE_URL}/api/chat`, {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
@@ -383,7 +386,7 @@ const Chatbot = () => {
 
       const chatbotRequest = {
         content: `최근 30일 간의 사용자의 음주 기록: ${JSON.stringify(alcData)}.
-        이 데이터를 기반으로 사용자의 음주 습관, 평균 음주량 등에 대해서 분석하고 간한하게 조언해줘.
+        이 데이터를 기반으로 사용자의 음주 습관, 평균 음주량 등에 대해서 분석하고 간단하게 조언해줘.
         음주습관을 분석하기에 데이터가 부족하면 음주 데이터가 부족하다는 답변을 해줘.
         응답에 마크다운 기호(**, *, -, # 등)는 사용하지 말고, 평범한 문장으로만 답변해줘.
         한글 기준 600자 이내로 대답해줘.`,
@@ -447,7 +450,7 @@ const Chatbot = () => {
       const aerobicData = filterAerobicData(data.aerobicHistory);
       const anAerobicData = filterAnAerobicData(data.anAerobicHistory);
       setIsLoading(true);
-      
+
       setChatHistory((prev) => [
         ...prev,
         { message: '나의 운동내역 분석', isUser: true },
@@ -475,12 +478,16 @@ const Chatbot = () => {
 
   return (
     <>
-      <Layout>
-        <IconImg
-          src="https://img.icons8.com/?size=100&id=L3uh0mNuxBXw&format=png&color=000000"
-          onClick={handleOpenChatbotModal}
-        />
-      </Layout>
+      {!isAdminPage ? (
+        <Layout>
+          <IconImg
+            src="https://img.icons8.com/?size=100&id=L3uh0mNuxBXw&format=png&color=000000"
+            onClick={handleOpenChatbotModal}
+          />
+        </Layout>
+      ) : (
+        ''
+      )}
 
       <ContainerDiv key={title} display={displayValue}>
         <StyleDiv>
@@ -520,10 +527,10 @@ const Chatbot = () => {
           </ChatAreaDiv>
         </ContentDiv>
         <SuggestedQuestionsArea>
-          <SuggestedQuestion onClick={handleSleepPatternClick}>수면 패턴 분석</SuggestedQuestion>
-          <SuggestedQuestion onClick={handleDrinkPatternClick}>음주 습관 분석</SuggestedQuestion>
-          <SuggestedQuestion onClick={handleExercisePatternClick}>운동 내역 분석</SuggestedQuestion>
+          <SuggestedQuestion onClick={handleSleepPatternClick}>나의 수면패턴 분석</SuggestedQuestion>
+          <SuggestedQuestion onClick={handleDrinkPatternClick}>나의 음주습관 분석</SuggestedQuestion>
           <SuggestedQuestion onClick={handleDietRecommendClick}>식단 추천받기</SuggestedQuestion>
+          <SuggestedQuestion onClick={handleExercisePatternClick}>나의 운동내역 분석</SuggestedQuestion>
         </SuggestedQuestionsArea>
         <BottomContainer>
           <ChatInput

@@ -1,5 +1,7 @@
+import { BASE_URL } from './config';
+
 const getMemberInfo = async (token) => {
-  const resp = await fetch(`http://127.0.0.1:80/api/member/mypage`, {
+  const resp = await fetch(`${BASE_URL}/api/member/mypage`, {
     method: 'GET',
     headers: {
       'content-type': 'application/json',
@@ -15,7 +17,7 @@ const getMemberInfo = async (token) => {
 };
 
 const getTodayWater = async (day, token) => {
-  const resp = await fetch(`http://127.0.0.1:80/api/water`, {
+  const resp = await fetch(`${BASE_URL}/api/water`, {
     method: 'POST',
     headers: {
       'content-type': 'application/json',
@@ -34,7 +36,7 @@ const getTodayWater = async (day, token) => {
 };
 
 const enrollTodayWater = async (day, inputData, token) => {
-  const resp = await fetch(`http://127.0.0.1:80/api/water/enroll`, {
+  const resp = await fetch(`${BASE_URL}/api/water/enroll`, {
     method: 'POST',
     headers: {
       'content-type': 'application/json',
@@ -53,7 +55,7 @@ const enrollTodayWater = async (day, inputData, token) => {
 };
 
 const getTodayWeight = async (day, token) => {
-  const resp = await fetch(`http://127.0.0.1:80/api/weight`, {
+  const resp = await fetch(`${BASE_URL}/api/weight`, {
     method: 'POST',
     headers: {
       'content-type': 'application/json',
@@ -71,7 +73,7 @@ const getTodayWeight = async (day, token) => {
 };
 
 const enrollTodayWeight = async (day, inputData, token) => {
-  const resp = await fetch(`http://127.0.0.1:80/api/weight/enroll`, {
+  const resp = await fetch(`${BASE_URL}/api/weight/enroll`, {
     method: 'POST',
     headers: {
       'content-type': 'application/json',
@@ -90,7 +92,7 @@ const enrollTodayWeight = async (day, inputData, token) => {
 };
 
 const getMealData = async (day, token) => {
-  const resp = await fetch(`http://127.0.0.1:80/api/diet`, {
+  const resp = await fetch(`${BASE_URL}/api/diet`, {
     method: 'POST',
     headers: {
       'content-type': 'application/json',
@@ -108,7 +110,7 @@ const getMealData = async (day, token) => {
 };
 
 const getDayData = async (month, token) => {
-  const resp = await fetch(`http://127.0.0.1:80/api/diet/report/day?month=${month}`, {
+  const resp = await fetch(`${BASE_URL}/api/diet/report/day?month=${month}`, {
     method: 'GET',
     headers: {
       Authorization: `Bearer ${token}`,
@@ -122,7 +124,7 @@ const getDayData = async (month, token) => {
 };
 
 const getWeekData = async (year, token) => {
-  const resp = await fetch(`http://127.0.0.1:80/api/diet/report/week?year=${year}`, {
+  const resp = await fetch(`${BASE_URL}/api/diet/report/week?year=${year}`, {
     method: 'GET',
     headers: {
       Authorization: `Bearer ${token}`,
@@ -136,7 +138,7 @@ const getWeekData = async (year, token) => {
 };
 
 const getMonthData = async (year, token) => {
-  const resp = await fetch(`http://127.0.0.1:80/api/diet/report/month?year=${year}`, {
+  const resp = await fetch(`${BASE_URL}/api/diet/report/month?year=${year}`, {
     method: 'GET',
     headers: {
       Authorization: `Bearer ${token}`,
