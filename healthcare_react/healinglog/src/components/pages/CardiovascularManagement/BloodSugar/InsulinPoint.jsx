@@ -14,14 +14,15 @@ import { close, open } from '../../../../redux/modalSlice';
 import Swal from 'sweetalert2';
 import { isTokenExpired, getRoleFromToken } from '../../../util/JwtUtil';
 import { useNavigate } from 'react-router-dom';
+import { BASE_URL } from '../../../services/config';
 
 const NaviContainer = styled.div`
   display: grid;
   position: relative;
-  width: 300px; // 항목수에 비례해서 주시면 됩니다.
+  width: 300px;
   top: 20px;
   left: 40px;
-  grid-template-columns: 4fr 6fr; // 글자수만큼 fr 주면 됩니다. ex) 유산소 3글자니까 3fr
+  grid-template-columns: 4fr 6fr;
 `;
 const ImageLayoutDiv = styled.div`
   width: 100%;
@@ -187,7 +188,7 @@ const InsulinPoint = () => {
     }
   }, [navi, token]);
 
-  const url = 'http://127.0.0.1:80/api/insulin/list';
+  const url = `${BASE_URL}/api/insulin/list`;
   const options = {
     method: 'GET',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
@@ -282,8 +283,14 @@ const InsulinPoint = () => {
       cancelButtonText: '취소',
     }).then((result) => {
       if (result.isConfirmed) {
-        // ✅ 사용자가 '확인' 버튼을 눌렀을 때만 실행
-        fetch('http://127.0.0.1:80/api/insulin/write', {
+        if (inputData.enrollDate == '' || inputData.enrollDate == null) {
+          Swal.fire({
+            icon: 'error',
+            title: '측정 시간을 기록해주세요.',
+          });
+          return;
+        }
+        fetch(`${BASE_URL}/api/insulin/write`, {
           method: 'POST',
           headers: { 'content-type': 'application/json', Authorization: `Bearer ${token}` },
           body: JSON.stringify(inputData),
@@ -333,7 +340,7 @@ const InsulinPoint = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         // ✅ 사용자가 '확인' 버튼을 눌렀을 때만 실행
-        fetch('http://127.0.0.1:80/api/insulin/delete', {
+        fetch(`${BASE_URL}/api/insulin/delete`, {
           method: 'POST',
           headers: {
             'content-type': 'application/json',
@@ -421,7 +428,6 @@ const InsulinPoint = () => {
       <LineDiv />
       <LineDiv />
       <ContentLayout>
-        {/* // title 모달 위 쪽에 들어가는 제목 ,  */}
         <Modal title="인슐린 등록">
           <InputTag
             name="systole"
@@ -434,22 +440,15 @@ const InsulinPoint = () => {
             f={handleChange}
           ></InputTag>
           <InputTag
-            //type 인풋 유형 date , time, text , password ...
             type="datetime-local"
             step="60"
-            //vo 이름
             name="enrollDate"
-            plcaeholder="측정시간"
-            //인풋 상단 이름
-            title="측정시간"
-            //인풋태그 사이즈
+            plcaeholder="투약시간"
+            title="투약시간"
             size={'size3'}
-            // margin bottom , top
             mb={'10'}
             mt={'5'}
-            // 위쪽에 만들어둔 useState
             value={inputData.enrollDate}
-            // 입력값 저장하기
             f={handleDateChange}
           ></InputTag>
           <InputTag
@@ -462,22 +461,15 @@ const InsulinPoint = () => {
             mt={'5'}
             f={handleChange}
           ></InputTag>
-          {/* // 모달 바깥 등록 버튼 */}
           <ModalContainer>
             <Btn
-              //모달 title과 맞춰주기
               title={'인슐린 등록'}
-              // 인풋 입력값 보내기
               f={handleSubmit}
-              //margin top bottom right
               mt={'10'}
               mb={'20'}
               mr={'-10'}
-              // background color
               c={'#FF7F50'}
-              // font color
               fc={'white'}
-              // 화면에 노출되는 버튼 안 쪽 내용
               str={'등록'}
             ></Btn>
           </ModalContainer>
@@ -490,14 +482,11 @@ const InsulinPoint = () => {
                 <Div111>
                   <RightArmDiv>
                     {rightArmNumList.map((vo) => {
-                      const isDisabled = disablePoint.includes(vo); // 비활성화 여부 확인
+                      const isDisabled = disablePoint.includes(vo);
                       return (
                         <CheckDiv
                           key={vo}
                           onClick={() => {
-                            // 모달 안 데이터 초기화
-                            // reset();
-                            //해당 모달 열기
                             setInputData({
                               no: '',
                               memberNo: '1',
@@ -506,7 +495,6 @@ const InsulinPoint = () => {
                               note: '',
                               point: vo,
                             });
-                            // title : 모달 이름
                             dispatch(open({ title: '인슐린 등록', value: 'block' }));
                           }}
                           isDisabled={isDisabled}
@@ -533,7 +521,6 @@ const InsulinPoint = () => {
                               note: '',
                               point: vo,
                             });
-                            // title : 모달 이름
                             dispatch(open({ title: '인슐린 등록', value: 'block' }));
                           }}
                           isDisabled={isDisabled}
@@ -551,12 +538,11 @@ const InsulinPoint = () => {
                 <Div122>
                   <LeftStomDiv>
                     {leftStomNumList.map((vo) => {
-                      const isDisabled = disablePoint.includes(vo); // 비활성화 여부 확인
+                      const isDisabled = disablePoint.includes(vo);
                       return (
                         <CheckDiv
                           key={vo}
                           onClick={() => {
-                            // 모달 안 데이터 초기화
                             setInputData({
                               no: '',
                               memberNo: '1',
@@ -565,7 +551,6 @@ const InsulinPoint = () => {
                               note: '',
                               point: vo,
                             });
-                            // title : 모달 이름
                             dispatch(open({ title: '인슐린 등록', value: 'block' }));
                           }}
                           isDisabled={isDisabled}
@@ -579,12 +564,11 @@ const InsulinPoint = () => {
                 <Div123>
                   <LeftArmDiv>
                     {leftArmNumList.map((vo) => {
-                      const isDisabled = disablePoint.includes(vo); // 비활성화 여부 확인
+                      const isDisabled = disablePoint.includes(vo);
                       return (
                         <CheckDiv
                           key={vo}
                           onClick={() => {
-                            // 모달 안 데이터 초기화
                             setInputData({
                               no: '',
                               memberNo: '1',
@@ -593,7 +577,6 @@ const InsulinPoint = () => {
                               note: '',
                               point: vo,
                             });
-                            // title : 모달 이름
                             dispatch(open({ title: '인슐린 등록', value: 'block' }));
                           }}
                           isDisabled={isDisabled}
@@ -610,12 +593,11 @@ const InsulinPoint = () => {
               <Div210>
                 <RightLegDiv>
                   {rightLegNumList.map((vo) => {
-                    const isDisabled = disablePoint.includes(vo); // 비활성화 여부 확인
+                    const isDisabled = disablePoint.includes(vo);
                     return (
                       <CheckDiv
                         key={vo}
                         onClick={() => {
-                          // 모달 안 데이터 초기화
                           setInputData({
                             no: '',
                             memberNo: '1',
@@ -624,7 +606,6 @@ const InsulinPoint = () => {
                             note: '',
                             point: vo,
                           });
-                          // title : 모달 이름
                           dispatch(open({ title: '인슐린 등록', value: 'block' }));
                         }}
                         isDisabled={isDisabled}
@@ -638,12 +619,11 @@ const InsulinPoint = () => {
               <Div220>
                 <LeftLegDiv>
                   {leftLegNumList.map((vo) => {
-                    const isDisabled = disablePoint.includes(vo); // 비활성화 여부 확인
+                    const isDisabled = disablePoint.includes(vo);
                     return (
                       <CheckDiv
                         key={vo}
                         onClick={() => {
-                          // 모달 안 데이터 초기화
                           setInputData({
                             no: '',
                             memberNo: '1',
@@ -652,7 +632,6 @@ const InsulinPoint = () => {
                             note: '',
                             point: vo,
                           });
-                          // title : 모달 이름
                           dispatch(open({ title: '인슐린 등록', value: 'block' }));
                         }}
                         isDisabled={isDisabled}
@@ -693,32 +672,30 @@ const InsulinPoint = () => {
                 acc[vo.day].push(vo);
                 return acc;
               }, {})
-            ).map(
-              ([day, records]) =>
-                records.map((vo, index) => (
-                  <tr key={vo.no}>
-                    {index === 0 && (
-                      <td
-                        rowSpan={records.length}
-                        style={{ verticalAlign: 'middle', fontWeight: 'bold', textAlign: 'center' }}
-                      >
-                        {day}
-                      </td>
-                    )}
-                    <td>{vo.time}</td>
-                    <td>{vo.point}</td>
-                    <td>{vo.ableDate}</td>
-                    <td>{vo.note}</td>
-                    <td>
-                      <input
-                        type="checkbox"
-                        checked={selectedItems.includes(vo.no)}
-                        onChange={() => handleCheckboxChange(vo.no)}
-                      />
+            ).map(([day, records]) =>
+              records.map((vo, index) => (
+                <tr key={vo.no}>
+                  {index === 0 && (
+                    <td
+                      rowSpan={records.length}
+                      style={{ verticalAlign: 'middle', fontWeight: 'bold', textAlign: 'center' }}
+                    >
+                      {day}
                     </td>
-                  </tr>
-                ))
-              // checked={setDelNo(vo.no)} onChange={handleDelNo}
+                  )}
+                  <td>{vo.time}</td>
+                  <td>{vo.point}</td>
+                  <td>{vo.ableDate}</td>
+                  <td>{vo.note}</td>
+                  <td>
+                    <input
+                      type="checkbox"
+                      checked={selectedItems.includes(vo.no)}
+                      onChange={() => handleCheckboxChange(vo.no)}
+                    />
+                  </td>
+                </tr>
+              ))
             )}
           </tbody>
         </RadiusTable>

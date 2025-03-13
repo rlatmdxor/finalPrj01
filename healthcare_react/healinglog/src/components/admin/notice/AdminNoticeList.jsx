@@ -12,6 +12,7 @@ import ContentLayout from '../../util/ContentLayout';
 import { isTokenExpired, getRoleFromToken } from '../../util/JwtUtil';
 import Swal from 'sweetalert2';
 import BoardTable from '../../util/BoardTable';
+import { BASE_URL } from '../../services/config';
 
 const SearchDiv = styled.div`
   display: flex;
@@ -98,7 +99,7 @@ const AdminNoticeList = () => {
   const [num, setNum] = useState(0);
   const offset = (currentPage - 1) * boardLimit;
 
-  const url = `http://127.0.0.1:80/api/notice/list`;
+  const url = `${BASE_URL}/api/notice/list`;
   const options = {
     method: 'POST',
     headers: {
@@ -210,7 +211,12 @@ const AdminNoticeList = () => {
               </option>
             ))}
           </SelectBox>
-          <SearchBar handleClick={handleClick} handleChange={handleChange} handleClearClick={handleClearClick} />
+          <SearchBar
+            handleClick={handleClick}
+            handleChange={handleChange}
+            handleClearClick={handleClearClick}
+            value={searchInput.searchValue}
+          />
         </SearchDiv>
         <BoardTable columnWidths={['80px', '110px', '500px', '80px', '100px', '120px']}>
           <thead>

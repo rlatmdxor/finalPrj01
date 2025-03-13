@@ -22,6 +22,7 @@ import {
   OrderedListButton,
 } from '@draft-js-plugins/buttons';
 import Swal from 'sweetalert2';
+import { BASE_URL } from '../../services/config';
 
 const ContentDiv = styled.div`
   margin: 0;
@@ -240,7 +241,7 @@ const NoticeWrite = () => {
           formData.append('f', file);
         });
 
-        const response = await fetch('http://127.0.0.1:80/api/notice/write', {
+        const response = await fetch(`${BASE_URL}/api/notice/write`, {
           method: 'POST',
           headers: { Authorization: `Bearer ${token}` },
           body: formData,

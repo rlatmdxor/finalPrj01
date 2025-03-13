@@ -27,7 +27,7 @@ public class BloodPressureService {
         if(vo.getSystole() == "" || vo.getDiastole() == ""){
             throw new IllegalStateException("CODE [BLOODPRESSURE / WRITE / NULL PRESSURE]");
         }
-        if(vo.getPulse() != ""){
+        if( vo.getPulse() != "" ){
             pulse = Integer.parseInt(vo.getPulse());
         }
         if(vo.getNote() == null || vo.getNote().equals("")){
@@ -36,6 +36,10 @@ public class BloodPressureService {
 
         double systole = Double.parseDouble(vo.getSystole());
         double diastole = Double.parseDouble(vo.getDiastole());
+
+        String day = vo.getDay();
+        String time = vo.getTime();
+        vo.setEnrollDate(day+time);
 
         if(systole < 10 || systole > 300){
             throw new IllegalStateException("CODE [BLOODPRESSURE / WRITE / IMPOSSIBLE SYSTOlE]");
@@ -65,12 +69,15 @@ public class BloodPressureService {
         token = token.replace("Bearer ", "");
         String memberNo = jwtUtil.getNo(token);
         vo.setMemberNo(memberNo);
+        String day = vo.getDay();
+        String time = vo.getTime();
+        vo.setEnrollDate(day+time);
 
         int pulse = 0;
         if(vo.getSystole() == "" || vo.getDiastole() == ""){
             throw new IllegalStateException("CODE [BLOODPRESSURE / EDIT / NULL PRESSURE]");
         }
-        if(vo.getPulse() != ""){
+        if(vo.getPulse() != null){
             pulse = Integer.parseInt(vo.getPulse());
         }
         double systole = Double.parseDouble(vo.getSystole());

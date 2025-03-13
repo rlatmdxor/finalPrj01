@@ -30,6 +30,7 @@ import SearchBar from '../../../util/SearchBar';
 import Table from '../../../util/Table';
 import Pagination from '../../../util/Pagination';
 import { FaStar } from 'react-icons/fa';
+import { BASE_URL } from '../../../services/config';
 
 const ContentDiv = styled.div`
   margin: 0;
@@ -239,13 +240,18 @@ const ReviewWrite = () => {
     alert('로그인 정보가 없습니다.');
     window.location.href = '/login';
   }
+
+  const initstate = {
+    searchValue: '',
+  };
+
   const navigate = useNavigate();
   const [inputData, setInputData] = useState({});
   const [f, setFiles] = useState([]);
   const [editorState, setEditorState] = useState(() => EditorState.createEmpty());
   const editorRef = useRef(null);
   const [isFocused, setIsFocused] = useState(false);
-  const [searchInput, setSearchInput] = useState({});
+  const [searchInput, setSearchInput] = useState(initstate);
   const [dataVoList, setVoList] = useState([]);
   const [pagedData, setPagedData] = useState([]);
   const dispatch = useDispatch();
@@ -334,7 +340,7 @@ const ReviewWrite = () => {
           formData.append('f', file);
         });
 
-        const response = await fetch('http://127.0.0.1:80/api/review/write', {
+        const response = await fetch(`${BASE_URL}/api/review/write`, {
           method: 'POST',
           headers: { Authorization: `Bearer ${token}` },
           body: formData,
@@ -405,10 +411,10 @@ const ReviewWrite = () => {
   };
 
   const handleChange = (e) => {
-    setSearchInput((prev) => {
-      const ssr = { ...prev, searchValue: e.target.value };
-      return ssr;
-    });
+    setSearchInput((prev) => ({
+      ...prev,
+      searchValue: e.target.value,
+    }));
     setNum((prev) => prev + 1);
   };
 
@@ -452,7 +458,7 @@ const ReviewWrite = () => {
   };
 
   useEffect(() => {
-    fetch(`http://127.0.0.1:80/api/review/hospital/list`, {
+    fetch(`${BASE_URL}/api/review/hospital/list`, {
       method: 'POST',
       headers: {
         'content-type': 'application/json',

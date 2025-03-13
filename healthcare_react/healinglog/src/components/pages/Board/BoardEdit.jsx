@@ -22,6 +22,7 @@ import {
   OrderedListButton,
 } from '@draft-js-plugins/buttons';
 import Swal from 'sweetalert2';
+import { BASE_URL } from '../../services/config';
 
 const ContentDiv = styled.div`
   margin: 0;
@@ -198,7 +199,7 @@ const BoardEdit = () => {
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const response = await fetch(`http://127.0.0.1:80/api/board/honeytip/detail?bno=${bno}`, {
+        const response = await fetch(`${BASE_URL}/api/board/honeytip/detail?bno=${bno}`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         });
@@ -288,7 +289,7 @@ const BoardEdit = () => {
 
         formData.append('deleteFiles', deleteFilesBlob);
 
-        const response = await fetch('http://127.0.0.1:80/api/board/honeytip/edit', {
+        const response = await fetch(`${BASE_URL}/api/board/honeytip/edit`, {
           method: 'POST',
           headers: { Authorization: `Bearer ${token}` },
           body: formData,

@@ -17,6 +17,7 @@ import Modal from '../../util/Modal';
 import { useDispatch } from 'react-redux';
 import { close, open } from '../../../redux/modalSlice';
 import { isTokenExpired, getRoleFromToken } from '../../util/JwtUtil';
+import { BASE_URL } from '../../services/config';
 
 //모달 안의 버튼 컨테이너
 const ModalContainer = styled.div`
@@ -307,7 +308,7 @@ const BoardDetail = () => {
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const response = await fetch(`http://127.0.0.1:80/api/board/honeytip/detail?bno=${bno}`, {
+        const response = await fetch(`${BASE_URL}/api/board/honeytip/detail?bno=${bno}`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         });
@@ -359,7 +360,7 @@ const BoardDetail = () => {
   };
 
   const countLike = (ssd) => [
-    fetch('http://127.0.0.1:80/api/board/honeytip/recommend', {
+    fetch(`${BASE_URL}/api/board/honeytip/recommend`, {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
@@ -373,7 +374,7 @@ const BoardDetail = () => {
   ];
 
   const handleCountLike = () => {
-    fetch('http://127.0.0.1:80/api/board/honeytip/countLike', {
+    fetch(`${BASE_URL}/api/board/honeytip/countLike`, {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
@@ -427,7 +428,7 @@ const BoardDetail = () => {
       cancelButtonText: '취소',
     }).then((result) => {
       if (result.isConfirmed) {
-        fetch('http://127.0.0.1:80/api/board/honeytip/report', {
+        fetch(`${BASE_URL}/api/board/honeytip/report`, {
           method: 'POST',
           headers: {
             'content-type': 'application/json',
@@ -480,7 +481,7 @@ const BoardDetail = () => {
       cancelButtonText: '취소',
     }).then((result) => {
       if (result.isConfirmed) {
-        fetch('http://127.0.0.1:80/api/board/honeytip/delete', {
+        fetch(`${BASE_URL}/api/board/honeytip/delete`, {
           method: 'POST',
           headers: {
             'content-type': 'application/json',
@@ -523,7 +524,7 @@ const BoardDetail = () => {
       cancelButtonText: '취소',
     }).then((result) => {
       if (result.isConfirmed) {
-        fetch('http://127.0.0.1:80/api/board/honeytip/comment/write', {
+        fetch(`${BASE_URL}/api/board/honeytip/comment/write`, {
           method: 'POST',
           headers: {
             'content-type': 'application/json',
@@ -583,7 +584,7 @@ const BoardDetail = () => {
       cancelButtonText: '취소',
     }).then((result) => {
       if (result.isConfirmed) {
-        fetch('http://127.0.0.1:80/api/board/honeytip/comment/delete', {
+        fetch(`${BASE_URL}/api/board/honeytip/comment/delete`, {
           method: 'POST',
           headers: {
             'content-type': 'application/json',
@@ -635,7 +636,7 @@ const BoardDetail = () => {
       cancelButtonText: '취소',
     }).then((result) => {
       if (result.isConfirmed) {
-        fetch('http://127.0.0.1:80/api/board/honeytip/comment/report', {
+        fetch(`${BASE_URL}/api/board/honeytip/comment/report`, {
           method: 'POST',
           headers: {
             'content-type': 'application/json',
@@ -666,7 +667,7 @@ const BoardDetail = () => {
   };
 
   useEffect(() => {
-    fetch(`http://127.0.0.1:80/api/board/honeytip/comment/list?bno=${bno}`, {
+    fetch(`${BASE_URL}/api/board/honeytip/comment/list?bno=${bno}`, {
       method: 'GET',
       headers: {
         'content-type': 'application/json',
