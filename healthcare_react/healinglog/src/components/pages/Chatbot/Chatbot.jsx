@@ -300,6 +300,23 @@ const Chatbot = () => {
     }));
   };
 
+  const filterAerobicData = (data) => {
+    return data.map(({ exname, exerciseMinutes, enrollDate }) => ({
+      name: exname,
+      exerciseMinutes: exerciseMinutes,
+      enrollDate: enrollDate,
+    }));
+  };
+
+  const filterAnAerobicData = (data) => {
+    return data.map(({ exname, weight, reps, enrollDate }) => ({
+      name: exname,
+      weight: weight,
+      reps: reps,
+      enrollDate: enrollDate,
+    }));
+  };
+
   const handleSleepPatternClick = async () => {
     if (!token) {
       setChatHistory((prev) => [
@@ -410,6 +427,44 @@ const Chatbot = () => {
     }
   };
 
+  const handleExercisePatternClick = async () => {
+    if (!token) {
+      setChatHistory((prev) => [
+        ...prev,
+        { message: '나의 운동내역 분석', isUser: true },
+        { message: '로그인 후 이용할 수 있습니다.', isUser: false },
+      ]);
+    }
+
+    try {
+      const data = await getUserHealthData();
+      const aerobicData = filterAerobicData(data.aerobicHistory);
+      const anAerobicData = filterAnAerobicData(data.anAerobicHistory);
+
+      setChatHistory((prev) => [
+        ...prev,
+        { message: '나의 운동내역 분석', isUser: true },
+        { message: '최근 30일 간 회원님의 운동 내역을 분석합니다.', isUser: false },
+      ]);
+
+      const chatbotRequest = {
+        content: `최근 30일 간의 사용자의 운동 기록: 
+        유산소 ${JSON.stringify(aerobicData)}. 무산소 ${JSON.stringify(anAerobicData)}.
+        이 데이터를 기반으로 사용자의 운동 내역에 대해서 분석하고 간단하게 조언해줘.
+        운동 데이터를 사용자에게 보여줄 필요는 없어.
+        운동 내역을 분석하기에 데이터가 부족하면 운동 데이터가 부족하다는 답변을 해줘.
+        응답에 마크다운 기호(**, *, -, # 등)는 사용하지 말고, 평범한 문장으로만 답변해줘.
+        한글 기준 600자 이내로 대답해줘.`,
+      };
+
+      const responseData = await chatbotResponse(chatbotRequest);
+
+      setChatHistory((prev) => [...prev, { message: responseData, isUser: false }]);
+    } catch (error) {
+      console.error('API 요청 실패:', error);
+    }
+  };
+
   return (
     <>
       <Layout>
@@ -449,6 +504,7 @@ const Chatbot = () => {
           <SuggestedQuestion onClick={handleSleepPatternClick}>나의 수면패턴 분석</SuggestedQuestion>
           <SuggestedQuestion onClick={handleDrinkPatternClick}>나의 음주습관 분석</SuggestedQuestion>
           <SuggestedQuestion onClick={handleDietRecommendClick}>식단 추천받기</SuggestedQuestion>
+          <SuggestedQuestion onClick={handleExercisePatternClick}>운동 내역 분석</SuggestedQuestion>
         </SuggestedQuestionsArea>
         <BottomContainer>
           <ChatInput

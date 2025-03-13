@@ -14,4 +14,7 @@ public class AerobicHistoryVo {
     private String startTime;
     private String endTime;
 
+    private String exerciseMinutes;
+    private String enrollDate;
+
 }
