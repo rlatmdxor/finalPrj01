@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Avatar } from '@mui/material';
+import { Avatar, CircularProgress } from '@mui/material';
 import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
 import { close, open } from '../../../redux/modalSlice';
@@ -8,21 +8,31 @@ import Btn from '../../util/Btn';
 
 const Layout = styled.div`
   position: fixed;
-  right: 40px;
-  bottom: 40px;
+  right: 55px;
+  bottom: 50px;
+  cursor: pointer;
+`;
+
+const IconImg = styled.img`
+  width: 55px;
+  height: 55px;
+  padding: 8px;
+  border: 1px solid skyblue;
+  border-radius: 50px;
+  background-color: white;
 `;
 
 const ContainerDiv = styled.div`
   display: flex;
   flex-direction: column;
   z-index: 500;
-  height: 650px;
+  height: 690px;
   width: 450px;
   border: 1px solid gray;
   background-color: #ffffff;
   position: fixed;
-  right: 40px;
-  bottom: 40px;
+  right: 45px;
+  bottom: 45px;
   border-radius: 15px;
   box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
 
@@ -48,8 +58,9 @@ const CloseBtn = styled.button`
 `;
 
 const ContentDiv = styled.div`
-  height: 410px;
+  height: 440px;
   padding: 25px 25px 0px 25px;
+  border-bottom: 1px solid lightgrey;
   overflow-y: auto;
 
   &::-webkit-scrollbar {
@@ -102,6 +113,12 @@ const ChatAreaDiv = styled.div`
   }
 `;
 
+const ChatIconImg = styled.img`
+  width: 50px;
+  height: 50px;
+  margin-bottom: 7px;
+`;
+
 const NickTextDiv = styled.div`
   font-size: 13px;
   align-self: ${(props) => {
@@ -114,7 +131,7 @@ const ChatTextDiv = styled.div`
   max-width: 100%;
   word-break: break-all;
   margin-top: 5px;
-  margin-bottom: 10px;
+  margin-bottom: 14px;
   padding: 12px 18px;
   font-size: 14px;
   border-radius: 15px;
@@ -128,42 +145,21 @@ const ChatTextDiv = styled.div`
 
 const SuggestedQuestionsArea = styled.div`
   display: flex;
-  border-bottom: 1px solid lightgrey;
+  flex-wrap: wrap;
   gap: 6px;
-  overflow-x: auto;
-  padding: 11px 20px;
-  white-space: nowrap;
-  overflow-x: auto;
-
-  &::-webkit-scrollbar {
-    height: 6px;
-    opacity: 1;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 10px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: rgba(196, 196, 196, 0.6);
-    border-radius: 10px;
-  }
-
-  &::-webkit-scrollbar-thumb:hover {
-    background: rgba(156, 156, 156, 0.8);
-  }
+  padding: 8px 20px;
+  margin-top: 8px;
+  margin-bottom: 8px;
 `;
 
 const SuggestedQuestion = styled.div`
   width: fit-content;
   max-width: 100%;
-  padding: 9px 16px;
+  padding: 7px 16px;
   font-size: 13px;
   border-radius: 20px;
   border: 1px solid #ff8a60;
-  margin-top: 5px;
-  margin-bottom: 3px;
+  margin-bottom: 1px;
   cursor: pointer;
 `;
 
@@ -171,7 +167,6 @@ const BottomContainer = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-top: 23px;
   padding-left: 20px;
   padding-right: 20px;
 `;
@@ -191,6 +186,13 @@ const StyledSelect = styled.div`
   cursor: pointer;
 `;
 
+const IsLoadingArea = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20px 0px;
+`;
+
 const Chatbot = () => {
   const dispatch = useDispatch();
   const contentRef = useRef(null);
@@ -204,6 +206,7 @@ const Chatbot = () => {
 
   const [inputData, setInputData] = useState({ content: '' });
   const [chatHistory, setChatHistory] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (contentRef.current) {
@@ -280,9 +283,11 @@ const Chatbot = () => {
 
     setChatHistory((prev) => [...prev, { message: inputData.content, isUser: true }]);
     setInputData({ content: '' });
+    setIsLoading(true);
 
     const responseData = await chatbotResponse(inputData);
     setChatHistory((prev) => [...prev, { message: responseData, isUser: false }]);
+    setIsLoading(false);
   };
 
   const filterSleepData = (data) => {
@@ -324,6 +329,7 @@ const Chatbot = () => {
         { message: '나의 수면패턴 분석', isUser: true },
         { message: '로그인 후 이용할 수 있습니다.', isUser: false },
       ]);
+      return;
     }
 
     try {
@@ -335,6 +341,7 @@ const Chatbot = () => {
         { message: '나의 수면패턴 분석', isUser: true },
         { message: '최근 30일 간 회원님의 수면 패턴을 분석합니다.', isUser: false },
       ]);
+      setIsLoading(true);
 
       const chatbotRequest = {
         content: `최근 30일 간의 사용자의 수면 기록: ${JSON.stringify(sleepData)}.
@@ -347,6 +354,7 @@ const Chatbot = () => {
       const responseData = await chatbotResponse(chatbotRequest);
 
       setChatHistory((prev) => [...prev, { message: responseData, isUser: false }]);
+      setIsLoading(false);
     } catch (error) {
       console.error('API 요청 실패:', error);
     }
@@ -359,6 +367,7 @@ const Chatbot = () => {
         { message: '나의 음주습관 분석', isUser: true },
         { message: '로그인 후 이용할 수 있습니다.', isUser: false },
       ]);
+      return;
     }
 
     try {
@@ -370,6 +379,7 @@ const Chatbot = () => {
         { message: '나의 음주습관 분석', isUser: true },
         { message: '최근 30일 간 회원님의 음주 습관을 분석합니다.', isUser: false },
       ]);
+      setIsLoading(true);
 
       const chatbotRequest = {
         content: `최근 30일 간의 사용자의 음주 기록: ${JSON.stringify(alcData)}.
@@ -382,20 +392,13 @@ const Chatbot = () => {
       const responseData = await chatbotResponse(chatbotRequest);
 
       setChatHistory((prev) => [...prev, { message: responseData, isUser: false }]);
+      setIsLoading(false);
     } catch (error) {
       console.error('API 요청 실패:', error);
     }
   };
 
   const handleDietRecommendClick = () => {
-    if (!token) {
-      setChatHistory((prev) => [
-        ...prev,
-        { message: '식단 추천받기', isUser: true },
-        { message: '로그인 후 이용할 수 있습니다.', isUser: false },
-      ]);
-    }
-
     setChatHistory((prev) => [
       ...prev,
       { message: '식단 추천받기', isUser: true },
@@ -410,18 +413,20 @@ const Chatbot = () => {
   const handleDietOptionClick = async (option) => {
     try {
       setChatHistory((prev) => [...prev, { message: option, isUser: true }]);
+      setIsLoading(true);
 
       const chatbotRequest = {
         content: `사용자가 '${option}' 식단 추천을 요청했습니다.
-      이와 관련하여 하루 식단을 간단히 추천해줘. 한국인이 주로 먹는 음식으로 구성해줘.
-      아침, 점심, 저녁으로 나눠서 구조적으로 대답해줘. 
-      응답에 마크다운 기호(**, *, -, # 등)는 사용하지 말고, 평범한 문장으로만 답변해줘. 
-      한글 기준 600자 이내로 대답해줘.`,
+        이와 관련하여 하루 식단을 간단히 추천해줘. 한국인이 주로 먹는 음식으로 구성해줘.
+        아침, 점심, 저녁으로 나눠서 구조적으로 대답해줘. 
+        응답에 마크다운 기호(**, *, -, # 등)는 사용하지 말고, 평범한 문장으로만 답변해줘. 
+        한글 기준 600자 이내로 대답해줘.`,
       };
 
       const responseData = await chatbotResponse(chatbotRequest);
 
       setChatHistory((prev) => [...prev, { message: responseData, isUser: false }]);
+      setIsLoading(false);
     } catch (error) {
       console.error('API 요청 실패:', error);
     }
@@ -434,13 +439,15 @@ const Chatbot = () => {
         { message: '나의 운동내역 분석', isUser: true },
         { message: '로그인 후 이용할 수 있습니다.', isUser: false },
       ]);
+      return;
     }
 
     try {
       const data = await getUserHealthData();
       const aerobicData = filterAerobicData(data.aerobicHistory);
       const anAerobicData = filterAnAerobicData(data.anAerobicHistory);
-
+      setIsLoading(true);
+      
       setChatHistory((prev) => [
         ...prev,
         { message: '나의 운동내역 분석', isUser: true },
@@ -460,6 +467,7 @@ const Chatbot = () => {
       const responseData = await chatbotResponse(chatbotRequest);
 
       setChatHistory((prev) => [...prev, { message: responseData, isUser: false }]);
+      setIsLoading(false);
     } catch (error) {
       console.error('API 요청 실패:', error);
     }
@@ -468,7 +476,10 @@ const Chatbot = () => {
   return (
     <>
       <Layout>
-        <Avatar onClick={handleOpenChatbotModal} />
+        <IconImg
+          src="https://img.icons8.com/?size=100&id=L3uh0mNuxBXw&format=png&color=000000"
+          onClick={handleOpenChatbotModal}
+        />
       </Layout>
 
       <ContainerDiv key={title} display={displayValue}>
@@ -479,6 +490,7 @@ const Chatbot = () => {
         <CloseBtn onClick={handleClose}>X</CloseBtn>
         <ContentDiv ref={contentRef}>
           <ChatAreaDiv>
+            <ChatIconImg src="https://img.icons8.com/?size=100&id=L3uh0mNuxBXw&format=png&color=000000" />
             <NickTextDiv>힐링챗봇</NickTextDiv>
             <ChatTextDiv>안녕하세요 힐링로그 챗봇입니다. 무엇을 도와드릴까요?</ChatTextDiv>
             {chatHistory.map((vo, index) => {
@@ -487,7 +499,7 @@ const Chatbot = () => {
                   <NickTextDiv $isuser={vo.isUser}>{vo.isUser ? '사용자' : '힐링챗봇'}</NickTextDiv>
                   <ChatTextDiv $isuser={vo.isUser}>{vo.message}</ChatTextDiv>
                   {vo.options && (
-                    <SelectAreaDiv style={{}}>
+                    <SelectAreaDiv>
                       {vo.options.map((option, idx) => (
                         <StyledSelect key={idx} onClick={() => handleDietOptionClick(option)}>
                           {option}
@@ -498,13 +510,20 @@ const Chatbot = () => {
                 </div>
               );
             })}
+            {isLoading ? (
+              <IsLoadingArea>
+                <CircularProgress />
+              </IsLoadingArea>
+            ) : (
+              ''
+            )}
           </ChatAreaDiv>
         </ContentDiv>
         <SuggestedQuestionsArea>
-          <SuggestedQuestion onClick={handleSleepPatternClick}>나의 수면패턴 분석</SuggestedQuestion>
-          <SuggestedQuestion onClick={handleDrinkPatternClick}>나의 음주습관 분석</SuggestedQuestion>
-          <SuggestedQuestion onClick={handleDietRecommendClick}>식단 추천받기</SuggestedQuestion>
+          <SuggestedQuestion onClick={handleSleepPatternClick}>수면 패턴 분석</SuggestedQuestion>
+          <SuggestedQuestion onClick={handleDrinkPatternClick}>음주 습관 분석</SuggestedQuestion>
           <SuggestedQuestion onClick={handleExercisePatternClick}>운동 내역 분석</SuggestedQuestion>
+          <SuggestedQuestion onClick={handleDietRecommendClick}>식단 추천받기</SuggestedQuestion>
         </SuggestedQuestionsArea>
         <BottomContainer>
           <ChatInput
