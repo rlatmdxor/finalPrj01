@@ -447,7 +447,7 @@ const Chatbot = () => {
       const aerobicData = filterAerobicData(data.aerobicHistory);
       const anAerobicData = filterAnAerobicData(data.anAerobicHistory);
       setIsLoading(true);
-      
+
       setChatHistory((prev) => [
         ...prev,
         { message: '나의 운동내역 분석', isUser: true },
@@ -456,12 +456,15 @@ const Chatbot = () => {
 
       const chatbotRequest = {
         content: `최근 30일 간의 사용자의 운동 기록: 
-        유산소 ${JSON.stringify(aerobicData)}. 무산소 ${JSON.stringify(anAerobicData)}.
+        유산소 데이터 : ${JSON.stringify(aerobicData)}.
+        무산소 데이터 : ${JSON.stringify(anAerobicData)}.
+        운동명과 운동일 데이터를 잘 해석해서 운동 분포에 대해 판단해서 조언하고,
+        지금 상태에 알맞는 운동을 추천해주기도 했으면 좋겠어.
+        운동시간, 유산소 운동과 무산소 운동의 효과는 답변에 포함하지마.
         이 데이터를 기반으로 사용자의 운동 내역에 대해서 분석하고 간단하게 조언해줘.
-        운동 데이터를 사용자에게 보여줄 필요는 없어.
         운동 내역을 분석하기에 데이터가 부족하면 운동 데이터가 부족하다는 답변을 해줘.
         응답에 마크다운 기호(**, *, -, # 등)는 사용하지 말고, 평범한 문장으로만 답변해줘.
-        한글 기준 600자 이내로 대답해줘.`,
+        한글 기준 580자 이내로 대답해줘.`,
       };
 
       const responseData = await chatbotResponse(chatbotRequest);
