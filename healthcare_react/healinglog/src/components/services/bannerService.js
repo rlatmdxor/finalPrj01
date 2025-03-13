@@ -1,5 +1,7 @@
+import { BASE_URL } from './config';
+
 const getBannerList = async (showYn, searchValue, token) => {
-  const resp = await fetch(`http://127.0.0.1:80/api/banner?showYn=${showYn}&searchValue=${searchValue}`, {
+  const resp = await fetch(`${BASE_URL}/api/banner?showYn=${showYn}&searchValue=${searchValue}`, {
     method: 'GET',
     headers: {
       Authorization: `Bearer ${token}`,
@@ -13,7 +15,7 @@ const getBannerList = async (showYn, searchValue, token) => {
 };
 
 const enrollBanner = async (formData, token) => {
-  const resp = await fetch('http://127.0.0.1:80/api/banner/enroll', {
+  const resp = await fetch(`${BASE_URL}/api/banner/enroll`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${token}`,
@@ -28,7 +30,7 @@ const enrollBanner = async (formData, token) => {
 };
 
 const editBanner = async (formData, token) => {
-  const resp = await fetch('http://127.0.0.1:80/api/banner/edit', {
+  const resp = await fetch(`${BASE_URL}/api/banner/edit`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${token}`,
@@ -43,7 +45,7 @@ const editBanner = async (formData, token) => {
 };
 
 const deleteBanner = async (no, token) => {
-  const resp = await fetch(`http://127.0.0.1:80/api/banner/delete?no=${no}`, {
+  const resp = await fetch(`${BASE_URL}/api/banner/delete?no=${no}`, {
     method: 'GET',
     headers: {
       Authorization: `Bearer ${token}`,
@@ -57,7 +59,7 @@ const deleteBanner = async (no, token) => {
 };
 
 const multiDeleteBanner = async (noList, token) => {
-  const resp = await fetch(`http://127.0.0.1:80/api/banner/delete`, {
+  const resp = await fetch(`${BASE_URL}/api/banner/delete`, {
     method: 'POST',
     headers: {
       'content-type': 'application/json',

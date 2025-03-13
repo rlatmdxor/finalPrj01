@@ -289,7 +289,6 @@ const DashBoard = () => {
       <Title>나의 건강 현황</Title>
       <NaviContainer>
         <Navi target="dashboard" tag={'대시보드'}></Navi>
-        {/* <Navi target="dashboard/report" tag={'리포트'}></Navi> */}
       </NaviContainer>
       <ContentLayout>
         <SettingBtnDiv>

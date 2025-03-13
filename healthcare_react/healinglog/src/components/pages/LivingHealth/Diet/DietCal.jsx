@@ -1,3 +1,4 @@
+import { BASE_URL } from '../../../services/config';
 import React, { useEffect, useState } from 'react';
 import Title from '../../../util/Title';
 import styled from 'styled-components';
@@ -88,7 +89,7 @@ const DietCal = () => {
       return;
     }
 
-    fetch('http://127.0.0.1:80/api/diet/cal', {
+    fetch(`${BASE_URL}/api/diet/cal`, {
       method: 'GET',
       headers: {
         'content-type': 'application/json',
