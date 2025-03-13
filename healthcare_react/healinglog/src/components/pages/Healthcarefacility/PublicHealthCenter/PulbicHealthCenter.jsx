@@ -209,7 +209,7 @@ const PublicHealthCenter = ({}) => {
   };
   const [inputData, setInputData] = useState(initialInputData);
   const mapRef = useRef(null);
-  const [position, setPosition] = useState({ x: 15, y: 0 });
+
   const fetchPhcs = async (no) => {
     try {
       const response = await fetch(`${BASE_URL}/api/phc/search/${no}`, {
@@ -312,14 +312,14 @@ const PublicHealthCenter = ({}) => {
             h={40}
           />
         </SearchDiv>
-        {/* // styled.div새로 만들어서 마진주기 */}
+
         <ModalTt>
           <>
             <Modal title="보건소" width={700} ml={660}>
               {phcM ? (
                 <>
-                  <h4>보건소명: {phcM.name} </h4>
-                  <h4>주소: {phcM.address}</h4>
+                  <h4>{phcM.name} </h4>
+                  <h4>{phcM.address}</h4>
                   <h4>
                     전화번호: {phcM.tellNum} | 우편번호: {phcM.postNum}
                   </h4>

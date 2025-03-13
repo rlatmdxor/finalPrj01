@@ -11,16 +11,16 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class PharmacyService {
 
-    private final PharmacyMapper pharmacyMapper;
+    private final PharmacyMapper mapper;
 
     public Map<String, Object> searchPharmacies(String city, String district,String dong, String searchType, String keyword, int page, int size) {
         int offset = (page - 1) * size; // OFFSET 계산
 
         // 약국 목록 조회
-        List<PharmacyVo> pharmacies = pharmacyMapper.searchPharmacies(city, district, dong, searchType, keyword, size, offset);
+        List<PharmacyVo> pharmacies = mapper.searchPharmacies(city, district, dong, searchType, keyword, size, offset);
 
         // 전체 데이터 개수 조회
-        int totalElements = pharmacyMapper.countPharmacies(city, district, dong, searchType, keyword);
+        int totalElements = mapper.countPharmacies(city, district, dong, searchType, keyword);
 
         // 응답 데이터 구성
         Map<String, Object> response = new HashMap<>();
@@ -32,5 +32,8 @@ public class PharmacyService {
         return response;
     }
 
+    public PharmacyVo getService(String no){
+        return mapper.findByNo(no);
+    }
 
 }

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Title from '../../../util/Title';
 import { setSelection } from '../../../../redux/selectSlice';
 import styled from 'styled-components';
@@ -10,6 +10,9 @@ import SearchBar from '../../../util/SearchBar';
 import Pagination from '../../../util/Pagination';
 import { resetPaging, setTotalCount } from '../../../../redux/pagingSlice';
 import { BASE_URL } from '../../../services/config';
+import Modal from '../../../util/Modal';
+
+import { close, open } from '../../../../redux/modalSlice';
 
 const NaviContainer = styled.div`
   display: grid;
@@ -47,6 +50,12 @@ const BottomDiv = styled.div`
   margin-bottom: 35px;
 `;
 
+//모달 위치 조절용
+const ModalTt = styled.div`
+  margin-left: -120px;
+  margin-top: -100px;
+`;
+
 const Pharmacy = () => {
   const dispatch = useDispatch();
   const boardType = 'pharmacy';
@@ -65,6 +74,13 @@ const Pharmacy = () => {
 
   const currentPage = useSelector((state) => state.paging[boardType]?.currentPage || 1);
   const boardLimit = useSelector((state) => state.paging[boardType]?.boardLimit || 12);
+
+  //지도
+  const [isOpen, setIsOpen] = useState(false); // ✅ 모달 상태 추가
+  //지도
+  const [pharmacyM, setPharmacyM] = useState(null);
+  const [isMapLoaded, setIsMapLoaded] = useState(false);
+  const [selectedNo, setSelectedNo] = useState(null);
 
   // 📌 초기 페이징 상태 리셋
   useEffect(() => {
@@ -154,12 +170,12 @@ const Pharmacy = () => {
     setLoading(false);
   };
 
-  // 📌 검색어 업데이트 핸들러
+  // 검색어 업데이트 핸들러
   const handleKeywordChange = (e) => {
     setKeyword(e.target.value);
   };
 
-  // 📌 검색어 초기화 핸들러
+  // 검색어 초기화 핸들러
   const handleClearKeyword = () => {
     setKeyword('');
   };
@@ -171,6 +187,82 @@ const Pharmacy = () => {
     }
   }, [selectedCity, selectedDistrict, selectedDong]);
 
+  const handleChange = (e) => {
+    setInputData((props) => {
+      return {
+        ...props,
+        [e.target.name]: e.target.value,
+      };
+    });
+  };
+  const initialInputData = {
+    no: '',
+    name: '',
+    address: '',
+    tell_num: '',
+    post_num: '',
+    location_x: '',
+    location_y: '',
+  };
+
+  const [inputData, setInputData] = useState(initialInputData);
+  const mapRef = useRef(null);
+  const fetchPharmacys = async (no) => {
+    try {
+      const response = await fetch(`${BASE_URL}/api/pharmacy/search/${no}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      const data = await response.json();
+      if (data) setPharmacyM(data); // 약국 정보 저장
+    } catch (error) {
+      console.error('약국 데이터 불러오기 오류:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (isOpen && selectedNo) {
+      fetchPharmacys(selectedNo);
+    }
+  }, [isOpen, selectedNo]);
+
+  // 네이버 지도 API 로드
+  useEffect(() => {
+    if (!window.naver) {
+      const script = document.createElement('script');
+      script.src = `https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${process.env.REACT_APP_NAVER_MAP_API_ID}`;
+      script.async = true;
+      script.onload = () => {
+        setIsMapLoaded(true);
+      };
+      document.head.appendChild(script);
+    } else {
+      setIsMapLoaded(true);
+    }
+  }, []);
+
+  // ✅ 네이버 지도 생성 (pharmacyM 값이 있을 때 실행)
+  useEffect(() => {
+    if (!pharmacyM || !pharmacyM.locationX || !pharmacyM.locationY) {
+      console.warn('🚨 위치 정보가 올바르지 않음:', pharmacyM);
+      return;
+    }
+
+    if (isMapLoaded && window.naver && mapRef.current) {
+      const location = new window.naver.maps.LatLng(pharmacyM.locationY, pharmacyM.locationX);
+
+      const map = new window.naver.maps.Map(mapRef.current, {
+        center: location,
+        zoom: 15,
+      });
+
+      new window.naver.maps.Marker({
+        position: location,
+        map,
+      });
+    }
+  }, [pharmacyM, isMapLoaded]);
+
   return (
     <>
       <Title>의료기관 찾기</Title>
@@ -181,6 +273,33 @@ const Pharmacy = () => {
       </NaviContainer>
 
       <ContentLayout>
+        <ModalTt>
+          <>
+            <Modal title="약국" width={700} ml={660}>
+              {pharmacyM ? (
+                <>
+                  <h4>{pharmacyM.name} </h4>
+                  <h4>{pharmacyM.address}</h4>
+                  <h4>
+                    전화번호: {pharmacyM.tellNum} | 우편번호: {pharmacyM.postNum}
+                  </h4>
+                </>
+              ) : (
+                <p>약국 정보를 불러오는 중...</p>
+              )}
+              <div
+                ref={mapRef}
+                style={{
+                  width: '600px',
+                  height: '400px',
+                  marginBottom: '30px',
+                  marginLeft: '15px',
+                  background: '#eee',
+                }}
+              ></div>
+            </Modal>
+          </>
+        </ModalTt>
         <SearchDiv>
           <SelectBox width="120px" onChange={(e) => setSelectedCity(parseInt(e.target.value, 10))}>
             <option value="">도시 선택</option>
@@ -235,6 +354,7 @@ const Pharmacy = () => {
             h={40}
           />
         </SearchDiv>
+
         <Table>
           <thead>
             <tr>
@@ -246,7 +366,25 @@ const Pharmacy = () => {
           </thead>
           <tbody>
             {pharmacies.map((pharmacy, idx) => (
-              <tr key={idx}>
+              <tr
+                key={idx}
+                onClick={() => {
+                  setSelectedNo(pharmacy.no);
+                  setInputData({
+                    no: pharmacy.no,
+                    name: pharmacy.name,
+                    address: pharmacy.address,
+                    tell_num: pharmacy.tell_num,
+                    post_num: pharmacy.post_num,
+                    location_x: pharmacy.location_x,
+                    location_y: pharmacy.location_y,
+                  });
+                  console.log(pharmacy.no);
+                  fetchPharmacys(pharmacy.no);
+                  setIsOpen(true);
+                  dispatch(open({ title: '약국', value: 'block' }));
+                }}
+              >
                 <td width="150px">{pharmacy.name}</td>
                 <td width="110px">{pharmacy.tellNum}</td>
                 <td width="60px">{pharmacy.postNum}</td>
