@@ -1,6 +1,8 @@
 package com.kh.healthcare.OpenAI;
 
 import com.kh.healthcare.alc.report.AlcReportVo;
+import com.kh.healthcare.cardiovascularManagement.bloodPressure.BloodPressureVo;
+import com.kh.healthcare.cardiovascularManagement.bloodSugar.BloodSugarVo;
 import com.kh.healthcare.diet.DietReportVo;
 import com.kh.healthcare.diet.meal.TotalKcalVo;
 import com.kh.healthcare.diet.water.WaterVo;
@@ -8,6 +10,7 @@ import com.kh.healthcare.diet.weight.WeightVo;
 import com.kh.healthcare.exercise.aerobic.AerobicHistoryVo;
 import com.kh.healthcare.exercise.anAerobic.AnAerobicHistoryVo;
 import com.kh.healthcare.jwt.JwtUtil;
+import com.kh.healthcare.livingHealth.drug.DrugVo;
 import com.kh.healthcare.livingHealth.sleep.SleepVo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -41,13 +44,18 @@ public class UserHealthService {
         List<AlcReportVo> alcoholList = mapper.getAlcList(memberNo, startDate, endDate);
         List<AerobicHistoryVo> AerobicHistoryList = mapper.getAerobicHistoryList(memberNo, startDate, endDate);
         List<AnAerobicHistoryVo> AnAerobicHistoryList = mapper.getAnAerobicHistoryList(memberNo, startDate, endDate);
-
+        List<DrugVo> drugList = mapper.getDrugList(memberNo);
+        List<BloodPressureVo> bloodPressureList = mapper.getbloodPressureList(memberNo, startDate, endDate);
+        List<BloodSugarVo> bloodSugarList = mapper.getbloodSugarList(memberNo, startDate, endDate);
 
         UserHealthVo userHealthVo = new UserHealthVo();
         userHealthVo.setSleep(sleepList);
         userHealthVo.setAlcohol(alcoholList);
         userHealthVo.setAerobicHistory(AerobicHistoryList);
         userHealthVo.setAnAerobicHistory(AnAerobicHistoryList);
+        userHealthVo.setDrug(drugList);
+        userHealthVo.setBloodPressure(bloodPressureList);
+        userHealthVo.setBloodSugar(bloodSugarList);
 
         return userHealthVo;
     }
