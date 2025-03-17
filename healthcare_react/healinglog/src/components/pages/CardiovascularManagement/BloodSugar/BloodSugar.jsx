@@ -129,9 +129,7 @@ const fillWeekData = (data, year, week) => {
     .map((date) => {
       const filteredData = data.filter((d) => d.day === date);
 
-      return filteredData.length > 0
-        ? filteredData.sort((a, b) => a.time.localeCompare(b.time))
-        : [{ day: date, systole: null, diastole: null, time: '00:00' }];
+      return filteredData.length > 0 ? filteredData : [{ day: date, systole: null, diastole: null }];
     })
     .flat();
 };
@@ -142,9 +140,7 @@ const fillMonthData = (data, year, month) => {
     .map((date) => {
       const filteredData = data.filter((d) => d.day === date);
 
-      return filteredData.length > 0
-        ? filteredData.sort((a, b) => a.time.localeCompare(b.time))
-        : [{ day: date, systole: null, diastole: null, time: '00:00' }];
+      return filteredData.length > 0 ? filteredData : [{ day: date, systole: null, diastole: null }];
     })
     .flat();
 };
