@@ -18,8 +18,7 @@ public class BloodPressureVo {
     private String time;
     private String nick;
     private String note;
-
-
+    private String mday;
 
 }
 

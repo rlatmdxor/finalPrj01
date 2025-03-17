@@ -16,6 +16,20 @@ import Swal from 'sweetalert2';
 import { isTokenExpired, getRoleFromToken } from '../../../util/JwtUtil';
 import { useNavigate } from 'react-router-dom';
 import { BASE_URL } from '../../../services/config';
+
+const YearContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 2rem;
+  font-weight: bold;
+  gap: 35px;
+  height: 0px;
+  & > div {
+    cursor: pointer;
+  }
+`;
+
 const LineDiv = styled.div`
   height: 50px;
 `;
@@ -33,6 +47,92 @@ const ModalInputDiv = styled.div`
   display: grid;
   grid-template: repeat(3, 1fr) / 1fr 1fr;
 `;
+const getCustomWeekNumber = (dateString) => {
+  if (dateString instanceof Date) {
+    dateString = dateString.toISOString().split('T')[0];
+  }
+
+  const tempDate = new Date(dateString);
+  if (isNaN(tempDate)) {
+    return null;
+  }
+
+  tempDate.setHours(0, 0, 0, 0);
+
+  const yearStart = new Date(tempDate.getFullYear(), 0, 1);
+  const firstMonday = new Date(yearStart);
+  firstMonday.setDate(yearStart.getDate() + ((1 - yearStart.getDay() + 7) % 7));
+
+  const weekNumber = Math.ceil(((tempDate - firstMonday) / 86400000 + 1) / 7);
+
+  return weekNumber;
+};
+
+const getWeeklyData = (data, year, week) => {
+  console.log(`🔥 선택된 연도: ${year}, 선택된 주차: ${week}`);
+
+  return data.filter((d) => {
+    const dDate = new Date(d.day);
+    const dYear = dDate.getFullYear();
+    const dWeek = getCustomWeekNumber(d.day);
+
+    return dYear === year && dWeek === week;
+  });
+};
+
+const getMonthlyData = (data, year, month) => {
+  return data.filter((d) => {
+    const dDate = new Date(d.day);
+    const dYear = dDate.getFullYear();
+    const dMonth = dDate.getMonth() + 1;
+    return dYear === year && dMonth === month;
+  });
+};
+
+const generateWeekDates = (year, week) => {
+  const firstDayOfYear = new Date(year, 0, 1);
+  const firstMonday = new Date(firstDayOfYear);
+  firstMonday.setDate(firstDayOfYear.getDate() + ((1 - firstDayOfYear.getDay() + 7) % 7));
+
+  const startDate = new Date(firstMonday);
+  startDate.setDate(startDate.getDate() + (week - 1) * 7);
+
+  const weekDates = [];
+  for (let i = 0; i < 7; i++) {
+    const date = new Date(startDate);
+    date.setDate(startDate.getDate() + i);
+    weekDates.push(date.toISOString().split('T')[0]);
+  }
+  return weekDates;
+};
+
+const generateMonthDates = (year, month) => {
+  const lastDay = new Date(year, month, 0).getDate();
+  return Array.from({ length: lastDay }, (_, i) => new Date(year, month - 1, i + 1).toISOString().split('T')[0]);
+};
+
+const fillWeekData = (data, year, week) => {
+  const weekDates = generateWeekDates(year, week);
+
+  return weekDates
+    .map((date) => {
+      const filteredData = data.filter((d) => d.day === date);
+
+      return filteredData.length > 0 ? filteredData : [{ day: date, systole: null, diastole: null }];
+    })
+    .flat();
+};
+const fillMonthData = (data, year, month) => {
+  const monthDates = generateMonthDates(year, month);
+
+  return monthDates
+    .map((date) => {
+      const filteredData = data.filter((d) => d.day === date);
+
+      return filteredData.length > 0 ? filteredData : [{ day: date, systole: null, diastole: null }];
+    })
+    .flat();
+};
 
 const BloodPressure = () => {
   const navi = useNavigate();
@@ -65,10 +165,12 @@ const BloodPressure = () => {
   const [filteredData, setFilteredData] = useState([]);
   const [selectedRange, setSelectedRange] = useState('주');
   const [selectChart, setSelectChart] = useState('Line');
-  const dispatch = useDispatch();
   const [isAuthorized, setIsAuthorized] = useState(false);
+  const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+  const [currentWeek, setCurrentWeek] = useState(getCustomWeekNumber(new Date()));
+  const [currentMonth, setCurrentMonth] = useState(new Date().getMonth() + 1);
+  const dispatch = useDispatch();
 
-  const dataBtn = ['주', '월'];
   const boardType = 'bloodPressure';
   const { currentPage, boardLimit } = useSelector((state) => state.paging[boardType] || {});
   const offset = (currentPage - 1) * boardLimit;
@@ -86,8 +188,90 @@ const BloodPressure = () => {
 
   const [inputData, setInputData] = useState(initialInputData);
 
+  const handleRangeChange = (range) => {
+    setSelectedRange(range);
+
+    if (range === '주') {
+      setCurrentYear(new Date().getFullYear());
+      setCurrentWeek(getCustomWeekNumber(new Date()));
+    } else {
+      setCurrentYear(new Date().getFullYear());
+      setCurrentMonth(new Date().getMonth() + 1);
+    }
+  };
+
+  useEffect(() => {
+    if (!isAuthorized) {
+      return;
+    }
+    fetch(url, options)
+      .then((resp) => resp.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          dispatch(setTotalCount({ boardType: 'bloodPressure', totalCount: data.length }));
+          setFullData(data);
+        } else {
+          dispatch(resetPaging({ boardType: 'bloodPressure' }));
+          setFullData([]);
+        }
+      })
+      .catch((error) => console.error('데이터 불러오기 실패:', error));
+  }, [num, isAuthorized, token]);
   const reset = () => {
     setInputData(initialInputData);
+  };
+
+  useEffect(() => {
+    if (fullData.length > 0) {
+      if (selectedRange === '주') {
+        const weeklyData = getWeeklyData(fullData, currentYear, currentWeek);
+        setFilteredData(weeklyData);
+      } else {
+        const monthlyData = getMonthlyData(fullData, currentYear, currentMonth);
+        setFilteredData(monthlyData);
+      }
+    }
+  }, [fullData, selectedRange, currentYear, currentWeek, currentMonth]);
+
+  const handlePrev = () => {
+    if (selectedRange === '주') {
+      if (currentWeek > 1) {
+        setCurrentWeek((prev) => prev - 1);
+      } else {
+        setCurrentYear((prev) => prev - 1);
+        setCurrentWeek(52);
+      }
+    } else {
+      if (currentMonth > 1) {
+        setCurrentMonth((prev) => prev - 1);
+      } else {
+        setCurrentYear((prev) => prev - 1);
+        setCurrentMonth(12);
+      }
+    }
+  };
+
+  const handleNext = () => {
+    if (selectedRange === '주') {
+      const lastDayOfYear = new Date(currentYear, 11, 31);
+      const maxWeeks = getCustomWeekNumber(lastDayOfYear.toISOString().split('T')[0]);
+
+      console.log(`🔄 현재 연도: ${currentYear}, 현재 주차: ${currentWeek}, 최대 주차: ${maxWeeks}`);
+
+      if (currentWeek < maxWeeks) {
+        setCurrentWeek((prev) => prev + 1);
+      } else {
+        setCurrentYear((prev) => prev + 1);
+        setCurrentWeek(1);
+      }
+    } else {
+      if (currentMonth < 12) {
+        setCurrentMonth((prev) => prev + 1);
+      } else {
+        setCurrentYear((prev) => prev + 1);
+        setCurrentMonth(1);
+      }
+    }
   };
 
   const handleChange = (e) => {
@@ -299,145 +483,65 @@ const BloodPressure = () => {
   };
 
   useEffect(() => {
-    if (!isAuthorized) {
-      return;
-    }
-
-    fetch(url, options)
-      .then((resp) => resp.json())
-      .then((data) => {
-        if (data.length > 0) {
-          dispatch(setTotalCount({ boardType, totalCount: data.length }));
-          setFullData(data);
-        } else if (data == null) {
-          Swal.fire({
-            title: '다시 로그인해주세요.',
-            icon: 'success',
-            draggable: true,
-          }).then(() => (window.location.href = '/login'));
-        } else {
-          dispatch(resetPaging({ boardType }));
-          setFullData([]);
-        }
-      })
-      .catch((error) => console.error('데이터 불러오기 실패:', error));
-  }, [num, isAuthorized, token]);
-
-  useEffect(() => {
     setPagedData(fullData.slice(offset, offset + boardLimit));
   }, [fullData, currentPage, boardLimit]);
 
-  useEffect(() => {
-    if (selectedRange == '주') {
-      setFilteredData(filterData('week'));
-    } else if (selectedRange == '월') {
-      setFilteredData(filterData('month'));
-    } else {
-      setFilteredData(filterData('all'));
-    }
-  }, [selectedRange]);
+  const filledData =
+    selectedRange === '주'
+      ? fillWeekData(filteredData, currentYear, currentWeek)
+      : fillMonthData(filteredData, currentYear, currentMonth);
 
-  const filterData = (type) => {
-    const voList = [];
-
-    for (const vo of fullData) {
-      voList.push(vo.day);
-    }
-    const latestDate = new Date(voList[0]);
-
-    if (type === 'week') {
-      const oneWeekAgo = new Date(latestDate);
-      oneWeekAgo.setDate(latestDate.getDate() - 7);
-
-      return fullData.filter((item) => {
-        const itemDate = new Date(item.day);
-        return itemDate >= oneWeekAgo && itemDate <= latestDate;
-      });
-    }
-
-    if (type === 'month') {
-      const currentYear = latestDate.getFullYear();
-      const currentMonth = latestDate.getMonth() + 1;
-
-      return fullData.filter((item) => {
-        const [year, month] = item.day.split('-').map(Number);
-        return year === currentYear && month === currentMonth;
-      });
-    }
-
-    return fullData;
+  const chartData = {
+    labels: filledData.map((d) => d.day.substring(5)),
+    datasets: [
+      {
+        label: '수축기 혈압 (mmHg)',
+        data: filledData.map((d) => d.systole),
+        backgroundColor: [
+          'rgba(255, 99, 132, 0.2)',
+          'rgba(54, 162, 235, 0.2)',
+          'rgba(255, 206, 86, 0.2)',
+          'rgba(75, 192, 192, 0.2)',
+          'rgba(153, 102, 255, 0.2)',
+          'rgba(255, 159, 64, 0.2)',
+          'rgba(201, 203, 207, 0.2)',
+        ],
+        borderColor: [
+          'rgba(255, 99, 132, 1)',
+          'rgba(54, 162, 235, 1)',
+          'rgba(255, 206, 86, 1)',
+          'rgba(75, 192, 192, 1)',
+          'rgba(153, 102, 255, 1)',
+          'rgba(255, 159, 64, 1)',
+          'rgba(201, 203, 207, 1)',
+        ],
+        borderWidth: 1,
+      },
+      {
+        label: '이완기 혈압 (mmHg)',
+        data: filledData.map((d) => d.diastole),
+        backgroundColor: [
+          'rgba(255, 99, 132, 0.2)',
+          'rgba(54, 162, 235, 0.2)',
+          'rgba(255, 206, 86, 0.2)',
+          'rgba(75, 192, 192, 0.2)',
+          'rgba(153, 102, 255, 0.2)',
+          'rgba(255, 159, 64, 0.2)',
+          'rgba(201, 203, 207, 0.2)',
+        ],
+        borderColor: [
+          'rgba(255, 99, 132, 1)',
+          'rgba(54, 162, 235, 1)',
+          'rgba(255, 206, 86, 1)',
+          'rgba(75, 192, 192, 1)',
+          'rgba(153, 102, 255, 1)',
+          'rgba(255, 159, 64, 1)',
+          'rgba(201, 203, 207, 1)',
+        ],
+        borderWidth: 1,
+      },
+    ],
   };
-
-  useEffect(() => {
-    setFilteredData(filterData('week'));
-  }, [fullData]);
-
-  const labels = [];
-
-  for (const vo of filteredData) {
-    labels.unshift(vo.enrollDate);
-  }
-
-  const systoleList = [];
-  for (const vo of filteredData) {
-    systoleList.unshift(vo.systole);
-  }
-  const diastoleList = [];
-
-  for (const vo of filteredData) {
-    diastoleList.unshift(vo.diastole);
-  }
-
-  const dataset = [
-    {
-      label: '수축기 혈압 (mmHg)',
-
-      data: systoleList,
-      backgroundColor: [
-        'rgba(255, 99, 132, 0.2)',
-        'rgba(54, 162, 235, 0.2)',
-        'rgba(255, 206, 86, 0.2)',
-        'rgba(75, 192, 192, 0.2)',
-        'rgba(153, 102, 255, 0.2)',
-        'rgba(255, 159, 64, 0.2)',
-        'rgba(201, 203, 207, 0.2)',
-      ],
-      borderColor: [
-        'rgba(255, 99, 132, 1)',
-        'rgba(54, 162, 235, 1)',
-        'rgba(255, 206, 86, 1)',
-        'rgba(75, 192, 192, 1)',
-        'rgba(153, 102, 255, 1)',
-        'rgba(255, 159, 64, 1)',
-        'rgba(201, 203, 207, 1)',
-      ],
-      borderWidth: 1,
-    },
-    {
-      label: '이완기 혈압 (mmHg)',
-
-      data: diastoleList,
-      backgroundColor: [
-        'rgba(255, 99, 132, 0.2)',
-        'rgba(54, 162, 235, 0.2)',
-        'rgba(255, 206, 86, 0.2)',
-        'rgba(75, 192, 192, 0.2)',
-        'rgba(153, 102, 255, 0.2)',
-        'rgba(255, 159, 64, 0.2)',
-        'rgba(201, 203, 207, 0.2)',
-      ],
-      borderColor: [
-        'rgba(255, 99, 132, 1)',
-        'rgba(54, 162, 235, 1)',
-        'rgba(255, 206, 86, 1)',
-        'rgba(75, 192, 192, 1)',
-        'rgba(153, 102, 255, 1)',
-        'rgba(255, 159, 64, 1)',
-        'rgba(201, 203, 207, 1)',
-      ],
-      borderWidth: 1,
-    },
-  ];
 
   let now = new Date();
 
@@ -637,12 +741,25 @@ const BloodPressure = () => {
           </ModalContainer>
         </Modal>
 
-        <DateBtn dataBtn={dataBtn} onSelect={setSelectedRange} onChange={setSelectChart} line={'Bar'}></DateBtn>
+        <YearContainer>
+          <div onClick={handlePrev}>&lt;</div>
+          {selectedRange === '주' ? (
+            <h1>
+              {currentYear}-{currentWeek}주
+            </h1>
+          ) : (
+            <h1>
+              {currentYear}-{currentMonth}월
+            </h1>
+          )}
+          <div onClick={handleNext}>&gt;</div>
+        </YearContainer>
+        <DateBtn dataBtn={['주', '월']} onSelect={handleRangeChange} onChange={setSelectChart} line={'Bar'}></DateBtn>
 
         <Chart
           chartType={selectChart}
-          labels={labels}
-          dataset={dataset}
+          labels={chartData.labels}
+          dataset={chartData.datasets}
           width={100}
           height={450}
           xAxisColor="rgba(54, 162, 235, 1)"

@@ -18,6 +18,7 @@ public interface BloodPressureMapper {
                 , DIASTOLE
                 , PULSE
                 , TO_CHAR(ENROLL_DATE , 'YYYY-MM-DD') AS DAY
+                , TO_CHAR(ENROLL_DATE , 'MM-DD-HH24:MI') AS MDAY
                 , TO_CHAR(ENROLL_DATE , 'HH24:MI') AS TIME
                 , TO_CHAR(ENROLL_DATE , 'YYYY-MM-DD-HH24:MI') AS ENROLL_DATE
                 , NOTE
