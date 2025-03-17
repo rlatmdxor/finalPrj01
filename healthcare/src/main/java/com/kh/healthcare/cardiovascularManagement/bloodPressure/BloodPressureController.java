@@ -28,7 +28,9 @@ public class BloodPressureController {
     public List<BloodPressureVo> bloodPressureList(@RequestHeader("Authorization") String token){
 
         try{
-            return service.bloodPressureList(token);
+            List<BloodPressureVo> result = service.bloodPressureList(token);
+            System.out.println("result = " + result);
+            return result;
         }catch (Exception e){
             e.printStackTrace();
             return null;
