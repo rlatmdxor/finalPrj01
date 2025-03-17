@@ -118,7 +118,9 @@ const fillWeekData = (data, year, week) => {
     .map((date) => {
       const filteredData = data.filter((d) => d.day === date);
 
-      return filteredData.length > 0 ? filteredData : [{ day: date, systole: null, diastole: null }];
+      return filteredData.length > 0
+        ? filteredData.sort((a, b) => a.time.localeCompare(b.time)) // 시간순 정렬
+        : [{ day: date, systole: null, diastole: null, time: '00:00' }];
     })
     .flat();
 };
@@ -129,7 +131,9 @@ const fillMonthData = (data, year, month) => {
     .map((date) => {
       const filteredData = data.filter((d) => d.day === date);
 
-      return filteredData.length > 0 ? filteredData : [{ day: date, systole: null, diastole: null }];
+      return filteredData.length > 0
+        ? filteredData.sort((a, b) => a.time.localeCompare(b.time)) // 시간순 정렬
+        : [{ day: date, systole: null, diastole: null, time: '00:00' }];
     })
     .flat();
 };
