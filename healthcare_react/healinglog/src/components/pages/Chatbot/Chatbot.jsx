@@ -325,6 +325,25 @@ const Chatbot = () => {
     }));
   };
 
+  const filterBloodPressureData = (data) => {
+    return data.map(({ systole, diastole, purse, day, time, note }) => ({
+      systole: systole,
+      diastole: diastole,
+      purse: purse,
+      day: day,
+      time: time,
+      memo: note,
+    }));
+  };
+  const filterBloodSugarData = (data) => {
+    return data.map(({ sugar, day, time, note }) => ({
+      sugar: sugar,
+      day: day,
+      time: time,
+      memo: note,
+    }));
+  };
+
   const handleSleepPatternClick = async () => {
     if (!token) {
       setChatHistory((prev) => [
@@ -479,6 +498,108 @@ const Chatbot = () => {
     }
   };
 
+  const handleCardiovascularClick = async () => {
+    if (!token) {
+      setChatHistory((prev) => [
+        ...prev,
+        { message: '나의 혈압/혈당 분석', isUser: true },
+        { message: '로그인 후 이용할 수 있습니다.', isUser: false },
+      ]);
+      return;
+    }
+
+    try {
+      const data = await getUserHealthData();
+      const bloodPressureData = filterBloodPressureData(data.bloodPressure);
+      const bloodSugarData = filterBloodSugarData(data.bloodSugar);
+      setIsLoading(true);
+
+      setChatHistory((prev) => [
+        ...prev,
+        { message: '나의 혈압/혈당 분석', isUser: true },
+        { message: '최근 30일 간 회원님의 혈압 및 혈당을 분석합니다', isUser: false },
+      ]);
+
+      const chatbotRequest = {
+        content: `최근 30일 간의 사용자의 혈압 및 혈당 기록: 
+        혈압 : ${JSON.stringify(bloodPressureData)}. 혈당 : ${JSON.stringify(bloodSugarData)}.
+        이 데이터를 기반으로 사용자의 최고혈압, 최저혈압, 정상 범위 및
+        최고혈당, 최저혈당, 정상범위 등에 대해서 분석하고 간단하게 조언해줘.
+        혈압 또는 혈당 내역을 분석하기에 데이터가 부족하면 데이터가 부족하다는 답변을 해줘.
+        응답에 마크다운 기호(**, *, -, # 등)는 사용하지 말고, 평범한 문장으로만 답변해줘.
+        한글 기준 600자 이내로 대답해줘.`,
+      };
+
+      const responseData = await chatbotResponse(chatbotRequest);
+
+      setChatHistory((prev) => [...prev, { message: responseData, isUser: false }]);
+      setIsLoading(false);
+    } catch (error) {
+      console.error('API 요청 실패:', error);
+    }
+  };
+
+  const handleDrugClick = async () => {
+    if (!token) {
+      setChatHistory((prev) => [
+        ...prev,
+        { message: '복용중인 약 부작용 확인', isUser: true },
+        { message: '로그인 후 이용할 수 있습니다.', isUser: false },
+      ]);
+      return;
+    }
+    try {
+      const data = await getUserHealthData();
+
+      if (!data.drug || data.drug.length === 0) {
+        setChatHistory((prev) => [
+          ...prev,
+          { message: '복용중인 약 부작용 확인', isUser: true },
+          { message: '회원님이 현재 복용중인 약이 없습니다. 어떤 약의 부작용을 확인하고 싶나요?', isUser: false },
+        ]);
+        return;
+      }
+
+      const drugOptions = data.drug.map((drug) => drug.name);
+      setIsLoading(true);
+
+      setChatHistory((prev) => [
+        ...prev,
+        { message: '복용중인 약 부작용 확인', isUser: true },
+        {
+          message: '현재 회원님이 복용중인 약입니다. 어떤 약의 부작용을 확인하고 싶나요? 아래에서 선택해주세요!',
+          isUser: false,
+          options: drugOptions,
+        },
+      ]);
+
+      setIsLoading(false);
+    } catch (error) {
+      console.error('API 요청 실패:', error);
+    }
+  };
+
+  const handleDrugOptionClick = async (option) => {
+    try {
+      setChatHistory((prev) => [...prev, { message: option, isUser: true }]);
+      setIsLoading(true);
+
+      const chatbotRequest = {
+        content: `사용자가 '${option}' 약의 부작용을 알려달라고 요청했습니다.
+        이와 관련하여 이 약의 부작용과 복용 시 주의사항을 간단하게 설명해줘. 
+        응답에 마크다운 기호(**, *, -, # 등)는 사용하지 말고, 평범한 문장으로만 답변해줘. 
+        한글 기준 600자 이내로 대답해줘.`,
+      };
+
+      const responseData = await chatbotResponse(chatbotRequest);
+
+      setChatHistory((prev) => [...prev, { message: responseData, isUser: false }]);
+      setIsLoading(false);
+    } catch (error) {
+      console.error('API 요청 실패:', error);
+    }
+  };
+
   return (
     <>
       {!isAdminPage ? (
@@ -502,7 +623,7 @@ const Chatbot = () => {
           <ChatAreaDiv>
             <ChatIconImg src="https://img.icons8.com/?size=100&id=L3uh0mNuxBXw&format=png&color=000000" />
             <NickTextDiv>힐링챗봇</NickTextDiv>
-            <ChatTextDiv>안녕하세요 힐링로그 챗봇입니다. 무엇을 도와드릴까요?</ChatTextDiv>
+            <ChatTextDiv>안녕하세요, 힐링로그 챗봇입니다. 무엇을 도와드릴까요?</ChatTextDiv>
             {chatHistory.map((vo, index) => {
               return (
                 <div key={index}>
@@ -510,11 +631,16 @@ const Chatbot = () => {
                   <ChatTextDiv $isuser={vo.isUser}>{vo.message}</ChatTextDiv>
                   {vo.options && (
                     <SelectAreaDiv>
-                      {vo.options.map((option, idx) => (
-                        <StyledSelect key={idx} onClick={() => handleDietOptionClick(option)}>
-                          {option}
-                        </StyledSelect>
-                      ))}
+                      {vo.options.map((option, idx) => {
+                        const handleClick = vo.message.includes('식단')
+                          ? () => handleDietOptionClick(option)
+                          : () => handleDrugOptionClick(option);
+                        return (
+                          <StyledSelect key={idx} onClick={handleClick}>
+                            {option}
+                          </StyledSelect>
+                        );
+                      })}
                     </SelectAreaDiv>
                   )}
                 </div>
@@ -530,10 +656,12 @@ const Chatbot = () => {
           </ChatAreaDiv>
         </ContentDiv>
         <SuggestedQuestionsArea>
-          <SuggestedQuestion onClick={handleSleepPatternClick}>나의 수면패턴 분석</SuggestedQuestion>
-          <SuggestedQuestion onClick={handleDrinkPatternClick}>나의 음주습관 분석</SuggestedQuestion>
+          <SuggestedQuestion onClick={handleSleepPatternClick}>수면 패턴 분석</SuggestedQuestion>
+          <SuggestedQuestion onClick={handleDrinkPatternClick}>음주 습관 분석</SuggestedQuestion>
+          <SuggestedQuestion onClick={handleDrugClick}>복용중인 약 부작용 확인</SuggestedQuestion>
+          <SuggestedQuestion onClick={handleExercisePatternClick}>운동 내역 분석</SuggestedQuestion>
+          <SuggestedQuestion onClick={handleCardiovascularClick}>혈압/혈당 분석</SuggestedQuestion>
           <SuggestedQuestion onClick={handleDietRecommendClick}>식단 추천받기</SuggestedQuestion>
-          <SuggestedQuestion onClick={handleExercisePatternClick}>나의 운동내역 분석</SuggestedQuestion>
         </SuggestedQuestionsArea>
         <BottomContainer>
           <ChatInput
