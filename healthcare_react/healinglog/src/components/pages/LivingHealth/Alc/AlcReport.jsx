@@ -45,19 +45,66 @@ const NaviContainer = styled.div`
 
 const YearDiv = styled.div`
   display: flex;
-  height: 30px;
-  box-sizing: border-box;
   justify-content: center;
   align-items: center;
-  border: 1px solid rgb(118, 118, 118);
+  font-size: 45px;
+  font-weight: bold;
+  gap: 30px;
+  height: 0px;
+  margin-bottom: 20px;
+  margin-right: 240px;
 `;
 
 const YearBtn = styled.button`
   background-color: transparent;
+  justify-content: center;
   border: none;
-  padding: 0px 12px;
+  padding: 0px 5px;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 34px;
+  font-weight: bold;
+`;
+
+const MonthDiv = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 45px;
+  font-weight: bold;
+  gap: 30px;
+  height: 0px;
+  margin-bottom: 20px;
+  margin-right: 200px;
+`;
+
+const MonthBtn = styled.button`
+  background-color: transparent;
+  border: none;
+  padding: 0px 5px;
+  cursor: pointer;
+  font-size: 34px;
+  font-weight: bold;
+`;
+
+const WeekDiv = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 45px;
+  font-weight: bold;
+  gap: 30px;
+  height: 0px;
+  margin-bottom: 20px;
+  margin-right: 220px;
+`;
+
+const WeekBtn = styled.button`
+  background-color: transparent;
+  border: none;
+  padding: 0px 5px;
+  cursor: pointer;
+  font-size: 34px;
+  font-weight: bold;
 `;
 
 const SearchArea = styled.div`
@@ -86,7 +133,7 @@ const AlcReport = () => {
   const [fullData, setFullData] = useState([]); // 전체 데이터 저장
   const [pagedData, setPagedData] = useState([]); // 페이징된 데이터
   const [filteredData, setFilteredData] = useState([]); // 차트용 필터링 데이터
-  const [selectedRange, setSelectedRange] = useState('주'); // 기본값 '주'
+  const [selectedRange, setSelectedRange] = useState('월'); // 기본값 '월'
   const [selectChart, setSelectChart] = useState('Line'); // 그래프 모양 정하는 state
 
   const boardType = 'AlcReport';
@@ -95,10 +142,8 @@ const AlcReport = () => {
 
   const [selectedDrink, setSelectedDrink] = useState(null);
   const [alcoholAmount, setAlcoholAmount] = useState('');
-  // const [drinkDate, setDrinkDate] = useState('');
   const [alcoholIntake, setAlcoholIntake] = useState(0);
 
-  //나중엔 DB로 해야함 모달창 데이터(고도화 과정중 변경예정)
   const alcoholOptions = [
     { name: '소주', alc: 17, cc: 50 },
     { name: '맥주', alc: 5, cc: 250 },
@@ -110,6 +155,9 @@ const AlcReport = () => {
   const token = localStorage.getItem('token');
   const navi = useNavigate();
   const [isAuthorized, setIsAuthorized] = useState(false); // 로그인 여부 체크
+
+  const [dataVoList, setDataVoList] = useState([]);
+  const [chartVoList, setChartVoList] = useState([]);
 
   useEffect(() => {
     if (!token || isTokenExpired(token) || getRoleFromToken(token) == 'ROLE_ADMIN') {
@@ -193,7 +241,6 @@ const AlcReport = () => {
     }
 
     if (type === 'year') {
-      // 최근에 입력한 데이터를 기준으로 해당 년의 데이터를 가져오기
       const currentYear = latestDate.getFullYear();
 
       return fullData.filter((item) => {
@@ -205,18 +252,24 @@ const AlcReport = () => {
     return fullData; // 전체 기간
   };
 
-  // 처음에 일주일 데이터 로드
-  useEffect(() => {
-    setFilteredData(filterData('week'));
-  }, [fullData]);
+  // // 처음에 일주일 데이터 로드
+  // useEffect(() => {
+  //   setFilteredData(filterData('week'));
+  // }, [fullData]);
 
-  const dataBtn = ['주', '월', '년'];
+  const dataBtn = ['월', '년'];
+
   //테스트
   const currentYear = new Date().getFullYear();
   const currentMonth = String(new Date().getMonth() + 1).padStart(2, '0');
   const currentYearMonth = currentYear + '-' + currentMonth;
-  const [year, setYear] = useState(currentYear);
-  const [month, setMonth] = useState(currentYearMonth);
+  const currentWeek = new Date().getFullYear();
+  const [week, setWeek] = useState(currentWeek);
+  // const [year, setYear] = useState(currentYear);
+  // const [month, setMonth] = useState(currentYearMonth);
+
+  const [year, setYear] = useState(new Date().getFullYear());
+  const [month, setMonth] = useState(`${year}-${String(new Date().getMonth() + 1).padStart(2, '0')}`);
 
   const handleIncrease = () => {
     setYear((prev) => prev + 1);
@@ -226,8 +279,24 @@ const AlcReport = () => {
     setYear((prev) => prev - 1);
   };
 
-  const handleDateChange = (e) => {
-    setMonth(e.target.value);
+  const handleIncreaseMonth = () => {
+    setMonth((prev) => {
+      const [y, m] = prev.split('-').map(Number);
+      const newMonth = m === 12 ? 1 : m + 1;
+      const newYear = newMonth === 1 ? y + 1 : y;
+      setYear(newYear);
+      return `${newYear}-${String(newMonth).padStart(2, '0')}`;
+    });
+  };
+
+  const handleDecreaseMonth = () => {
+    setMonth((prev) => {
+      const [y, m] = prev.split('-').map(Number);
+      const newMonth = m === 1 ? 12 : m - 1;
+      const newYear = newMonth === 12 ? y - 1 : y;
+      setYear(newYear);
+      return `${newYear}-${String(newMonth).padStart(2, '0')}`;
+    });
   };
 
   const getYearalcList = async () => {
@@ -275,9 +344,10 @@ const AlcReport = () => {
           // 월별 데이터 필터링
           filteredData = alcList.filter((item) => {
             const itemDate = new Date(item.enrollDate);
-            const itemYear = itemDate.getFullYear();
-            const itemMonth = (itemDate.getMonth() + 1).toString().padStart(2, '0');
-            return itemYear === year && itemMonth === month.split('-')[1];
+            return (
+              itemDate.getFullYear() === year &&
+              String(itemDate.getMonth() + 1).padStart(2, '0') === month.split('-')[1]
+            );
           });
         } else if (selectedRange === '년') {
           // 연도별 데이터 필터링
@@ -297,12 +367,39 @@ const AlcReport = () => {
   }, [selectedRange, year, month]);
   //테스트
 
-  const labels = [];
+  // 날짜 기준 오름차순 정렬 (과거 → 현재)
+  const sortedData = [...filteredData].sort(
+    (a, b) => new Date(a.endDate || a.enrollDate) - new Date(b.endDate || b.enrollDate)
+  );
 
-  // 차트에 들어갈 x축 라벨
-  for (const vo of filteredData) {
-    labels.unshift(vo.enrollDate);
-  }
+  //X축 라벨을 `selectedRange`에 따라 다르게 표시
+  const labels = sortedData.map((vo) => {
+    const dateStr = vo.endDate || vo.enrollDate || '날짜 없음';
+
+    if (dateStr === '날짜 없음') return dateStr; // 날짜 정보 없으면 그대로 반환
+
+    const dateParts = dateStr.split('-'); // 날짜를 '-' 기준 분할
+    const [year, month, day] = dateParts;
+
+    if (selectedRange === '년') {
+      return `${month}-${day}`; // 년 단위: MM-DD 형식
+    }
+    if (selectedRange === '월') {
+      return `${parseInt(day, 10)}일`; // 월 단위: "D일" 형식
+    }
+
+    return dateStr;
+  });
+
+  const displayLabels = labels.map((label) => {
+    const date = new Date(label);
+    return isNaN(date.getTime()) ? label : `${date.getDate()}일`;
+  });
+
+  const getDaysConsumed = (enrollDate) => {
+    const end = new Date(enrollDate);
+    return Math.ceil(end / (1000 * 60 * 60 * 24)) + 1; // 시작일부터 포함하여 계산
+  };
 
   const alcList = [];
 
@@ -336,8 +433,6 @@ const AlcReport = () => {
     },
   ];
 
-  //모달 고도화작업중 진행 예정 시작
-
   // 테이블에서 술 선택 시 상태 업데이트
   const handleDrinkSelection = (drink) => {
     setSelectedDrink(drink);
@@ -352,19 +447,12 @@ const AlcReport = () => {
       setAlcoholIntake(0);
     }
   };
-  // 모달 고도화작업중 진행예정 끝
-
-  // useEffect(() => {
-  //   dispatch(setTotalCount({ boardType, totalCount: alcList.length }));
-  //   dispatch(resetPaging({ boardType }));
-  // }, [boardType, alcList.length, dispatch]);
 
   //인풋 안 쪽에 들어가는 데이터 ~~~Vo에 들어있는 이름으로 맞춰주기
   const initialInputData = { alcType: '', abv: '', cc: '', enrollDate: '' };
   // 모달 안 쪽 인풋에 데이터 관리
   const [inputData, setInputData] = useState(initialInputData);
   // 페이징 쪽에 있는 자료 활용
-  // const data = dataVoList.slice(offset, offset + boardLimit);
   // 화면 렌더링
   const [num, setNum] = useState('');
 
@@ -556,17 +644,21 @@ const AlcReport = () => {
       <Title>음주관리</Title>
 
       <div></div>
-      {/* <NaviContainer>
-        <Navi target="alc" tag={'캘린더'}></Navi>
-        <Navi target="alc/report" tag={'리포트'}></Navi>
-      </NaviContainer> */}
 
       <ContentLayout>
-        {/* <DateBtn dataBtn={dataBtn} onSelect={setSelectedRange} onChange={setSelectChart}></DateBtn> */}
-
         <SearchArea>
-          {selectedRange === '월' ? (
-            <Input type="month" name="month" defaultValue={month} onChange={handleDateChange} />
+          {selectedRange === '주' ? (
+            <WeekDiv>
+              <WeekBtn></WeekBtn>
+              <span>{week}</span>
+              <WeekBtn></WeekBtn>
+            </WeekDiv>
+          ) : selectedRange === '월' ? (
+            <MonthDiv>
+              <MonthBtn onClick={handleDecreaseMonth}>{'<'}</MonthBtn>
+              <span>{month}</span>
+              <MonthBtn onClick={handleIncreaseMonth}>{'>'}</MonthBtn>
+            </MonthDiv>
           ) : selectedRange === '년' ? (
             <YearDiv>
               <YearBtn onClick={handleDecrease}>{'<'}</YearBtn>
