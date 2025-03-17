@@ -244,8 +244,11 @@ const CigaretteReport = () => {
   const currentYearMonth = currentYear + '-' + currentMonth;
   const currentWeek = new Date().getFullYear();
   const [week, setWeek] = useState(currentWeek);
-  const [year, setYear] = useState(currentYear);
-  const [month, setMonth] = useState(currentYearMonth);
+  // const [year, setYear] = useState(currentYear);
+  // const [month, setMonth] = useState(currentYearMonth);
+
+  const [year, setYear] = useState(new Date().getFullYear());
+  const [month, setMonth] = useState(`${year}-${String(new Date().getMonth() + 1).padStart(2, '0')}`);
 
   const handleIncrease = () => {
     setYear((prev) => prev + 1);
@@ -260,6 +263,7 @@ const CigaretteReport = () => {
       const [y, m] = prev.split('-').map(Number);
       const newMonth = m === 12 ? 1 : m + 1;
       const newYear = newMonth === 1 ? y + 1 : y;
+      setYear(newYear);
       return `${newYear}-${String(newMonth).padStart(2, '0')}`;
     });
   };
@@ -269,6 +273,7 @@ const CigaretteReport = () => {
       const [y, m] = prev.split('-').map(Number);
       const newMonth = m === 1 ? 12 : m - 1;
       const newYear = newMonth === 12 ? y - 1 : y;
+      setYear(newYear);
       return `${newYear}-${String(newMonth).padStart(2, '0')}`;
     });
   };
@@ -328,9 +333,10 @@ const CigaretteReport = () => {
           // 월별 데이터 필터링
           filteredData = cigaretteList.filter((item) => {
             const itemDate = new Date(item.endDate);
-            const itemYear = itemDate.getFullYear();
-            const itemMonth = (itemDate.getMonth() + 1).toString().padStart(2, '0');
-            return itemYear === year && itemMonth === month.split('-')[1];
+            return (
+              itemDate.getFullYear() === year &&
+              String(itemDate.getMonth() + 1).padStart(2, '0') === month.split('-')[1]
+            );
           });
         } else if (selectedRange === '년') {
           // 연도별 데이터 필터링
@@ -617,28 +623,10 @@ const CigaretteReport = () => {
   return (
     <>
       <Title>흡연관리</Title>
-      {/* <NaviContainer>
-        <Navi target="cigarette" tag={'캘린더'}></Navi>
-        <Navi target="cigarette/report" tag={'리포트'}></Navi>
-      </NaviContainer> */}
+
       <div></div>
 
       <ContentLayout>
-        {/* <SearchArea>
-          {selectedRange === '월' ? (
-            <Input type="month" name="month" defaultValue={month} onChange={handleDateChange} />
-          ) : selectedRange === '년' ? (
-            <YearDiv>
-              <YearBtn onClick={handleDecrease}>{'<'}</YearBtn>
-              <span>{year}</span>
-              <YearBtn onClick={handleIncrease}>{'>'}</YearBtn>
-            </YearDiv>
-          ) : (
-            ''
-          )}
-          <DateBtn dataBtn={dataBtn} onSelect={setSelectedRange} onChange={setSelectChart}></DateBtn>
-        </SearchArea> */}
-
         <SearchArea>
           {selectedRange === '주' ? (
             <WeekDiv>
@@ -811,7 +799,6 @@ const CigaretteReport = () => {
             <Btn mt={'50'} mr={'46'} mb={'20'} str={'등록'} c={'#FF7F50'} fc={'white'}></Btn>
           </div>
         </BtnContainer>
-        {/* <RadiusTable width="100%" thBgColor="" radius="0px"> */}
         <Table>
           <thead>
             <tr>
