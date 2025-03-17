@@ -7,7 +7,6 @@ import Title from '../../../util/Title';
 import Modal from '../../../util/Modal';
 import Btn from '../../../util/Btn';
 import InputTag from '../../../util/Input';
-import Navi from '../../../util/Navi';
 import Table from '../../../util/Table';
 import Pagination from '../../../util/Pagination';
 
@@ -22,29 +21,68 @@ import { useNavigate } from 'react-router-dom';
 import { getRoleFromToken, isTokenExpired } from '../../../util/JwtUtil';
 import { BASE_URL } from '../../../services/config';
 
-const NaviContainer = styled.div`
-  display: grid;
-  position: relative;
-  width: 300px; // 항목수에 비례해서 주시면 됩니다.
-  top: 20px;
-  left: 40px;
-  grid-template-columns: 3fr 3fr; // 글자수만큼 fr 주면 됩니다. ex) 유산소 3글자니까 3fr
-`;
 const YearDiv = styled.div`
   display: flex;
-  height: 30px;
-  box-sizing: border-box;
   justify-content: center;
   align-items: center;
-  border: 1px solid rgb(118, 118, 118);
+  font-size: 45px;
+  font-weight: bold;
+  gap: 30px;
+  height: 0px;
+  margin-bottom: 20px;
+  margin-right: 220px;
 `;
 
 const YearBtn = styled.button`
   background-color: transparent;
+  justify-content: center;
   border: none;
-  padding: 0px 12px;
+  padding: 0px 5px;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 34px;
+  font-weight: bold;
+`;
+
+const MonthDiv = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 45px;
+  font-weight: bold;
+  gap: 30px;
+  height: 0px;
+  margin-bottom: 20px;
+  margin-right: 160px;
+`;
+
+const MonthBtn = styled.button`
+  background-color: transparent;
+  border: none;
+  padding: 0px 5px;
+  cursor: pointer;
+  font-size: 34px;
+  font-weight: bold;
+`;
+
+const WeekDiv = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 45px;
+  font-weight: bold;
+  gap: 30px;
+  height: 0px;
+  margin-bottom: 20px;
+  margin-right: 220px;
+`;
+
+const WeekBtn = styled.button`
+  background-color: transparent;
+  border: none;
+  padding: 0px 5px;
+  cursor: pointer;
+  font-size: 34px;
+  font-weight: bold;
 `;
 
 const SearchArea = styled.div`
@@ -72,7 +110,7 @@ const CigaretteReport = () => {
   const [fullData, setFullData] = useState([]); // 전체 데이터 저장
   const [pagedData, setPagedData] = useState([]); // 페이징된 데이터
   const [filteredData, setFilteredData] = useState([]); // 차트용 필터링 데이터
-  const [selectedRange, setSelectedRange] = useState('주'); // 기본값 '주'
+  const [selectedRange, setSelectedRange] = useState('월'); // 기본값 '주'
   const [selectChart, setSelectChart] = useState('Line'); // 그래프 모양 정하는 state
 
   const boardType = 'CigaretteReport';
@@ -151,8 +189,6 @@ const CigaretteReport = () => {
 
   // 차트용 필터링 데이터의 마지막 기록 날짜를 기준으로 최근 7일간의 데이터와 해당 날짜가 포함된 달의 데이터를 가져옴
   const filterData = (type) => {
-    // const today = new Date(); // 오늘 날짜 가져오기
-
     //데이터의 최근날짜
     const voList = [];
 
@@ -206,6 +242,8 @@ const CigaretteReport = () => {
   const currentYear = new Date().getFullYear();
   const currentMonth = String(new Date().getMonth() + 1).padStart(2, '0');
   const currentYearMonth = currentYear + '-' + currentMonth;
+  const currentWeek = new Date().getFullYear();
+  const [week, setWeek] = useState(currentWeek);
   const [year, setYear] = useState(currentYear);
   const [month, setMonth] = useState(currentYearMonth);
 
@@ -217,6 +255,31 @@ const CigaretteReport = () => {
     setYear((prev) => prev - 1);
   };
 
+  const handleIncreaseMonth = () => {
+    setMonth((prev) => {
+      const [y, m] = prev.split('-').map(Number);
+      const newMonth = m === 12 ? 1 : m + 1;
+      const newYear = newMonth === 1 ? y + 1 : y;
+      return `${newYear}-${String(newMonth).padStart(2, '0')}`;
+    });
+  };
+
+  const handleDecreaseMonth = () => {
+    setMonth((prev) => {
+      const [y, m] = prev.split('-').map(Number);
+      const newMonth = m === 1 ? 12 : m - 1;
+      const newYear = newMonth === 12 ? y - 1 : y;
+      return `${newYear}-${String(newMonth).padStart(2, '0')}`;
+    });
+  };
+
+  const handleIncreaseWeek = () => {
+    setWeek((prev) => prev + 1); // 주 증가
+  };
+
+  const handleDecreaseWeek = () => {
+    setWeek((prev) => prev - 1); // 주 감소
+  };
   const handleDateChange = (e) => {
     setMonth(e.target.value);
   };
@@ -284,16 +347,36 @@ const CigaretteReport = () => {
     };
 
     fetchData();
-  }, [selectedRange, year, month]);
+  }, [selectedRange, year, month, week]);
   //테스트
 
-  const dataBtn = ['주', '월', '년'];
+  const dataBtn = ['월', '년'];
 
   // 날짜 기준 오름차순 정렬 (과거 → 현재)
   const sortedData = [...filteredData].sort((a, b) => new Date(a.endDate) - new Date(b.endDate));
 
   // X축: 정렬된 날짜 리스트
-  const labels = sortedData.map((vo) => vo.endDate);
+  const labels = sortedData.map((vo) => {
+    const dateParts = vo.endDate.split('-'); // 날짜를 '-'로 나눔
+    const [year, month, day] = dateParts; // 연도, 월, 일을 분리
+
+    if (selectedRange === '년') {
+      // 년별 데이터일 때는 월-일 형식으로 표시 (ex: "03-01")
+      return `${month}-${day}`;
+    }
+
+    if (selectedRange === '월') {
+      // 월별 데이터일 때는 월-일 형식으로 표시 (ex: "03-01")
+      return `${parseInt(day)}일`;
+    }
+
+    // 일별 데이터는 날짜 그대로 표시
+    if (day) {
+      return `${parseInt(day)}일`;
+    }
+
+    return vo.endDate;
+  });
 
   const getDaysConsumed = (startDate, endDate) => {
     const start = new Date(startDate);
@@ -308,9 +391,9 @@ const CigaretteReport = () => {
 
   // const cigaretteList = [];
   // 차트에 들어갈 1번 데이터의 내용
-  for (const vo of filteredData) {
-    cigaretteList.push(vo.endDate);
-  }
+  // for (const vo of filteredData) {
+  //   cigaretteList.push(vo.endDate);
+  // }
 
   const dataset = [
     {
@@ -345,7 +428,7 @@ const CigaretteReport = () => {
   const maxValue = Math.max(...cigaretteList);
 
   // yMax 값 설정 (최대값 + 0.5)
-  const yMaxValue = maxValue + 0.2;
+  const yMaxValue = maxValue + maxValue * 0.2;
 
   //인풋 안 쪽에 들어가는 데이터 ~~~Vo에 들어있는 이름으로 맞춰주기
   const initialInputData = { cigarette: '', startDate: '', endDate: '', tar: '' };
@@ -541,7 +624,7 @@ const CigaretteReport = () => {
       <div></div>
 
       <ContentLayout>
-        <SearchArea>
+        {/* <SearchArea>
           {selectedRange === '월' ? (
             <Input type="month" name="month" defaultValue={month} onChange={handleDateChange} />
           ) : selectedRange === '년' ? (
@@ -554,8 +637,35 @@ const CigaretteReport = () => {
             ''
           )}
           <DateBtn dataBtn={dataBtn} onSelect={setSelectedRange} onChange={setSelectChart}></DateBtn>
-        </SearchArea>
+        </SearchArea> */}
 
+        <SearchArea>
+          {selectedRange === '주' ? (
+            <WeekDiv>
+              {/* <WeekBtn onClick={handleDecreaseWeek}>{'<'}</WeekBtn>
+              <span>{week}</span>
+              <WeekBtn onClick={handleIncreaseWeek}>{'>'}</WeekBtn> */}
+              <WeekBtn></WeekBtn>
+              <span>{week}</span>
+              <WeekBtn></WeekBtn>
+            </WeekDiv>
+          ) : selectedRange === '월' ? (
+            <MonthDiv>
+              <MonthBtn onClick={handleDecreaseMonth}>{'<'}</MonthBtn>
+              <span>{month}</span>
+              <MonthBtn onClick={handleIncreaseMonth}>{'>'}</MonthBtn>
+            </MonthDiv>
+          ) : selectedRange === '년' ? (
+            <YearDiv>
+              <YearBtn onClick={handleDecrease}>{'<'}</YearBtn>
+              <span>{year}</span>
+              <YearBtn onClick={handleIncrease}>{'>'}</YearBtn>
+            </YearDiv>
+          ) : (
+            ''
+          )}
+          <DateBtn dataBtn={dataBtn} onSelect={setSelectedRange} onChange={setSelectChart}></DateBtn>
+        </SearchArea>
         <Chart
           chartType={selectChart} // 차트 타입지정
           labels={labels} // 위랑 동일
