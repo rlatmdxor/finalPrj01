@@ -157,12 +157,11 @@ const Sleep = () => {
     // 마지막 데이터 추가
     if (matchedDay > 0) {
       const hours = Math.floor(daySleepDuration / matchedDay / 60); // 정수 시간
-      const minutes = Math.round((daySleepDuration / matchedDay) % 60); // 정수 분
-      TempDayList.push(hours + '시간' + minutes + '분');
+      TempDayList.push(hours);
     }
     // 최종 리스트 저장
     setDayList(TempDayList);
-  }, [dataVoList.length, state]);
+  }, [num, dataVoList.length, state]);
 
   useEffect(() => {
     let TempDayLabels = [];
@@ -214,7 +213,7 @@ const Sleep = () => {
     // 월별 데이터 업데이트
     setMonthLabels(monthLabels);
     setMonthList(monthList);
-  }, [dataVoList.length, state]);
+  }, [dataVoList.length, state, num]);
 
   useEffect(() => {
     for (let i = 1; i <= daysInYear; i++) {
@@ -253,7 +252,7 @@ const Sleep = () => {
     // 최종 데이터 세팅
     setWeekList(TempWeekList);
     setWeekLabels(TempWeekLables); // 주 레이블 업데이트
-  }, [dataVoList.length, state]);
+  }, [dataVoList.length, state, num]);
 
   useEffect(() => {
     if (!isAuthorized) {
@@ -296,7 +295,7 @@ const Sleep = () => {
   useEffect(() => {
     dispatch(setTotalCount({ boardType, totalCount: chartVoList.length }));
     dispatch(resetPaging({ boardType }));
-  }, [chartVoList.length, dispatch]);
+  }, [num, chartVoList.length, dispatch]);
 
   const offset = (currentPage - 1) * boardLimit;
   const data = chartVoList.slice(offset, offset + boardLimit);
@@ -422,7 +421,7 @@ const Sleep = () => {
 
     Swal.fire({
       title: '수정하시겠습니까?', // 제목
-      icon: 'success', // 아이콘 유형 (warning, success, error 등)
+      icon: 'question', // 아이콘 유형 (warning, success, error 등)
       showCancelButton: true, // 취소 버튼 표시
       confirmButtonColor: '#3085d6', // 등록 버튼 색상
       cancelButtonColor: '#d33', // 취소 버튼 색상
@@ -435,12 +434,12 @@ const Sleep = () => {
         fetch(`${BASE_URL}/api/sleep/edit`, options)
           .then((resp) => resp.text())
           .then((data) => {
-            setNum((prev) => prev + 1);
             Swal.fire({
-              icon: 'warning',
+              icon: 'success',
               title: '수정 완료.',
               confirmButtonText: '확인',
             });
+            setNum((prev) => prev + 1);
           });
 
         dispatch(close(e.target.title));

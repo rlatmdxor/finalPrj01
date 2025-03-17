@@ -70,6 +70,14 @@ public class SleepController {
             if(betweenTime < 0 ){
                 betweenTime = betweenTime+1440;
             }
+
+            long betwennHours = betweenTime / 60; // 몫 = 시간
+            long betwennMinutes = betweenTime % 60; // 나머지 = 분
+
+            // "X시간 Y분" 형식으로 변환
+            String sleepDurationHours = String.format("%d시간 %d분", betwennHours, betwennMinutes);
+            vo.setSleepDurationHour(sleepDurationHours);
+
             String sleepMinutes = String.valueOf(betweenTime);
 
 
@@ -77,7 +85,7 @@ public class SleepController {
             service.edit(token, vo);
             return "edit ok ~~~";
         }catch (Exception e){
-            throw new IllegalStateException("CODE [ CHALLENGER / LIST ]");
+            throw new IllegalStateException("CODE [ SLEEP / EDIT ]");
         }
 
     }
