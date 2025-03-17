@@ -53,6 +53,7 @@ public interface SleepMapper {
                     SLEEP_START = TO_DATE((TO_DATE(#{vo.recordDate}) || #{vo.sleepStart} ), 'YYYY-MM-DD HH24:MI'),
                     SLEEP_END =TO_DATE((TO_DATE(#{vo.recordDate}) || #{vo.sleepEnd} ), 'YYYY-MM-DD HH24:MI'),
                     SLEEP_DURATION =#{vo.sleepDuration},
+                    SLEEP_DURATION_HOUR = #{vo.sleepDurationHour},
                     RECORD_DATE = TO_DATE(#{vo.recordDate})
             WHERE MEMBER_NO = #{userNo}
             AND NO =#{vo.no}
