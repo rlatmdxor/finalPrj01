@@ -21,7 +21,7 @@ public interface UserHealthMapper {
                 , TO_CHAR(SLEEP_END , 'HH24:MI') AS SLEEP_END
             FROM SLEEP
             WHERE MEMBER_NO = #{memberNo}
-            AND RECORD_DATE BETWEEN #{startDate} AND #{endDate}
+            AND RECORD_DATE BETWEEN TO_DATE(#{startDate}, 'YYYY-MM-DD') AND TO_DATE(#{endDate}, 'YYYY-MM-DD')
             ORDER BY SLEEP_START DESC
             """)
     List<SleepVo> getSleepList(String memberNo, String startDate, String endDate);
@@ -34,7 +34,7 @@ public interface UserHealthMapper {
                 , TO_CHAR(ENROLL_DATE, 'YYYY-MM-DD') AS ENROLL_DATE
             FROM RECORD_ALC
             WHERE MEMBER_NO = #{memberNo}
-            AND ENROLL_DATE BETWEEN #{startDate} AND #{endDate}
+            AND ENROLL_DATE BETWEEN TO_DATE(#{startDate}, 'YYYY-MM-DD') AND TO_DATE(#{endDate}, 'YYYY-MM-DD')
             ORDER BY ENROLL_DATE DESC
             """)
     List<AlcReportVo> getAlcList(String memberNo, String startDate, String endDate);
@@ -47,7 +47,7 @@ public interface UserHealthMapper {
             FROM AEROBIC_HISTORY H
             JOIN AEROBIC A ON H.EX_NO = A.NO
             WHERE H.USER_NO = #{memberNo}
-            AND H.EX_DATE BETWEEN #{startDate} AND #{endDate}
+            AND H.EX_DATE BETWEEN TO_DATE(#{startDate}, 'YYYY-MM-DD') AND TO_DATE(#{endDate}, 'YYYY-MM-DD')
             ORDER BY H.EX_DATE DESC
             """)
     List<AerobicHistoryVo> getAerobicHistoryList(String memberNo, String startDate, String endDate);
@@ -61,7 +61,7 @@ public interface UserHealthMapper {
             FROM ANAEROBIC_HISTORY H
             JOIN ANAEROBIC A ON H.EX_NO = A.NO
             WHERE H.USER_NO = #{memberNo}
-            AND H.EX_DATE BETWEEN #{startDate} AND #{endDate}
+            AND H.EX_DATE BETWEEN TO_DATE(#{startDate}, 'YYYY-MM-DD') AND TO_DATE(#{endDate}, 'YYYY-MM-DD')
             ORDER BY H.EX_DATE DESC
             """)
     List<AnAerobicHistoryVo> getAnAerobicHistoryList(String memberNo, String startDate, String endDate);
@@ -85,7 +85,7 @@ public interface UserHealthMapper {
                 , NOTE
             FROM BLOOD_PRESSURE
             WHERE MEMBER_NO = #{memberNo}
-            AND ENROLL_DATE BETWEEN #{startDate} AND #{endDate}
+            AND ENROLL_DATE BETWEEN TO_DATE(#{startDate}, 'YYYY-MM-DD') AND TO_DATE(#{endDate}, 'YYYY-MM-DD')
             ORDER BY ENROLL_DATE DESC
             """)
     List<BloodPressureVo> getbloodPressureList(String memberNo, String startDate, String endDate);
@@ -98,7 +98,7 @@ public interface UserHealthMapper {
                 , NOTE
             FROM BLOOD_SUGAR
             WHERE MEMBER_NO = #{memberNo}
-            AND ENROLL_DATE BETWEEN #{startDate} AND #{endDate}
+            AND ENROLL_DATE BETWEEN TO_DATE(#{startDate}, 'YYYY-MM-DD') AND TO_DATE(#{endDate}, 'YYYY-MM-DD')
             ORDER BY ENROLL_DATE DESC
             """)
     List<BloodSugarVo> getbloodSugarList(String memberNo, String startDate, String endDate);
