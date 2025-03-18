@@ -22,7 +22,7 @@ public interface MealMapper {
                 SEQ_DIET.NEXTVAL
                 , #{memberNo}
                 , #{mealCode}
-                , #{dietDay}
+                , TO_DATE(#{dietDay}, 'YYYY-MM-DD')
                 , #{memo}
                 , #{image}
             )
@@ -64,7 +64,7 @@ public interface MealMapper {
                 , DEL_YN
             FROM DIET
             WHERE MEMBER_NO = #{memberNo}
-            AND DIET_DAY = #{dietDay}
+            AND DIET_DAY = TO_DATE(#{dietDay}, 'YYYY-MM-DD')
             AND DEL_YN = 'N'
             """)
     List<DietVo> getDietDetail(DietVo vo);

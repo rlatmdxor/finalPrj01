@@ -22,7 +22,7 @@ public interface WaterMapper {
             (
                  SEQ_WATER_LOG.NEXTVAL
                  , #{memberNo}
-                 , #{enrollDate}
+                 , TO_DATE(#{enrollDate}, 'YYYY-MM-DD')
                  , #{amount}
             )
             """)
@@ -32,7 +32,7 @@ public interface WaterMapper {
             UPDATE WATER_LOG
             SET AMOUNT = #{amount}
             WHERE MEMBER_NO = #{memberNo}
-            AND TRUNC(ENROLL_DATE) = #{enrollDate}
+            AND TRUNC(ENROLL_DATE) = TO_DATE(#{enrollDate}, 'YYYY-MM-DD')
             """)
     void waterUpdate(WaterVo vo);
 
@@ -40,7 +40,7 @@ public interface WaterMapper {
             SELECT AMOUNT
             FROM WATER_LOG
             WHERE MEMBER_NO = #{memberNo}
-            AND TRUNC(ENROLL_DATE) = #{enrollDate}
+            AND TRUNC(ENROLL_DATE) = TO_DATE(#{enrollDate}, 'YYYY-MM-DD')
             """)
     WaterVo getWaterByDate(WaterVo vo);
 

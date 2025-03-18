@@ -23,7 +23,7 @@ public interface WeightMapper {
             (
                 SEQ_WEIGHT_LOG.NEXTVAL
                 , #{memberNo}
-                , #{enrollDate}
+                , TO_DATE(#{enrollDate}, 'YYYY-MM-DD')
                 , #{amount}
             )
             """)
@@ -33,7 +33,7 @@ public interface WeightMapper {
             UPDATE WEIGHT_LOG
             SET AMOUNT = #{amount}
             WHERE MEMBER_NO = #{memberNo}
-            AND TRUNC(ENROLL_DATE) = #{enrollDate}
+            AND TRUNC(ENROLL_DATE) = TO_DATE(#{enrollDate}, 'YYYY-MM-DD')
             """)
     void weightUpdate(WeightVo vo);
 
@@ -41,7 +41,7 @@ public interface WeightMapper {
             SELECT AMOUNT
             FROM WEIGHT_LOG
             WHERE MEMBER_NO = #{memberNo}
-            AND TRUNC(ENROLL_DATE) = #{enrollDate}
+            AND TRUNC(ENROLL_DATE) = TO_DATE(#{enrollDate}, 'YYYY-MM-DD')
             """)
     WeightVo getWeightByDate(WeightVo vo);
 
