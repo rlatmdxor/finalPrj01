@@ -20,8 +20,13 @@ public interface AlcReportMapper {
     List<AlcReportVo> list(String memberNo);
 
     @Insert("""
-        INSERT INTO RECORD_ALC (NO, MEMBER_NO, ALC_TYPE, ABV, CC, ENROLL_DATE)
-        VALUES (SEQ_RECORD_ALC.NEXTVAL, #{memberNo}, #{vo.alcType}, #{vo.abv}, #{vo.cc}, #{vo.enrollDate})
+    INSERT INTO RECORD_ALC (NO, MEMBER_NO, ALC_TYPE, ABV, CC, ENROLL_DATE)
+    VALUES (SEQ_RECORD_ALC.NEXTVAL,
+            #{memberNo},
+            #{vo.alcType},
+            #{vo.abv},
+            #{vo.cc},
+            TO_DATE(#{vo.enrollDate}, 'YYYY-MM-DD'))
     """)
     void write(@Param("memberNo") String memberNo, @Param("vo") AlcReportVo vo);
 
@@ -32,7 +37,7 @@ public interface AlcReportMapper {
             ALC_TYPE = #{vo.alcType},
             ABV = #{vo.abv},
             CC = #{vo.cc},
-            ENROLL_DATE = #{vo.enrollDate}
+            ENROLL_DATE = TO_DATE(#{vo.enrollDate}, 'YYYY-MM-DD')
         WHERE NO = #{vo.no} AND MEMBER_NO = #{memberNo}
     """)
     void update(@Param("memberNo") String memberNo, @Param("vo") AlcReportVo vo);

@@ -28,7 +28,7 @@ public class HospitalController {
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "200") int size) {
 
-        // ✅ 기존 검색어가 없을 경우, "동/시/구" 정보를 자동 검색어로 설정
+        // 기존 검색어가 없을 경우, 동/시/구 정보를 자동 검색어로 설정
         if ((keyword == null || keyword.isEmpty()) && (searchType == null || searchType.isEmpty())) {
             keyword = (dong != null && !dong.isEmpty()) ? dong
                     : (district != null && !district.isEmpty()) ? district

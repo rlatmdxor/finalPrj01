@@ -11,7 +11,7 @@ public interface LocationMapper {
     @Select("""
             SELECT NO, CITY_NAME FROM CITY ORDER BY NO
             """)
-    List<CityVo> getCities(); // 모든 도시 가져오기\
+    List<CityVo> getCities(); // 모든 도시 가져오기
 
     @Select("""
             SELECT NO, DISTRICT_NAME, CITY_NO FROM DISTRICT WHERE CITY_NO = #{cityNo} ORDER BY DISTRICT_NAME

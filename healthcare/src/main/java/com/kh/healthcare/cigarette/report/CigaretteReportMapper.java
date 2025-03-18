@@ -26,23 +26,24 @@ public interface CigaretteReportMapper {
             ,#{memberNo}
             ,#{vo.cigarette}
             ,#{vo.tar}
-            ,#{vo.startDate}
-            ,#{vo.endDate}
+            ,TO_DATE(#{vo.startDate}, 'YYYY-MM-DD')
+            ,TO_DATE(#{vo.endDate}, 'YYYY-MM-DD')
             )
             """)
     void write(@Param("memberNo") String memberNo , @Param("vo") CigaretteReportVo vo);
 
 
     @Update("""
-            UPDATE RECORD_CIGARETTE
-            SET
-               CIGARETTE = #{vo.cigarette},
-               TAR = #{vo.tar},
-               START_DATE = #{vo.startDate},
-               END_DATE = #{vo.endDate}
-            WHERE NO = #{vo.no} AND MEMBER_NO = #{memberNo}
-            """)
+    UPDATE RECORD_CIGARETTE
+    SET
+       CIGARETTE = #{vo.cigarette},
+       TAR = #{vo.tar},
+       START_DATE = TO_DATE(#{vo.startDate}, 'YYYY-MM-DD'),
+       END_DATE = TO_DATE(#{vo.endDate}, 'YYYY-MM-DD')
+    WHERE NO = #{vo.no} AND MEMBER_NO = #{memberNo}
+""")
     void update(@Param("memberNo") String memberNo , @Param("vo") CigaretteReportVo vo);
+
 
 
     @Delete("""
