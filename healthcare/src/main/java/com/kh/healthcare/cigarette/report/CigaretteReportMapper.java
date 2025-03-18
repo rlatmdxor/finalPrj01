@@ -34,15 +34,16 @@ public interface CigaretteReportMapper {
 
 
     @Update("""
-            UPDATE RECORD_CIGARETTE
-            SET
-               CIGARETTE = #{vo.cigarette},
-               TAR = #{vo.tar},
-                TO_DATE(#{vo.startDate}, 'YYYY-MM-DD'),
-               TO_DATE(#{vo.endDate}, 'YYYY-MM-DD')
-            WHERE NO = #{vo.no} AND MEMBER_NO = #{memberNo}
-            """)
+    UPDATE RECORD_CIGARETTE
+    SET
+       CIGARETTE = #{vo.cigarette},
+       TAR = #{vo.tar},
+       START_DATE = TO_DATE(#{vo.startDate}, 'YYYY-MM-DD'),
+       END_DATE = TO_DATE(#{vo.endDate}, 'YYYY-MM-DD')
+    WHERE NO = #{vo.no} AND MEMBER_NO = #{memberNo}
+""")
     void update(@Param("memberNo") String memberNo , @Param("vo") CigaretteReportVo vo);
+
 
 
     @Delete("""

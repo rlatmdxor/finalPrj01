@@ -20,13 +20,13 @@ public interface AlcReportMapper {
     List<AlcReportVo> list(String memberNo);
 
     @Insert("""
-        INSERT INTO RECORD_ALC (NO, MEMBER_NO, ALC_TYPE, ABV, CC, ENROLL_DATE)
-        VALUES (SEQ_RECORD_ALC.NEXTVAL
-        , #{memberNo}
-        , #{vo.alcType}
-        , #{vo.abv}
-        , #{vo.cc}
-        , TO_DATE(#{vo.enrollDate}, 'YYYY-MM-DD')
+    INSERT INTO RECORD_ALC (NO, MEMBER_NO, ALC_TYPE, ABV, CC, ENROLL_DATE)
+    VALUES (SEQ_RECORD_ALC.NEXTVAL,
+            #{memberNo},
+            #{vo.alcType},
+            #{vo.abv},
+            #{vo.cc},
+            TO_DATE(#{vo.enrollDate}, 'YYYY-MM-DD'))
     """)
     void write(@Param("memberNo") String memberNo, @Param("vo") AlcReportVo vo);
 
