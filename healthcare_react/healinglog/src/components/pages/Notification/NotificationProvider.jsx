@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect } from 'react';
 import SockJS from 'sockjs-client';
 import { Client } from '@stomp/stompjs';
+import { BASE_URL } from '../../services/config';
 
 // 알림 데이터를 전역으로 제공할 Context 생성
 export const NotificationContext = createContext();
