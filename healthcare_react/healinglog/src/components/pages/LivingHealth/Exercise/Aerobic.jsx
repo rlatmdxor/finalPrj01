@@ -233,7 +233,7 @@ const Aerobic = () => {
               {bookmarkedAerobic.map((aerobic) => (
                 <Line key={aerobic.no}>
                   <Star>
-                    <StarIcon src="/img/Star.webp" onClick={() => unmark(aerobic.no)} />
+                    <StarIcon src="/img/Star.png" onClick={() => unmark(aerobic.no)} />
                   </Star>
                   <Content>
                     <div
@@ -276,7 +276,7 @@ const Aerobic = () => {
               {aerobic.map((aerobic) => (
                 <Line key={aerobic.no}>
                   <Star>
-                    <StarIcon src="/img/EmptyStar.webp" onClick={() => mark(aerobic.no)} />
+                    <StarIcon src="/img/EmptyStar.png" onClick={() => mark(aerobic.no)} />
                   </Star>
                   <Content>
                     <div

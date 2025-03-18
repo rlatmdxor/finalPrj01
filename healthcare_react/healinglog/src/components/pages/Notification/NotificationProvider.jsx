@@ -11,7 +11,7 @@ const NotificationProvider = ({ children }) => {
 
   useEffect(() => {
     // 웹소켓 연결 생성
-    const socket = new SockJS('http://localhost/api/websocket');
+    const socket = new SockJS(`${BASE_URL}/api/websocket`);
     const client = new Client({
       webSocketFactory: () => socket,
       reconnectDelay: 5000, // 5초 후 자동 재연결

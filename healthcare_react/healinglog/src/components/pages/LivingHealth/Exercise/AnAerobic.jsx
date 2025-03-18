@@ -214,7 +214,7 @@ const AnAerobic = () => {
               {bookmarkedAnaerobic.map((anaerobic) => (
                 <Line key={anaerobic.no}>
                   <Star>
-                    <StarIcon src="/img/Star.webp" onClick={() => unmark(anaerobic.no)} />
+                    <StarIcon src="/img/Star.png" onClick={() => unmark(anaerobic.no)} />
                   </Star>
                   <Content>
                     <div
@@ -257,7 +257,7 @@ const AnAerobic = () => {
               {armExercises.map((anaerobic) => (
                 <Line key={anaerobic.no}>
                   <Star>
-                    <StarIcon src="/img/EmptyStar.webp" onClick={() => mark(anaerobic.no)} />
+                    <StarIcon src="/img/EmptyStar.png" onClick={() => mark(anaerobic.no)} />
                   </Star>
                   <Content>
                     <div
@@ -300,7 +300,7 @@ const AnAerobic = () => {
               {legExercises.map((anaerobic) => (
                 <Line key={anaerobic.no}>
                   <Star>
-                    <StarIcon src="/img/EmptyStar.webp" onClick={() => mark(anaerobic.no)} />
+                    <StarIcon src="/img/EmptyStar.png" onClick={() => mark(anaerobic.no)} />
                   </Star>
                   <Content>
                     <div
@@ -343,7 +343,7 @@ const AnAerobic = () => {
               {shoulderExercises.map((anaerobic) => (
                 <Line key={anaerobic.no}>
                   <Star>
-                    <StarIcon src="/img/EmptyStar.webp" onClick={() => mark(anaerobic.no)} />
+                    <StarIcon src="/img/EmptyStar.png" onClick={() => mark(anaerobic.no)} />
                   </Star>
                   <Content>
                     <div
@@ -386,7 +386,7 @@ const AnAerobic = () => {
               {chestExercises.map((anaerobic) => (
                 <Line key={anaerobic.no}>
                   <Star>
-                    <StarIcon src="/img/EmptyStar.webp" onClick={() => mark(anaerobic.no)} />
+                    <StarIcon src="/img/EmptyStar.png" onClick={() => mark(anaerobic.no)} />
                   </Star>
                   <Content>
                     <div
@@ -429,7 +429,7 @@ const AnAerobic = () => {
               {coreExercises.map((anaerobic) => (
                 <Line key={anaerobic.no}>
                   <Star>
-                    <StarIcon src="/img/EmptyStar.webp" onClick={() => mark(anaerobic.no)} />
+                    <StarIcon src="/img/EmptyStar.png" onClick={() => mark(anaerobic.no)} />
                   </Star>
                   <Content>
                     <div
@@ -472,7 +472,7 @@ const AnAerobic = () => {
               {etcExercises.map((anaerobic) => (
                 <Line key={anaerobic.no}>
                   <Star>
-                    <StarIcon src="/img/EmptyStar.webp" onClick={() => mark(anaerobic.no)} />
+                    <StarIcon src="/img/EmptyStar.png" onClick={() => mark(anaerobic.no)} />
                   </Star>
                   <Content>
                     <div
