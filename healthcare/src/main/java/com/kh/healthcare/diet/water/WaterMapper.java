@@ -22,7 +22,7 @@ public interface WaterMapper {
             (
                  SEQ_WATER_LOG.NEXTVAL
                  , #{memberNo}
-                 , #{enrollDate}
+                 , TO_DATE(#{enrollDate}, 'YYYY-MM-DD')
                  , #{amount}
             )
             """)

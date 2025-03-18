@@ -9,8 +9,16 @@ public class CorsConfig implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/api/**")
-                .allowedMethods("POST", "GET", "DELETE", "PUT")
-                .allowedOriginPatterns("http://localhost:3000");
+        registry.addMapping("/**")
+                .allowedOrigins(
+                        "http://localhost:3000"
+                        , "http://dhc0mhvzf0wlm.cloudfront.net"
+                        , "http://healinglog-react.s3.ap-northeast-2.amazonaws.com"
+                        , "http://d3e15pchphfv7e.cloudfront.net"
+                )
+                .allowedMethods("*")
+                .allowedHeaders("*")
+                .allowCredentials(true);
+                ;
     }
 }

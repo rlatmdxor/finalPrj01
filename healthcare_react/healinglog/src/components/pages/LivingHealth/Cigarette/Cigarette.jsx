@@ -15,6 +15,7 @@ import Pagination from '../../../util/Pagination';
 import { setTotalCount, resetPaging } from '../../../../redux/pagingSlice';
 import { close, open } from '../../../../redux/modalSlice';
 import ContentLayout from '../../../util/ContentLayout';
+import { BASE_URL } from '../../../services/config';
 
 const NaviContainer = styled.div`
   display: grid;
@@ -61,7 +62,7 @@ const dataset = [
 ];
 
 const Cigarette = () => {
-  const url = 'http://127.0.0.1/api/cigarette/list';
+  const url = `${BASE_URL}/cigarette/list`;
 
   const options = {
     method: 'POST',
@@ -144,7 +145,7 @@ const Cigarette = () => {
 
   // 인풋 입력값 보내기
   const handleSubmit = (e) => {
-    fetch('http://127.0.0.1:80/api/cigarette/write', {
+    fetch(`${BASE_URL}/api/cigarette/write`, {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
@@ -168,7 +169,7 @@ const Cigarette = () => {
 
   //수정모달
   const handleEditSubmit = (e) => {
-    fetch('http://127.0.0.1:80/api/cigarette/update', {
+    fetch(`${BASE_URL}/api/cigarette/update`, {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
@@ -194,7 +195,7 @@ const Cigarette = () => {
   };
 
   const handleDeleteSubmit = (e) => {
-    fetch('http://127.0.0.1/api/cigarette/delete', {
+    fetch(`${BASE_URL}/api/cigarette/delete`, {
       method: 'DELETE',
       headers: {
         'content-type': 'application/json',
