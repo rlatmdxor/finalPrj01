@@ -24,27 +24,42 @@ public class SleepController {
     @PostMapping("write")
     public String write(@RequestHeader ("Authorization") String token, @RequestBody  SleepVo vo){
         try {
+            System.out.println("##### SleepController.write1");
             LocalTime sleepStart = LocalTime.parse(vo.getSleepStart(), formatter);
+            System.out.println("##### SleepController.write2");
             LocalTime sleepEnd = LocalTime.parse(vo.getSleepEnd(), formatter);
+            System.out.println("##### SleepController.write3");
             long betweenTime = ChronoUnit.MINUTES.between(sleepStart, sleepEnd);
-
+            System.out.println("##### SleepController.write4");
             if(betweenTime < 0 ){
+                System.out.println("##### SleepController.write5");
                 betweenTime = betweenTime+1440;
             }
 
+            System.out.println("##### SleepController.write6");
             long betwennHours = betweenTime / 60; // 몫 = 시간
+            System.out.println("##### SleepController.write7");
             long betwennMinutes = betweenTime % 60; // 나머지 = 분
+            System.out.println("##### SleepController.write8");
 
             // "X시간 Y분" 형식으로 변환
             String sleepDurationHours = String.format("%d시간 %d분", betwennHours, betwennMinutes);
             vo.setSleepDurationHour(sleepDurationHours);
+            System.out.println("##### SleepController.write9");
 
             String sleepMinutes = String.valueOf(betweenTime);
             vo.setSleepDuration(sleepMinutes);
+            System.out.println("##### SleepController.write10");
+            System.out.println("token = " + token);
+            System.out.println("vo = " + vo);
+
             service.write(token, vo);
+
+            System.out.println("##### SleepController.write11");
             return "write ok~~~";
         }catch (Exception e){
-            throw new IllegalStateException("CODE [ CHALLENGER / WRITE ]");
+            e.printStackTrace();
+            throw new IllegalStateException("CODE [ SLEEP / WRITE ]");
         }
 
     }
@@ -55,7 +70,7 @@ public class SleepController {
             List<SleepVo> voList =  service.list(token);
             return voList;
         }catch (Exception e){
-            throw new IllegalStateException("CODE [ CHALLENGER / LIST ]");
+            throw new IllegalStateException("CODE [ SLEEP / LIST ]");
         }
 
     }
@@ -95,7 +110,7 @@ public class SleepController {
             service.del(token, vo);
             return "del ok ~~~";
         }catch (Exception e){
-            throw new IllegalStateException("CODE [ CHALLENGER / DEL ]");
+            throw new IllegalStateException("CODE [ SLEEP / DEL ]");
         }
 
     }

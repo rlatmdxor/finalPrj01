@@ -24,11 +24,11 @@ public interface SleepMapper {
              (
              SEQ_SLEEP.NEXTVAL
              ,#{userNo}
-             , TO_DATE((TO_DATE(#{vo.recordDate}) || #{vo.sleepStart} ), 'YYYY-MM-DD HH24:MI')
-             , TO_DATE((TO_DATE(#{vo.recordDate}) || #{vo.sleepEnd} ), 'YYYY-MM-DD HH24:MI')
+             , TO_DATE(TO_CHAR(TO_DATE(#{vo.recordDate}, 'YYYY-MM-DD'), 'YYYY-MM-DD') || #{vo.sleepStart}, 'YYYY-MM-DD HH24:MI')
+             , TO_DATE(TO_CHAR(TO_DATE(#{vo.recordDate}, 'YYYY-MM-DD'), 'YYYY-MM-DD') || #{vo.sleepEnd}, 'YYYY-MM-DD HH24:MI')
              , #{vo.sleepDuration}
              , #{vo.sleepDurationHour}
-             , TO_DATE(#{vo.recordDate})
+             , TO_DATE(#{vo.recordDate}, 'YYYY-MM-DD')
              )
             """)
     void write(String userNo, SleepVo vo);
@@ -50,11 +50,11 @@ public interface SleepMapper {
     @Update("""
             UPDATE SLEEP
                 SET
-                    SLEEP_START = TO_DATE((TO_DATE(#{vo.recordDate}) || #{vo.sleepStart} ), 'YYYY-MM-DD HH24:MI'),
-                    SLEEP_END =TO_DATE((TO_DATE(#{vo.recordDate}) || #{vo.sleepEnd} ), 'YYYY-MM-DD HH24:MI'),
+                    SLEEP_START = TO_DATE(TO_CHAR(TO_DATE(#{vo.recordDate}, 'YYYY-MM-DD'), 'YYYY-MM-DD') || #{vo.sleepStart}, 'YYYY-MM-DD HH24:MI'),
+                    SLEEP_END = TO_DATE(TO_CHAR(TO_DATE(#{vo.recordDate}, 'YYYY-MM-DD'), 'YYYY-MM-DD') || #{vo.sleepEnd}, 'YYYY-MM-DD HH24:MI'),
                     SLEEP_DURATION =#{vo.sleepDuration},
                     SLEEP_DURATION_HOUR = #{vo.sleepDurationHour},
-                    RECORD_DATE = TO_DATE(#{vo.recordDate})
+                    RECORD_DATE = TO_DATE(#{vo.recordDate}, 'YYYY-MM-DD')
             WHERE MEMBER_NO = #{userNo}
             AND NO =#{vo.no}
             """)

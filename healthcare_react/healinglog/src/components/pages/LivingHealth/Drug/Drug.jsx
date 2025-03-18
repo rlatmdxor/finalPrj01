@@ -222,7 +222,7 @@ const Drug = () => {
       showCancelButton: true, // 취소 버튼 표시
       confirmButtonColor: '#3085d6', // 등록 버튼 색상
       cancelButtonColor: '#d33', // 취소 버튼 색상
-      confirmButtonText: '등록', // 등록 버튼 텍스트
+      confirmButtonText: '삭제', // 등록 버튼 텍스트
       cancelButtonText: '취소', // 취소 버튼 텍스트
     }).then((result) => {
       if (result.isConfirmed) {
