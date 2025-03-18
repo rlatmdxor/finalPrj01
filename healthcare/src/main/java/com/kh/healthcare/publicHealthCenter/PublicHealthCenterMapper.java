@@ -17,7 +17,7 @@ public interface PublicHealthCenterMapper {
             FROM PUBLIC_HEALTH_CENTER PH
             WHERE 1=1
             
-            <!-- ✅ 시/구 검색 (필수가 아님) -->
+            <!-- 시/구 검색 (필수가 아님) -->
             <if test='city != null and city != ""'>
                 AND CITY = #{city}
             </if>
@@ -25,7 +25,7 @@ public interface PublicHealthCenterMapper {
                 AND DISTRICT = #{district}
             </if>
 
-            <!-- ✅ 검색어가 없을 경우, 시/구 정보를 자동 검색어로 설정 -->
+            <!-- 검색어가 없을 경우, 시/구 정보를 자동 검색어로 설정 -->
             <if test='(searchType == null or searchType == "") and (keyword == null or keyword == "")'>
                 <choose>
                     <when test='district != null and district != ""'>
@@ -37,7 +37,7 @@ public interface PublicHealthCenterMapper {
                 </choose>
             </if>
 
-            <!-- ✅ 검색 조건 적용 -->
+            <!-- 검색 조건 적용 -->
             <if test='searchType != null and searchType != "" and keyword != null and keyword != ""'>
                 <choose>
                     <when test='searchType == "name"'>
@@ -74,7 +74,7 @@ public interface PublicHealthCenterMapper {
         FROM PUBLIC_HEALTH_CENTER
         WHERE 1=1
         
-        <!-- ✅ 시/구 검색 (필수가 아님) -->
+        <!-- 시/구 검색 (필수가 아님) -->
         <if test='city != null and city != ""'>
             AND CITY = #{city}
         </if>
@@ -82,7 +82,7 @@ public interface PublicHealthCenterMapper {
             AND DISTRICT = #{district}
         </if>
 
-        <!-- ✅ 검색어가 없을 경우, 시/구 정보를 자동 검색어로 설정 -->
+        <!-- 검색어가 없을 경우, 시/구 정보를 자동 검색어로 설정 -->
         <if test='(searchType == null or searchType == "") and (keyword == null or keyword == "")'>
             <choose>
                 <when test='district != null and district != ""'>
@@ -94,7 +94,7 @@ public interface PublicHealthCenterMapper {
             </choose>
         </if>
 
-        <!-- ✅ 검색 조건 적용 -->
+        <!-- 검색 조건 적용 -->
         <if test='searchType != null and searchType != "" and keyword != null and keyword != ""'>
             <choose>
                 <when test='searchType == "name"'>

@@ -19,7 +19,7 @@ public interface HospitalMapper {
             LEFT JOIN REVIEW_BOARD RB ON H.NO = RB.HOSPITAL_NO
             WHERE 1=1
             
-            <!-- ✅ 지역 필터 유지 -->
+            <!-- 지역 필터 유지 -->
             <if test='city != null and city != ""'>
                 AND H.CITY = #{city}
             </if>
@@ -30,12 +30,12 @@ public interface HospitalMapper {
                 AND H.DONG = #{dong}
             </if>
 
-            <!-- ✅ 병원 유형 필터링 -->
+            <!-- 병원 유형 필터링 -->
             <if test='hospitalType != null and hospitalType != ""'>
                 AND H.HOSPITAL_TYPE = #{hospitalType}
             </if>
 
-            <!-- ✅ 검색 조건 적용 -->
+            <!-- 검색 조건 적용 -->
             <if test='searchType != null and searchType != "" and keyword != null and keyword != ""'>
                 AND (
                     <choose>
@@ -79,7 +79,7 @@ public interface HospitalMapper {
         LEFT JOIN REVIEW_BOARD RB ON H.NO = RB.HOSPITAL_NO
         WHERE 1=1
 
-        <!-- ✅ 지역 필터 유지 -->
+
         <if test='city != null and city != ""'>
             AND H.CITY = #{city}
         </if>
@@ -90,12 +90,12 @@ public interface HospitalMapper {
             AND H.DONG = #{dong}
         </if>
 
-        <!-- ✅ 병원 유형 필터링 -->
+        <!-- 병원 유형 필터링 -->
         <if test='hospitalType != null and hospitalType != ""'>
             AND H.HOSPITAL_TYPE = #{hospitalType}
         </if>
 
-        <!-- ✅ 검색 조건 적용 -->
+        <!-- 검색 조건 적용 -->
         <if test='searchType != null and searchType != "" and keyword != null and keyword != ""'>
             AND (
                 <choose>

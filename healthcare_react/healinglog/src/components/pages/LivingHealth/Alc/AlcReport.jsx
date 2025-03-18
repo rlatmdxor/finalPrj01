@@ -265,8 +265,6 @@ const AlcReport = () => {
   const currentYearMonth = currentYear + '-' + currentMonth;
   const currentWeek = new Date().getFullYear();
   const [week, setWeek] = useState(currentWeek);
-  // const [year, setYear] = useState(currentYear);
-  // const [month, setMonth] = useState(currentYearMonth);
 
   const [year, setYear] = useState(new Date().getFullYear());
   const [month, setMonth] = useState(`${year}-${String(new Date().getMonth() + 1).padStart(2, '0')}`);
@@ -771,10 +769,10 @@ const AlcReport = () => {
               </table>
 
               {/* 추가된 알코올 섭취량 표시 */}
-              <div style={{ marginTop: '20px', padding: '10px', border: '1px solid #ddd' }}>
+              {/* <div style={{ marginTop: '20px', padding: '10px', border: '1px solid #ddd' }}>
                 <h4>섭취한 총 알코올 양:</h4>
                 <p style={{ fontSize: '20px', fontWeight: 'bold', color: '#FF7F50' }}>{alcoholIntake} ml</p>
-              </div>
+              </div> */}
             </div>
           </div>
           <ModalContainer>
@@ -884,10 +882,10 @@ const AlcReport = () => {
               </table>
 
               {/* 추가된 알코올 섭취량 표시 */}
-              <div style={{ marginTop: '20px', padding: '10px', border: '1px solid #ddd' }}>
+              {/* <div style={{ marginTop: '20px', padding: '10px', border: '1px solid #ddd' }}>
                 <h4>섭취한 총 알코올 양:</h4>
                 <p style={{ fontSize: '20px', fontWeight: 'bold', color: '#FF7F50' }}>{alcoholIntake} ml</p>
-              </div>
+              </div> */}
             </div>
           </div>
           <ModalContainer>
