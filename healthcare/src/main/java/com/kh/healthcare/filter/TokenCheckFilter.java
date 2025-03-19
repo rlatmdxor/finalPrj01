@@ -60,13 +60,6 @@ public class TokenCheckFilter implements Filter {
         }
 
         // JWT에서 데이터 추출
-//        String id = jwtUtil.getId(token);
-//        String nick = jwtUtil.getNick(token);
-//        String role = jwtUtil.getRole(token);
-//
-//        System.out.println("id = " + id);
-//        System.out.println("nick = " + nick);
-//        System.out.println("role = " + role);
 
         // 필터 체인 실행 (요청을 컨트롤러로 전달)
         filterChain.doFilter(servletRequest, servletResponse);

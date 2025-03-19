@@ -7,7 +7,6 @@ public class AnAerobicVo {
 
     private String no;
     private String name;
-//    private String bookmark;
     private String description;
     private String imageUrl;
     private String guide;
