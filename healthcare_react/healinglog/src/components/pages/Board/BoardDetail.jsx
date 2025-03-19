@@ -770,7 +770,7 @@ const BoardDetail = () => {
           </ModalContainer>
         </Modal>
         <MinDiv>
-          <div className="form-label">카테고리리</div>
+          <div className="form-label">카테고리</div>
           <div className="form-input">{boardVo.categoryName}</div>
           <div className="form-label">조회수</div>
           <div className="form-input">{boardVo.hit}</div>
