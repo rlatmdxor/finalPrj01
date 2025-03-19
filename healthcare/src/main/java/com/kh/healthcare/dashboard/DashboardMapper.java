@@ -20,8 +20,8 @@ public interface DashboardMapper {
             (SELECT
                 ROUND(SUM(
                     CONSUMPTION_RATIO *
-                    (LEAST(TO_DATE(#{endDate}, 'YY/MM/DD'), END_DATE) -
-                     GREATEST(TO_DATE(#{startDate}, 'YY/MM/DD'), START_DATE) + 1)
+                    (LEAST(TO_DATE(#{endDate}, 'YYYY-MM-DD'), END_DATE) -
+                     GREATEST(TO_DATE(#{startDate}, 'YYYY-MM-DD'), START_DATE) + 1)
                 ), 2)
             FROM (
                 SELECT
@@ -30,8 +30,8 @@ public interface DashboardMapper {
                     (1 / (END_DATE - START_DATE + 1)) AS CONSUMPTION_RATIO
                 FROM RECORD_CIGARETTE
                 WHERE MEMBER_NO = #{memberNo}
-                AND (START_DATE <= TO_DATE(#{endDate}, 'YY/MM/DD'))
-                AND (END_DATE >= TO_DATE(#{startDate}, 'YY/MM/DD'))
+                AND (START_DATE <= TO_DATE(#{endDate}, 'YYYY-MM-DD'))
+                AND (END_DATE >= TO_DATE(#{startDate}, 'YYYY-MM-DD'))
             )) AS COUNT_CIGARETTE, 
             NVL((SELECT SUM((ABV/100)*CC) FROM RECORD_ALC WHERE MEMBER_NO = #{memberNo} AND ENROLL_DATE TO_DATE(#{startDate}, 'YYYY-MM-DD') AND TO_DATE(#{endDate}, 'YYYY-MM-DD')), 0) AS SUM_ALC,             
             ROUND(NVL((SELECT AVG(AMOUNT) FROM WEIGHT_LOG WHERE MEMBER_NO = #{memberNo} AND ENROLL_DATE TO_DATE(#{startDate}, 'YYYY-MM-DD') AND TO_DATE(#{endDate}, 'YYYY-MM-DD')), 0),1) AS AVG_WEIGHT,               
