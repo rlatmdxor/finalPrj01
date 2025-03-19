@@ -204,17 +204,6 @@ const AlcReport = () => {
 
     const latestDate = new Date(voList[0]);
 
-    if (type === 'week') {
-      // 최근에 입력한 데이터를 기준으로 최신7일간의 데이터를 가져오기
-      const oneWeekAgo = new Date(latestDate);
-      oneWeekAgo.setDate(latestDate.getDate() - 7);
-
-      return fullData.filter((item) => {
-        const itemDate = new Date(item.enrollDate); // 문자열을 Date 객체로 변환
-        return itemDate >= oneWeekAgo && itemDate <= latestDate; // 최신 날짜 기준 7일 이내 데이터
-      });
-    }
-
     if (type === 'month') {
       // 최근에 입력한 데이터를 기준으로 해당 월의 데이터를 가져오기
       const currentYear = latestDate.getFullYear();

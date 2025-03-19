@@ -228,7 +228,7 @@ const CigaretteReport = () => {
 
   // 처음에 일주일 데이터 로드
   useEffect(() => {
-    setFilteredData(filterData('week'));
+    setFilteredData(filterData('month'));
   }, [fullData]);
 
   //테스트
@@ -613,13 +613,7 @@ const CigaretteReport = () => {
 
       <ContentLayout>
         <SearchArea>
-          {selectedRange === '주' ? (
-            <WeekDiv>
-              <WeekBtn></WeekBtn>
-              <span>{week}</span>
-              <WeekBtn></WeekBtn>
-            </WeekDiv>
-          ) : selectedRange === '월' ? (
+          {selectedRange === '월' ? (
             <MonthDiv>
               <MonthBtn onClick={handleDecreaseMonth}>{'<'}</MonthBtn>
               <span>{month}</span>
