@@ -9,8 +9,6 @@ import InsulinPoint from './components/pages/CardiovascularManagement/BloodSugar
 import Hospital from './components/pages/Healthcarefacility/Hospital/Hospital';
 import Pharmacy from './components/pages/Healthcarefacility/Pharmacy/Pharmacy';
 import PulbicHealthCenter from './components/pages/Healthcarefacility/PublicHealthCenter/PulbicHealthCenter';
-import Alc from './components/pages/LivingHealth/Alc/Alc';
-import Cigarette from './components/pages/LivingHealth/Cigarette/Cigarette';
 
 import Diet from './components/pages/LivingHealth/Diet/Diet';
 import Drug from './components/pages/LivingHealth/Drug/Drug';
@@ -70,8 +68,6 @@ export const routes = [
   { path: '/diet/report', component: <DietReport /> },
   { path: '/aerobic', component: <Aerobic /> },
   { path: '/anaerobic', component: <AnAerobic /> },
-  { path: '/alc/re', component: <Alc /> },
-  { path: '/cigarette/re', component: <Cigarette /> },
   { path: '/drug', component: <Drug /> },
   { path: '/drug1', component: <Drug1 /> },
   { path: '/bloodpressure', component: <BloodPressure /> },
