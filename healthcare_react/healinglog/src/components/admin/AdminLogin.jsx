@@ -10,7 +10,7 @@ import Title from '../util/Title';
 import { login } from '../../../src/redux/AdminSlice';
 import { useNavigate } from 'react-router-dom';
 import { setNick } from '../../redux/JoinSlice';
-
+import Swal from 'sweetalert2';
 import { BASE_URL } from '../services/config';
 
 const StyledMiddle = styled.div`
@@ -57,7 +57,12 @@ const AdminLogin = () => {
       .then((resp) => resp.text())
       .then((token) => {
         if (!token) {
-          alert('로그인에 실패했습니다.');
+          Swal.fire({
+            icon: 'error',
+            title: '로그인에 실패했습니다.',
+            confirmButtonText: '확인',
+          });
+
           return;
         }
         localStorage.setItem('token', token);
@@ -67,7 +72,11 @@ const AdminLogin = () => {
         const nick = getPayload(token, 'nick');
         dispatch(setNick(nick));
         dispatch(login({ no, id, nick }));
-        alert(`환영합니다 ${nick}님`);
+        Swal.fire({
+          icon: 'success',
+          title: `환영합니다. ${nick}님`,
+          confirmButtonText: '확인',
+        });
         navi('../../admin/usermanage');
       })
       .catch(() => {});
