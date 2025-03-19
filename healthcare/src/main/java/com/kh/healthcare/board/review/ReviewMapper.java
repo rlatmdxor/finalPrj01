@@ -132,8 +132,12 @@ public interface ReviewMapper {
                 , B.MEMBER_NO
                 , B.REVIEW_NO
                 , B.CONTENT
-                , B.ENROLL_DATE
-                , M.NICK
+                , M.NICK,
+                CASE
+                    WHEN TRUNC(B.ENROLL_DATE) = TRUNC(SYSDATE)
+                    THEN TO_CHAR(B.ENROLL_DATE, 'HH24:MI')
+                    ELSE TO_CHAR(B.ENROLL_DATE, 'YY.MM.DD')
+                END AS ENROLL_DATE
             FROM REVIEW_COMMENT B
             JOIN MEMBER M ON ( B.MEMBER_NO = M.NO )
             WHERE B.REVIEW_NO = #{bno}
