@@ -41,7 +41,6 @@ public class ReviewController {
     }
     @PostMapping("hospital/list")
     public List<ReviewHospitalVo> searchHospital(@RequestBody SearchFilterVo filterVo){
-        System.out.println("ReviewController.searchHospital");
         try {
             List<ReviewHospitalVo> ReviewHospitalVoList = service.searchHospital(filterVo);
             return ReviewHospitalVoList;

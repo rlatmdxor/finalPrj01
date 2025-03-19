@@ -16,15 +16,12 @@ import { useDispatch } from 'react-redux';
 import { isTokenExpired, getRoleFromToken } from '../../util/JwtUtil';
 import { BASE_URL } from '../../services/config';
 
-//모달 안의 버튼 컨테이너
-
 const ContentDiv = styled.div`
   margin: 0;
   padding-left: 5%;
   width: 95%;
   display: grid;
   grid-template-rows: 40px 40px 1fr 50px 60px 105px 100px 140px;
-  /* border: 1px solid #ccc; */
 `;
 const InputDiv = styled.div`
   width: 95%;

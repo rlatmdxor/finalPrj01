@@ -159,7 +159,6 @@ const imagePlugin = createImagePlugin();
 const { Toolbar } = staticToolbarPlugin;
 const plugins = [staticToolbarPlugin, textAlignmentPlugin, linkPlugin, imagePlugin];
 
-// 이미지 렌더링 컴포넌트 (크기 조절 가능)
 const ImageComponent = (props) => {
   const { block, contentState } = props;
   const entity = contentState.getEntity(block.getEntityAt(0));
@@ -167,7 +166,6 @@ const ImageComponent = (props) => {
   return <img src={src} alt="Inserted" style={{ width: width || '50%', maxWidth: '100%', height: 'auto' }} />;
 };
 
-// 블록 렌더러 설정
 const blockRendererFn = (block, contentState) => {
   if (block.getType() === 'atomic') {
     const entity = contentState.getEntity(block.getEntityAt(0));
@@ -261,7 +259,7 @@ const BoardWrite = () => {
 
         const response = await fetch(`${BASE_URL}/api/board/honeytip/write`, {
           method: 'POST',
-          headers: { Authorization: `Bearer ${token}` }, // Content-Type 제거 (자동 설정됨)
+          headers: { Authorization: `Bearer ${token}` },
           body: formData,
         });
 
@@ -273,7 +271,7 @@ const BoardWrite = () => {
             draggable: true,
           });
           setInputData({ title: '', memberNo: '', content: '', categoryNo: '' });
-          setFiles([]); // 파일 목록 초기화
+          setFiles([]);
           navigate('/board');
         } else {
           Swal.fire({

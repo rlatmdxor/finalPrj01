@@ -122,7 +122,6 @@ const ReportedReviewComment = () => {
           .then((data) => {
             setSelectedItems([]);
             setNum((x) => x - 1);
-            console.log(num);
             Swal.fire({
               title: `${data}개의 댓글이 삭제되었습니다.`,
               icon: 'success',

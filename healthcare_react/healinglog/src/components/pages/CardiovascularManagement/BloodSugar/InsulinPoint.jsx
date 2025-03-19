@@ -157,14 +157,12 @@ const LineDiv = styled.div`
   height: 50px;
 `;
 
-//모달 밖의 버튼 컨테이너
 const BtnContainer = styled.div`
   display: flex;
   justify-content: end;
   margin-right: -45px;
 `;
 
-//모달 안의 버튼 컨테이너
 const ModalContainer = styled.div`
   display: flex;
   justify-content: end;
@@ -225,8 +223,6 @@ const InsulinPoint = () => {
       .then((model) => {
         const data = model.insulinList;
         const disablePointList = model.disablePointList;
-        console.log(data);
-        console.log(disablePointList);
         setDisablePoint(disablePointList);
         if (model == null) {
           Swal.fire({
@@ -241,13 +237,12 @@ const InsulinPoint = () => {
           setVoList(pagedData);
         } else {
           dispatch(resetPaging({ boardType }));
-          setVoList([]); // 데이터가 없을 경우 초기화
+          setVoList([]);
         }
       })
       .catch((error) => console.error('데이터 불러오기 실패:', error));
   }, [num, isAuthorized, token]);
 
-  // 인풋 입력값 받아오기
   const handleChange = (e) => {
     setInputData((props) => {
       return {
@@ -256,29 +251,25 @@ const InsulinPoint = () => {
       };
     });
   };
-  // 날짜 따로 입력받기
   const handleDateChange = (event) => {
     const newDate = event.target.value;
 
-    // 2주 후 날짜 계산
     const dateObj = new Date(newDate);
     dateObj.setDate(dateObj.getDate() + 14);
-    const formattedDate = dateObj.toISOString().split('T')[0]; // YYYY-MM-DD 형식
+    const formattedDate = dateObj.toISOString().split('T')[0];
 
-    // state 업데이트 (기존 정보 유지)
     setInputData((prevState) => ({
       ...prevState,
       enrollDate: newDate,
-      ableDate: formattedDate, // 2주 후 날짜 자동 추가
+      ableDate: formattedDate,
     }));
   };
 
-  // 인풋 입력값 보내기
   const handleSubmit = (e) => {
     Swal.fire({
       title: '등록하시겠습니까?',
       icon: 'question',
-      showCancelButton: true, //  취소 버튼 추가 (없으면 무조건 실행됨)
+      showCancelButton: true,
       confirmButtonText: '확인',
       cancelButtonText: '취소',
     }).then((result) => {
@@ -297,7 +288,6 @@ const InsulinPoint = () => {
         })
           .then((resp) => resp.text())
           .then((data) => {
-            console.log(data);
             setNum((x) => x + 1);
             if (data == 1) {
               Swal.fire({
@@ -315,7 +305,6 @@ const InsulinPoint = () => {
             }
           });
 
-        // 모달 창 닫기
         dispatch(close(e.target.title));
       }
     });
@@ -334,12 +323,11 @@ const InsulinPoint = () => {
     Swal.fire({
       title: `${selectedItems.length}개의 항목을 삭제하시겠습니까?`,
       icon: 'question',
-      showCancelButton: true, // ❗ 취소 버튼 추가 (없으면 무조건 실행됨)
+      showCancelButton: true,
       confirmButtonText: '확인',
       cancelButtonText: '취소',
     }).then((result) => {
       if (result.isConfirmed) {
-        // ✅ 사용자가 '확인' 버튼을 눌렀을 때만 실행
         fetch(`${BASE_URL}/api/insulin/delete`, {
           method: 'POST',
           headers: {
@@ -352,7 +340,6 @@ const InsulinPoint = () => {
           .then((data) => {
             setSelectedItems([]);
             setNum((x) => x - 1);
-            console.log(num);
             Swal.fire({
               title: `${data}개의 항목이 삭제되었습니다.`,
               icon: 'success',
@@ -360,12 +347,10 @@ const InsulinPoint = () => {
             });
           });
 
-        // 모달 창 닫기
         dispatch(close(e.target.title));
       }
     });
   };
-  //////////////////////////////////////////////////////////////////////////////
 
   const rightArmNumList = ['1', '2', '3', '4', '5', '6', '7', '8'];
   const leftArmNumList = ['9', '10', '11', '12', '13', '14', '15', '16'];
@@ -408,13 +393,9 @@ const InsulinPoint = () => {
     '48',
   ];
 
-  // 체크박스 선택/해제 핸들러
   const handleCheckboxChange = (no) => {
-    setSelectedItems(
-      (prevSelected) =>
-        prevSelected.includes(no)
-          ? prevSelected.filter((item) => item !== no) // 체크 해제 시 제거
-          : [...prevSelected, no] // 체크 시 추가
+    setSelectedItems((prevSelected) =>
+      prevSelected.includes(no) ? prevSelected.filter((item) => item !== no) : [...prevSelected, no]
     );
   };
 
@@ -508,7 +489,7 @@ const InsulinPoint = () => {
                 <Div112>
                   <RightStomDiv>
                     {rightStomNumList.map((vo) => {
-                      const isDisabled = disablePoint.includes(vo); // 비활성화 여부 확인
+                      const isDisabled = disablePoint.includes(vo);
                       return (
                         <CheckDiv
                           key={vo}

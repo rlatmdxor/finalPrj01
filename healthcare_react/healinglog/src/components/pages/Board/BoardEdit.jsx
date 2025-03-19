@@ -160,7 +160,6 @@ const imagePlugin = createImagePlugin();
 const { Toolbar } = staticToolbarPlugin;
 const plugins = [staticToolbarPlugin, textAlignmentPlugin, linkPlugin, imagePlugin];
 
-// 이미지 렌더링 컴포넌트 (크기 조절 가능)
 const ImageComponent = (props) => {
   const { block, contentState } = props;
   const entity = contentState.getEntity(block.getEntityAt(0));
@@ -168,7 +167,6 @@ const ImageComponent = (props) => {
   return <img src={src} alt="Inserted" style={{ width: width || '50%', maxWidth: '100%', height: 'auto' }} />;
 };
 
-// 블록 렌더러 설정
 const blockRendererFn = (block, contentState) => {
   if (block.getType() === 'atomic') {
     const entity = contentState.getEntity(block.getEntityAt(0));
@@ -184,8 +182,8 @@ const blockRendererFn = (block, contentState) => {
 
 const BoardEdit = () => {
   const token = localStorage.getItem('token');
-  const [searchParams] = useSearchParams(); // 쿼리스트링 값 가져오기
-  const bno = searchParams.get('bno'); // 'bno' 키의 값 가져오기
+  const [searchParams] = useSearchParams();
+  const bno = searchParams.get('bno');
   const navigate = useNavigate();
   const [inputData, setInputData] = useState({});
   const [f, setFiles] = useState([]);
@@ -204,7 +202,6 @@ const BoardEdit = () => {
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         });
         const data = await response.json();
-        console.log('Fetched isRecommend:', data.isRecommend);
         const isRec = Number(data.isRecommend);
 
         setInputData(data.detailVo);
@@ -301,7 +298,7 @@ const BoardEdit = () => {
             icon: 'success',
             draggable: true,
           });
-          setFiles([]); // 파일 목록 초기화
+          setFiles([]);
           navigate('/board');
         } else {
           Swal.fire({
@@ -332,15 +329,6 @@ const BoardEdit = () => {
     }
   };
 
-  // const handleFileChange = (e) => {
-  //   const file = e.target.files;
-
-  //   for (let index = 0; index < file.length; index++) {
-  //     const files = e.target.files[index];
-  //     newFiles.push(files);
-  //   }
-  //   setFiles(() => newFiles);
-  // };
   const handleFileChange = (e) => {
     const fileList = Array.from(e.target.files);
     setNewFiles((prev) => [...prev, ...fileList]);

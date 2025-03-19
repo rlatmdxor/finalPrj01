@@ -294,7 +294,6 @@ const ImageComponent = (props) => {
   return <img src={src} alt="Inserted" style={{ width: width || '50%', maxWidth: '100%', height: 'auto' }} />;
 };
 
-// 블록 렌더러 설정
 const blockRendererFn = (block, contentState) => {
   if (block.getType() === 'atomic') {
     const entity = contentState.getEntity(block.getEntityAt(0));
@@ -734,7 +733,7 @@ const ReviewDetail = () => {
                   id={item.id}
                   name="reportReasonzzz"
                   value={item.value}
-                  checked={radio == item.value} // ✅ 정확한 비교
+                  checked={radio == item.value}
                   onChange={handleChange}
                 />
                 <label htmlFor={item.id}>{item.label}</label>
@@ -800,7 +799,7 @@ const ReviewDetail = () => {
               {f?.map((file, index) => (
                 <span
                   key={index}
-                  onClick={() => handleDownload(file.path, file.originName)} // ✅ URL만으로 다운로드 실행
+                  onClick={() => handleDownload(file.path, file.originName)}
                   style={{ cursor: 'pointer', color: 'blue', textDecoration: 'underline' }}
                 >
                   {file.originName}&nbsp;&nbsp;&nbsp;
