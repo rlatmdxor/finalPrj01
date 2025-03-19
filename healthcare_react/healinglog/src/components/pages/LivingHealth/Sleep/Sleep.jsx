@@ -31,6 +31,9 @@ const YearContainer = styled.div`
   font-weight: bold;
   gap: 35px;
   height: 0px;
+  & > div {
+    cursor: pointer;
+  }
 `;
 
 const BtnContainer = styled.div`

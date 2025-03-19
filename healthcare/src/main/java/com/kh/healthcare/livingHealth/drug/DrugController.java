@@ -1,5 +1,6 @@
 package com.kh.healthcare.livingHealth.drug;
 
+import com.kh.healthcare.member.MemberVo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +22,7 @@ public class DrugController {
             List<DrugVo> voList = service.list(token);
             return  voList;
         }catch (Exception e){
-            throw new IllegalStateException("CODE [ CHALLENGER / LIST ]");
+            throw new IllegalStateException("CODE [ DRUG / LIST ]");
         }
 
     }
@@ -32,7 +33,7 @@ public class DrugController {
             List<DrugVo> voList = service.delList(token);
             return  voList;
         }catch (Exception e){
-            throw new IllegalStateException("CODE [ CHALLENGER / DELLIST ]");
+            throw new IllegalStateException("CODE [ DRUG / DELLIST ]");
         }
 
     }
@@ -43,7 +44,7 @@ public class DrugController {
             List<DrugVo> voList = service.find(vo);
             return voList;
         }catch (Exception e){
-            throw new IllegalStateException("CODE [ CHALLENGER / FIND ]");
+            throw new IllegalStateException("CODE [ DRUG / FIND ]");
         }
 
     }
@@ -54,7 +55,7 @@ public class DrugController {
             int result =  service.write(token,vo);
             return result;
         }catch (Exception e){
-            throw new IllegalStateException("CODE [ CHALLENGER / WRITE ]");
+            throw new IllegalStateException("CODE [ DRUG / WRITE ]");
         }
 
     }
@@ -65,18 +66,27 @@ public class DrugController {
             List<DrugColorCategoryVo> result =  service.color();
             return result;
         }catch (Exception e){
-            throw new IllegalStateException("CODE [ CHALLENGER / COLOR ]");
+            throw new IllegalStateException("CODE [ DRUG / COLOR ]");
         }
 
     }
-
     @GetMapping("form")
     public List<DrugFormCategoryVo> form(){
         try {
             List<DrugFormCategoryVo> result = service.form();
             return result;
         }catch (Exception e){
-            throw new IllegalStateException("CODE [ CHALLENGER / FORM ]");
+            throw new IllegalStateException("CODE [ DRUG / FORM ]");
+        }
+
+    }
+    @PostMapping("get/name")
+    public String name(@RequestHeader ("Authorization") String token){
+        try {
+            String name = service.name(token);
+            return name;
+        }catch (Exception e){
+            throw new IllegalStateException("CODE [ DRUG / NAME ]");
         }
 
     }
@@ -86,7 +96,7 @@ public class DrugController {
         try {
             service.del(token,vo);
         }catch (Exception e){
-            throw new IllegalStateException("CODE [ CHALLENGER / DEL ]");
+            throw new IllegalStateException("CODE [ DRUG / DEL ]");
         }
 
     }
@@ -95,7 +105,7 @@ public class DrugController {
         try {
             service.removeDrug(token, vo);
         }catch (Exception e){
-            throw new IllegalStateException("CODE [ CHALLENGER / REMOVEDRUG ]");
+            throw new IllegalStateException("CODE [ DRUG / REMOVEDRUG ]");
         }
 
     }
