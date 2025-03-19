@@ -67,8 +67,6 @@ const Sleep = () => {
   const [dataVoList, setDataVoList] = useState([]);
   const [chartVoList, setChartVoList] = useState([]);
   const [num, setNum] = useState(0);
-
-  const TempDayLabels = [];
   const TempDayList = [];
   const dataBtn = ['일', '주', '월'];
   const [selectedRange, setSelectedRange] = useState('일');

@@ -53,7 +53,6 @@ const DietCal = () => {
 
   const formatData = (data) => {
     const events = {};
-    console.log(data);
     data.kcal.forEach((item) => {
       const day = formatDate(item.dietDay);
 
@@ -100,7 +99,6 @@ const DietCal = () => {
       .then((data) => {
         const formattedData = formatData(data);
         setEvents(formattedData);
-        console.log(formattedData);
       });
   }, [isAuthorized, token]);
 
