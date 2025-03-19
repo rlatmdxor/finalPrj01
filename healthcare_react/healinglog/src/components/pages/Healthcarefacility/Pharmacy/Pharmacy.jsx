@@ -76,13 +76,13 @@ const Pharmacy = () => {
   const boardLimit = useSelector((state) => state.paging[boardType]?.boardLimit || 12);
 
   //지도
-  const [isOpen, setIsOpen] = useState(false); // ✅ 모달 상태 추가
+  const [isOpen, setIsOpen] = useState(false);
   //지도
   const [pharmacyM, setPharmacyM] = useState(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [selectedNo, setSelectedNo] = useState(null);
 
-  // 📌 초기 페이징 상태 리셋
+  // 초기 페이징 상태 리셋
   useEffect(() => {
     dispatch(resetPaging({ boardType }));
   }, []);
@@ -91,33 +91,30 @@ const Pharmacy = () => {
     handleSearch(); // 초기 로딩 시 검색 실행
   }, []);
 
-  // 📌 시 데이터 가져오기
   useEffect(() => {
     fetch(`${BASE_URL}/api/location/cities`)
       .then((res) => res.json())
       .then((data) => setCities(data))
-      .catch((error) => console.error('시 데이터 로드 실패:', error));
+      .catch(() => {});
   }, []);
 
-  // 📌 군/구 데이터 가져오기
   useEffect(() => {
     if (selectedCity) {
       fetch(`${BASE_URL}/api/location/districts/${selectedCity}`)
         .then((res) => res.json())
         .then((data) => setDistricts(data))
-        .catch((error) => console.error('구 데이터 로드 실패:', error));
+        .catch(() => {});
     } else {
       setDistricts([]);
     }
   }, [selectedCity]);
 
-  // 📌 동 데이터 가져오기
   useEffect(() => {
     if (selectedDistrict) {
       fetch(`${BASE_URL}/api/location/dongs/${selectedDistrict}`)
         .then((res) => res.json())
         .then((data) => setDongs(data))
-        .catch((error) => console.error('동 데이터 로드 실패:', error));
+        .catch(() => {});
     } else {
       setDongs([]);
     }
@@ -127,7 +124,7 @@ const Pharmacy = () => {
     handleSearch();
   }, [currentPage]);
 
-  // 📌 검색 실행
+  // 검색 실행
   const handleSearch = async () => {
     setLoading(true);
 
@@ -164,7 +161,6 @@ const Pharmacy = () => {
 
       setPharmacies(data.pharmacies || []);
     } catch (error) {
-      console.error('❌ 검색 오류:', error);
       setPharmacies([]);
     }
     setLoading(false);
@@ -215,9 +211,7 @@ const Pharmacy = () => {
       });
       const data = await response.json();
       if (data) setPharmacyM(data); // 약국 정보 저장
-    } catch (error) {
-      console.error('약국 데이터 불러오기 오류:', error);
-    }
+    } catch (error) {}
   };
 
   useEffect(() => {
@@ -241,10 +235,9 @@ const Pharmacy = () => {
     }
   }, []);
 
-  // ✅ 네이버 지도 생성 (pharmacyM 값이 있을 때 실행)
+  // 네이버 지도 생성 (pharmacyM 값이 있을 때 실행)
   useEffect(() => {
     if (!pharmacyM || !pharmacyM.locationX || !pharmacyM.locationY) {
-      console.warn('🚨 위치 정보가 올바르지 않음:', pharmacyM);
       return;
     }
 
@@ -336,7 +329,6 @@ const Pharmacy = () => {
             ))}
           </SelectBox>
 
-          {/* 검색 옵션 */}
           <SelectBox value={searchType} onChange={(e) => setSearchType(e.target.value)}>
             <option value="">검색 조건 선택</option>
             <option value="name">약국명</option>
@@ -345,7 +337,6 @@ const Pharmacy = () => {
             <option value="postNum">우편번호</option>
           </SelectBox>
 
-          {/* SearchBar */}
           <SearchBar
             handleClick={handleSearch} // 검색 버튼 클릭 시 handleSearch 실행
             handleChange={handleKeywordChange} // 검색어 입력 시 keyword 업데이트
@@ -379,7 +370,6 @@ const Pharmacy = () => {
                     location_x: pharmacy.location_x,
                     location_y: pharmacy.location_y,
                   });
-                  console.log(pharmacy.no);
                   fetchPharmacys(pharmacy.no);
                   setIsOpen(true);
                   dispatch(open({ title: '약국', value: 'block' }));

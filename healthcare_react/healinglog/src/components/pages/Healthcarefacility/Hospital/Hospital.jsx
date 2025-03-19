@@ -79,7 +79,7 @@ const Hospital = () => {
   const boardLimit = useSelector((state) => state.paging[boardType]?.boardLimit || 12);
 
   //지도
-  const [isOpen, setIsOpen] = useState(false); // ✅ 모달 상태 추가
+  const [isOpen, setIsOpen] = useState(false);
   //지도
   const [hospitalM, setHospitalM] = useState(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
@@ -99,7 +99,7 @@ const Hospital = () => {
     fetch(`${BASE_URL}/api/location/cities`)
       .then((res) => res.json())
       .then((data) => setCities(data))
-      .catch((error) => console.error('시 데이터 로드 실패:', error));
+      .catch(() => {});
   }, []);
 
   // 군/구 데이터 가져오기
@@ -108,7 +108,7 @@ const Hospital = () => {
       fetch(`${BASE_URL}/api/location/districts/${selectedCity}`)
         .then((res) => res.json())
         .then((data) => setDistricts(data))
-        .catch((error) => console.error('구 데이터 로드 실패:', error));
+        .catch(() => {});
     } else {
       setDistricts([]);
     }
@@ -120,7 +120,7 @@ const Hospital = () => {
       fetch(`${BASE_URL}/api/location/dongs/${selectedDistrict}`)
         .then((res) => res.json())
         .then((data) => setDongs(data))
-        .catch((error) => console.error('동 데이터 로드 실패:', error));
+        .catch(() => {});
     } else {
       setDongs([]);
     }
@@ -171,7 +171,6 @@ const Hospital = () => {
       dispatch(setTotalCount({ boardType: 'hospital', totalCount: data.totalElements || data.hospitals.length }));
       setHospitals(data.hospitals || []);
     } catch (error) {
-      console.error('❌ 검색 오류:', error);
       setHospitals([]);
     }
     setLoading(false);
@@ -222,9 +221,7 @@ const Hospital = () => {
       });
       const data = await response.json();
       if (data) setHospitalM(data); // 약국 정보 저장
-    } catch (error) {
-      console.error('약국 데이터 불러오기 오류:', error);
-    }
+    } catch (error) {}
   };
 
   useEffect(() => {
@@ -251,7 +248,6 @@ const Hospital = () => {
   //  네이버 지도 생성 (hospitalM 값이 있을 때 실행)
   useEffect(() => {
     if (!hospitalM || !hospitalM.locationX || !hospitalM.locationY) {
-      console.warn('위치 정보가 올바르지 않음:', hospitalM);
       return;
     }
 
@@ -328,7 +324,6 @@ const Hospital = () => {
             ))}
           </SelectBox>
 
-          {/* 동 선택 */}
           <SelectBox
             disabled={!selectedDistrict}
             onChange={(e) => {
@@ -345,7 +340,6 @@ const Hospital = () => {
             ))}
           </SelectBox>
 
-          {/* 수정중임 병원종류 선택 */}
           <SelectBox value={hospitalType} onChange={(e) => setHospitalType(e.target.value)}>
             <option value="">과 선택</option>
             <option value="내과">내과</option>
@@ -386,7 +380,6 @@ const Hospital = () => {
             <tr>
               <th>병원명</th>
               <th>주소</th>
-              {/* <th>진단과</th> */}
               <th>별점</th>
             </tr>
           </thead>
@@ -407,7 +400,6 @@ const Hospital = () => {
                     location_y: hospital.location_y,
                     rating: hospital.rating,
                   });
-                  console.log(hospital.no);
                   fetchHospitals(hospital.no);
                   setIsOpen(true);
                   dispatch(open({ title: '병원', value: 'block' }));
@@ -415,7 +407,6 @@ const Hospital = () => {
               >
                 <td width="195px">{hospital.name}</td>
                 <td>{hospital.address}</td>
-                {/* <td width="30px">{hospital.rating}</td> */}
                 <td width="180px">
                   {[1, 2, 3, 4, 5].map((value) => {
                     const fullStar = hospital.rating >= value;

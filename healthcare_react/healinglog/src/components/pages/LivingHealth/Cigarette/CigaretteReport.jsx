@@ -93,13 +93,6 @@ const SearchArea = styled.div`
   margin-top: 10px;
 `;
 
-const Input = styled.input`
-  box-sizing: border-box;
-  font-family: '맑은 고딕';
-  height: 30px;
-  padding: 0px 4px;
-`;
-
 const BottomDiv = styled.div`
   margin-top: 25px;
   margin-bottom: 35px;
@@ -179,7 +172,7 @@ const CigaretteReport = () => {
           setFullData([]);
         }
       })
-      .catch((error) => console.error('데이터 불러오기 실패:', error));
+      .catch(() => {});
   }, [isAuthorized, token]);
 
   // 테이블 페이징 처리
@@ -307,7 +300,6 @@ const CigaretteReport = () => {
       const data = await response.json();
       return data;
     } catch (error) {
-      console.error('데이터 불러오기 실패:', error);
       return [];
     }
   };
@@ -347,9 +339,7 @@ const CigaretteReport = () => {
         }
 
         setFilteredData(filteredData);
-      } catch (error) {
-        console.error('[ERROR] GET DATA', error);
-      }
+      } catch (error) {}
     };
 
     fetchData();
@@ -500,7 +490,6 @@ const CigaretteReport = () => {
             });
           })
           .catch((error) => {
-            console.error('등록 실패:', error);
             Swal.fire({
               title: '등록 실패',
               text: '오류가 발생했습니다. 다시 시도해주세요.',
@@ -553,8 +542,6 @@ const CigaretteReport = () => {
             });
           })
           .catch((error) => {
-            console.error('수정 실패:', error);
-            // 수정 실패 시 알림
             Swal.fire({
               title: '수정 실패',
               text: '오류가 발생했습니다. 다시 시도해주세요.',
@@ -607,8 +594,6 @@ const CigaretteReport = () => {
             });
           })
           .catch((error) => {
-            console.error('삭제 실패:', error);
-            // 삭제 실패 시 메시지
             Swal.fire({
               title: '삭제 실패',
               text: '오류가 발생했습니다. 다시 시도해주세요.',
@@ -630,9 +615,6 @@ const CigaretteReport = () => {
         <SearchArea>
           {selectedRange === '주' ? (
             <WeekDiv>
-              {/* <WeekBtn onClick={handleDecreaseWeek}>{'<'}</WeekBtn>
-              <span>{week}</span>
-              <WeekBtn onClick={handleIncreaseWeek}>{'>'}</WeekBtn> */}
               <WeekBtn></WeekBtn>
               <span>{week}</span>
               <WeekBtn></WeekBtn>
