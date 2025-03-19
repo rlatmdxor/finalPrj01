@@ -210,7 +210,7 @@ const StartStartDiv = styled.div`
 const LayoutTextarea = styled.textarea`
   width: 80%;
   height: 70%;
-  padding-left: 140px;
+  padding: 10px;
   border-radius: 10px;
   resize: none; /* 크기 조정 방지 */
 `;
