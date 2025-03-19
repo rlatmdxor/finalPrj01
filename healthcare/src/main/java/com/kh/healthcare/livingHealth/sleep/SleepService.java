@@ -19,16 +19,9 @@ public class SleepService {
     private final JwtUtil jwtUtil;
 
     public void write(String token, SleepVo vo) {
-
         token = token.replace("Bearer ", "");
-        System.out.println("service.token = " + token);
         String userNo = jwtUtil.getNo(token);
-        System.out.println("service.replacetoken = " + token);
-        System.out.println("service.vo = " + vo);
-        System.out.println("service.userNo = " + userNo);
-
         mapper.write(userNo, vo);
-        System.out.println("SleepService.write service end ~~~~~~~~~~~~~~");
     }
 
     public List<SleepVo> list(String token) {
