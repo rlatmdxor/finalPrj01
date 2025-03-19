@@ -12,6 +12,7 @@ import Btn from '../../../util/Btn';
 import Swal from 'sweetalert2';
 import { isTokenExpired, getRoleFromToken } from '../../../util/JwtUtil';
 import { BASE_URL } from '../../../services/config';
+import { FaStar } from 'react-icons/fa';
 
 const AnAerobic = () => {
   const dispatch = useDispatch();
@@ -214,7 +215,11 @@ const AnAerobic = () => {
               {bookmarkedAnaerobic.map((anaerobic) => (
                 <Line key={anaerobic.no}>
                   <Star>
-                    <StarIcon src="/img/Star.png" onClick={() => unmark(anaerobic.no)} />
+                    <FaStar
+                      key={anaerobic.no}
+                      style={{ color: 'black', fontSize: '30px', cursor: 'pointer' }}
+                      onClick={() => unmark(anaerobic.no)}
+                    />
                   </Star>
                   <Content>
                     <div
@@ -257,7 +262,11 @@ const AnAerobic = () => {
               {armExercises.map((anaerobic) => (
                 <Line key={anaerobic.no}>
                   <Star>
-                    <StarIcon src="/img/EmptyStar.png" onClick={() => mark(anaerobic.no)} />
+                    <FaStar
+                      key={anaerobic.no}
+                      style={{ color: 'grey', fontSize: '30px', cursor: 'pointer' }}
+                      onClick={() => mark(anaerobic.no)}
+                    />
                   </Star>
                   <Content>
                     <div
@@ -300,7 +309,11 @@ const AnAerobic = () => {
               {legExercises.map((anaerobic) => (
                 <Line key={anaerobic.no}>
                   <Star>
-                    <StarIcon src="/img/EmptyStar.png" onClick={() => mark(anaerobic.no)} />
+                    <FaStar
+                      key={anaerobic.no}
+                      style={{ color: 'grey', fontSize: '30px', cursor: 'pointer' }}
+                      onClick={() => mark(anaerobic.no)}
+                    />
                   </Star>
                   <Content>
                     <div
@@ -343,7 +356,11 @@ const AnAerobic = () => {
               {shoulderExercises.map((anaerobic) => (
                 <Line key={anaerobic.no}>
                   <Star>
-                    <StarIcon src="/img/EmptyStar.png" onClick={() => mark(anaerobic.no)} />
+                    <FaStar
+                      key={anaerobic.no}
+                      style={{ color: 'grey', fontSize: '30px', cursor: 'pointer' }}
+                      onClick={() => mark(anaerobic.no)}
+                    />
                   </Star>
                   <Content>
                     <div
@@ -386,7 +403,11 @@ const AnAerobic = () => {
               {chestExercises.map((anaerobic) => (
                 <Line key={anaerobic.no}>
                   <Star>
-                    <StarIcon src="/img/EmptyStar.png" onClick={() => mark(anaerobic.no)} />
+                    <FaStar
+                      key={anaerobic.no}
+                      style={{ color: 'grey', fontSize: '30px', cursor: 'pointer' }}
+                      onClick={() => mark(anaerobic.no)}
+                    />
                   </Star>
                   <Content>
                     <div
@@ -429,7 +450,11 @@ const AnAerobic = () => {
               {coreExercises.map((anaerobic) => (
                 <Line key={anaerobic.no}>
                   <Star>
-                    <StarIcon src="/img/EmptyStar.png" onClick={() => mark(anaerobic.no)} />
+                    <FaStar
+                      key={anaerobic.no}
+                      style={{ color: 'grey', fontSize: '30px', cursor: 'pointer' }}
+                      onClick={() => mark(anaerobic.no)}
+                    />
                   </Star>
                   <Content>
                     <div
@@ -472,7 +497,11 @@ const AnAerobic = () => {
               {etcExercises.map((anaerobic) => (
                 <Line key={anaerobic.no}>
                   <Star>
-                    <StarIcon src="/img/EmptyStar.png" onClick={() => mark(anaerobic.no)} />
+                    <FaStar
+                      key={anaerobic.no}
+                      style={{ color: 'grey', fontSize: '30px', cursor: 'pointer' }}
+                      onClick={() => mark(anaerobic.no)}
+                    />
                   </Star>
                   <Content>
                     <div

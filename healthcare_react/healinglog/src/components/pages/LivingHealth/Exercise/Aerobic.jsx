@@ -12,6 +12,7 @@ import Btn from '../../../util/Btn';
 import Swal from 'sweetalert2';
 import { isTokenExpired, getRoleFromToken } from '../../../util/JwtUtil';
 import { BASE_URL } from '../../../services/config';
+import { FaStar } from 'react-icons/fa';
 
 const Aerobic = () => {
   const dispatch = useDispatch();
@@ -233,7 +234,11 @@ const Aerobic = () => {
               {bookmarkedAerobic.map((aerobic) => (
                 <Line key={aerobic.no}>
                   <Star>
-                    <StarIcon src="/img/Star.png" onClick={() => unmark(aerobic.no)} />
+                    <FaStar
+                      key={aerobic.no}
+                      style={{ color: 'black', fontSize: '30px', cursor: 'pointer' }}
+                      onClick={() => unmark(aerobic.no)}
+                    />
                   </Star>
                   <Content>
                     <div
@@ -276,7 +281,11 @@ const Aerobic = () => {
               {aerobic.map((aerobic) => (
                 <Line key={aerobic.no}>
                   <Star>
-                    <StarIcon src="/img/EmptyStar.png" onClick={() => mark(aerobic.no)} />
+                    <FaStar
+                      key={aerobic.no}
+                      style={{ color: 'grey', fontSize: '30px', cursor: 'pointer' }}
+                      onClick={() => mark(aerobic.no)}
+                    />
                   </Star>
                   <Content>
                     <div
