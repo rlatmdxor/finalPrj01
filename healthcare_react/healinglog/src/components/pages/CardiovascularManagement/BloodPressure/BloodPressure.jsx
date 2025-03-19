@@ -119,7 +119,7 @@ const fillWeekData = (data, year, week) => {
       const filteredData = data.filter((d) => d.day === date);
 
       return filteredData.length > 0
-        ? filteredData.sort((a, b) => a.time.localeCompare(b.time)) // 시간순 정렬
+        ? filteredData.sort((a, b) => a.time.localeCompare(b.time))
         : [{ day: date, systole: null, diastole: null, time: '00:00' }];
     })
     .flat();
@@ -132,7 +132,7 @@ const fillMonthData = (data, year, month) => {
       const filteredData = data.filter((d) => d.day === date);
 
       return filteredData.length > 0
-        ? filteredData.sort((a, b) => a.time.localeCompare(b.time)) // 시간순 정렬
+        ? filteredData.sort((a, b) => a.time.localeCompare(b.time))
         : [{ day: date, systole: null, diastole: null, time: '00:00' }];
     })
     .flat();
@@ -466,7 +466,6 @@ const BloodPressure = () => {
           .then((data) => {
             if (data == 1) {
               setNum((x) => x - 1);
-              console.log(num);
               Swal.fire({
                 title: '삭제되었습니다.',
                 icon: 'success',

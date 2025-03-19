@@ -19,7 +19,6 @@ import { close, open } from '../../../redux/modalSlice';
 import { isTokenExpired, getRoleFromToken } from '../../util/JwtUtil';
 import { BASE_URL } from '../../services/config';
 
-//모달 안의 버튼 컨테이너
 const ModalContainer = styled.div`
   display: flex;
   justify-content: end;
@@ -31,7 +30,6 @@ const ContentDiv = styled.div`
   width: 95%;
   display: grid;
   grid-template-rows: 40px 40px 1fr 50px 60px 55px 50px 100px 140px;
-  /* border: 1px solid #ccc; */
 `;
 const InputDiv = styled.div`
   width: 95%;
@@ -258,7 +256,6 @@ const ImageComponent = (props) => {
   return <img src={src} alt="Inserted" style={{ width: width || '50%', maxWidth: '100%', height: 'auto' }} />;
 };
 
-// 블록 렌더러 설정
 const blockRendererFn = (block, contentState) => {
   if (block.getType() === 'atomic') {
     const entity = contentState.getEntity(block.getEntityAt(0));
@@ -288,8 +285,8 @@ const BoardDetail = () => {
   }, [navi, token]);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
-  const [searchParams] = useSearchParams(); // 쿼리스트링 값 가져오기
-  const bno = searchParams.get('bno'); // 'bno' 키의 값 가져오기
+  const [searchParams] = useSearchParams();
+  const bno = searchParams.get('bno');
   const navigate = useNavigate();
   const [boardVo, setBoardVo] = useState({});
   const [f, setFiles] = useState([]);
@@ -343,7 +340,7 @@ const BoardDetail = () => {
   const handleDownload = (url, fileName) => {
     const a = document.createElement('a');
     a.href = url;
-    a.download = fileName || 'downloaded-file'; // 🔹 파일 이름 지정 가능
+    a.download = fileName || 'downloaded-file';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -751,7 +748,7 @@ const BoardDetail = () => {
                   id={item.id}
                   name="reportReasonzzz"
                   value={item.value}
-                  checked={radio == item.value} // ✅ 정확한 비교
+                  checked={radio == item.value}
                   onChange={handleChange}
                 />
                 <label htmlFor={item.id}>{item.label}</label>
@@ -802,7 +799,7 @@ const BoardDetail = () => {
               {f?.map((file, index) => (
                 <span
                   key={index}
-                  onClick={() => handleDownload(file.path, file.originName)} // ✅ URL만으로 다운로드 실행
+                  onClick={() => handleDownload(file.path, file.originName)}
                   style={{ cursor: 'pointer', color: 'blue', textDecoration: 'underline' }}
                 >
                   {file.originName}&nbsp;&nbsp;&nbsp;

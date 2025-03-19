@@ -29,7 +29,6 @@ public class BloodPressureController {
 
         try{
             List<BloodPressureVo> result = service.bloodPressureList(token);
-            System.out.println("result = " + result);
             return result;
         }catch (Exception e){
             e.printStackTrace();

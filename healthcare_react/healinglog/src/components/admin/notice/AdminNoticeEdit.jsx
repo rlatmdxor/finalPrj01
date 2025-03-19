@@ -171,7 +171,6 @@ const imagePlugin = createImagePlugin();
 const { Toolbar } = staticToolbarPlugin;
 const plugins = [staticToolbarPlugin, textAlignmentPlugin, linkPlugin, imagePlugin];
 
-// 이미지 렌더링 컴포넌트 (크기 조절 가능)
 const ImageComponent = (props) => {
   const { block, contentState } = props;
   const entity = contentState.getEntity(block.getEntityAt(0));
@@ -179,7 +178,6 @@ const ImageComponent = (props) => {
   return <img src={src} alt="Inserted" style={{ width: width || '50%', maxWidth: '100%', height: 'auto' }} />;
 };
 
-// 블록 렌더러 설정
 const blockRendererFn = (block, contentState) => {
   if (block.getType() === 'atomic') {
     const entity = contentState.getEntity(block.getEntityAt(0));
@@ -215,7 +213,6 @@ const AdminNoticeEdit = () => {
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         });
         const data = await response.json();
-        console.log('Fetched isRecommend:', data.isRecommend);
         const isRec = Number(data.isRecommend);
 
         setInputData(data.detailVo);

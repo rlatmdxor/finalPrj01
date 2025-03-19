@@ -17,10 +17,10 @@ import { BASE_URL } from '../../services/config';
 const NaviContainer = styled.div`
   display: grid;
   position: relative;
-  width: 500px; // 항목수에 비례해서 주시면 됩니다.
+  width: 500px;
   top: 20px;
   left: 40px;
-  grid-template-columns: 5fr 7fr 6fr; // 글자수만큼 fr 주면 됩니다. ex) 유산소 3글자니까 3fr
+  grid-template-columns: 5fr 7fr 6fr;
 `;
 const BottomDiv = styled.div`
   display: flex;
@@ -119,7 +119,6 @@ const ReportedReview = () => {
           .then((data) => {
             setSelectedItems([]);
             setNum((x) => x - 1);
-            console.log(num);
             Swal.fire({
               title: `${data}개의 게시글이 삭제되었습니다.`,
               icon: 'success',

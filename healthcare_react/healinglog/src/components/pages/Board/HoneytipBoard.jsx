@@ -127,7 +127,6 @@ const HoneytipBoard = () => {
       .then((data) => {
         if (data.length > 0) {
           dispatch(setTotalCount({ boardType, totalCount: data.length }));
-          // const pagedData = data.slice(offset, offset + boardLimit);
           setVoList(data);
         } else {
           dispatch(resetPaging({ boardType }));
@@ -153,8 +152,6 @@ const HoneytipBoard = () => {
     setNum((prev) => prev + 1);
   };
   const handleCategory = (e) => {
-    console.log(e.target.value);
-
     setSearchInput((prev) => {
       return {
         ...prev,

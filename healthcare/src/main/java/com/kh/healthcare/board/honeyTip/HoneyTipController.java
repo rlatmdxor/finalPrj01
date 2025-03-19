@@ -195,7 +195,6 @@ public class HoneyTipController {
     public List<HoneyTipCommentReportVo> reportedCommentList() {
         try{
             List<HoneyTipCommentReportVo> honeyTipCommentReportVoList = service.reportedCommentList();
-            System.out.println("honeyTipCommentReportVoList = " + honeyTipCommentReportVoList);
             return honeyTipCommentReportVoList;
         } catch (Exception e) {
             throw new IllegalStateException("CODE [ BOARD/ COMMENT / REPORTED / LIST ]");
