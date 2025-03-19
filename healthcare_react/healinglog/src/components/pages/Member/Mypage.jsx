@@ -101,9 +101,7 @@ const Mypage = () => {
 
     fetch(`${BASE_URL}/api/member/checkPhoneForModal`, {
       method: 'POST',
-      headers: {
-        // 'content-type': 'application/json',
-      },
+      headers: {},
       body: formDataForCheck,
     })
       .then((resp) => resp.text())
@@ -156,9 +154,7 @@ const Mypage = () => {
   }, []);
 
   //모달 리셋함수
-  const reset = () => {
-    // setNick(nick);
-  };
+  const reset = () => {};
 
   return (
     <>
@@ -571,7 +567,6 @@ const Mypage = () => {
             className="phone"
             type="text"
             maxLength="11"
-            // value={phone}
             onChange={(e) => setNewPhone(e.target.value)}
           />
           <CheckMsg isNoProblem={phoneCheckMsg === '사용 가능한 전화번호입니다.'}>{phoneCheckMsg}</CheckMsg>
@@ -936,7 +931,6 @@ const JoinInput = styled.input`
   border: 1px solid gray;
   padding-left: 20px;
   margin-bottom: 10px;
-  /* background-color: rgba(225, 227, 225, 1); */
   &::placeholder {
     color: #888;
     font-size: 16px;

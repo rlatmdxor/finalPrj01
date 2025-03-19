@@ -520,7 +520,6 @@ const ExReport = () => {
           <ChartPosition>
             <Chart
               chartType={selectedChartCalories}
-              // labels={caloriesChartData?.labels || []}
               labels={formattedCaloriesLabels}
               dataset={caloriesChartData?.datasets || []}
               width={100}

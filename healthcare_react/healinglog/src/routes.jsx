@@ -31,7 +31,6 @@ import AlcReport from './components/pages/LivingHealth/Alc/AlcReport';
 import CigaretteReport from './components/pages/LivingHealth/Cigarette/CigaretteReport';
 import ExHistory from './components/pages/LivingHealth/Exercise/ExHistory';
 import ExReport from './components/pages/LivingHealth/Exercise/ExReport';
-// import Exercising from './components/pages/LivingHealth/Exercise/Exercising';
 import DietCal from './components/pages/LivingHealth/Diet/DietCal';
 import DietReport from './components/pages/LivingHealth/Diet/DietReport';
 import ReportedHoneyBoard from './components/admin/honeyBoard/ReportedHoneyBoard';
@@ -97,7 +96,6 @@ export const routes = [
   { path: '/anaerobic/:name', component: <AnAerobicDetail /> },
   { path: '/exhistory', component: <ExHistory /> },
   { path: '/exreport', component: <ExReport /> },
-  // { path: '/exercising/:name', component: <Exercising /> },
   { path: '/board/write', component: <BoardWrite /> },
   { path: '/admin/usermanage', component: <AdminUserManage /> },
   { path: '/alc', component: <AlcReport /> },

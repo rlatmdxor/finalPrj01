@@ -15,7 +15,6 @@ const Navi = ({ target, tag, selected }) => {
   const isSelected = location.pathname === `/${target}`;
 
   const isSelected2 = selected === 'selected';
-  // const isSelected2 = '1';
 
   return (
     <>
@@ -56,8 +55,6 @@ const NaviBtn = styled.button`
   width: fit-content;
   height: 40px;
   font-size: 24px;
-  /* font-weight: bold; */
-  /* color: ${({ target, currentPath }) => (currentPath === `/${target}` ? 'black' : '#959595')}; */
   color: ${({ target, currentPath, isSelected, isSelected2 }) =>
     currentPath === `/${target}` || isSelected || isSelected2 ? 'black' : '#959595'};
   cursor: pointer;

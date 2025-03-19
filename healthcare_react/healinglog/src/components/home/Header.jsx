@@ -264,8 +264,6 @@ const Header = () => {
                     navi('/insulin');
                     checkPushCard(push.no);
                   } else if (replacedContent.includes('댓글')) {
-                    // dispatch(close('알림 내역'));
-                    // setIsOpen(false);
                     checkPushCard(push.no);
                     getBoardNo(push.enrollDate);
                     navi(`/board/detail?bno=${boardNo}`);
