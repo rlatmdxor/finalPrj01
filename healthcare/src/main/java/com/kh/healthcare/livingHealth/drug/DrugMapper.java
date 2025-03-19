@@ -64,5 +64,8 @@ public interface DrugMapper {
 
     void removeDrug(String userNo, List<String> vo);
 
-
+    @Select("""
+            SELECT NAME FROM MEMBER WHERE NO = ${userNo}
+            """)
+    String name(String userNo);
 }

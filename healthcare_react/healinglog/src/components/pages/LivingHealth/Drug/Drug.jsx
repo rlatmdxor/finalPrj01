@@ -76,6 +76,7 @@ const Drug = () => {
       setIsAuthorized(true);
     }
   }, [navi, token]);
+
   const dispatch = useDispatch();
   const initialInputData = { no: '', name: '', form: '', color1: '' };
   const initialCheckData = { no: '', memberNo: '1', notes: '' };
@@ -88,6 +89,7 @@ const Drug = () => {
   const [drugColor, setDrugColor] = useState([]);
   const [drugForm, setDrugForm] = useState([]);
   const [drugDel, setDrugDel] = useState([]);
+  const [name, setName] = useState('');
   const options = {
     method: 'post',
     headers: {
@@ -104,6 +106,24 @@ const Drug = () => {
     },
     body: JSON.stringify(checkedItem),
   };
+
+  useEffect(() => {
+    if (!isAuthorized) {
+      return;
+    }
+    fetch(`${BASE_URL}/api/drug/get/name`, {
+      method: 'post',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((resp) => {
+        return resp.text();
+      })
+      .then((data) => {
+        return setName(data);
+      });
+  }, []);
 
   useEffect(() => {
     if (!isAuthorized) {
@@ -248,7 +268,6 @@ const Drug = () => {
       }
     });
   };
-
   return (
     <>
       <Title>복용약</Title>
@@ -340,7 +359,7 @@ const Drug = () => {
         </BtnContainer>
 
         <MedisonTable
-          title="구승용 님의 현재 복용약"
+          title={`${name} 님의 현재 복용약`}
           MediSonData={drugVoList}
           setDrugDel={setDrugDel}
           drugDel={drugDel}

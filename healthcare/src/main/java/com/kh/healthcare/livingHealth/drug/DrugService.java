@@ -61,4 +61,11 @@ public class DrugService {
         String userNo = jwtUtil.getNo(token);
         mapper.removeDrug(userNo, vo);
     }
+
+    public String name(String token) {
+        token = token.replace("Bearer ", "");
+        String userNo = jwtUtil.getNo(token);
+        return mapper.name(userNo);
+
+    }
 }

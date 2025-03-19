@@ -45,6 +45,7 @@ const Drug1 = () => {
   const token = localStorage.getItem('token');
   const navi = useNavigate();
   const [isAuthorized, setIsAuthorized] = useState(false);
+  const [name, setName] = useState('');
   useEffect(() => {
     if (!token || isTokenExpired(token) || getRoleFromToken(token) == 'ROLE_ADMIN') {
       window.localStorage.removeItem('token');
@@ -119,6 +120,24 @@ const Drug1 = () => {
     });
   };
 
+  useEffect(() => {
+    if (!isAuthorized) {
+      return;
+    }
+    fetch(`${BASE_URL}/api/drug/get/name`, {
+      method: 'post',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((resp) => {
+        return resp.text();
+      })
+      .then((data) => {
+        return setName(data);
+      });
+  }, []);
+
   return (
     <>
       <Title> 복용약</Title>
@@ -131,7 +150,7 @@ const Drug1 = () => {
       </BtnContainer>
       <ContentLayout>
         <MedisonTable
-          title="구승용 님의 과거 복용약"
+          title={`${name} 님의 과거 복용약`}
           MediSonData={drugVoList}
           setDrugDel={setDrugDel}
           drugDel={drugDel}
