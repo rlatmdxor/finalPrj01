@@ -44,11 +44,11 @@ const NaviContainer = styled.div`
 const Drug1 = () => {
   const token = localStorage.getItem('token');
   const navi = useNavigate();
-  const [isAuthorized, setIsAuthorized] = useState(false); // 로그인 여부 체크
+  const [isAuthorized, setIsAuthorized] = useState(false);
   useEffect(() => {
     if (!token || isTokenExpired(token) || getRoleFromToken(token) == 'ROLE_ADMIN') {
-      window.localStorage.removeItem('token'); // 토큰 삭제
-      navi('/login'); // 로그인 페이지로 이동
+      window.localStorage.removeItem('token');
+      navi('/login');
       Swal.fire({
         icon: 'warning',
         title: '로그인이 필요합니다',
@@ -56,7 +56,7 @@ const Drug1 = () => {
         confirmButtonText: '확인',
       });
     } else {
-      setIsAuthorized(true); // 로그인 성공 시 데이터 요청 가능
+      setIsAuthorized(true);
     }
   }, [navi, token]);
 
@@ -86,17 +86,15 @@ const Drug1 = () => {
   const handleDel = () => {
     const checkedDrug = drugDel.filter((item) => item.isChecked).map((item) => item.no);
     Swal.fire({
-      title: '삭제하시겠습니까?', // 제목
-      icon: 'question', // 아이콘 유형 (warning, success, error 등)
-      showCancelButton: true, // 취소 버튼 표시
-      confirmButtonColor: '#3085d6', // 등록 버튼 색상
-      cancelButtonColor: '#d33', // 취소 버튼 색상
-      confirmButtonText: '등록', // 등록 버튼 텍스트
-      cancelButtonText: '취소', // 취소 버튼 텍스트
+      title: '삭제하시겠습니까?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: '등록',
+      cancelButtonText: '취소',
     }).then((result) => {
       if (result.isConfirmed) {
-        //패치 넣기
-
         fetch(`${BASE_URL}/api/drug/removeDrug`, {
           method: 'post',
           headers: {
@@ -114,11 +112,8 @@ const Drug1 = () => {
               confirmButtonText: '확인',
             });
           });
-        setDrugDel(
-          (prev) =>
-            prev
-              .filter((item) => !checkedDrug.includes(item.no)) // 삭제된 항목 제외
-              .map((item) => ({ ...item, isChecked: false })) // 나머지 체크 해제
+        setDrugDel((prev) =>
+          prev.filter((item) => !checkedDrug.includes(item.no)).map((item) => ({ ...item, isChecked: false }))
         );
       }
     });
