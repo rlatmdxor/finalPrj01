@@ -70,7 +70,7 @@ const AdminLogin = () => {
         alert(`환영합니다 ${nick}님`);
         navi('../../admin/usermanage');
       })
-      .catch((error) => console.error(`fetch 에러 발생:`, error));
+      .catch(() => {});
   };
 
   const { formData, handleInputChange, handleSubmit } = useFormData(initState, submitCallBack);

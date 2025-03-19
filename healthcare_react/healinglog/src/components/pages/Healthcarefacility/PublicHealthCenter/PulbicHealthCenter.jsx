@@ -88,38 +88,38 @@ const PublicHealthCenter = ({}) => {
   const endPage = useSelector((state) => state.paging[boardType]?.endPage || 5);
   const offset = (currentPage - 1) * boardLimit;
 
-  // 📌 초기 페이징 상태 리셋
+  // 초기 페이징 상태 리셋
   useEffect(() => {
     dispatch(resetPaging({ boardType }));
   }, []);
 
-  // 📌 시 데이터 가져오기
+  // 시 데이터 가져오기
   useEffect(() => {
     fetch(`${BASE_URL}/api/location/cities`)
       .then((res) => res.json())
       .then((data) => setCities(data))
-      .catch((error) => console.error('시 데이터 로드 실패:', error));
+      .catch(() => {});
   }, []);
 
-  // 📌 군/구 데이터 가져오기
+  // 군/구 데이터 가져오기
   useEffect(() => {
     if (selectedCity) {
       fetch(`${BASE_URL}/api/location/districts/${selectedCity}`)
         .then((res) => res.json())
         .then((data) => setDistricts(data))
-        .catch((error) => console.error('구 데이터 로드 실패:', error));
+        .catch(() => {});
     } else {
       setDistricts([]);
     }
   }, [selectedCity]);
 
-  // 📌 동 데이터 가져오기
+  // 동 데이터 가져오기
   useEffect(() => {
     if (selectedDistrict) {
       fetch(`${BASE_URL}/api/location/dongs/${selectedDistrict}`)
         .then((res) => res.json())
         .then((data) => setDongs(data))
-        .catch((error) => console.error('동 데이터 로드 실패:', error));
+        .catch(() => {});
     } else {
       setDongs([]);
     }
@@ -166,7 +166,6 @@ const PublicHealthCenter = ({}) => {
 
       setPhcs(data.phcs || []);
     } catch (error) {
-      console.error('검색 오류:', error);
       setPhcs([]);
     }
     setLoading(false);
@@ -218,9 +217,7 @@ const PublicHealthCenter = ({}) => {
       });
       const data = await response.json();
       if (data) setPhcM(data); // 보건소 정보 저장
-    } catch (error) {
-      console.error('보건소 데이터 불러오기 오류:', error);
-    }
+    } catch (error) {}
   };
 
   useEffect(() => {
@@ -245,10 +242,9 @@ const PublicHealthCenter = ({}) => {
     }
   }, []);
 
-  // ✅ 네이버 지도 생성 (phcM 값이 있을 때 실행)
+  // 네이버 지도 생성 (phcM 값이 있을 때 실행)
   useEffect(() => {
     if (!phcM || !phcM.locationX || !phcM.locationY) {
-      console.warn('🚨 위치 정보가 올바르지 않음:', phcM);
       return;
     }
 
@@ -365,7 +361,6 @@ const PublicHealthCenter = ({}) => {
                     location_x: phc.location_x,
                     location_y: phc.location_y,
                   });
-                  console.log(phc.no);
                   fetchPhcs(phc.no);
                   setIsOpen(true);
                   dispatch(open({ title: '보건소', value: 'block' }));

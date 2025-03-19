@@ -7,7 +7,6 @@ import Chart from '../../../util/Chart';
 import Table from '../../../util/Table';
 import Btn from '../../../util/Btn';
 import Pagination from '../../../util/Pagination';
-import Navi from '../../../util/Navi';
 import Modal from '../../../util/Modal';
 import InputTag from '../../../util/Input';
 
@@ -32,15 +31,6 @@ const BtnContainer = styled.div`
 const ModalContainer = styled.div`
   display: flex;
   justify-content: end;
-`;
-
-const NaviContainer = styled.div`
-  display: grid;
-  position: relative;
-  width: 400px; // 항목수에 비례해서 주시면 됩니다.
-  top: 20px;
-  left: 40px;
-  grid-template-columns: 3fr 3fr; // 글자수만큼 fr 주면 됩니다. ex) 유산소 3글자니까 3fr
 `;
 
 const YearDiv = styled.div`
@@ -141,8 +131,6 @@ const AlcReport = () => {
   const offset = Math.max((currentPage - 1) * boardLimit, 0);
 
   const [selectedDrink, setSelectedDrink] = useState(null);
-  const [alcoholAmount, setAlcoholAmount] = useState('');
-  const [alcoholIntake, setAlcoholIntake] = useState(0);
 
   const alcoholOptions = [
     { name: '소주', alc: 17, cc: 50 },
@@ -197,7 +185,7 @@ const AlcReport = () => {
           setFullData([]);
         }
       })
-      .catch((error) => console.error('데이터 불러오기 실패:', error));
+      .catch(() => {});
   }, [isAuthorized, token]);
 
   // 테이블 페이징 처리
@@ -207,8 +195,6 @@ const AlcReport = () => {
 
   // 차트용 필터링 데이터의 마지막 기록 날짜를 기준으로 최근 7일간의 데이터와 해당 날짜가 포함된 달의 데이터를 가져옴
   const filterData = (type) => {
-    // const today = new Date(); // 오늘 날짜 가져오기
-
     //데이터의 최근날짜
     const voList = [];
 
@@ -251,11 +237,6 @@ const AlcReport = () => {
 
     return fullData; // 전체 기간
   };
-
-  // // 처음에 일주일 데이터 로드
-  // useEffect(() => {
-  //   setFilteredData(filterData('week'));
-  // }, [fullData]);
 
   const dataBtn = ['월', '년'];
 
@@ -316,7 +297,6 @@ const AlcReport = () => {
       const data = await response.json();
       return data;
     } catch (error) {
-      console.error('데이터 불러오기 실패:', error);
       return [];
     }
   };
@@ -356,14 +336,11 @@ const AlcReport = () => {
         }
 
         setFilteredData(filteredData);
-      } catch (error) {
-        console.error('[ERROR] GET DATA', error);
-      }
+      } catch (error) {}
     };
 
     fetchData();
   }, [selectedRange, year, month]);
-  //테스트
 
   // 날짜 기준 오름차순 정렬 (과거 → 현재)
   const sortedData = [...filteredData].sort(
@@ -388,16 +365,6 @@ const AlcReport = () => {
 
     return dateStr;
   });
-
-  const displayLabels = labels.map((label) => {
-    const date = new Date(label);
-    return isNaN(date.getTime()) ? label : `${date.getDate()}일`;
-  });
-
-  const getDaysConsumed = (enrollDate) => {
-    const end = new Date(enrollDate);
-    return Math.ceil(end / (1000 * 60 * 60 * 24)) + 1; // 시작일부터 포함하여 계산
-  };
 
   const alcList = [];
 
@@ -436,16 +403,6 @@ const AlcReport = () => {
     setSelectedDrink(drink);
   };
 
-  // 알코올 섭취량 계산
-  const calculateAlcoholIntake = () => {
-    if (selectedDrink && alcoholAmount) {
-      const intake = (selectedDrink.alc / 100) * parseFloat(alcoholAmount);
-      setAlcoholIntake(intake.toFixed(2));
-    } else {
-      setAlcoholIntake(0);
-    }
-  };
-
   //인풋 안 쪽에 들어가는 데이터 ~~~Vo에 들어있는 이름으로 맞춰주기
   const initialInputData = { alcType: '', abv: '', cc: '', enrollDate: '' };
   // 모달 안 쪽 인풋에 데이터 관리
@@ -467,8 +424,6 @@ const AlcReport = () => {
       };
     });
   };
-
-  // 인풋 입력값 보내기
 
   const handleSubmit = (e) => {
     Swal.fire({
@@ -510,7 +465,6 @@ const AlcReport = () => {
             });
           })
           .catch((error) => {
-            console.error('등록 실패:', error);
             Swal.fire({
               title: '등록 실패',
               text: '오류가 발생했습니다. 다시 시도해주세요.',
@@ -563,7 +517,6 @@ const AlcReport = () => {
             });
           })
           .catch((error) => {
-            console.error('수정 실패:', error);
             // 수정 실패 시 알림
             Swal.fire({
               title: '수정 실패',
@@ -612,15 +565,12 @@ const AlcReport = () => {
               icon: 'success',
               confirmButtonColor: '#3085d6',
             }).then(() => {
-              // 모달 닫기
               dispatch(close('음주 수정'));
               // 필요 시 페이지 새로고침
               window.location.reload();
             });
           })
           .catch((error) => {
-            console.error('삭제 실패:', error);
-            // 삭제 실패 시 메시지
             Swal.fire({
               title: '삭제 실패',
               text: '오류가 발생했습니다. 다시 시도해주세요.',
@@ -720,9 +670,6 @@ const AlcReport = () => {
                 value={inputData.cc}
                 mb="10"
                 mt="5"
-                // value={alcoholAmount}
-                // onChange={(e) => setAlcoholAmount(e.target.value)}
-                // onBlur={calculateAlcoholIntake}
                 f={handleChange}
               />
 
@@ -735,12 +682,10 @@ const AlcReport = () => {
                 mb="10"
                 mt="5"
                 value={inputData.enrollDate}
-                // onChange={(e) => setDrinkDate(e.target.value)}
                 f={handleChange}
               />
             </div>
 
-            {/* 오른쪽 설명 텍스트 */}
             <div style={{ fontSize: '14px', color: '#555' }}>
               <table border="0" style={{ width: '100%', textAlign: 'center' }}>
                 <thead>
@@ -767,28 +712,18 @@ const AlcReport = () => {
                   ))}
                 </tbody>
               </table>
-
-              {/* 추가된 알코올 섭취량 표시 */}
-              {/* <div style={{ marginTop: '20px', padding: '10px', border: '1px solid #ddd' }}>
-                <h4>섭취한 총 알코올 양:</h4>
-                <p style={{ fontSize: '20px', fontWeight: 'bold', color: '#FF7F50' }}>{alcoholIntake} ml</p>
-              </div> */}
             </div>
           </div>
           <ModalContainer>
             <Btn
               title={'음주 등록'}
-              // 인풋 입력값 보내기
               f={handleSubmit}
-              //margin top bottom right
               mt={'10'}
               mb={'20'}
               mr={'-10'}
-              // background color
               c={'#FF7F50'}
               // font color
               fc={'white'}
-              // 화면에 노출되는 버튼 안 쪽 내용
               str={'등록'}
             ></Btn>
           </ModalContainer>
@@ -796,7 +731,6 @@ const AlcReport = () => {
 
         <Modal title="음주 수정">
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-            {/* 왼쪽 입력 폼 */}
             <div>
               <InputTag
                 type="text"
@@ -808,7 +742,6 @@ const AlcReport = () => {
                 mb="10"
                 mt="5"
                 f={handleChange}
-                // value={selectedDrink ? selectedDrink.name : ''}
               />
 
               <InputTag
@@ -821,7 +754,6 @@ const AlcReport = () => {
                 mb="10"
                 mt="5"
                 f={handleChange}
-                // value={selectedDrink ? selectedDrink.alc : ''}
               />
 
               <InputTag
@@ -833,9 +765,6 @@ const AlcReport = () => {
                 value={inputData.cc}
                 mb="10"
                 mt="5"
-                // value={alcoholAmount}
-                // onChange={(e) => setAlcoholAmount(e.target.value)}
-                // onBlur={calculateAlcoholIntake}
                 f={handleChange}
               />
 
@@ -848,7 +777,6 @@ const AlcReport = () => {
                 mb="10"
                 mt="5"
                 value={inputData.enrollDate}
-                // onChange={(e) => setDrinkDate(e.target.value)}
                 f={handleChange}
               />
             </div>
@@ -880,12 +808,6 @@ const AlcReport = () => {
                   ))}
                 </tbody>
               </table>
-
-              {/* 추가된 알코올 섭취량 표시 */}
-              {/* <div style={{ marginTop: '20px', padding: '10px', border: '1px solid #ddd' }}>
-                <h4>섭취한 총 알코올 양:</h4>
-                <p style={{ fontSize: '20px', fontWeight: 'bold', color: '#FF7F50' }}>{alcoholIntake} ml</p>
-              </div> */}
             </div>
           </div>
           <ModalContainer>
@@ -938,7 +860,6 @@ const AlcReport = () => {
                       alc: vo.alc,
                       enrollDate: vo.enrollDate,
                     });
-                    //모달 열기
                     dispatch(open({ title: '음주 수정', value: 'block' }));
                   }}
                 >
