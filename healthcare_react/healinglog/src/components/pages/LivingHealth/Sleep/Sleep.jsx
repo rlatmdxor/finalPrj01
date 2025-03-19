@@ -47,12 +47,12 @@ const ModalContainer = styled.div`
 const Sleep = () => {
   const navi = useNavigate();
   const token = localStorage.getItem('token');
-  const [isAuthorized, setIsAuthorized] = useState(false); // 로그인 여부 체크
+  const [isAuthorized, setIsAuthorized] = useState(false);
 
   useEffect(() => {
     if (!token || isTokenExpired(token) || getRoleFromToken(token) == 'ROLE_ADMIN') {
-      window.localStorage.removeItem('token'); // 토큰 삭제
-      navi('/login'); // 로그인 페이지로 이동
+      window.localStorage.removeItem('token');
+      navi('/login');
       Swal.fire({
         icon: 'warning',
         title: '로그인이 필요합니다',
@@ -60,7 +60,7 @@ const Sleep = () => {
         confirmButtonText: '확인',
       });
     } else {
-      setIsAuthorized(true); // 로그인 성공 시 데이터 요청 가능
+      setIsAuthorized(true);
     }
   }, [navi, token]);
 
@@ -86,7 +86,7 @@ const Sleep = () => {
   const now = new Date();
   const [state, setState] = useState(0);
   const currentYear = String(now.getFullYear() + state);
-  const yearStartDay = subYears(startOfYear(now), -state); // 올해 1월 1일
+  const yearStartDay = subYears(startOfYear(now), -state);
 
   const [monthList, setMonthList] = useState([]);
   const [monthLabels, setMonthLabels] = useState([]);
@@ -106,18 +106,18 @@ const Sleep = () => {
 
   let uniqueDaysInWeek = new Set();
 
-  let matchedDay = 0; // let으로 선언하여 값을 변경 가능하게 설정
-  let daySleepDuration = 0; // 수면 지속 시간 초기화
+  let matchedDay = 0;
+  let daySleepDuration = 0;
 
-  let startDay = addDays(startOfMonth(addMonths(now, state)), 1); // state에 따라 시작일을 설정
-  let endDay = addDays(endOfMonth(addMonths(now, state)), 1); // state에 따라 종료일을 설정
-  let MonthStartDay = addDays(startOfMonth(addMonths(now, state)), 1); // state에 따라 시작일을 설정
-  let MonthEndDay = addDays(endOfMonth(addMonths(now, state)), 1); // state에 따라 종료일을 설정
+  let startDay = addDays(startOfMonth(addMonths(now, state)), 1);
+  let endDay = addDays(endOfMonth(addMonths(now, state)), 1);
+  let MonthStartDay = addDays(startOfMonth(addMonths(now, state)), 1);
+  let MonthEndDay = addDays(endOfMonth(addMonths(now, state)), 1);
   let currentDay = startDay.toISOString().split('T')[0];
 
   useEffect(() => {
     const endDayStr = endDay.toISOString().split('T')[0];
-    // 전체 데이터를 날짜별로 정렬 (정렬이 되어있지 않다면)
+
     dataVoList.sort((a, b) => new Date(a.day) - new Date(b.day));
 
     for (const vo of dataVoList) {
@@ -126,38 +126,35 @@ const Sleep = () => {
       }
 
       while (currentDay < vo.day) {
-        const hours = Math.floor(daySleepDuration / matchedDay / 60); // 정수 시간
-        // 현재 날짜에 해당하는 데이터가 없으면 0 추가
+        const hours = Math.floor(daySleepDuration / matchedDay / 60);
+
         TempDayList.push(matchedDay > 0 ? hours : 0);
         matchedDay = 0;
         daySleepDuration = 0;
         startDay = addDays(startDay, 1);
-        currentDay = startDay.toISOString().split('T')[0]; // 날짜 업데이트
+        currentDay = startDay.toISOString().split('T')[0];
       }
 
-      // 현재 날짜와 vo.day가 일치하면 sleepDuration 합산
       if (vo.day === currentDay) {
         daySleepDuration += Number(vo.sleepDuration);
         matchedDay++;
       }
     }
 
-    // 해당 달에 데이터가 하나도 없을 경우 0을 채워넣기
     if (TempDayList.length === 0) {
       let currentDay = startDay.toISOString().split('T')[0];
       while (currentDay <= endDayStr) {
         TempDayList.push(0);
         startDay = addDays(startDay, 1);
-        currentDay = startDay.toISOString().split('T')[0]; // 날짜 업데이트
+        currentDay = startDay.toISOString().split('T')[0];
       }
     }
 
-    // 마지막 데이터 추가
     if (matchedDay > 0) {
-      const hours = Math.floor(daySleepDuration / matchedDay / 60); // 정수 시간
+      const hours = Math.floor(daySleepDuration / matchedDay / 60);
       TempDayList.push(hours);
     }
-    // 최종 리스트 저장
+
     setDayList(TempDayList);
   }, [num, dataVoList.length, state]);
 
@@ -166,16 +163,14 @@ const Sleep = () => {
     let monthLabels = [];
     let monthList = [];
 
-    // 월별 날짜 리스트 만들기
     while (MonthStartDay <= MonthEndDay) {
       TempDayLabels.push(MonthStartDay.toISOString().split('T')[0].slice(5, 10));
-      MonthStartDay = addDays(startOfDay(MonthStartDay), 1); // 하루씩 증가
+      MonthStartDay = addDays(startOfDay(MonthStartDay), 1);
     }
     if (TempDayLabels.length > 0) {
-      setDayLabels(TempDayLabels); // 월별 날짜 설정
+      setDayLabels(TempDayLabels);
     }
 
-    // 월별 데이터 처리
     const monthCount = Array.from({ length: 12 }, () => 0);
     let lastDate = '';
 
@@ -183,7 +178,7 @@ const Sleep = () => {
       for (const vo of dataVoList) {
         if (vo.day.slice(5, 7) === String(i + 1).padStart(2, '0') && vo.day.slice(0, 4) === currentYear) {
           if (lastDate !== vo.day) {
-            monthCount[i] += 1; // 중복되는 날짜는 세지 않음
+            monthCount[i] += 1;
             lastDate = vo.day;
           }
         }
@@ -193,22 +188,20 @@ const Sleep = () => {
     let x = 0;
     for (let i = 0; i < 12; i++) {
       monthLabels.push(i + 1 + '월');
-      x = 0; // 누적 초기화
+      x = 0;
       for (const vo of dataVoList) {
         if (vo.day.slice(5, 7) === String(i + 1).padStart(2, '0') && vo.day.slice(0, 4) === currentYear) {
-          x += Number(vo.sleepDuration); // 수면 시간 누적
+          x += Number(vo.sleepDuration);
         }
       }
 
-      // 평균 계산: monthCount[i]가 0이 아닌 경우에만 평균 계산
       if (monthCount[i] > 0) {
-        monthList.push(Math.floor(x / monthCount[i] / 60)); // 월별 평균
+        monthList.push(Math.floor(x / monthCount[i] / 60));
       } else {
-        monthList.push(0); // 데이터가 없으면 0
+        monthList.push(0);
       }
     }
 
-    // 월별 데이터 업데이트
     setMonthLabels(monthLabels);
     setMonthList(monthList);
   }, [dataVoList.length, state, num]);
@@ -219,20 +212,17 @@ const Sleep = () => {
       const currentDate = addDays(yearStartDay, i);
       const currentDateStr = currentDate.toISOString().split('T')[0];
 
-      // 날짜와 일치하는 데이터를 찾기
       const matchedVo = dataVoList.find((vo) => vo.day === currentDateStr);
 
-      // 주에 입력된 날짜가 며칠인지 확인
       if (matchedVo) {
         weekSleepDuration += Number(matchedVo.sleepDuration);
         uniqueDaysInWeek.add(currentDateStr);
       }
 
-      // 7일(1주)마다 데이터를 저장하고 초기화
       if (dayCounter === 7) {
-        removeDate[weekCounter] = uniqueDaysInWeek.size; // 주별 입력된 고유 날짜 개수 저장
+        removeDate[weekCounter] = uniqueDaysInWeek.size;
         TempWeekList.push(Math.floor(weekSleepDuration / removeDate[weekCounter] / 60));
-        TempWeekLables.push(weekCounter + 1 + '주'); // 주 레이블 추가
+        TempWeekLables.push(weekCounter + 1 + '주');
         weekCounter++;
         weekSleepDuration = 0;
         dayCounter = 0;
@@ -240,16 +230,14 @@ const Sleep = () => {
       }
     }
 
-    // 365일이라 1일~6일 남은 경우 처리 (마지막 주 데이터 추가)
     if (dayCounter > 0) {
       removeDate[weekCounter] = uniqueDaysInWeek.size;
       TempWeekList.push(weekSleepDuration / removeDate[weekCounter]);
-      TempWeekLables.push(weekCounter + 1 + '주'); // 마지막 주 레이블 추가
+      TempWeekLables.push(weekCounter + 1 + '주');
     }
 
-    // 최종 데이터 세팅
     setWeekList(TempWeekList);
-    setWeekLabels(TempWeekLables); // 주 레이블 업데이트
+    setWeekLabels(TempWeekLables);
   }, [dataVoList.length, state, num]);
 
   useEffect(() => {
@@ -332,8 +320,8 @@ const Sleep = () => {
         'rgba(153, 102, 255, 1)',
         'rgba(255, 159, 64, 1)',
         'rgba(201, 203, 207, 1)',
-      ], // 테두리 색상
-      borderWidth: 1, // 테두리 두께
+      ],
+      borderWidth: 1,
     },
   ];
 
@@ -392,13 +380,13 @@ const Sleep = () => {
       return;
     }
     Swal.fire({
-      title: '등록하시겠습니까?', // 제목
-      icon: 'success', // 아이콘 유형 (warning, success, error 등)
-      showCancelButton: true, // 취소 버튼 표시
-      confirmButtonColor: '#3085d6', // 등록 버튼 색상
-      cancelButtonColor: '#d33', // 취소 버튼 색상
-      confirmButtonText: '등록', // 등록 버튼 텍스트
-      cancelButtonText: '취소', // 취소 버튼 텍스트
+      title: '등록하시겠습니까?',
+      icon: 'success',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: '등록',
+      cancelButtonText: '취소',
     }).then((result) => {
       if (result.isConfirmed) {
         fetch(`${BASE_URL}/api/sleep/write`, options)
@@ -418,17 +406,15 @@ const Sleep = () => {
     }
 
     Swal.fire({
-      title: '수정하시겠습니까?', // 제목
-      icon: 'question', // 아이콘 유형 (warning, success, error 등)
-      showCancelButton: true, // 취소 버튼 표시
-      confirmButtonColor: '#3085d6', // 등록 버튼 색상
-      cancelButtonColor: '#d33', // 취소 버튼 색상
-      confirmButtonText: '수정', // 등록 버튼 텍스트
-      cancelButtonText: '취소', // 취소 버튼 텍스트
+      title: '수정하시겠습니까?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: '수정',
+      cancelButtonText: '취소',
     }).then((result) => {
       if (result.isConfirmed) {
-        //패치 넣기
-
         fetch(`${BASE_URL}/api/sleep/edit`, options)
           .then((resp) => resp.text())
           .then((data) => {
@@ -458,17 +444,15 @@ const Sleep = () => {
     }
 
     Swal.fire({
-      title: '삭제하시겠습니까?', // 제목
-      icon: 'question', // 아이콘 유형 (warning, success, error 등)
-      showCancelButton: true, // 취소 버튼 표시
-      confirmButtonColor: '#3085d6', // 등록 버튼 색상
-      cancelButtonColor: '#d33', // 취소 버튼 색상
-      confirmButtonText: '삭제', // 등록 버튼 텍스트
-      cancelButtonText: '취소', // 취소 버튼 텍스트
+      title: '삭제하시겠습니까?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: '삭제',
+      cancelButtonText: '취소',
     }).then((result) => {
       if (result.isConfirmed) {
-        //패치 넣기
-
         fetch(`${BASE_URL}/api/sleep/del`, options)
           .then((resp) => resp.text())
           .then((data) => {
