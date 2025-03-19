@@ -33,7 +33,7 @@ public class SecurityConfig {
             CorsConfiguration conf = new CorsConfiguration();
             conf.addAllowedOriginPattern("http://localhost:3000");
             conf.addAllowedOriginPattern("http://healinglog-react.s3.ap-northeast-2.amazonaws.com");
-            conf.addAllowedOriginPattern("http://d3e15pchphfv7e.cloudfront.net");
+            conf.addAllowedOriginPattern("http://dgp308zgwxy9o.cloudfront.net");
             conf.addAllowedMethod("*");
             conf.addAllowedHeader("*");
             conf.setAllowCredentials(true); // 웹소켓 때문에 해놈
