@@ -64,7 +64,6 @@ const LayoutDiv = styled.div`
   grid-template-columns: 1fr 175px;
   grid-template-rows: 1fr 1fr 1fr;
   margin-right: 50px;
-  /* row-gap: 10px; */
 `;
 
 const DaumBtn = styled.button`

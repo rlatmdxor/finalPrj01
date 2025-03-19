@@ -25,7 +25,6 @@ const DateBtn2 = ({ dataBtn, onSelect, onChange }) => {
 
   const handleSelect = (event) => {
     onChange(event.target.value);
-    // onChange(document.querySelector('select').value);
   };
 
   return (

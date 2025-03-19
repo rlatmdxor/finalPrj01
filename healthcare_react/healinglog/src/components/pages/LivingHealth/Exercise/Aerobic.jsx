@@ -417,7 +417,6 @@ const StarIcon = styled.img`
 
 const BookmarkList = styled.div`
   display: grid;
-  /* grid-column: span 2; */
   grid-template-rows: 1fr;
   grid-auto-rows: 50px;
   justify-self: center;

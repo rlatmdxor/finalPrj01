@@ -85,18 +85,7 @@ const Profile = () => {
         />
       </ProfileContainer>
       <BtnContainer>
-        <Btn
-          str="삭제"
-          f={handleFileDelete}
-          c={theme.gray}
-          // w={'90'}
-          // h={'50'}
-          // fs={'20'}
-          mt={'0'}
-          mb={'0'}
-          ml={'0'}
-          mr={'0'}
-        ></Btn>
+        <Btn str="삭제" f={handleFileDelete} c={theme.gray} mt={'0'} mb={'0'} ml={'0'} mr={'0'}></Btn>
       </BtnContainer>
       <div></div>
     </>

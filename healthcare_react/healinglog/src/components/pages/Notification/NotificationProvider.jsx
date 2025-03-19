@@ -20,7 +20,6 @@ const NotificationProvider = ({ children }) => {
         Authorization: `Bearer ${token}`,
       }, //토큰 전송
       onConnect: () => {
-        console.log('✅ 웹소켓 연결 성공');
         // 서버에서 오는 알림 구독
         client.subscribe('/topic/notifications', (message) => {
           const notification = message.body;

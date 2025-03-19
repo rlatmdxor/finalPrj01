@@ -2,7 +2,6 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import Title from '../../util/Title';
-// import LoginInput from '../../util/LoginInput';
 import { useFormData } from '../../util/useFormData';
 import { useDispatch } from 'react-redux';
 import { getPayload } from '../../util/JwtUtil';
@@ -42,7 +41,6 @@ const LoginPage = () => {
 
           return;
         }
-        // console.log('token ::: ', token);
         localStorage.setItem('token', token);
 
         const no = getPayload(token, 'no');
@@ -109,16 +107,12 @@ const Layout = styled.div`
   display: grid;
   width: 600px;
   height: 300px;
-  /* margin-top: 100px; */
   justify-self: center;
-  /* margin-left: 380px; */
 `;
 
 const LinkLayout = styled(Link)`
   text-decoration: none;
   color: gray;
-  /* margin-left: 370px;
-  margin-right: -330px; */
 `;
 
 const Btn = styled.button`
