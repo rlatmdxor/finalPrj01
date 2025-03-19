@@ -30,40 +30,6 @@ const ContentDiv = styled.div`
   width: 95%;
   display: grid;
   grid-template-rows: 40px 40px 1fr 50px 60px 105px 100px 140px;
-  /* border: 1px solid #ccc; */
-`;
-const InputDiv = styled.div`
-  width: 95%;
-  height: 40px;
-  display: grid;
-  grid-template-columns: 130px 170px 130px 150px 130px 1fr 80px;
-
-  & .form-label {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #d3ebcf;
-    color: #32383f;
-    font-weight: 600;
-    font-size: 14px;
-    padding: 2px 0px;
-    text-align: center;
-    height: 35px;
-  }
-  & .form-input {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  & select,
-  input {
-    box-sizing: border-box;
-    width: 100%;
-    height: 40px;
-    font-size: 14px;
-    border: 1px solid #ccc;
-    padding: 0px 8px;
-  }
 `;
 
 const InputDiv2 = styled.div`
@@ -91,7 +57,6 @@ const InputDiv2 = styled.div`
     align-items: center;
     box-sizing: border-box;
     width: 100%;
-    /* height: 40px; */
     font-size: 14px;
     border: 1px solid #ccc;
     padding: 0px 8px;
@@ -170,15 +135,7 @@ const EditorDiv = styled.div`
   padding: 10px;
   margin-top: 8px;
 `;
-const attachLayDiv = styled.div`
-  width: 95%;
-`;
 
-const BottomDiv = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
 const MinDiv = styled.div`
   width: 95%;
   display: grid;
@@ -216,7 +173,7 @@ const ThumbsupDiv = styled.div`
 `;
 const CommentWriteDiv = styled.div`
   width: 95%;
-  border: 1px solid #ccc;
+  padding-left: 25px;
   display: grid;
   grid-template-columns: 7fr 1fr;
 `;
@@ -232,28 +189,27 @@ const CommentBtnArea = styled.div`
 `;
 const CommentListDiv = styled.div`
   width: 95%;
-  border: 1px solid #ccc;
   display: grid;
-  grid-template-rows: 15px 1fr;
-`;
-const SamhangDiv = styled.div`
-  display: flex;
-  justify-content: end;
+  grid-template-rows: 1fr;
   border-top: 1px solid #ccc;
 `;
+
 const CommentDiv = styled.div`
   display: grid;
-  grid-template-columns: 1fr 7fr 1fr;
+  grid-template-columns: 1fr 7fr 0.85fr 0.5fr;
+  min-height: 65px;
+  border-bottom: 1px solid #ccc;
 `;
 const MiddleStartDiv = styled.div`
   display: flex;
   justify-content: center;
-  align-items: start;
+  align-items: center;
 `;
 const StartStartDiv = styled.div`
   display: flex;
   justify-content: start;
-  align-items: start;
+  align-items: center;
+  margin: 15px;
 `;
 const LayoutTextarea = styled.textarea`
   width: 90%;
@@ -262,10 +218,7 @@ const LayoutTextarea = styled.textarea`
   border-radius: 10px;
   resize: none; /* 크기 조정 방지 */
 `;
-const StyledSpan = styled.span`
-  cursor: pointer;
-  color: darkgray;
-`;
+
 const ModalDiv = styled.div``;
 
 const ReportDiv = styled.div`
@@ -278,6 +231,19 @@ const ReportDiv = styled.div`
 `;
 const LayDiv = styled.div`
   height: 30px;
+`;
+const DelDiv = styled.div`
+  display: flex;
+  justify-content: start;
+  align-items: end;
+  color: red;
+  cursor: pointer;
+`;
+
+const TimeDiv = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 
 const staticToolbarPlugin = createToolbarPlugin();
@@ -847,34 +813,35 @@ const ReviewDetail = () => {
             <Btn str={'등록하기'} c={'#d3ebcf'} fc={'black'} h={'80'} w={'100'} f={handleEnrollComment} />
           </CommentBtnArea>
         </CommentWriteDiv>
+        <LayDiv />
+        <LayDiv />
         <CommentListDiv>
           {commentList?.map((vo) => {
             return (
               <>
-                <SamhangDiv>
-                  {vo.memberNo == userNo || isAdmin ? (
-                    <>
-                      <StyledSpan commentNo={vo.no} onClick={handleFetchDeleteComment}>
-                        삭제하기
-                      </StyledSpan>
-                    </>
-                  ) : (
-                    <StyledSpan value={vo.no} onClick={handleReportModalOpen}>
-                      신고하기
-                    </StyledSpan>
-                  )}
-                </SamhangDiv>
-
                 <CommentDiv>
                   <MiddleStartDiv>{vo.nick}</MiddleStartDiv>
                   <StartStartDiv>{vo.content}</StartStartDiv>
-                  <MiddleStartDiv>{vo.enrollDate}</MiddleStartDiv>
+                  <TimeDiv>{vo.enrollDate}</TimeDiv>
+                  {vo.memberNo == userNo || isAdmin ? (
+                    <>
+                      <DelDiv commentNo={vo.no} onClick={handleFetchDeleteComment}>
+                        삭제하기
+                      </DelDiv>
+                    </>
+                  ) : (
+                    <DelDiv value={vo.no} onClick={handleReportModalOpen}>
+                      신고하기
+                    </DelDiv>
+                  )}
                 </CommentDiv>
               </>
             );
           })}
         </CommentListDiv>
       </ContentDiv>
+      <LayDiv />
+      <LayDiv />
       <LayDiv />
     </>
   );
