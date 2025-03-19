@@ -15,7 +15,6 @@ public class AlcCalenderController {
 
     @PostMapping("list")
     public List<AlcCalenderVo> alcCalenderVoList(@RequestBody AlcCalenderVo vo) {
-        System.out.println("vo = " + vo);
 
         return service.list(vo.getMemberNo());
     }
@@ -23,7 +22,6 @@ public class AlcCalenderController {
     @PostMapping("write")
     public String write(@RequestBody AlcCalenderVo vo) {
         service.write(vo);
-        System.out.println("vo = " + vo);
         return "write";
     }
 
